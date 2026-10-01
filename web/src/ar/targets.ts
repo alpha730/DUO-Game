@@ -11,7 +11,10 @@ let cached: Promise<string> | null = null;
 export function loadTargets(): Promise<string> {
   cached ??= fetch(TARGETS_URL)
     .then(async (res) => {
-      if (!res.ok) throw new Error(`Poster data missing (${res.status}).`);
+      // The SPA rewrite answers a missing file with index.html (200), so check the type too.
+      if (!res.ok || res.headers.get("content-type")?.includes("text/html")) {
+        throw new Error(`Poster data missing (${res.status}).`);
+      }
       const blob = await res.blob();
       if (blob.size < 1024) throw new Error("Poster data is broken.");
       return URL.createObjectURL(blob);

@@ -378,3 +378,11 @@ a {
 .camera-help h2 {
   margin-bottom: 12px;
 }
+
+.ar-hint.model-loading {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: var(--radius);
+}

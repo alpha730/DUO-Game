@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { GetMyStateOutput } from "@shared/types";
 import { CameraError } from "../ar/cameraError";
-import { loadModel } from "../ar/models";
+import { cachedModel, loadModel } from "../ar/models";
 import { createScanner, type Scanner } from "../ar/scanner";
 import { loadTargets } from "../ar/targets";
 import CameraHelp, { type ScanProblem } from "../components/CameraHelp";
@@ -63,6 +63,13 @@ export default function Scan() {
           current = i;
           const l = byPoster.get(i)!;
           setLingo(l);
+          if (!loaded.has(i)) {
+            const cached = cachedModel(l.modelUrl); // loaded on an earlier visit → instant
+            if (cached) {
+              s.setModel(i, cached);
+              loaded.add(i);
+            }
+          }
           setModelReady(loaded.has(i));
           if (loaded.has(i)) return;
           loadModel(l.modelUrl)
@@ -135,6 +142,12 @@ export default function Scan() {
               </div>
             )}
             {status === "scanning" && !lingo && <p className="ar-hint">Point your camera at a poster</p>}
+            {status === "scanning" && lingo && !modelReady && (
+              <div className="ar-hint model-loading" aria-live="polite">
+                <div className="spinner" />
+                <p>{lingo.name} is appearing…</p>
+              </div>
+            )}
             {status === "scanning" && lingo && (
               <ScanOverlay
                 lingo={lingo}

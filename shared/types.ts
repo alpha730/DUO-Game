@@ -1,1 +1,387 @@
-export {};
+// Single source of truth for data shapes (SPEC §4) and function I/O (SPEC §5).
+// Copied into functions/src/shared by functions/scripts/copy-shared.mjs — edit only this file.
+
+// DECISION: Firestore Timestamps differ between the web SDK and firebase-admin, so documents use
+// this structural type (both satisfy it). Function inputs/outputs use epoch millis (number) instead.
+export interface FireTimestamp {
+  seconds: number;
+  nanoseconds: number;
+  toMillis(): number;
+  toDate(): Date;
+}
+
+/** IST calendar date, `YYYY-MM-DD` in Asia/Kolkata. */
+export type IstDate = string;
+
+// ---------- Fixed lists ----------
+
+export const DEPARTMENTS = ["CSE", "AI&DS", "AI&ML", "IT", "ECE", "EE", "ME", "CE", "Other"] as const;
+export type Department = (typeof DEPARTMENTS)[number];
+
+export const YEARS = [1, 2, 3, 4] as const;
+export type Year = (typeof YEARS)[number];
+
+export const LINGO_COUNT = 10;
+
+export type Role = "admin" | "volunteer";
+export type ChallengeType = "speak" | "meaning";
+export type AttemptStatus = "open" | "won" | "failed" | "forfeit";
+export type RaidStatus = "scheduled" | "active" | "ended";
+export type FinalStatus = "idle" | "showing" | "recording" | "scoring" | "done";
+
+// ---------- Collection names ----------
+
+export const COL = {
+  users: "users",
+  catches: "catches", // subcollection of users/{uid}
+  lingos: "lingos",
+  config: "config",
+  challenges: "challenges",
+  attempts: "attempts",
+  rollNumbers: "rollNumbers",
+  pointsLog: "pointsLog",
+  leaderboard: "leaderboard",
+  raids: "raids",
+  players: "players", // subcollection of raids/{id}
+  prizes: "prizes",
+  redemptions: "redemptions",
+  final: "final",
+} as const;
+
+export const DOC = {
+  gameConfig: "game", // config/game
+  studentsBoard: "students", // leaderboard/students
+  deptsBoard: "depts", // leaderboard/depts
+  finalState: "state", // final/state
+} as const;
+
+/** challenges/{date}_{lingoId} */
+export const challengeId = (date: IstDate, lingoId: string) => `${date}_${lingoId}`;
+
+// ---------- Documents (SPEC §4) ----------
+
+/** users/{uid} — owner read only */
+export interface UserDoc {
+  name: string;
+  email: string;
+  dept: Department;
+  year: Year;
+  roll: string; // trimmed + uppercased, unique
+  points: number;
+  todayPoints: number;
+  todayDate: IstDate | null;
+  streak: number;
+  lastWinDate: IstDate | null;
+  lingosCaught: number;
+  allTenBonus: boolean;
+  profileDone: boolean;
+  createdAt: FireTimestamp;
+}
+
+/** users/{uid}/catches/{lingoId} — owner read only */
+export interface CatchDoc {
+  firstCaughtAt: FireTimestamp | null;
+  timesCaught: number;
+  lastCaughtDate: IstDate | null;
+  triesToday: number;
+  triesDate: IstDate | null;
+}
+
+/** lingos/{lingoId} — signed-in read */
+export interface LingoDoc {
+  name: string;
+  detYear: number; // 2016–2025
+  posterIndex: number; // 0–9, = MindAR target index
+  modelUrl: string;
+  rarity: "common" | "rare" | "epic" | "legendary";
+  color: string; // hex
+}
+
+/** Editable game numbers (SPEC §2), stored in config/game.rules */
+export interface GameRules {
+  triesPerLingoPerDay: number; // 2
+  speakSeconds: number; // 20
+  meaningSeconds: number; // 15
+  graceSeconds: number; // 2
+  speakPassRatio: number; // 0.8
+  firstCatchPoints: number; // 100
+  repeatCatchPoints: number; // 20
+  allTenBonus: number; // 500
+  streakBonusPerDay: number; // 10
+  streakBonusMax: number; // 100
+  raidCatchPoints: number; // 150
+  dailyCap: number; // 500
+}
+
+export const DEFAULT_RULES: GameRules = {
+  triesPerLingoPerDay: 2,
+  speakSeconds: 20,
+  meaningSeconds: 15,
+  graceSeconds: 2,
+  speakPassRatio: 0.8,
+  firstCatchPoints: 100,
+  repeatCatchPoints: 20,
+  allTenBonus: 500,
+  streakBonusPerDay: 10,
+  streakBonusMax: 100,
+  raidCatchPoints: 150,
+  dailyCap: 500,
+};
+
+/** config/game — signed-in read */
+export interface GameConfigDoc {
+  startAt: FireTimestamp;
+  lockAt: FireTimestamp;
+  locked: boolean;
+  campusLat: number;
+  campusLng: number;
+  campusRadiusM: number;
+  rules: GameRules;
+}
+
+/** challenges/{date}_{lingoId} — never client-readable */
+export interface SpeakChallengeDoc {
+  type: "speak";
+  phrase: string;
+}
+export interface MeaningChallengeDoc {
+  type: "meaning";
+  word: string;
+  options: [string, string, string, string];
+  correctIndex: 0 | 1 | 2 | 3;
+}
+export type ChallengeDoc = SpeakChallengeDoc | MeaningChallengeDoc;
+
+/** attempts/{id} — never client-readable */
+export interface AttemptDoc {
+  uid: string;
+  lingoId: string;
+  date: IstDate;
+  type: ChallengeType;
+  raidId?: string;
+  startedAt: FireTimestamp;
+  expiresAt: FireTimestamp;
+  status: AttemptStatus;
+  score?: number; // 0–1 match ratio (speak) or 0/1 (meaning)
+}
+
+/** rollNumbers/{roll} — never client-readable */
+export interface RollNumberDoc {
+  uid: string;
+}
+
+export type PointsReason = "firstCatch" | "repeatCatch" | "streak" | "allTen" | "raid" | "redeem" | "admin";
+
+/** pointsLog/{id} — never client-readable */
+export interface PointsLogDoc {
+  uid: string;
+  amount: number; // negative for redemptions
+  reason: PointsReason;
+  attemptId?: string;
+  createdAt: FireTimestamp;
+}
+
+export interface StudentRow {
+  uid: string;
+  name: string;
+  dept: Department;
+  points: number;
+}
+
+/** leaderboard/students — signed-in read */
+export interface StudentsBoardDoc {
+  top: StudentRow[]; // top 100
+  updatedAt: FireTimestamp;
+}
+
+export interface DeptRow {
+  dept: Department;
+  points: number;
+  players: number;
+}
+
+/** leaderboard/depts — signed-in read */
+export interface DeptsBoardDoc {
+  rows: DeptRow[];
+  updatedAt: FireTimestamp;
+}
+
+/** raids/{id} — signed-in read */
+export interface RaidDoc {
+  posterIndex: number;
+  lingoId: string;
+  startAt: FireTimestamp;
+  endAt: FireTimestamp;
+  minPlayers: number; // 20
+  joined: number;
+  unlocked: boolean;
+  status: RaidStatus;
+}
+
+/** raids/{id}/players/{uid} — never client-readable */
+export interface RaidPlayerDoc {
+  joinedAt: FireTimestamp;
+}
+
+/** prizes/{id} — signed-in read */
+export interface PrizeDoc {
+  name: string;
+  cost: number;
+  stock: number;
+}
+
+/** redemptions/{id} — never client-readable */
+export interface RedemptionDoc {
+  uid: string;
+  prizeId: string;
+  cost: number;
+  byUid: string; // volunteer/admin who redeemed
+  createdAt: FireTimestamp;
+}
+
+export interface FinalContestant {
+  uid: string;
+  name: string;
+  dept: Department;
+  eliminated: boolean;
+}
+
+/** final/state — signed-in read */
+export interface FinalStateDoc {
+  round: number; // 0 = not started, 1–3
+  phrase: string;
+  contestants: FinalContestant[];
+  scores: Record<string, number>; // uid -> score for the current round
+  status: FinalStatus;
+}
+
+// ---------- Function I/O (SPEC §5) ----------
+
+export interface CompleteProfileInput {
+  name: string;
+  dept: Department;
+  year: Year;
+  roll: string;
+}
+export interface CompleteProfileOutput {
+  ok: true;
+}
+
+/** UserDoc with timestamps as millis, as returned by functions */
+export type UserView = Omit<UserDoc, "createdAt"> & { createdAt: number };
+export type CatchView = Omit<CatchDoc, "firstCaughtAt"> & { lingoId: string; firstCaughtAt: number | null };
+
+export type GetMyStateInput = Record<string, never>;
+export interface GetMyStateOutput {
+  user: UserView | null;
+  catches: CatchView[];
+  serverNow: number;
+}
+
+export interface StartAttemptInput {
+  lingoId: string;
+  lat: number;
+  lng: number;
+  raidId?: string;
+}
+/** Never contains the answer (correctIndex). */
+export interface StartAttemptOutput {
+  attemptId: string;
+  type: ChallengeType;
+  phrase?: string;
+  word?: string;
+  options?: string[];
+  expiresAt: number;
+  serverNow: number;
+}
+
+export interface SubmitAttemptInput {
+  attemptId: string;
+  transcript?: string; // speak
+  choice?: number; // meaning, 0–3
+}
+export type BonusKind = "streak" | "allTen" | "raid";
+export interface Bonus {
+  kind: BonusKind;
+  points: number;
+}
+export interface SubmitAttemptOutput {
+  result: "won" | "failed";
+  pointsAdded: number;
+  bonuses: Bonus[];
+  newTotal: number;
+  missedWords?: string[];
+}
+
+/** forfeitAttempt is HTTP: POST body, header `Authorization: Bearer <idToken>`, responds 204. */
+export interface ForfeitAttemptBody {
+  attemptId: string;
+}
+
+export interface JoinRaidInput {
+  raidId: string;
+  lat: number;
+  lng: number;
+}
+export interface JoinRaidOutput {
+  joined: number;
+  unlocked: boolean;
+}
+
+export interface RedeemPrizeInput {
+  uid: string;
+  prizeId: string;
+}
+export interface RedeemPrizeOutput {
+  newBalance: number;
+}
+
+// Admin functions
+
+export interface AdminSetConfigInput {
+  startAt?: number;
+  lockAt?: number;
+  locked?: boolean;
+  campusLat?: number;
+  campusLng?: number;
+  campusRadiusM?: number;
+  rules?: Partial<GameRules>;
+}
+
+export type ChallengeUpload =
+  | { date: IstDate; lingoId: string; type: "speak"; phrase: string }
+  | { date: IstDate; lingoId: string; type: "meaning"; word: string; options: string[]; correctIndex: number };
+export interface AdminUpsertChallengesInput {
+  challenges: ChallengeUpload[];
+}
+export interface AdminUpsertChallengesOutput {
+  written: number;
+}
+
+export interface AdminCreateRaidInput {
+  posterIndex: number;
+  lingoId: string;
+  startAt: number;
+  minutes?: number; // default 15
+  minPlayers?: number; // default 20
+}
+export interface AdminCreateRaidOutput {
+  raidId: string;
+}
+
+export interface LockGameInput {
+  locked: boolean;
+}
+
+export type FinalControlInput =
+  | { action: "start"; topN?: number } // default 20
+  | { action: "setPhrase"; phrase: string }
+  | { action: "setStatus"; status: FinalStatus }
+  | { action: "score"; uid: string; score: number }
+  | { action: "eliminate"; keep: number } // keep top N of current round
+  | { action: "nextRound" }
+  | { action: "reset" };
+
+export interface OkOutput {
+  ok: true;
+}

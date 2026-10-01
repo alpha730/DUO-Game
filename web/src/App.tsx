@@ -1,14 +1,14 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { PublicOnly, RequireProfile, SetupOnly } from "./components/Guards";
 import { AuthProvider, useAuth } from "./lib/auth";
 import Login from "./screens/Login";
+import Setup from "./screens/Setup";
 
-function Root() {
-  const { user, signOut } = useAuth();
-  if (user === undefined) return <main className="screen center"><div className="spinner" /></main>;
-  if (!user) return <Login />;
+function HomeStub() {
+  const { profile, signOut } = useAuth();
   return (
     <main className="screen center">
-      <p>Signed in as {user.email}</p>
+      <p>Welcome, {profile?.name}</p>
       <button className="btn secondary" onClick={signOut}>Log out</button>
     </main>
   );
@@ -18,7 +18,10 @@ export default function App() {
   return (
     <AuthProvider>
       <Routes>
-        <Route path="*" element={<Root />} />
+        <Route path="/" element={<PublicOnly><Login /></PublicOnly>} />
+        <Route path="/setup" element={<SetupOnly><Setup /></SetupOnly>} />
+        <Route path="/home" element={<RequireProfile><HomeStub /></RequireProfile>} />
+        <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </AuthProvider>
   );

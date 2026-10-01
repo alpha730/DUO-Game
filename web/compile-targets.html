@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Compile targets.mind</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 640px; margin: 24px auto; padding: 0 16px; }
+      #thumbs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 12px 0; }
+      #thumbs figure { margin: 0; font-size: 12px; text-align: center; }
+      #thumbs img { width: 100%; border: 1px solid #ccc; }
+      button { padding: 10px 16px; font-size: 16px; }
+    </style>
+  </head>
+  <body>
+    <!-- Dev-only tool (not part of the app build). Run `npm run dev` and open /compile-targets.html. -->
+    <h1>Compile targets.mind</h1>
+    <p>
+      Pick the 10 poster images. They are sorted by file name, so name them <code>01…10</code>:
+      file 1 → posterIndex 0 … file 10 → posterIndex 9. Save the result as <code>assets/targets.mind</code>.
+    </p>
+    <input id="files" type="file" accept="image/*" multiple />
+    <div id="thumbs"></div>
+    <button id="compile" disabled>Compile</button>
+    <p id="status"></p>
+    <script type="module" src="/src/tools/compileTargets.ts"></script>
+  </body>
+</html>

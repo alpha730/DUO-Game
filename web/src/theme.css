@@ -271,3 +271,58 @@ a {
     text-align: center;
   }
 }
+
+/* ---------- AR scan screen ---------- */
+.ar-screen {
+  position: fixed;
+  inset: 0 0 calc(var(--nav-h) + var(--safe-bottom)) 0;
+  background: #000;
+  overflow: hidden;
+}
+
+.ar-root {
+  position: absolute;
+  inset: 0;
+}
+
+.ar-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.ar-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ar-overlay > * {
+  pointer-events: auto;
+}
+
+.ar-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.6);
+  color: #fff;
+  font-weight: 600;
+  text-align: center;
+}
+
+.ar-hint.error {
+  border-radius: var(--radius);
+  background: rgb(60 10 10 / 0.85);
+}

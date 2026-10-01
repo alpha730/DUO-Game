@@ -14,3 +14,5 @@ functions/src/shared/
 *.local
 .DS_Store
 !web/.env.development
+*.tsbuildinfo
+web/public/assets/

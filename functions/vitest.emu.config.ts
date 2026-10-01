@@ -1,6 +1,7 @@
 import { defineConfig } from "vitest/config";
 
-// Rules tests hit the Firestore emulator (port 8085); run with `npm run test:rules`.
+// Emulator tests (rules + functions); run with `npm run test:emu` while emulators are up,
+// or `npm run test:emu:ci` to start them just for the run.
 export default defineConfig({
   test: {
     include: ["test/**/*.test.ts"],

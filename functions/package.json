@@ -14,8 +14,8 @@
     "serve": "npm run build && firebase emulators:start --only functions",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
-    "test:rules": "vitest run --config vitest.rules.config.ts",
-    "test:rules:emu": "firebase emulators:exec --only firestore \"npm run test:rules\""
+    "test:emu": "vitest run --config vitest.emu.config.ts",
+    "test:emu:ci": "npm run build && firebase emulators:exec --only auth,firestore,functions \"npm run test:emu\""
   },
   "dependencies": {
     "firebase-admin": "^13.10.0",

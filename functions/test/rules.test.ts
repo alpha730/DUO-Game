@@ -1,4 +1,4 @@
-// Firestore rules tests (SPEC §6). Needs the Firestore emulator: `npm run test:rules`.
+// Firestore rules tests (SPEC §6). Needs the Firestore emulator: `npm run test:emu`.
 import {
   assertFails,
   assertSucceeds,

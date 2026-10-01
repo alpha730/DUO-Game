@@ -2,6 +2,7 @@
 // Needs Auth + Firestore + Functions emulators: `npm run test:emu`.
 import { deleteApp, initializeApp, type FirebaseApp } from "firebase/app";
 import { connectAuthEmulator, createUserWithEmailAndPassword, getAuth, signOut } from "firebase/auth";
+import { connectFirestoreEmulator, doc, getDoc, getFirestore } from "firebase/firestore";
 import { connectFunctionsEmulator, getFunctions, httpsCallable } from "firebase/functions";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -14,9 +15,11 @@ async function newPlayer() {
   connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
   const fns = getFunctions(app, "asia-south1");
   connectFunctionsEmulator(fns, "127.0.0.1", 5001);
+  const db = getFirestore(app);
+  connectFirestoreEmulator(db, "127.0.0.1", 8085);
   const email = `t${Date.now()}${Math.random().toString(36).slice(2, 6)}@example.com`;
   await createUserWithEmailAndPassword(auth, email, "password123");
-  return { auth, completeProfile: httpsCallable(fns, "completeProfile") };
+  return { auth, db, completeProfile: httpsCallable(fns, "completeProfile") };
 }
 
 const roll = `T${Date.now().toString(36).toUpperCase()}`;
@@ -33,8 +36,26 @@ afterAll(async () => {
 });
 
 describe("completeProfile", () => {
-  it("creates the profile", async () => {
+  it("creates the profile with SPEC §4 defaults", async () => {
     await expect(a.completeProfile(profile())).resolves.toMatchObject({ data: { ok: true } });
+    const snap = await getDoc(doc(a.db, "users", a.auth.currentUser!.uid));
+    expect(snap.data()).toMatchObject({
+      name: "Test Player",
+      dept: "CSE",
+      year: 1,
+      roll,
+      points: 0,
+      attemptsToday: 0,
+      attemptsDate: null,
+      dayStreak: 0,
+      lastPlayDate: null,
+      lingosCaught: 0,
+      allTenBonus: false,
+      favorites: [],
+      favoriteChangesLeft: 1,
+      profileDone: true,
+    });
+    for (const old of ["todayPoints", "todayDate", "streak", "lastWinDate"]) expect(snap.data()).not.toHaveProperty(old);
   });
 
   it("rejects a second call by the same user", async () => {

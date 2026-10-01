@@ -68,23 +68,33 @@ export interface UserDoc {
   year: Year;
   roll: string; // trimmed + uppercased, unique
   points: number;
-  todayPoints: number;
-  todayDate: IstDate | null;
-  streak: number;
-  lastWinDate: IstDate | null;
+  /** Non-raid attempts used on `attemptsDate`; treat as 0 when attemptsDate ≠ today. */
+  attemptsToday: number;
+  attemptsDate: IstDate | null;
+  /** Overall "days played in a row" — display only, no points. */
+  dayStreak: number;
+  lastPlayDate: IstDate | null;
   lingosCaught: number;
   allTenBonus: boolean;
+  /** lingoIds, max 2; empty until chosen after the first 2 catches. */
+  favorites: string[];
+  favoriteChangesLeft: number;
   profileDone: boolean;
   createdAt: FireTimestamp;
 }
 
-/** users/{uid}/catches/{lingoId} — owner read only */
+export type Level = 1 | 2 | 3 | "MAX";
+
+/** users/{uid}/catches/{lingoId} — owner read only; created on the first catch. */
 export interface CatchDoc {
   firstCaughtAt: FireTimestamp | null;
   timesCaught: number;
   lastCaughtDate: IstDate | null;
-  triesToday: number;
-  triesDate: IstDate | null;
+  /** Never goes down. */
+  level: Level;
+  /** Consecutive IST days caught while a favourite; 0 for non-favourites. */
+  favStreak: number;
+  maxBonusGiven: boolean;
 }
 
 /** lingos/{lingoId} — signed-in read */
@@ -99,33 +109,48 @@ export interface LingoDoc {
 
 /** Editable game numbers (SPEC §2), stored in config/game.rules */
 export interface GameRules {
-  triesPerLingoPerDay: number; // 2
+  attemptsPerDay: number; // 4 — won, failed, forfeited all count; raids don't
+  catchesPerLingoPerDay: number; // 1 — a failed attempt may be retried on the same Lingo
+  favoritesCount: number; // 2
+  favoriteChanges: number; // 1 for the whole game
   speakSeconds: number; // 20
   meaningSeconds: number; // 15
   graceSeconds: number; // 2
   speakPassRatio: number; // 0.8
-  firstCatchPoints: number; // 100
-  repeatCatchPoints: number; // 20
-  allTenBonus: number; // 500
-  streakBonusPerDay: number; // 10
-  streakBonusMax: number; // 100
-  raidCatchPoints: number; // 150
-  dailyCap: number; // 500
+  firstCatchPoints: number; // 100 (Level 1)
+  repeatCatchPoints: number; // 20 — non-favourite
+  favoriteCatchPointsPerDay: number; // 20 × favourite's streak day (day 1 = 20 … day 10 = 200)
+  favLevel2Streak: number; // 3
+  favLevel3Streak: number; // 6
+  favMaxStreak: number; // 10 → MAX form
+  maxBonus: number; // 1000, once per Lingo
+  nonFavLevel2Catches: number; // 3 total catches
+  nonFavLevel3Catches: number; // 6 total catches
+  allTenBonus: number; // 1000, once
+  raidCatchPoints: number; // 150, outside the daily 4
 }
 
+/** SPEC §2 */
 export const DEFAULT_RULES: GameRules = {
-  triesPerLingoPerDay: 2,
+  attemptsPerDay: 4,
+  catchesPerLingoPerDay: 1,
+  favoritesCount: 2,
+  favoriteChanges: 1,
   speakSeconds: 20,
   meaningSeconds: 15,
   graceSeconds: 2,
   speakPassRatio: 0.8,
   firstCatchPoints: 100,
   repeatCatchPoints: 20,
-  allTenBonus: 500,
-  streakBonusPerDay: 10,
-  streakBonusMax: 100,
+  favoriteCatchPointsPerDay: 20,
+  favLevel2Streak: 3,
+  favLevel3Streak: 6,
+  favMaxStreak: 10,
+  maxBonus: 1000,
+  nonFavLevel2Catches: 3,
+  nonFavLevel3Catches: 6,
+  allTenBonus: 1000,
   raidCatchPoints: 150,
-  dailyCap: 500,
 };
 
 /** config/game — signed-in read */
@@ -170,7 +195,15 @@ export interface RollNumberDoc {
   uid: string;
 }
 
-export type PointsReason = "firstCatch" | "repeatCatch" | "streak" | "allTen" | "raid" | "redeem" | "admin";
+export type PointsReason =
+  | "firstCatch"
+  | "repeatCatch"
+  | "favoriteCatch"
+  | "max"
+  | "allTen"
+  | "raid"
+  | "redeem"
+  | "admin";
 
 /** pointsLog/{id} — never client-readable */
 export interface PointsLogDoc {
@@ -293,6 +326,8 @@ export interface StartAttemptOutput {
   options?: string[];
   expiresAt: number;
   serverNow: number;
+  /** Daily attempts left after this one (unchanged for raid attempts). */
+  attemptsLeft: number;
 }
 
 export interface SubmitAttemptInput {
@@ -300,17 +335,33 @@ export interface SubmitAttemptInput {
   transcript?: string; // speak
   choice?: number; // meaning, 0–3
 }
-export type BonusKind = "streak" | "allTen" | "raid";
+export type BonusKind = "max" | "allTen" | "raid";
 export interface Bonus {
   kind: BonusKind;
   points: number;
 }
 export interface SubmitAttemptOutput {
   result: "won" | "failed";
+  /** Total added by this attempt, bonuses included. */
   pointsAdded: number;
   bonuses: Bonus[];
+  /** Lingo level after this attempt (unchanged on a fail). */
+  newLevel: Level;
+  /** Present when the Lingo is a favourite. */
+  favStreak?: number;
   newTotal: number;
   missedWords?: string[];
+  /** True when the user has ≥ 2 catches and hasn't chosen favourites → open /favorites. */
+  needsFavorites: boolean;
+}
+
+export interface SetFavoritesInput {
+  /** Exactly 2 distinct lingoIds, both already caught. */
+  lingoIds: string[];
+}
+export interface SetFavoritesOutput {
+  favorites: string[];
+  favoriteChangesLeft: number;
 }
 
 /** forfeitAttempt is HTTP: POST body, header `Authorization: Bearer <idToken>`, responds 204. */

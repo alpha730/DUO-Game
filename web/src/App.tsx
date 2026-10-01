@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { Loading, PublicOnly, RequireProfile, RequireRole, SetupOnly } from "./components/Guards";
 import NavLayout from "./components/NavLayout";
 import { AuthProvider } from "./lib/auth";
+import Favorites from "./screens/Favorites";
 import Home from "./screens/Home";
 import Leaderboard from "./screens/Leaderboard";
 import Login from "./screens/Login";
@@ -31,6 +32,7 @@ export default function App() {
             <Route path="/me" element={<Me />} />
           </Route>
           <Route path="/catch/:lingoId" element={<RequireProfile><Catch /></RequireProfile>} />
+          <Route path="/favorites" element={<RequireProfile><Favorites /></RequireProfile>} />
 
           <Route path="/admin" element={<RequireRole roles={["admin"]}><Admin /></RequireRole>} />
           <Route path="/redeem" element={<RequireRole roles={["admin", "volunteer"]}><Redeem /></RequireRole>} />

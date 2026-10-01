@@ -73,7 +73,7 @@ async function main() {
     campusLat: 26.7838,
     campusLng: 75.8225,
     campusRadiusM: prod ? 600 : 20_000_000,
-    rules: DEFAULT_RULES,
+    rules: DEFAULT_RULES, // exactly SPEC §2 (see shared/types.ts)
   };
   batch.set(db.collection(COL.config).doc(DOC.gameConfig), config);
 

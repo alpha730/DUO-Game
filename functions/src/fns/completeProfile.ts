@@ -2,6 +2,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import {
   COL,
+  DEFAULT_RULES,
   DEPARTMENTS,
   YEARS,
   type CompleteProfileInput,
@@ -9,7 +10,7 @@ import {
   type Department,
   type Year,
 } from "../shared/types";
-import { db, userRef } from "../lib/db";
+import { db, loadConfig, userRef } from "../lib/db";
 import { requireAuth } from "../lib/guards";
 
 // DECISION: roll numbers are letters, digits and dashes (3–20 chars); "/" is not allowed because
@@ -34,6 +35,7 @@ export const completeProfile = onCall<unknown, Promise<CompleteProfileOutput>>(a
   const uid = requireAuth(req);
   const { name, dept, year, roll } = parseProfile(req.data);
   const email = (req.auth?.token.email as string | undefined) ?? "";
+  const rules = (await loadConfig())?.rules ?? DEFAULT_RULES;
 
   const rollRef = db().collection(COL.rollNumbers).doc(roll);
   const uRef = userRef(uid);
@@ -55,12 +57,14 @@ export const completeProfile = onCall<unknown, Promise<CompleteProfileOutput>>(a
       year,
       roll,
       points: 0,
-      todayPoints: 0,
-      todayDate: null,
-      streak: 0,
-      lastWinDate: null,
+      attemptsToday: 0,
+      attemptsDate: null,
+      dayStreak: 0,
+      lastPlayDate: null,
       lingosCaught: 0,
       allTenBonus: false,
+      favorites: [],
+      favoriteChangesLeft: rules.favoriteChanges,
       profileDone: true,
       createdAt: FieldValue.serverTimestamp(),
     });

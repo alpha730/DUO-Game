@@ -17,7 +17,7 @@ export default function Home() {
           <h1 style={{ margin: 0 }}>{BRAND.gameName}</h1>
         </div>
         <div className="row small" style={{ gap: 8 }}>
-          <span className="card" style={{ padding: "6px 10px" }}>🔥 {profile?.streak ?? 0}</span>
+          <span className="card" style={{ padding: "6px 10px" }}>🔥 {profile?.dayStreak ?? 0}</span>
           <span className="card" style={{ padding: "6px 10px" }}>⭐ {profile?.points ?? 0}</span>
         </div>
       </header>
@@ -47,7 +47,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Placeholder day={4}>Live collection, today's tries and raid banner</Placeholder>
+      <Placeholder day={4}>Favourite cards, level badges, attempts left today (x/4), raid banner</Placeholder>
 
       <Link className="btn" to="/scan">
         📷 Scan a poster

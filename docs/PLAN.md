@@ -8,7 +8,7 @@ Rules and data shapes are in `SPEC.md`. If behind schedule, drop items marked *(
 | 1 | Oct 1 | Setup, login, profile |
 | 2 | Oct 2 | AR scanning |
 | 3 | Oct 3 | Challenges + one-chance rule |
-| 4 | Oct 4 | Points, streaks, bonuses, Home |
+| 4 | Oct 4 | Points, favourites, Lingo streaks + levels, Home |
 | 5 | Oct 5 | Leaderboards, Me page |
 | 6 | Oct 6 | Owl Raids |
 | 7 | Oct 7 | Admin, content, share card |
@@ -48,7 +48,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 | 2.1 | Install `mind-ar` + `three`; `Scan` screen lazy-loaded | Bundle for other screens unaffected |
 | 2.2 | Start MindAR image tracking with `/assets/targets.mind` (10 targets) | Camera opens on Android + iPhone |
 | 2.3 | Load `lingos` once; on `targetFound(i)` show matching `.glb` with idle animation; hide on `targetLost` | Pointing at poster 3 shows Lingo 3 |
-| 2.4 | Overlay: Lingo name + "Catch it" (→ `/catch/:lingoId`), or "Come back tomorrow" if no tries left (from `getMyState`) | Correct button shows |
+| 2.4 | Overlay: Lingo name + "Catch it" (→ `/catch/:lingoId`), or "Caught today ✓" / "No attempts left today" (from `getMyState`) | Correct button shows |
 | 2.5 | `getMyState` function (auto-forfeits open attempts) | Returns user + catches + serverNow |
 | 2.6 | Clean-up: stop camera + dispose scene on leave | No camera light after leaving |
 | 2.7 | Camera permission denied / in-app browser → helpful message | Tested inside Instagram browser |
@@ -57,7 +57,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 ## Day 3 — Challenges + one-chance rule (Oct 3)
 | # | Task | Done when |
 |---|---|---|
-| 3.1 | `startAttempt` per SPEC §5 (game open, on campus, one open attempt, tries left, challenge without answer) | Returns challenge; answer never in response |
+| 3.1 | `startAttempt` per SPEC §5 (game open, on campus, one open attempt, Lingo not caught today, attemptsToday < 4, challenge without answer) | Returns challenge; answer never in response |
 | 3.2 | `submitAttempt` scoring only (points come Day 4): speak → match helper; meaning → correctIndex; expiry + grace | Late answers rejected and marked forfeit |
 | 3.3 | `forfeitAttempt` as HTTP `onRequest` with Bearer token, CORS for hosting domain | `curl` with token forfeits |
 | 3.4 | Catch screen pre-flight: mic permission (speak) + location, then Start button | No permission prompt appears after Start |
@@ -65,17 +65,19 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 | 3.6 | Speak UI: SpeechRecognition `en-IN`, interim transcript shown, stop on final result → submit | Saying the phrase wins |
 | 3.7 | Meaning UI: word + 4 big buttons → submit | Right option wins, wrong fails |
 | 3.8 | One-chance: `visibilitychange`(hidden) + `pagehide` → `fetch(keepalive)` forfeit with cached token → "Chance lost" | Switching tab mid-attempt forfeits; reload shows attempt forfeited |
-| 3.9 | Result screen: won / failed (missed words) / forfeit; tries left today | All 3 states shown |
-| 3.10 | Browser without SpeechRecognition + a speak challenge → show "Open in Chrome or Safari" before Start (no try used) | Firefox shows message, tries unchanged |
+| 3.9 | Result screen: won / failed (missed words) / forfeit; attempts left today (x/4) | All 3 states shown |
+| 3.10 | Browser without SpeechRecognition + a speak challenge → show "Open in Chrome or Safari" before Start (no attempt used) | Firefox shows message, attempts unchanged |
 
-## Day 4 — Points, streaks, Home (Oct 4)
+## Day 4 — Points, favourites, Lingo streaks + levels, Home (Oct 4)
 | # | Task | Done when |
 |---|---|---|
-| 4.1 | `lib/points.ts`: pure function computing points from (user, catch, now, rules) → amounts + bonuses; unit tests | Tests: first catch, repeat, cap, streak reset, all-10 |
-| 4.2 | Wire into `submitAttempt` in one transaction (user, catch doc, pointsLog) | Points correct in emulator |
-| 4.3 | `todayPoints` reset when `todayDate` ≠ today; cap 500 | Cap respected |
-| 4.4 | Home: 10-slot grid (colour vs silhouette + catch count), points, streak flame, tries today, Scan button | Updates after a catch |
-| 4.5 | Win animation + "+100" pop + bonus banners | Looks good on phone |
+| 4.1 | `lib/points.ts`: pure function (user, catch doc, isFavorite, today, rules) → points, new favStreak, new level, bonuses (MAX, all-10); unit tests | Tests: first catch, non-fav repeat, fav streak day 1→10, missed day resets streak but keeps level, MAX bonus once, all-10 once |
+| 4.2 | Wire into `submitAttempt` in one transaction (user, catch doc, pointsLog) | Points + levels correct in emulator |
+| 4.3 | `attemptsToday` resets when `attemptsDate` ≠ today; limit 4; raid attempts skip it | 5th attempt rejected |
+| 4.4 | `setFavorites` (exactly 2, both caught; 1 change allowed; changed favourite streak → 0) + tests | Second change rejected |
+| 4.5 | `/favorites` picker: opens after the 2nd catch (`needsFavorites`), also from Me if a change is left | Can pick 2 favourites |
+| 4.6 | Home: 2 favourite cards (level, 🔥 "Day 6/10", caught today ✓), 10-slot grid with level badges, points, "Attempts left 3/4", Scan button | Updates after a catch |
+| 4.7 | Win animation + "+100" pop + level-up / MAX / all-10 celebrations | Looks good on phone |
 
 ## Day 5 — Leaderboards + Me (Oct 5)
 | # | Task | Done when |
@@ -108,7 +110,9 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 - [ ] Models load < 5 s; scan works in daylight and indoor light
 - [ ] Cheating tests: switch tab mid-attempt, reload, kill app, change phone clock, call functions from console with fake data, submit after timer, two tabs at once, fake location
 - [ ] Same roll number twice → blocked
-- [ ] Daily cap, streak across midnight IST
+- [ ] 4-attempt limit (fail + forfeit count, raids don't); same Lingo can't be caught twice a day
+- [ ] Favourite streaks across midnight IST; missed day resets streak but keeps level; MAX at day 10
+- [ ] Favourite change allowed once only; all-10 bonus given once
 - [ ] Leaderboard updates within 5 min
 - [ ] Fix everything found
 

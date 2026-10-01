@@ -6,27 +6,38 @@
 - Challenge types:
   - **speak** — say the shown phrase out loud (20 s)
   - **meaning** — pick the correct meaning of a word from 4 options (15 s)
-- Win → points. Fail / forfeit → no points, uses up a try.
+- Win → points. Fail / forfeit → no points, uses up one of the day's 4 attempts.
+- **4 attempts per day**, on any Lingos. A Lingo can be caught at most once per day.
+- Each student picks **2 favourite Lingos**. Only favourites build a streak; a 10-day streak turns a favourite into its **MAX** form.
+- Non-favourites level up by total catches, so everyone can collect all 10 (2 favourites + 2 others per day).
 - **One-chance rule:** leaving the app during a challenge (close, tab switch, lock screen, call) forfeits it.
 - Leaderboards (students + departments) live until Oct 22, 12:00 IST. Final round on stage Oct 22.
 
 ## 2. Game rules & numbers (all stored in `config/game`, editable by admin)
 | Rule | Value |
 |---|---|
-| Tries per Lingo per day | 2 (a win ends the day for that Lingo) |
+| Attempts per day (per user) | **4** (won, failed and forfeited all count; raid attempts do NOT count) |
+| Same Lingo per day | max 1 **catch** (win). A failed attempt may be retried on the same Lingo with another of the 4 |
+| Favourites | **2** per user |
+| Favourite changes | 1 allowed for the whole game; the replaced and the new favourite start at streak 0 |
 | speak timer | 20 s |
 | meaning timer | 15 s |
 | Grace after expiry | 2 s |
 | speak pass mark | ≥ 80% of phrase words found in transcript |
-| First-ever catch of a Lingo | +100 |
-| Repeat catch (new day) | +20 |
-| All 10 Lingos caught (once) | +500 |
-| Streak bonus (first win of the day) | +10 × streakDays, max +100 |
-| Owl Raid catch | +150 |
-| Daily cap per user | 500 (bonuses for "all 10" and raids are outside the cap) |
+| First-ever catch of any Lingo | +100 (Level 1) |
+| Repeat catch, non-favourite | +20 |
+| Favourite catch | +20 × that favourite's streak day (day 1 = 20 … day 10 = 200) |
+| Favourite reaches 3-day streak | Level 2 |
+| Favourite reaches 6-day streak | Level 3 |
+| Favourite reaches 10-day streak | **MAX** form + 1,000 bonus (once per Lingo) |
+| Non-favourite levels | Level 2 at 3 total catches, Level 3 at 6 total catches (no MAX) |
+| All 10 Lingos collected | +1,000 bonus (once) |
+| Owl Raid catch | +150 (outside the daily 4) |
 | Location check | must be within `campusRadiusM` of campus centre |
 
-**Streak:** a day counts if the user wins ≥ 1 challenge that IST day. Missing a day resets to 0.
+**Favourite streak:** +1 when the favourite is caught on the IST day right after its last catch. A missed day resets the streak to 0, but **levels never go down**. MAX is permanent once reached.
+**Choosing favourites:** after a user's first 2 catches, the app asks them to pick 2 favourites from Lingos they have caught. Until then no streaks count. Last day a 10-day streak can still be completed: start by Oct 12.
+**Daily streak (overall):** also kept for display ("days played in a row"), no points.
 
 ## 3. The one-chance rule (exact behaviour)
 1. Catch screen opens → **pre-flight first**: request mic permission (speak) and location. Only after both succeed show the **Start** button. (Permission prompts must never happen during an attempt.)
@@ -42,8 +53,8 @@
 ## 4. Data model (Firestore)
 | Path | Fields | Client read |
 |---|---|---|
-| `users/{uid}` | name, email, dept, year, roll, points, todayPoints, todayDate, streak, lastWinDate, lingosCaught (number), allTenBonus (bool), profileDone, createdAt | owner only |
-| `users/{uid}/catches/{lingoId}` | firstCaughtAt, timesCaught, lastCaughtDate, triesToday, triesDate | owner only |
+| `users/{uid}` | name, email, dept, year, roll, points, attemptsToday, attemptsDate, dayStreak, lastPlayDate, lingosCaught (number), allTenBonus (bool), favorites (lingoId[] max 2), favoriteChangesLeft (1), profileDone, createdAt | owner only |
+| `users/{uid}/catches/{lingoId}` | firstCaughtAt, timesCaught, lastCaughtDate, level (1\|2\|3\|'MAX'), favStreak, maxBonusGiven (bool) | owner only |
 | `lingos/{lingoId}` | name, detYear, posterIndex (0–9), modelUrl, rarity, color | signed-in |
 | `config/game` | startAt, lockAt, locked, campusLat, campusLng, campusRadiusM, rules (table above) | signed-in |
 | `challenges/{date}_{lingoId}` | type ('speak'\|'meaning'), phrase? , word?, options? (4), correctIndex? | **never** |
@@ -68,8 +79,9 @@ All callable (`onCall`) unless noted. Every one runs the checks in CLAUDE.md rul
 |---|---|---|---|
 | `completeProfile` | name, dept, year, roll | Validate; transaction: fail if `rollNumbers/{roll}` exists or profile done; create user + roll doc | `{ok}` |
 | `getMyState` | – | Auto-forfeit open attempts; return user, catches, today's tries | `{user, catches, serverNow}` |
-| `startAttempt` | lingoId, lat, lng, raidId? | Game open; on campus; no open attempt; tries left today; load `challenges/{today}_{lingoId}`; create attempt; increment triesToday | `{attemptId, type, phrase? , word?, options?, expiresAt, serverNow}` |
-| `submitAttempt` | attemptId, transcript? , choice? | Owner + open + in time; score (speak: word match ≥ 80%; meaning: choice == correctIndex); on win → award points (transaction: points, todayPoints cap, streak, catches, all-10 bonus, pointsLog) | `{result:'won'\|'failed', pointsAdded, bonuses[], newTotal, missedWords?}` |
+| `startAttempt` | lingoId, lat, lng, raidId? | Game open; on campus; no open attempt; Lingo not already caught today; attemptsToday < 4 (reset when attemptsDate ≠ today; skipped for raids); load `challenges/{today}_{lingoId}`; create attempt; increment attemptsToday | `{attemptId, type, phrase? , word?, options?, expiresAt, serverNow, attemptsLeft}` |
+| `submitAttempt` | attemptId, transcript? , choice? | Owner + open + in time; score (speak: word match ≥ 80%; meaning: choice == correctIndex); on win → one transaction: catch doc (timesCaught, favStreak, level), points per §2, MAX + all-10 bonuses, dayStreak, pointsLog | `{result:'won'\|'failed', pointsAdded, bonuses[], newLevel, favStreak?, newTotal, missedWords?, needsFavorites}` |
+| `setFavorites` | lingoIds (exactly 2, both already caught) | First time: save. Later: only if favoriteChangesLeft > 0; decrement; new favourite starts favStreak 0 | `{favorites, favoriteChangesLeft}` |
 | `forfeitAttempt` | **HTTP `onRequest`**, header `Authorization: Bearer <idToken>`, body `{attemptId}` | Verify token; if owner + open → `forfeit` | 204 |
 | `refreshLeaderboard` | **scheduled**, every 5 min | Top 100 users by points; sum points per dept | – |
 | `joinRaid` | raidId, lat, lng | Raid active; on campus; add player; if joined ≥ minPlayers → unlocked | `{joined, unlocked}` |
@@ -95,7 +107,8 @@ Roles = custom claims `{role:'admin'|'volunteer'}` set by `scripts/setRole.ts`.
 |---|---|---|
 | `/` | Login | Google button, email/password form, sign-up toggle |
 | `/setup` | Profile | name, dept, year, roll → `completeProfile` |
-| `/home` | Collection | 10 slots (caught = colour + count, not caught = silhouette), points, streak, today's tries, "Scan" button, raid banner if active |
+| `/home` | Collection | top: 2 favourite cards (Lingo, level, 🔥 streak "Day 6/10", "caught today ✓/not yet"); 10-slot grid (caught = colour + level badge, not caught = silhouette); points, "Attempts left today: 3/4", "Scan" button, raid banner if active |
+| `/favorites` | Pick favourites | shown after the first 2 catches (and from Me, if a change is left); choose 2 of caught Lingos → `setFavorites`; warns that changing resets the streak |
 | `/scan` | AR | camera + MindAR (`/assets/targets.mind`, 10 targets); target found → show that Lingo's model + "Catch it" |
 | `/catch/:lingoId` | Challenge | pre-flight (mic + location) → Start → timer → speak (mic + live transcript) or meaning (4 buttons) → result |
 | `/leaderboard` | Rankings | tabs Students / Departments, own rank pinned at bottom |
@@ -109,7 +122,7 @@ Bottom nav on Home / Scan / Leaderboard / Me. Large tap targets. Works in portra
 ## 8. AR details
 - Build `targets.mind` from the 10 poster images with the MindAR compiler; target index = `posterIndex`.
 - On `targetFound(i)` → load `lingos` where posterIndex == i → show its `.glb` with a gentle idle bob; show "Catch it".
-- If the user caught it today or has 0 tries left → show "Come back tomorrow" instead.
+- If the user already caught this Lingo today → "Caught today ✓ — come back tomorrow"; if 0 attempts left today → "No attempts left today". Otherwise "Catch it" (favourites also show their streak, e.g. "🔥 Day 4 — keep it going").
 - Stop camera + dispose three.js scene when leaving `/scan`.
 - iOS Safari and Android Chrome both supported; show "Open in Chrome/Safari" if inside an in-app browser (Instagram/WhatsApp) that blocks camera.
 

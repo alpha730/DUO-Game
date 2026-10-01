@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import type { GetMyStateOutput } from "@shared/types";
 import { loadModel } from "../ar/models";
 import { createScanner, type Scanner } from "../ar/scanner";
+import ScanOverlay from "../components/ScanOverlay";
+import { api } from "../lib/api";
+import { catchStatus } from "../lib/catchStatus";
 import { loadLingos, type Lingo } from "../lib/lingos";
 
 type Status = "starting" | "scanning" | "error";
@@ -12,6 +16,19 @@ export default function Scan() {
   const [lingo, setLingo] = useState<Lingo | null>(null);
   const [modelReady, setModelReady] = useState(false);
   const [error, setError] = useState("");
+  const [me, setMe] = useState<GetMyStateOutput | null>(null);
+
+  // Today's catches + attempts left; also auto-forfeits any open attempt (SPEC §3.5).
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .getMyState({})
+      .then((s) => !cancelled && setMe(s))
+      .catch((err) => console.warn("getMyState failed; overlay falls back to 'Catch it'", err));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let scanner: Scanner | null = null;
@@ -81,7 +98,14 @@ export default function Scan() {
           </div>
         )}
         {status === "scanning" && !lingo && <p className="ar-hint">Point your camera at a poster</p>}
-        {status === "scanning" && lingo && <p className="ar-hint">{lingo.name}</p>}
+        {status === "scanning" && lingo && (
+          <ScanOverlay
+            lingo={lingo}
+            status={catchStatus(lingo.id, me)}
+            attemptsLeft={me?.attemptsLeft ?? null}
+            attemptsPerDay={me?.attemptsPerDay ?? null}
+          />
+        )}
         {status === "error" && (
           <div className="ar-hint error" role="alert">
             Couldn't start the camera. {error}

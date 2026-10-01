@@ -1,5 +1,10 @@
 import { httpsCallable } from "firebase/functions";
-import type { CompleteProfileInput, CompleteProfileOutput } from "@shared/types";
+import type {
+  CompleteProfileInput,
+  CompleteProfileOutput,
+  GetMyStateInput,
+  GetMyStateOutput,
+} from "@shared/types";
 import { functions } from "./firebase";
 
 const call =
@@ -9,6 +14,7 @@ const call =
 
 export const api = {
   completeProfile: call<CompleteProfileInput, CompleteProfileOutput>("completeProfile"),
+  getMyState: call<GetMyStateInput, GetMyStateOutput>("getMyState"),
 };
 
 /** User-facing text for a callable error. Server HttpsErrors already carry friendly messages. */

@@ -326,3 +326,40 @@ a {
   border-radius: var(--radius);
   background: rgb(60 10 10 / 0.85);
 }
+
+.scan-card {
+  width: 100%;
+  max-width: 448px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: rgb(15 26 10 / 0.92);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+}
+
+.scan-card p {
+  margin: 0;
+}
+
+.scan-card .swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  flex: none;
+}
+
+.scan-card .streak {
+  color: var(--warn);
+  font-weight: 700;
+}
+
+.scan-card .done {
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  text-align: center;
+  font-weight: 600;
+}

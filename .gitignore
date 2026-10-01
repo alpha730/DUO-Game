@@ -13,3 +13,4 @@ emulator-data/
 functions/src/shared/
 *.local
 .DS_Store
+!web/.env.development

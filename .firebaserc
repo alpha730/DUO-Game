@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "demo-decade-hunt"
+    "default": "demo-decade-hunt",
+    "prod": "decade-hunt-66f6e"
   }
 }

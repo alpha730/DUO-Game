@@ -54,4 +54,4 @@ firestore.rules, firestore.indexes.json, firebase.json
 - Web dev: `cd web && npm run dev`
 - Seed emulator: `npx tsx scripts/seed.ts`
 - Tests: `cd functions && npm test`
-- Deploy: `firebase deploy` (only after the day's checks pass)
+- Deploy: `firebase deploy -P prod` (only after the day's checks pass; default project is the emulator-only `demo-decade-hunt`)

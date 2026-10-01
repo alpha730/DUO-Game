@@ -1,0 +1,57 @@
+# Decade Hunt — Claude Code instructions
+
+Campus AR game for the Duolingo English Test 10-year celebration at JECRC, Jaipur.
+Students scan 10 posters on campus, a creature ("Lingo") appears on the camera, and they catch it by
+speaking a phrase or picking a word's meaning. Points → leaderboard → final round on Oct 22.
+
+**Before any work:** read `docs/SPEC.md` (what to build) and `docs/PLAN.md` (what to build today).
+Work only on the current day's tasks in `docs/PLAN.md`, in order.
+
+## Key dates (IST, Asia/Kolkata)
+- Build: Oct 1–9 · Game live: **Oct 10, 00:00** · Play locks: **Oct 22, 12:00** · Final round: Oct 22 afternoon
+- All "today" logic uses the IST date (`YYYY-MM-DD` in Asia/Kolkata), computed on the server.
+
+## Stack
+- `/web` — React 18 + Vite + TypeScript, react-router-dom, Firebase JS SDK (modular)
+- AR — `mind-ar` (image tracking, three.js build) + three.js `GLTFLoader`
+- Voice — browser `SpeechRecognition` / `webkitSpeechRecognition`, lang `en-IN`
+- `/functions` — Firebase Cloud Functions v2, Node 20, TypeScript, region `asia-south1`
+- Firestore (asia-south1), Firebase Auth (Google + email/password, **any email**), Firebase Hosting
+- `/shared/types.ts` — all shared types; copied into `functions/src/shared` by a prebuild script
+
+## Folder structure
+```
+/web            React app
+/functions      Cloud Functions
+/shared         types.ts (single source of truth for data shapes + function I/O)
+/scripts        seed + admin scripts (run locally with the emulator or a service account)
+/assets         poster images, targets.mind, lingo .glb models
+/docs           SPEC.md, PLAN.md
+firestore.rules, firestore.indexes.json, firebase.json
+```
+
+## Hard rules (never break these)
+1. **The phone never writes to Firestore.** Every write goes through a Cloud Function.
+2. **Points are only calculated on the server.** The client only displays them.
+3. Collections `attempts`, `challenges`, `rollNumbers`, `pointsLog`, `redemptions` are **never readable** from the client.
+4. The correct answer of a challenge (`correctIndex`, the phrase for future days) is **never sent** to the client before it answers.
+5. The server is the timer: an answer received after `expiresAt` (+2 s grace) is rejected, whatever the client says.
+6. Every callable function checks: signed in → profile done → game open (`now` between `startAt` and `lockAt`, `locked == false`).
+7. Never commit secrets. Firebase web config lives in `web/.env` (`VITE_FIREBASE_*`), which is git-ignored.
+8. Don't use Duolingo's logo, name or the Duo owl in code/assets until we confirm approval. Use the placeholder `BRAND` constants in `web/src/config/brand.ts`.
+
+## How to work
+- Do one task at a time from `docs/PLAN.md`. After each task: run it in the emulator, tick the "done when" check, commit.
+- Commit messages: `day<N>: <task #> <short description>`.
+- Keep functions small: one file per function in `functions/src/fns/`, shared helpers in `functions/src/lib/`.
+- Mobile-first: design at 375 px wide; must run on a cheap Android phone over campus Wi-Fi.
+- 3D models under 2 MB each; lazy-load AR code only on the Scan screen.
+- If a task is ambiguous, follow `docs/SPEC.md`; if SPEC is silent, choose the simplest option and leave a `// DECISION:` comment.
+- Write unit tests for scoring/matching/date helpers (`functions/src/lib/*.test.ts`, vitest).
+
+## Commands
+- Emulators: `firebase emulators:start`
+- Web dev: `cd web && npm run dev`
+- Seed emulator: `npx tsx scripts/seed.ts`
+- Tests: `cd functions && npm test`
+- Deploy: `firebase deploy` (only after the day's checks pass)

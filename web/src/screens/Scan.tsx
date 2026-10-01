@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { GetMyStateOutput } from "@shared/types";
 import { loadModel } from "../ar/models";
 import { createScanner, type Scanner } from "../ar/scanner";
+import { loadTargets } from "../ar/targets";
 import ScanOverlay from "../components/ScanOverlay";
 import { api } from "../lib/api";
 import { catchStatus } from "../lib/catchStatus";
@@ -37,11 +38,11 @@ export default function Scan() {
     let current: number | null = null; // posterIndex in view
 
     (async () => {
-      const lingos = await loadLingos();
+      const [lingos, targets] = await Promise.all([loadLingos(), loadTargets()]);
       if (cancelled) return;
       const byPoster = new Map(lingos.map((l) => [l.posterIndex, l]));
 
-      const s = createScanner(container.current!, [...byPoster.keys()], {
+      const s = createScanner(container.current!, targets, [...byPoster.keys()], {
         onFound: (i) => {
           current = i;
           const l = byPoster.get(i)!;

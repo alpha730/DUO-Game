@@ -2,10 +2,7 @@
 // TensorFlow.js and three.js never land in the bundle for other screens.
 // DECISION: three is pinned to 0.151.3 — mind-ar 1.2.5 imports `sRGBEncoding`, removed in three r152.
 import { MindARThree, type MindARAnchor } from "mind-ar/dist/mindar-image-three.prod.js";
-import { Clock, DirectionalLight, HemisphereLight, type Object3D } from "three";
-
-/** Compiled from the 10 posters; target index = posterIndex (SPEC §8). Replace the file, not the code. */
-export const TARGETS_URL = "/assets/targets.mind";
+import { Clock, DirectionalLight, HemisphereLight, Texture, type Mesh, type Object3D } from "three";
 
 export interface ScannerEvents {
   onFound(posterIndex: number): void;
@@ -25,9 +22,15 @@ const HOVER_Z = 0.3;
 const BOB_HEIGHT = 0.04;
 
 /**
+ * @param targetsSrc URL of the compiled targets (from loadTargets()).
  * @param posterIndexes which targets to track (one anchor each) — from the `lingos` collection.
  */
-export function createScanner(container: HTMLElement, posterIndexes: number[], events: ScannerEvents): Scanner {
+export function createScanner(
+  container: HTMLElement,
+  targetsSrc: string,
+  posterIndexes: number[],
+  events: ScannerEvents,
+): Scanner {
   // Each scanner gets its own root so stopping one (e.g. React StrictMode's double mount) never
   // removes another scanner's video/canvas.
   const root = document.createElement("div");
@@ -36,7 +39,7 @@ export function createScanner(container: HTMLElement, posterIndexes: number[], e
 
   const mindar = new MindARThree({
     container: root,
-    imageTargetSrc: TARGETS_URL,
+    imageTargetSrc: targetsSrc,
     maxTrack: 1,
     uiLoading: "no",
     uiScanning: "no",
@@ -61,7 +64,50 @@ export function createScanner(container: HTMLElement, posterIndexes: number[], e
   }
 
   const clock = new Clock();
-  let running = false;
+  let starting = false;
+  let stopped = false;
+
+  /** Camera off + everything freed. Safe in any state, including after a failed start. */
+  function teardown() {
+    mindar.renderer.setAnimationLoop(null);
+    // Not mindar.stop(): it throws if start() failed after opening the camera (no controller yet),
+    // which would leave the camera light on.
+    mindar.controller?.stopProcessVideo();
+    const stream = mindar.video?.srcObject as MediaStream | null | undefined;
+    stream?.getTracks().forEach((t) => t.stop());
+    mindar.video?.remove();
+    dispose();
+  }
+
+  /** Frees everything MindAR's own stop() leaves behind (SPEC §8: dispose the scene on leave). */
+  function dispose() {
+    // The image-matching worker: MindAR's dispose() only messages it, so terminate it ourselves.
+    const controller = mindar.controller;
+    controller?.dispose();
+    controller?.worker?.terminate();
+
+    mindar.scene.traverse((obj) => {
+      const mesh = obj as Mesh;
+      mesh.geometry?.dispose();
+      const materials = Array.isArray(mesh.material) ? mesh.material : mesh.material ? [mesh.material] : [];
+      for (const m of materials) {
+        for (const value of Object.values(m)) if (value instanceof Texture) value.dispose();
+        m.dispose();
+      }
+    });
+    mindar.scene.clear();
+    models.clear();
+
+    // Phones allow only a few WebGL contexts; release ours instead of waiting for GC.
+    mindar.renderer.dispose();
+    mindar.renderer.forceContextLoss();
+
+    // MindAR registers window "resize" with an anonymous bound function we can't remove; neuter it.
+    mindar.resize = () => {};
+
+    // MindAR appends its canvases to the root; remove them with it.
+    root.remove();
+  }
 
   function animate() {
     const t = clock.getElapsedTime();
@@ -75,19 +121,22 @@ export function createScanner(container: HTMLElement, posterIndexes: number[], e
 
   return {
     async start() {
-      await mindar.start();
-      running = true;
+      starting = true;
+      try {
+        await mindar.start();
+      } finally {
+        starting = false;
+        // Left the screen while the camera was starting: finish the stop now that it's open.
+        if (stopped) teardown();
+      }
+      if (stopped) return;
       clock.start();
       mindar.renderer.setAnimationLoop(animate);
     },
     stop() {
-      if (running) {
-        running = false;
-        mindar.renderer.setAnimationLoop(null);
-        mindar.stop();
-      }
-      // MindAR appends its video + canvases to the root; remove them with it.
-      root.remove();
+      if (stopped) return;
+      stopped = true;
+      if (!starting) teardown(); // otherwise start() tears down when the camera finishes opening
     },
     setModel(i, model) {
       const anchor = anchors.get(i);

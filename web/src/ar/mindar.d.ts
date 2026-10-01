@@ -25,6 +25,11 @@ declare module "mind-ar/dist/mindar-image-three.prod.js" {
     renderer: WebGLRenderer;
     scene: Scene;
     camera: PerspectiveCamera;
+    /** Set once start() has loaded the targets. */
+    controller?: { dispose(): void; stopProcessVideo(): void; worker?: Worker };
+    /** Set once start() has opened the camera. */
+    video?: HTMLVideoElement;
+    resize(): void;
     addAnchor(targetIndex: number): MindARAnchor;
     start(): Promise<void>;
     stop(): void;

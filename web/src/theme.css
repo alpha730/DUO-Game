@@ -363,3 +363,18 @@ a {
   text-align: center;
   font-weight: 600;
 }
+
+.camera-help {
+  width: 100%;
+  max-width: 448px;
+  margin: auto 0;
+  padding: 20px 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.camera-help h2 {
+  margin-bottom: 12px;
+}

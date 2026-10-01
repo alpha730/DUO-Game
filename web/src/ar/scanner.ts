@@ -3,6 +3,7 @@
 // DECISION: three is pinned to 0.151.3 — mind-ar 1.2.5 imports `sRGBEncoding`, removed in three r152.
 import { MindARThree, type MindARAnchor } from "mind-ar/dist/mindar-image-three.prod.js";
 import { Clock, DirectionalLight, HemisphereLight, Texture, type Mesh, type Object3D } from "three";
+import { withCameraErrors } from "./cameraError";
 
 export interface ScannerEvents {
   onFound(posterIndex: number): void;
@@ -104,6 +105,10 @@ export function createScanner(
 
     // MindAR registers window "resize" with an anonymous bound function we can't remove; neuter it.
     mindar.resize = () => {};
+    // Each MindAR instance adds its UI <style> to <head>; drop them so visits don't pile up.
+    for (const s of document.head.querySelectorAll("style")) {
+      if (s.textContent?.startsWith(".mindar-ui-overlay")) s.remove();
+    }
 
     // MindAR appends its canvases to the root; remove them with it.
     root.remove();
@@ -123,7 +128,7 @@ export function createScanner(
     async start() {
       starting = true;
       try {
-        await mindar.start();
+        await withCameraErrors(() => mindar.start());
       } finally {
         starting = false;
         // Left the screen while the camera was starting: finish the stop now that it's open.

@@ -14,6 +14,7 @@ import {
   type LingoDoc,
   type PrizeDoc,
 } from "../shared/types";
+import { LINGOS, lingoId } from "./lingos";
 
 const args = process.argv.slice(2);
 const prod = args.includes("--prod");
@@ -31,21 +32,6 @@ const IST = "+05:30";
 const istDate = (ms = Date.now()) => new Date(ms + 5.5 * 3600 * 1000).toISOString().slice(0, 10);
 const today = istDate();
 
-const LINGOS: Array<[string, string, LingoDoc["rarity"], string]> = [
-  ["Pip", "2016", "common", "#58CC02"],
-  ["Ziggy", "2017", "common", "#1CB0F6"],
-  ["Bloop", "2018", "common", "#FF9600"],
-  ["Echo", "2019", "rare", "#CE82FF"],
-  ["Nova", "2020", "rare", "#FF4B4B"],
-  ["Remy", "2021", "rare", "#FFC800"],
-  ["Quill", "2022", "epic", "#2B70C9"],
-  ["Sage", "2023", "epic", "#00CD9C"],
-  ["Lumo", "2024", "legendary", "#E91E63"],
-  ["Decka", "2025", "legendary", "#7C4DFF"],
-];
-
-const lingoId = (year: string) => `lingo-${year}`;
-
 async function main() {
   const batch = db.batch();
 
@@ -54,7 +40,7 @@ async function main() {
       name,
       detYear: Number(year),
       posterIndex,
-      modelUrl: `/assets/models/${lingoId(year)}.glb`, // placeholder until Day 2 models land
+      modelUrl: `/assets/models/${lingoId(year)}.glb`, // placeholder cubes from make-placeholder-models.ts
       rarity,
       color,
     };

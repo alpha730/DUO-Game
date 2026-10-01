@@ -6,3 +6,4 @@ setGlobalOptions({ region: "asia-south1", maxInstances: 20 });
 
 // One export per function; each lives in its own file in ./fns.
 export { completeProfile } from "./fns/completeProfile";
+export { getMyState } from "./fns/getMyState";

@@ -305,10 +305,16 @@ export type UserView = Omit<UserDoc, "createdAt"> & { createdAt: number };
 export type CatchView = Omit<CatchDoc, "firstCaughtAt"> & { lingoId: string; firstCaughtAt: number | null };
 
 export type GetMyStateInput = Record<string, never>;
+// DECISION: besides SPEC's {user, catches, serverNow}, getMyState returns the server's IST `today`
+// and attempts left, so the client never computes "today" itself (CLAUDE.md).
 export interface GetMyStateOutput {
+  /** null until the profile is set up. attemptsToday is already reset to 0 if attemptsDate ≠ today. */
   user: UserView | null;
   catches: CatchView[];
   serverNow: number;
+  today: IstDate;
+  attemptsLeft: number;
+  attemptsPerDay: number;
 }
 
 export interface StartAttemptInput {

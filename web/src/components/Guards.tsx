@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import type { Role } from "@shared/types";
+import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../lib/auth";
 
 export function Loading() {
@@ -34,5 +35,22 @@ export function RequireProfile({ children }: { children: ReactNode }) {
   if (user === undefined || (user && profile === undefined)) return <Loading />;
   if (!user) return <Navigate to="/" replace />;
   if (!profile?.profileDone) return <Navigate to="/setup" replace />;
+  return <>{children}</>;
+}
+
+/** Role-gated screens (custom claim `role`, set by scripts/setRole.ts). */
+export function RequireRole({ roles, children }: { roles: Role[]; children: ReactNode }) {
+  const { user, role } = useAuth();
+  if (user === undefined || (user && role === undefined)) return <Loading />;
+  if (!user) return <Navigate to="/" replace />;
+  if (!role || !roles.includes(role)) {
+    return (
+      <main className="screen center">
+        <h2>Staff only</h2>
+        <p className="muted">This page is for {roles.join(" / ")} accounts.</p>
+        <Link className="btn secondary" to="/home">Back to the hunt</Link>
+      </main>
+    );
+  }
   return <>{children}</>;
 }

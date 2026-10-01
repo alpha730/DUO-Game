@@ -1,7 +1,7 @@
 import { onAuthStateChanged, signOut as fbSignOut, type User } from "firebase/auth";
 import { doc, onSnapshot } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { COL, type UserDoc } from "@shared/types";
+import { COL, type Role, type UserDoc } from "@shared/types";
 import { auth, db } from "./firebase";
 
 interface AuthState {
@@ -9,6 +9,8 @@ interface AuthState {
   user: User | null | undefined;
   /** undefined while loading; null if the user doc doesn't exist yet */
   profile: UserDoc | null | undefined;
+  /** undefined while loading; null for players */
+  role: Role | null | undefined;
   signOut: () => Promise<void>;
 }
 
@@ -17,8 +19,21 @@ const AuthContext = createContext<AuthState | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [profile, setProfile] = useState<UserDoc | null | undefined>(undefined);
+  const [role, setRole] = useState<Role | null | undefined>(undefined);
 
   useEffect(() => onAuthStateChanged(auth, setUser), []);
+
+  useEffect(() => {
+    if (!user) {
+      setRole(user === null ? null : undefined);
+      return;
+    }
+    setRole(undefined);
+    user
+      .getIdTokenResult()
+      .then((t) => setRole((t.claims.role as Role | undefined) ?? null))
+      .catch(() => setRole(null));
+  }, [user]);
 
   // Live user doc (owner-readable per firestore.rules), so points/profile update after function calls.
   useEffect(() => {
@@ -36,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = () => fbSignOut(auth);
 
-  return <AuthContext.Provider value={{ user, profile, signOut }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, profile, role, signOut }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

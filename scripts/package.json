@@ -1,0 +1,13 @@
+{
+  "name": "scripts",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "firebase-admin": "^13.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

@@ -461,3 +461,35 @@ a {
   border-radius: 14px;
   flex: none;
 }
+
+.timer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.timer-bar {
+  flex: 1;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.timer-fill {
+  height: 100%;
+  background: var(--primary);
+  transition: width 0.1s linear;
+}
+
+.timer[data-low="true"] .timer-fill {
+  background: var(--warn);
+}
+
+.timer-seconds {
+  min-width: 3ch;
+  text-align: right;
+  font-weight: 800;
+  font-size: 1.2rem;
+  font-variant-numeric: tabular-nums;
+}

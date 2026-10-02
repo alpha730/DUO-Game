@@ -53,6 +53,10 @@ describe("completeProfile", () => {
       allTenBonus: false,
       favorites: [],
       favoriteChangesLeft: 1,
+      wins: 0,
+      losses: 0,
+      totalAnswerMs: 0,
+      pointsReachedAt: null,
       profileDone: true,
     });
     for (const old of ["todayPoints", "todayDate", "streak", "lastWinDate"]) expect(snap.data()).not.toHaveProperty(old);

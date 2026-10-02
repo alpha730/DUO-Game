@@ -65,6 +65,10 @@ export const completeProfile = onCall<unknown, Promise<CompleteProfileOutput>>(a
       allTenBonus: false,
       favorites: [],
       favoriteChangesLeft: rules.favoriteChanges,
+      wins: 0,
+      losses: 0,
+      totalAnswerMs: 0,
+      pointsReachedAt: null,
       profileDone: true,
       createdAt: FieldValue.serverTimestamp(),
     });

@@ -19,6 +19,17 @@ export function words(text: string): string[] {
 }
 
 /**
+ * Pronounce match (SPEC §2): pass if the transcript contains the word or one of its `accept`
+ * spellings as whole words ("schedule" ≠ "schedules"). Multi-word spellings ("all right") must
+ * appear as consecutive words. Normalised like `words()`.
+ */
+export function matchWord(word: string, transcript: string, accept: string[] = []): { passed: boolean } {
+  const heard = ` ${words(transcript).join(" ")} `;
+  const targets = [word, ...accept].map((t) => words(t).join(" ")).filter(Boolean);
+  return { passed: targets.some((t) => heard.includes(` ${t} `)) };
+}
+
+/**
  * Speech match (SPEC §5): each phrase word counts if it appears anywhere in the transcript.
  * Extra words and word order don't matter. Phrases should spell out numbers, since speech
  * recognition may return either "10" or "ten".

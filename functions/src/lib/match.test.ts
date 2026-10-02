@@ -1,5 +1,33 @@
 import { describe, expect, it } from "vitest";
-import { matchPhrase, words } from "./match";
+import { matchPhrase, matchWord, words } from "./match";
+
+describe("matchWord (pronounce)", () => {
+  it("passes when the transcript is the word", () => {
+    expect(matchWord("comfortable", "comfortable").passed).toBe(true);
+  });
+  it("ignores case, punctuation and extra words around it", () => {
+    expect(matchWord("Entrepreneur", "um the word is entrepreneur!").passed).toBe(true);
+  });
+  it("accepts listed alternative spellings", () => {
+    expect(matchWord("colour", "color", ["color"]).passed).toBe(true);
+    expect(matchWord("colour", "color").passed).toBe(false);
+  });
+  it("supports multi-word spellings as consecutive words", () => {
+    expect(matchWord("alright", "it's all right", ["all right"]).passed).toBe(true);
+    expect(matchWord("alright", "all is right", ["all right"]).passed).toBe(false);
+  });
+  it("matches whole words only", () => {
+    expect(matchWord("schedule", "schedules").passed).toBe(false);
+    expect(matchWord("form", "comfortable").passed).toBe(false);
+  });
+  it("fails a wrong or empty transcript", () => {
+    expect(matchWord("schedule", "shed jewel").passed).toBe(false);
+    expect(matchWord("schedule", "").passed).toBe(false);
+  });
+  it("never passes an empty word", () => {
+    expect(matchWord("", "anything", [""]).passed).toBe(false);
+  });
+});
 
 describe("words", () => {
   it("lowercases, strips punctuation, collapses spaces", () => {

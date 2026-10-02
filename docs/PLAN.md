@@ -62,8 +62,8 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 | 3.3 | `forfeitAttempt` as HTTP `onRequest` with Bearer token, CORS for hosting domain | `curl` with token forfeits |
 | 3.4 | Catch screen pre-flight: mic permission (speak) + location, then Start button | No permission prompt appears after Start |
 | 3.5 | Timer from `expiresAt − serverNow`; auto-submit/fail at 0 | Changing phone clock does nothing |
-| 3.6 | Speak UI: SpeechRecognition `en-IN`, interim transcript shown, stop on final result → submit | Saying the phrase wins |
-| 3.7 | Meaning UI: word + 4 big buttons → submit | Right option wins, wrong fails |
+| 3.6 | Pronounce + speak UI: SpeechRecognition `en-IN`, interim transcript shown, stop on final result → submit | Saying the word / sentence wins |
+| 3.7 | Meaning + question UI: word or question prompt + 4 big buttons → submit | Right option wins, wrong fails |
 | 3.8 | One-chance: `visibilitychange`(hidden) + `pagehide` → `fetch(keepalive)` forfeit with cached token → "Chance lost" | Switching tab mid-attempt forfeits; reload shows attempt forfeited |
 | 3.9 | Result screen: won / failed (missed words) / forfeit; attempts left today (x/4) | All 3 states shown |
 | 3.10 | Browser without SpeechRecognition + a speak challenge → show "Open in Chrome or Safari" before Start (no attempt used) | Firefox shows message, attempts unchanged |
@@ -71,7 +71,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 ## Day 4 — Points, favourites, Lingo streaks + levels, Home (Oct 4)
 | # | Task | Done when |
 |---|---|---|
-| 4.1 | `lib/points.ts`: pure function (user, catch doc, isFavorite, today, rules) → points, new favStreak, new level, bonuses (MAX, all-10); unit tests | Tests: first catch, non-fav repeat, fav streak day 1→10, missed day resets streak but keeps level, MAX bonus once, all-10 once |
+| 4.1 | `lib/points.ts`: pure function (user, catch doc, isFavorite, today, rules) → points, new favStreak, new level, bonuses (MAX, all-10) + speed bonus from seconds left; unit tests | Tests: speed bonus 0…max and clamped, first catch, non-fav repeat, fav streak day 1→10, missed day resets streak but keeps level, MAX bonus once, all-10 once |
 | 4.2 | Wire into `submitAttempt` in one transaction (user, catch doc, pointsLog) | Points + levels correct in emulator |
 | 4.3 | `attemptsToday` resets when `attemptsDate` ≠ today; limit 4; raid attempts skip it | 5th attempt rejected |
 | 4.4 | `setFavorites` (exactly 2, both caught; 1 change allowed; changed favourite streak → 0) + tests | Second change rejected |
@@ -82,7 +82,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 ## Day 5 — Leaderboards + Me (Oct 5)
 | # | Task | Done when |
 |---|---|---|
-| 5.1 | `refreshLeaderboard` scheduled every 5 min (+ admin "refresh now") | Docs update |
+| 5.1 | `refreshLeaderboard` scheduled every 5 min (+ admin "refresh now"), tie-break order: points → accuracy → avg answer time → reached first; unit test the sort | Two users with equal points rank by accuracy, then speed |
 | 5.2 | Leaderboard screen: Students / Departments tabs, own rank pinned (own points from user doc; rank "100+" if outside top 100) | Shows correctly |
 | 5.3 | Me screen: QR of uid (`qrcode` lib), stats, logout | QR scannable |
 | 5.4 | Firestore index for points ordering | No index errors |
@@ -101,7 +101,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 |---|---|---|
 | 7.1 | `scripts/setRole.ts` (admin/volunteer claims) | Role works |
 | 7.2 | `/admin`: edit config, upload challenges JSON (validate 4 options, correctIndex 0–3, dates in range), create raid, stats (users, attempts today, wins), refresh leaderboard, lock game | All actions work |
-| 7.3 | Load 130 real challenges (Oct 10–22) | Every day × Lingo has one |
+| 7.3 | Load 130 real challenges (Oct 10–22), all 4 types mixed ~25% each, medium difficulty (B1–B2) | Every day × Lingo has one |
 | 7.4 | Set real campus centre + radius, real start/lock times | Config final |
 | 7.5 | Share card on Me: canvas image "I caught 7/10 Lingos · 1,240 pts" → Web Share API / download | Shares to Instagram |
 

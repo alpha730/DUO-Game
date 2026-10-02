@@ -63,15 +63,26 @@ async function main() {
   };
   batch.set(db.collection(COL.config).doc(DOC.gameConfig), config);
 
+  // One sample of each type for today (medium, CEFR B1–B2 — SPEC §9).
   const challenges: Array<[string, ChallengeDoc]> = [
-    [lingoId("2016"), { type: "speak", phrase: "Ten years of opening doors to the world" }],
+    [lingoId("2016"), { type: "pronounce", word: "programme", accept: ["program"] }],
+    [lingoId("2017"), { type: "speak", phrase: "Practice every day and you will see the difference." }],
     [
-      lingoId("2017"),
+      lingoId("2018"),
       {
         type: "meaning",
-        word: "resilient",
-        options: ["Easily broken", "Able to recover quickly", "Very quiet", "Always late"],
-        correctIndex: 1,
+        word: "reluctant",
+        options: ["unwilling", "excited", "tired", "careful"],
+        correctIndex: 0,
+      },
+    ],
+    [
+      lingoId("2019"),
+      {
+        type: "question",
+        prompt: "She has been working here ___ 2022.",
+        options: ["since", "for", "from", "at"],
+        correctIndex: 0,
       },
     ],
   ];

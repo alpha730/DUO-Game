@@ -20,6 +20,7 @@ export function userView(user: UserDoc, today: string): UserView {
     ...user,
     attemptsToday: attemptsUsedToday(user, today),
     createdAt: millis(user.createdAt) ?? 0,
+    pointsReachedAt: millis(user.pointsReachedAt),
   };
 }
 

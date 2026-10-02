@@ -19,6 +19,7 @@ const NEVER_READABLE = [
   "pointsLog/p1",
   "redemptions/r1",
   "raids/raid1/players/alice",
+  "depts/CSE",
 ];
 const SIGNED_IN_READABLE = [
   "lingos/lingo1",

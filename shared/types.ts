@@ -24,7 +24,10 @@ export type Year = (typeof YEARS)[number];
 export const LINGO_COUNT = 10;
 
 export type Role = "admin" | "volunteer";
-export type ChallengeType = "speak" | "meaning";
+/** pronounce/speak are voice (mic); meaning/question are 4-option taps. */
+export type ChallengeType = "pronounce" | "speak" | "meaning" | "question";
+export const CHALLENGE_TYPES = ["pronounce", "speak", "meaning", "question"] as const;
+export const isVoiceChallenge = (t: ChallengeType) => t === "pronounce" || t === "speak";
 export type AttemptStatus = "open" | "won" | "failed" | "forfeit";
 export type RaidStatus = "scheduled" | "active" | "ended";
 export type FinalStatus = "idle" | "showing" | "recording" | "scoring" | "done";
@@ -45,6 +48,7 @@ export const COL = {
   players: "players", // subcollection of raids/{id}
   prizes: "prizes",
   redemptions: "redemptions",
+  depts: "depts", // depts/{dept}: running totals, server-only
   final: "final",
 } as const;
 
@@ -83,6 +87,14 @@ export interface UserDoc {
   /** lingoIds, max 2; empty until chosen after the first 2 catches. */
   favorites: string[];
   favoriteChangesLeft: number;
+  // Leaderboard tie-breaks (SPEC §2): points → accuracy → avg answer time → reached first.
+  wins: number;
+  /** failed + forfeited (incl. expired and auto-forfeited) */
+  losses: number;
+  /** Sum of answerMs over wins; avg answer time = totalAnswerMs / wins. */
+  totalAnswerMs: number;
+  /** When the user reached their current points total (earlier ranks higher on ties). */
+  pointsReachedAt: FireTimestamp | null;
   profileDone: boolean;
   createdAt: FireTimestamp;
 }
@@ -117,10 +129,14 @@ export interface GameRules {
   catchesPerLingoPerDay: number; // 1 — a failed attempt may be retried on the same Lingo
   favoritesCount: number; // 2
   favoriteChanges: number; // 1 for the whole game
+  pronounceSeconds: number; // 15
   speakSeconds: number; // 20
   meaningSeconds: number; // 15
+  questionSeconds: number; // 20
   graceSeconds: number; // 2
   speakPassRatio: number; // 0.8
+  /** Every correct answer: +this per full second left on the server timer (clamped 0…timer). */
+  speedBonusPerSecond: number; // 1
   firstCatchPoints: number; // 100 (Level 1)
   repeatCatchPoints: number; // 20 — non-favourite
   favoriteCatchPointsPerDay: number; // 20 × favourite's streak day (day 1 = 20 … day 10 = 200)
@@ -140,10 +156,13 @@ export const DEFAULT_RULES: GameRules = {
   catchesPerLingoPerDay: 1,
   favoritesCount: 2,
   favoriteChanges: 1,
+  pronounceSeconds: 15,
   speakSeconds: 20,
   meaningSeconds: 15,
+  questionSeconds: 20,
   graceSeconds: 2,
   speakPassRatio: 0.8,
+  speedBonusPerSecond: 1,
   firstCatchPoints: 100,
   repeatCatchPoints: 20,
   favoriteCatchPointsPerDay: 20,
@@ -168,9 +187,27 @@ export interface GameConfigDoc {
   rules: GameRules;
 }
 
-/** challenges/{date}_{lingoId} — never client-readable */
+/** Seconds allowed for each challenge type. */
+export function timerSeconds(type: ChallengeType, rules: GameRules): number {
+  return {
+    pronounce: rules.pronounceSeconds,
+    speak: rules.speakSeconds,
+    meaning: rules.meaningSeconds,
+    question: rules.questionSeconds,
+  }[type];
+}
+
+/** challenges/{date}_{lingoId} — never client-readable. Medium difficulty (CEFR B1–B2). */
+export interface PronounceChallengeDoc {
+  type: "pronounce";
+  /** Say this word. */
+  word: string;
+  /** Other spellings speech recognition may return (e.g. "colour" for "color"). Never sent to the client. */
+  accept?: string[];
+}
 export interface SpeakChallengeDoc {
   type: "speak";
+  /** Say this sentence; pass at ≥ speakPassRatio of its words. */
   phrase: string;
 }
 export interface MeaningChallengeDoc {
@@ -179,7 +216,14 @@ export interface MeaningChallengeDoc {
   options: [string, string, string, string];
   correctIndex: 0 | 1 | 2 | 3;
 }
-export type ChallengeDoc = SpeakChallengeDoc | MeaningChallengeDoc;
+export interface QuestionChallengeDoc {
+  type: "question";
+  /** e.g. fill in the blank, pick the correct sentence, synonym/antonym, simple grammar */
+  prompt: string;
+  options: [string, string, string, string];
+  correctIndex: 0 | 1 | 2 | 3;
+}
+export type ChallengeDoc = PronounceChallengeDoc | SpeakChallengeDoc | MeaningChallengeDoc | QuestionChallengeDoc;
 
 /** attempts/{id} — never client-readable */
 export interface AttemptDoc {
@@ -191,7 +235,14 @@ export interface AttemptDoc {
   startedAt: FireTimestamp;
   expiresAt: FireTimestamp;
   status: AttemptStatus;
-  score?: number; // 0–1 match ratio (speak) or 0/1 (meaning)
+  /** 0–1 word match (speak), else 0/1. */
+  score?: number;
+  /** Server time the answer arrived (set by submitAttempt). */
+  receivedAt?: FireTimestamp;
+  /** receivedAt − startedAt */
+  answerMs?: number;
+  /** floor((expiresAt − receivedAt)/1000), clamped 0…timer; only counts on a win. */
+  speedBonus?: number;
 }
 
 /** rollNumbers/{roll} — never client-readable */
@@ -203,6 +254,7 @@ export type PointsReason =
   | "firstCatch"
   | "repeatCatch"
   | "favoriteCatch"
+  | "speed"
   | "max"
   | "allTen"
   | "raid"
@@ -223,12 +275,23 @@ export interface StudentRow {
   name: string;
   dept: Department;
   points: number;
+  /** wins ÷ (wins + losses), 0–1 */
+  accuracy: number;
+  /** totalAnswerMs ÷ wins */
+  avgAnswerMs: number;
 }
 
 /** leaderboard/students — signed-in read */
 export interface StudentsBoardDoc {
-  top: StudentRow[]; // top 100
+  /** Top 100 in tie-break order: points → accuracy → avgAnswerMs (low first) → pointsReachedAt. */
+  top: StudentRow[];
   updatedAt: FireTimestamp;
+}
+
+/** depts/{dept} — server-only running totals, updated inside submitAttempt; copied to leaderboard/depts. */
+export interface DeptDoc {
+  points: number;
+  players: number;
 }
 
 export interface DeptRow {
@@ -305,7 +368,10 @@ export interface CompleteProfileOutput {
 }
 
 /** UserDoc with timestamps as millis, as returned by functions */
-export type UserView = Omit<UserDoc, "createdAt"> & { createdAt: number };
+export type UserView = Omit<UserDoc, "createdAt" | "pointsReachedAt"> & {
+  createdAt: number;
+  pointsReachedAt: number | null;
+};
 export type CatchView = Omit<CatchDoc, "firstCaughtAt"> & { lingoId: string; firstCaughtAt: number | null };
 
 export type GetMyStateInput = Record<string, never>;
@@ -327,12 +393,17 @@ export interface StartAttemptInput {
   lng: number;
   raidId?: string;
 }
-/** Never contains the answer (correctIndex). */
+/** Never contains the answer: no `accept`, no `correctIndex` (CLAUDE.md rule 4). */
 export interface StartAttemptOutput {
   attemptId: string;
   type: ChallengeType;
-  phrase?: string;
+  /** pronounce, meaning */
   word?: string;
+  /** speak */
+  phrase?: string;
+  /** question */
+  prompt?: string;
+  /** meaning, question — always 4 */
   options?: string[];
   expiresAt: number;
   serverNow: number;
@@ -342,8 +413,10 @@ export interface StartAttemptOutput {
 
 export interface SubmitAttemptInput {
   attemptId: string;
-  transcript?: string; // speak
-  choice?: number; // meaning, 0–3
+  /** pronounce, speak */
+  transcript?: string;
+  /** meaning, question: 0–3 */
+  choice?: number;
 }
 export type BonusKind = "max" | "allTen" | "raid";
 export interface Bonus {
@@ -352,8 +425,10 @@ export interface Bonus {
 }
 export interface SubmitAttemptOutput {
   result: "won" | "failed";
-  /** Total added by this attempt, bonuses included. */
+  /** Total added by this attempt, speed bonus and bonuses included; 0 on a fail. */
   pointsAdded: number;
+  /** Part of pointsAdded: +1 per full second left (0 on a fail). */
+  speedBonus: number;
   bonuses: Bonus[];
   /** Lingo level after this attempt (unchanged on a fail). */
   newLevel: Level;
@@ -410,8 +485,10 @@ export interface AdminSetConfigInput {
 }
 
 export type ChallengeUpload =
+  | { date: IstDate; lingoId: string; type: "pronounce"; word: string; accept?: string[] }
   | { date: IstDate; lingoId: string; type: "speak"; phrase: string }
-  | { date: IstDate; lingoId: string; type: "meaning"; word: string; options: string[]; correctIndex: number };
+  | { date: IstDate; lingoId: string; type: "meaning"; word: string; options: string[]; correctIndex: number }
+  | { date: IstDate; lingoId: string; type: "question"; prompt: string; options: string[]; correctIndex: number };
 export interface AdminUpsertChallengesInput {
   challenges: ChallengeUpload[];
 }

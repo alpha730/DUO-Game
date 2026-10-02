@@ -34,6 +34,11 @@ export default function Result({
       body = (
         <>
           {outcome.data.pointsAdded > 0 && <p className="points-pop">+{outcome.data.pointsAdded}</p>}
+          {outcome.data.needsFavorites && (
+            <Link className="btn" to="/favorites" data-needs-favorites>
+              ⭐ Pick your 2 favourites
+            </Link>
+          )}
           <p className="muted">
             Nice one. Come back tomorrow to catch it again.
           </p>

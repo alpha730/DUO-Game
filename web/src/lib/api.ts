@@ -6,6 +6,8 @@ import type {
   GetMyStateOutput,
   StartAttemptInput,
   StartAttemptOutput,
+  SetFavoritesInput,
+  SetFavoritesOutput,
   SubmitAttemptInput,
   SubmitAttemptOutput,
 } from "@shared/types";
@@ -40,6 +42,7 @@ export const api = {
     return startAttempt(data);
   },
   submitAttempt: call<SubmitAttemptInput, SubmitAttemptOutput>("submitAttempt"),
+  setFavorites: call<SetFavoritesInput, SetFavoritesOutput>("setFavorites"),
 };
 
 /** User-facing text for a callable error. Server HttpsErrors already carry friendly messages. */

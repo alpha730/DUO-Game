@@ -20,5 +20,13 @@ export default defineConfig({
   server: {
     host: true, // reachable from a phone on the same Wi-Fi
     fs: { allow: [".."] }, // ../shared
+    // Same-origin forfeit endpoint, like the Hosting rewrite in firebase.json (no CORS preflight
+    // for the keepalive request fired while the page is closing).
+    proxy: {
+      "/api/forfeit": {
+        target: "http://127.0.0.1:5001",
+        rewrite: () => "/demo-decade-hunt/asia-south1/forfeitAttempt",
+      },
+    },
   },
 });

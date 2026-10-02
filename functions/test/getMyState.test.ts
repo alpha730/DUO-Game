@@ -81,6 +81,7 @@ describe("getMyState", () => {
     await theirs.set({ ...base, uid: "someone-else", status: "open" });
     await p.getMyState();
     expect((await mine.get()).data()?.status).toBe("forfeit");
+    expect((await adb.doc(`users/${p.uid}`).get()).data()?.losses).toBe(1); // a forfeit is a loss
     expect((await theirs.get()).data()?.status).toBe("open");
   });
 

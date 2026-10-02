@@ -7,5 +7,7 @@ export default defineConfig({
     include: ["test/**/*.test.ts"],
     testTimeout: 30000,
     hookTimeout: 30000,
+    // Some tests patch config/game temporarily; run files one at a time.
+    fileParallelism: false,
   },
 });

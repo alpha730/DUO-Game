@@ -9,6 +9,7 @@ import {
 } from "@shared/types";
 import { requestLocation, requestMic, type CheckState, type Position } from "../catch/preflight";
 import { useCountdown } from "../catch/useCountdown";
+import ChoiceChallenge from "../components/ChoiceChallenge";
 import Preflight from "../components/Preflight";
 import TimerBar from "../components/TimerBar";
 import VoiceChallenge from "../components/VoiceChallenge";
@@ -41,7 +42,7 @@ function Active({ challenge, onSubmit }: { challenge: StartAttemptOutput; onSubm
       {isVoiceChallenge(challenge.type) ? (
         <VoiceChallenge challenge={challenge} onTranscript={onTranscript} onSubmit={onVoice} />
       ) : (
-        <p className="small muted">Challenge: {challenge.type}</p>
+        <ChoiceChallenge challenge={challenge} onChoose={(choice) => onSubmit({ choice })} />
       )}
     </section>
   );

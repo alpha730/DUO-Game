@@ -12,6 +12,7 @@ import { requestLocation, requestMic, type CheckState, type Position } from "../
 import { useCountdown } from "../catch/useCountdown";
 import ChoiceChallenge from "../components/ChoiceChallenge";
 import Preflight from "../components/Preflight";
+import Result from "../components/Result";
 import TimerBar from "../components/TimerBar";
 import VoiceChallenge from "../components/VoiceChallenge";
 import { api, apiErrorMessage } from "../lib/api";
@@ -57,7 +58,13 @@ export default function Catch() {
   // Reload mid-attempt → the pagehide forfeit already went out: show "Chance lost" straight away.
   const [reloaded] = useState(() => (reloadedAttempt?.lingoId === lingoId ? reloadedAttempt : null));
   const [lingo, setLingo] = useState<Lingo | null>(null);
-  const [me, setMe] = useState<GetMyStateOutput | null>(null);
+  const [me, setMeRaw] = useState<GetMyStateOutput | null>(null);
+  // Latest server count of attempts left today (getMyState, then each startAttempt).
+  const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null);
+  const setMe = useCallback((s: GetMyStateOutput) => {
+    setMeRaw(s);
+    setAttemptsLeft(s.attemptsLeft);
+  }, []);
   const [phase, setPhase] = useState<Phase>(reloaded ? "done" : "preflight");
   const [mic, setMic] = useState<CheckState>("idle");
   const [loc, setLoc] = useState<CheckState>("idle");
@@ -67,13 +74,14 @@ export default function Catch() {
   const [outcome, setOutcome] = useState<Outcome | null>(reloaded ? { kind: "forfeit" } : null);
   const token = useRef<string | null>(null);
   const submitted = useRef(false);
+  const lastAnswer = useRef<Answer>({});
 
   // Mount: auto-forfeit any open attempt (SPEC §3.5) + attempts left; Lingo name/colour.
   useEffect(() => {
     if (reloaded) reloadedAttempt = null; // show it once
     api.getMyState({}).then(setMe, () => {});
     loadLingos().then((ls) => setLingo(ls.find((l) => l.id === lingoId) ?? null), () => {});
-  }, [lingoId, reloaded]);
+  }, [lingoId, reloaded, setMe]);
 
   // One-chance rule (SPEC §3.4): hiding the page (tab switch, lock screen, call, app switch) or
   // closing/reloading it while the challenge runs forfeits it. Not `blur` — that fires on harmless things.
@@ -142,6 +150,7 @@ export default function Catch() {
       token.current = (await auth.currentUser?.getIdToken()) ?? null;
       const out = await api.startAttempt({ lingoId, lat: position.lat, lng: position.lng });
       submitted.current = false;
+      setAttemptsLeft(out.attemptsLeft);
       setChallenge(out);
       setPhase("active");
     } catch (err) {
@@ -154,6 +163,7 @@ export default function Catch() {
     async (answer: Answer) => {
       if (!challenge || submitted.current) return; // one answer per attempt (timer vs. tap race)
       submitted.current = true;
+      lastAnswer.current = answer;
       setPhase("submitting");
       try {
         const data = await api.submitAttempt({ attemptId: challenge.attemptId, ...answer });
@@ -174,6 +184,17 @@ export default function Catch() {
     [challenge],
   );
 
+  function retry() {
+    setChallenge(null);
+    setOutcome(null);
+    lastAnswer.current = {};
+    submitted.current = false;
+    activeAttempt.clear();
+    api.getMyState({}).then(setMe, () => {});
+    if (mic === "ok" && loc === "ok") setPhase("ready");
+    else void runPreflight();
+  }
+
   const name = lingo?.name ?? "this Lingo";
 
   return (
@@ -182,9 +203,9 @@ export default function Catch() {
         <span className="swatch" style={{ background: lingo?.color ?? "var(--surface-2)" }} aria-hidden="true" />
         <div>
           <h1 style={{ margin: 0 }}>Catch {name}</h1>
-          {me && phase !== "active" && (
+          {me && attemptsLeft !== null && (phase === "preflight" || phase === "ready" || phase === "starting") && (
             <p className="small muted" style={{ margin: 0 }}>
-              Attempts left today: {me.attemptsLeft}/{me.attemptsPerDay}
+              Attempts left today: {attemptsLeft}/{me.attemptsPerDay}
             </p>
           )}
         </div>
@@ -219,9 +240,15 @@ export default function Catch() {
       )}
 
       {phase === "done" && outcome && (
-        <section className="card" data-outcome={outcome.kind}>
-          <p>Result: {outcome.kind}</p>
-        </section>
+        <Result
+          outcome={outcome}
+          lingoName={name}
+          type={challenge?.type ?? null}
+          heard={lastAnswer.current.transcript}
+          attemptsLeft={attemptsLeft}
+          attemptsPerDay={me?.attemptsPerDay ?? null}
+          onRetry={retry}
+        />
       )}
     </main>
   );

@@ -590,3 +590,45 @@ a {
   background: var(--surface);
   font-weight: 800;
 }
+
+.result {
+  align-items: stretch;
+}
+
+.result-icon {
+  font-size: 3.5rem;
+  text-align: center;
+  line-height: 1;
+}
+
+.result p {
+  text-align: center;
+}
+
+.points-pop {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.missed {
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.missed-word {
+  display: inline-block;
+  margin: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgb(255 75 75 / 0.18);
+  color: #ffb3b3;
+  font-weight: 600;
+}
+
+.attempts-left {
+  margin: 0;
+  color: var(--muted);
+}

@@ -10,3 +10,4 @@ export { getMyState } from "./fns/getMyState";
 export { startAttempt } from "./fns/startAttempt";
 export { submitAttempt } from "./fns/submitAttempt";
 export { forfeitAttempt } from "./fns/forfeitAttempt";
+export { setFavorites } from "./fns/setFavorites";

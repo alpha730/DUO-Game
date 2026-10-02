@@ -707,3 +707,119 @@ a {
   color: var(--warn);
   font-size: 1.2rem;
 }
+
+/* ---------- Home ---------- */
+.stat {
+  padding: 6px 10px;
+  font-weight: 700;
+}
+
+.attempts-pill {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.attempts-pill[data-left="0"] strong {
+  color: var(--danger);
+}
+
+.fav-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.fav-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 2px solid var(--warn);
+}
+
+.fav-card .swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.fav-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fav-streak {
+  color: var(--warn);
+  font-weight: 800;
+}
+
+.fav-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.fav-bar > div {
+  height: 100%;
+  background: var(--warn);
+}
+
+.done-today {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.lingo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.lingo-slot {
+  position: relative;
+  aspect-ratio: 0.8;
+  border-radius: 12px;
+  background: #0b1307;
+  border: 1px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px;
+  overflow: hidden;
+}
+
+.lingo-slot[data-caught="true"] {
+  border: 0;
+  color: #fff;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.6);
+}
+
+.lingo-slot .level-badge {
+  font-size: 0.6rem;
+  padding: 1px 5px;
+}
+
+.slot-name {
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.slot-silhouette {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #26361e;
+}
+
+.slot-year {
+  font-size: 0.6rem;
+  opacity: 0.75;
+}

@@ -26,7 +26,8 @@ describe("submitAttempt", () => {
     for (const [lingoId, answer] of answers) {
       const a = await start(p, lingoId);
       const out = await submit(p, { attemptId: a.attemptId, ...answer });
-      expect(out).toMatchObject({ result: "won", pointsAdded: 0 });
+      expect(out).toMatchObject({ result: "won" });
+      expect(out.pointsAdded).toBe(100 + out.speedBonus); // first catch + speed bonus
       const doc = await attempt(a.attemptId);
       expect(doc.status).toBe("won");
       expect(doc.score).toBe(1);

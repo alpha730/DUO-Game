@@ -7,11 +7,14 @@ import {
   type AttemptDoc,
   type CatchDoc,
   type ChallengeDoc,
+  type PointsLogDoc,
+  type PointsReason,
   type SubmitAttemptOutput,
   type UserDoc,
 } from "../shared/types";
 import { catchRef, db, userRef } from "../lib/db";
 import { requirePlayer } from "../lib/guards";
+import { scoreCatch } from "../lib/points";
 import { scoreAnswer } from "../lib/score";
 import { speedBonus } from "../lib/speed";
 
@@ -68,32 +71,72 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
     const answerMs = now - attempt.startedAt.toMillis();
     const bonus = result.won ? speedBonus(expiresAt, now, timerSeconds(attempt.type, rules), rules.speedBonusPerSecond) : 0;
 
+    const receivedAt = Timestamp.fromMillis(now);
     tx.update(attemptRef, {
       status: result.won ? "won" : "failed",
       score: result.score,
-      receivedAt: Timestamp.fromMillis(now),
+      receivedAt,
       answerMs,
       speedBonus: bonus,
     });
-    // Points, catches and streaks are wired in on Day 4 (PLAN 4.2).
-    tx.update(
-      userRef(uid),
-      result.won
-        ? { wins: FieldValue.increment(1), totalAnswerMs: FieldValue.increment(answerMs) }
-        : { losses: FieldValue.increment(1) },
-    );
-
     const caught = catchSnap.data() as CatchDoc | undefined;
+    const missed = result.missedWords ? { missedWords: result.missedWords } : {};
+
+    if (!result.won) {
+      // Wrong / failed = 0 points (SPEC §2); it only counts as a loss.
+      tx.update(userRef(uid), { losses: FieldValue.increment(1) });
+      const response: SubmitAttemptOutput = {
+        result: "failed",
+        pointsAdded: 0,
+        speedBonus: 0,
+        bonuses: [],
+        newLevel: caught?.level ?? 1,
+        newTotal: user.points,
+        needsFavorites: false,
+        ...missed,
+      };
+      return { late: false as const, response };
+    }
+
+    // Win: points, catch doc, user totals and the points log in this one transaction (PLAN 4.2).
+    const o = scoreCatch({ user, catchDoc: caught, lingoId: attempt.lingoId, today: attempt.date, rules, speedBonus: bonus });
+    tx.set(
+      catchRef(uid, attempt.lingoId),
+      { ...o.catchDoc, ...(o.firstCatch ? { firstCaughtAt: receivedAt } : {}) },
+      { merge: true },
+    );
+    tx.update(userRef(uid), {
+      points: FieldValue.increment(o.pointsAdded),
+      ...o.user,
+      wins: FieldValue.increment(1),
+      totalAnswerMs: FieldValue.increment(answerMs),
+      pointsReachedAt: receivedAt, // tie-break: who reached this total first
+    });
+    const log = (amount: number, reason: PointsReason) => {
+      if (amount <= 0) return;
+      const entry: Omit<PointsLogDoc, "createdAt"> & { createdAt: Timestamp } = {
+        uid,
+        amount,
+        reason,
+        attemptId,
+        createdAt: receivedAt,
+      };
+      tx.create(db().collection(COL.pointsLog).doc(), entry);
+    };
+    log(o.base, o.baseReason);
+    log(o.speedBonus, "speed");
+    for (const b of o.bonuses) log(b.points, b.kind);
+
     const response: SubmitAttemptOutput = {
-      result: result.won ? "won" : "failed",
-      // DECISION: Day 3 is scoring only — points (incl. the speed bonus) are paid from PLAN 4.2.
-      pointsAdded: 0,
-      speedBonus: 0,
-      bonuses: [],
-      newLevel: caught?.level ?? 1,
-      newTotal: user.points,
-      needsFavorites: false,
-      ...(result.missedWords ? { missedWords: result.missedWords } : {}),
+      result: "won",
+      pointsAdded: o.pointsAdded,
+      speedBonus: o.speedBonus,
+      bonuses: o.bonuses,
+      newLevel: o.newLevel,
+      ...(o.favorite ? { favStreak: o.catchDoc.favStreak } : {}),
+      newTotal: user.points + o.pointsAdded,
+      needsFavorites: o.needsFavorites,
+      ...missed,
     };
     return { late: false as const, response };
   });

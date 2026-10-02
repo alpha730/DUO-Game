@@ -86,8 +86,17 @@ async function main() {
       },
     ],
   ];
-  for (const [id, ch] of challenges) {
-    batch.set(db.collection(COL.challenges).doc(challengeId(today, id)), ch);
+  // DECISION: every Lingo gets a challenge for the next 7 days (the 4 samples rotate), so the full
+  // flow can be played on the emulators from any poster, on any day. Today, Lingos 2016–2019 keep
+  // exactly the samples above (the tests rely on that).
+  const samples = challenges.map(([, ch]) => ch);
+  let written = 0;
+  for (let day = 0; day < 7; day++) {
+    const date = istDate(Date.now() + day * 86_400_000);
+    LINGOS.forEach(([, year], i) => {
+      batch.set(db.collection(COL.challenges).doc(challengeId(date, lingoId(year))), samples[(i + day) % samples.length]);
+      written++;
+    });
   }
 
   const prizes: Array<[string, PrizeDoc]> = [
@@ -99,7 +108,7 @@ async function main() {
   await batch.commit();
   console.log(
     `Seeded ${prod ? "PROD" : "emulator"} (${projectId}): ${LINGOS.length} lingos, config/game ` +
-      `(start ${startAt}, lock ${lockAt}), ${challenges.length} challenges for ${today}, ${prizes.length} prizes.`,
+      `(start ${startAt}, lock ${lockAt}), ${written} challenges (10 Lingos × 7 days from ${today}), ${prizes.length} prizes.`,
   );
 }
 

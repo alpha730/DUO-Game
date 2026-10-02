@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { LINGO_COUNT, type GetMyStateOutput } from "@shared/types";
+import type { Object3D } from "three";
 import { CameraError } from "../ar/cameraError";
 import { cachedModel, loadModel } from "../ar/models";
 import { createScanner, type Scanner } from "../ar/scanner";
@@ -88,6 +89,22 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
           const l = byPoster.get(i);
           if (!l) {
             setBarePoster(i);
+            // DECISION: /ar-test is signed out, so the lingos collection can't be read; show the model
+            // by the file naming convention (poster i → lingo-<2016+i>.glb) so tracking + model can be
+            // checked on real phones.
+            if (testMode && !loaded.has(i)) {
+              const url = `/assets/models/lingo-${2016 + i}.glb`;
+              const cached = cachedModel(url);
+              const place = (m: Object3D) => {
+                if (cancelled) return;
+                s.setModel(i, m);
+                loaded.add(i);
+                if (current === i) setModelReady(true);
+              };
+              if (cached) place(cached);
+              else loadModel(url).then(place, (err) => console.error(`model ${url}`, err));
+            }
+            setModelReady(loaded.has(i));
             return;
           }
           setLingo(l);

@@ -357,6 +357,11 @@ export interface StartAttemptInput {
   lat: number;
   lng: number;
   raidId?: string;
+  /**
+   * false when the browser has no SpeechRecognition (SPEC §3.8): a pronounce/speak challenge is then
+   * refused ("needs-speech") without using an attempt or revealing its content. Default true.
+   */
+  speech?: boolean;
 }
 /** Never contains the answer: no `accept`, no `correctIndex` (CLAUDE.md rule 4). */
 export interface StartAttemptOutput {

@@ -3,6 +3,7 @@ import { HttpsError, onCall } from "firebase-functions/v2/https";
 import {
   COL,
   challengeId,
+  isVoiceChallenge,
   timerSeconds,
   type AttemptDoc,
   type CatchDoc,
@@ -14,7 +15,7 @@ import { forfeitTx, readOpenAttemptsTx } from "../lib/attempts";
 import { publicChallenge } from "../lib/challenge";
 import { istDate } from "../lib/date";
 import { catchRef, db, userRef } from "../lib/db";
-import { isOnCampus, isValidLatLng } from "../lib/geo";
+import { campusCheck, isEmulator, isValidLatLng } from "../lib/geo";
 import { requirePlayer } from "../lib/guards";
 import { attemptsUsedToday } from "../lib/state";
 
@@ -25,7 +26,7 @@ const fail = (code: string, message: string): never => {
 export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (req) => {
   const now = Date.now();
   const { uid, config } = await requirePlayer(req, now);
-  const { lingoId, lat, lng, raidId } = (req.data ?? {}) as Record<string, unknown>;
+  const { lingoId, lat, lng, raidId, speech } = (req.data ?? {}) as Record<string, unknown>;
 
   if (typeof lingoId !== "string" || !/^[\w-]{1,40}$/.test(lingoId)) {
     throw new HttpsError("invalid-argument", "Unknown Lingo.");
@@ -33,7 +34,7 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
   // DECISION: raids arrive on Day 6; until then a raidId is refused rather than silently ignored.
   if (raidId !== undefined) throw new HttpsError("unimplemented", "Owl Raids aren't open yet.", { code: "no-raids" });
   if (!isValidLatLng(lat, lng)) throw new HttpsError("invalid-argument", "We need your location.", { code: "bad-location" });
-  if (!isOnCampus(lat as number, lng as number, config)) {
+  if (campusCheck(lat as number, lng as number, config, isEmulator()) === "off-campus") {
     fail("off-campus", "You need to be on campus to catch Lingos.");
   }
 
@@ -58,6 +59,11 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
     const used = attemptsUsedToday(user, today);
     if (used >= rules.attemptsPerDay) fail("no-attempts", "No attempts left today. Come back tomorrow!");
     if (!challengeSnap.exists) fail("no-challenge", "This Lingo has no challenge today.");
+    // No speech recognition in this browser + a voice challenge: refuse BEFORE any write, so no
+    // attempt is used and nothing but "it needs your voice" is revealed (SPEC §3.8).
+    if (speech === false && isVoiceChallenge((challengeSnap.data() as ChallengeDoc).type)) {
+      fail("needs-speech", "Open in Chrome or Safari for this Lingo — it needs your voice.");
+    }
 
     // Closing any open attempt guarantees "only one open attempt per user" (SPEC §3.7): an attempt
     // left open in another tab is forfeited (and counted as a loss) here.

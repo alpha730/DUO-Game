@@ -66,7 +66,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 | 3.7 | Meaning + question UI: word or question prompt + 4 big buttons → submit | Right option wins, wrong fails |
 | 3.8 | One-chance: `visibilitychange`(hidden) + `pagehide` → `fetch(keepalive)` forfeit with cached token → "Chance lost" | Switching tab mid-attempt forfeits; reload shows attempt forfeited |
 | 3.9 | Result screen: won / failed (missed words) / forfeit; attempts left today (x/4) | All 3 states shown |
-| 3.10 | Browser without SpeechRecognition + a speak challenge → show "Open in Chrome or Safari" before Start (no attempt used) | Firefox shows message, attempts unchanged |
+| 3.10 | Browser without SpeechRecognition → client sends `speech: false` with `startAttempt`; a pronounce/speak challenge is refused server-side with "Open in Chrome or Safari for this Lingo" (no attempt used, content never revealed); meaning/question work normally (SPEC §3.8) | Firefox: voice Lingo shows the message, attempts unchanged; meaning Lingo playable |
 
 ## Day 4 — Points, favourites, Lingo streaks + levels, Home (Oct 4)
 | # | Task | Done when |

@@ -1,23 +1,41 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import type { CameraProblem } from "../ar/cameraError";
 import { openInChromeUrl, platform } from "../lib/browser";
 
 export type ScanProblem = { kind: CameraProblem | "inApp" | "data"; app?: string; message?: string };
 
-function CopyLink() {
+function CopyLink({ path = "/scan" }: { path?: string }) {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
     try {
-      await navigator.clipboard.writeText(location.origin + "/scan");
+      await navigator.clipboard.writeText(location.origin + path);
       setCopied(true);
     } catch {
-      prompt("Copy this link:", location.origin + "/scan");
+      prompt("Copy this link:", location.origin + path);
     }
   };
   return (
     <button className="btn secondary" onClick={copy}>
       {copied ? "Link copied ✓" : "Copy link"}
     </button>
+  );
+}
+
+/** Buttons to reopen the current page in a browser with speech recognition (PLAN 3.10). */
+export function OpenInBrowser() {
+  return (
+    <div className="stack" data-needs-speech>
+      {platform() === "android" && (
+        <a className="btn" href={openInChromeUrl()}>
+          Open in Chrome
+        </a>
+      )}
+      <CopyLink path={location.pathname} />
+      <Link className="btn link" to="/scan">
+        Catch a different Lingo
+      </Link>
+    </div>
   );
 }
 

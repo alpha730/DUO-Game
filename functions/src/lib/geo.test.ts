@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { distanceM, isOnCampus, isValidLatLng } from "./geo";
+import { campusCheck, distanceM, isOnCampus, isValidLatLng } from "./geo";
 
 describe("distanceM", () => {
   it("is 0 for the same point", () => {
@@ -20,6 +20,21 @@ describe("isOnCampus", () => {
   const campus = { campusLat: 26.78, campusLng: 75.82, campusRadiusM: 500 };
   it("accepts inside the radius", () => expect(isOnCampus(26.782, 75.82, campus)).toBe(true));
   it("rejects outside the radius", () => expect(isOnCampus(26.79, 75.82, campus)).toBe(false));
+});
+
+describe("campusCheck", () => {
+  const campus = { campusLat: 26.78, campusLng: 75.82, campusRadiusM: 500 };
+  const home = [26.9124, 75.7873] as const; // Jaipur city centre, ~17 km away
+  it("is on campus inside the radius in both modes", () => {
+    expect(campusCheck(26.782, 75.82, campus, false)).toBe("on-campus");
+    expect(campusCheck(26.782, 75.82, campus, true)).toBe("on-campus");
+  });
+  it("refuses off-campus in production", () => {
+    expect(campusCheck(...home, campus, false)).toBe("off-campus");
+  });
+  it("only skips (with a warning) on the emulator", () => {
+    expect(campusCheck(...home, campus, true)).toBe("skipped");
+  });
 });
 
 describe("isValidLatLng", () => {

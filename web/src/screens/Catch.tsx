@@ -9,8 +9,10 @@ import {
 } from "@shared/types";
 import { activeAttempt, sendForfeit } from "../catch/forfeit";
 import { requestLocation, requestMic, type CheckState, type Position } from "../catch/preflight";
+import { speechSupported } from "../catch/speech";
 import { useCountdown } from "../catch/useCountdown";
 import ChoiceChallenge from "../components/ChoiceChallenge";
+import { OpenInBrowser } from "../components/CameraHelp";
 import Preflight from "../components/Preflight";
 import Result from "../components/Result";
 import TimerBar from "../components/TimerBar";
@@ -70,6 +72,7 @@ export default function Catch() {
   const [loc, setLoc] = useState<CheckState>("idle");
   const [position, setPosition] = useState<Position | null>(null);
   const [error, setError] = useState("");
+  const [needsSpeech, setNeedsSpeech] = useState(false);
   const [challenge, setChallenge] = useState<StartAttemptOutput | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(reloaded ? { kind: "forfeit" } : null);
   const token = useRef<string | null>(null);
@@ -148,12 +151,14 @@ export default function Catch() {
     try {
       // Cache the ID token now so the one-chance forfeit needs no async work later (SPEC §3.4).
       token.current = (await auth.currentUser?.getIdToken()) ?? null;
-      const out = await api.startAttempt({ lingoId, lat: position.lat, lng: position.lng });
+      // No SpeechRecognition here → the server refuses voice challenges up front (no attempt used).
+      const out = await api.startAttempt({ lingoId, lat: position.lat, lng: position.lng, speech: speechSupported() });
       submitted.current = false;
       setAttemptsLeft(out.attemptsLeft);
       setChallenge(out);
       setPhase("active");
     } catch (err) {
+      setNeedsSpeech((err as { details?: { code?: string } }).details?.code === "needs-speech");
       setError(apiErrorMessage(err));
       setPhase("ready");
     }
@@ -219,7 +224,8 @@ export default function Catch() {
               {error}
             </p>
           )}
-          {phase !== "preflight" && (
+          {needsSpeech && <OpenInBrowser />}
+          {phase !== "preflight" && !needsSpeech && (
             <button className="btn" onClick={start} disabled={phase === "starting"}>
               {phase === "starting" ? "Starting…" : "Start"}
             </button>

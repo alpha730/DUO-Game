@@ -43,7 +43,7 @@
 | **Speed bonus** (every correct answer, incl. raids) | +1 per full second left on the server timer: `floor((expiresAt − receivedAt)/1000)`, clamped 0…timer length |
 | Wrong / failed / forfeited attempt | 0 points (and it uses one of the 4 attempts) |
 | Logging in, opening the app, days played | 0 points |
-| Location check | must be within `campusRadiusM` of campus centre |
+| Location check | must be within `campusRadiusM` of campus centre (on the **emulators only** an off-campus player is let through with a logged warning, for testing from home; never skipped in production) |
 
 **Favourite streak:** +1 when the favourite is caught on the IST day right after its last catch. A missed day resets the streak to 0, but **levels never go down**. MAX is permanent once reached.
 **Choosing favourites:** after a user's first 2 catches, the app asks them to pick 2 favourites from Lingos they have caught. Until then no streaks count. Last day a 10-day streak can still be completed: start by Oct 12.
@@ -69,6 +69,7 @@ The same order picks the top 20 for the final round. The live final round on Oct
 5. On app start / Catch screen mount: server auto-forfeits any `open` attempt of this user (`startAttempt` and a `getMyState` call both do this).
 6. `submitAttempt` rejects if: not the owner, status ≠ open, or `now > expiresAt + grace` (then marks it `forfeit`).
 7. Only one open attempt per user at a time.
+8. **No speech recognition in the browser** (e.g. Firefox): the client sends `speech: false` with `startAttempt`. If that Lingo's challenge today is **pronounce** or **speak**, the server refuses with "Open in Chrome or Safari for this Lingo" — **no attempt is used** and the challenge content is never revealed. **meaning** and **question** work normally.
 
 ## 4. Data model (Firestore)
 | Path | Fields | Client read |
@@ -97,7 +98,7 @@ All callable (`onCall`) unless noted. Every one runs the checks in CLAUDE.md rul
 |---|---|---|---|
 | `completeProfile` | name | Require verified email; name 2–40 chars, trimmed; fail if profile already done; create user with defaults (email from the auth token) | `{ok}` |
 | `getMyState` | – | Auto-forfeit open attempts; return user, catches, today's tries | `{user, catches, serverNow}` |
-| `startAttempt` | lingoId, lat, lng, raidId? | Game open; on campus; no open attempt; Lingo not already caught today; attemptsToday < 4 (reset when attemptsDate ≠ today; skipped for raids); load `challenges/{today}_{lingoId}`; create attempt; increment attemptsToday | `{attemptId, type, word?, phrase?, prompt?, options?, expiresAt, serverNow, attemptsLeft}` (never `accept` or `correctIndex`) |
+| `startAttempt` | lingoId, lat, lng, raidId?, speech? | Game open; on campus; no open attempt; Lingo not already caught today; attemptsToday < 4 (reset when attemptsDate ≠ today; skipped for raids); load `challenges/{today}_{lingoId}`; if `speech === false` and the type is pronounce/speak → refuse (no attempt used, §3.8); create attempt; increment attemptsToday | `{attemptId, type, word?, phrase?, prompt?, options?, expiresAt, serverNow, attemptsLeft}` (never `accept` or `correctIndex`) |
 | `submitAttempt` | attemptId, transcript? , choice? | Owner + open + in time; score (pronounce: word or accept[] in transcript; speak: word match ≥ 80%; meaning/question: choice == correctIndex); on win → one transaction: catch doc (timesCaught, favStreak, level), points per §2 incl. speed bonus, MAX + all-10 bonuses, wins++, totalAnswerMs += answerMs, pointsReachedAt = now, dayStreak, pointsLog; on fail → losses++ (forfeits also do losses++) | `{result:'won'\|'failed', pointsAdded, speedBonus, bonuses[], newLevel, favStreak?, newTotal, missedWords?, needsFavorites}` |
 | `setFavorites` | lingoIds (exactly 2, both already caught) | First time: save. Later: only if favoriteChangesLeft > 0; decrement; new favourite starts favStreak 0 | `{favorites, favoriteChangesLeft}` |
 | `forfeitAttempt` | **HTTP `onRequest`**, header `Authorization: Bearer <idToken>`, body `{attemptId}` | Verify token; if owner + open → `forfeit` and the user's losses++ (same when an expired or auto-forfeited attempt is closed) | 204 |

@@ -20,6 +20,28 @@ export function isValidLatLng(lat: unknown, lng: unknown): boolean {
   );
 }
 
+/** True only inside the Firebase emulator (the env var is set by the emulator, never in production). */
+export const isEmulator = () => process.env.FUNCTIONS_EMULATOR === "true";
+
+/**
+ * Campus location check (SPEC §2). DECISION (user request): on the emulators an off-campus player
+ * is let through with a warning so the game can be played from home; in production it's refused.
+ */
+export function campusCheck(
+  lat: number,
+  lng: number,
+  campus: { campusLat: number; campusLng: number; campusRadiusM: number },
+  emulator: boolean,
+): "on-campus" | "skipped" | "off-campus" {
+  if (isOnCampus(lat, lng, campus)) return "on-campus";
+  if (emulator) {
+    const m = Math.round(distanceM(lat, lng, campus.campusLat, campus.campusLng));
+    console.warn(`[emulator] off campus by ${m} m (radius ${campus.campusRadiusM} m) — check skipped; enforced in production`);
+    return "skipped";
+  }
+  return "off-campus";
+}
+
 export function isOnCampus(
   lat: number,
   lng: number,

@@ -84,15 +84,33 @@ describe("startAttempt", () => {
     expect((await adb.doc(`users/${p.uid}`).get()).data()!.attemptsToday).toBe(0);
   });
 
-  it("enforces the campus radius", async () => {
+  // Production refuses off-campus players (src/lib/geo.test.ts); the emulator only warns so the game
+  // can be played from home.
+  it("lets an off-campus player through on the emulator", async () => {
     const restore = await patchConfig({ campusRadiusM: 500 });
     try {
       const p = await newPlayer();
-      await expect(start(p, LINGO.speak, { lat: 26.9124, lng: 75.7873 })).rejects.toMatchObject({ details: { code: "off-campus" } }); // city centre
-      await expect(start(p, LINGO.speak)).resolves.toMatchObject({ type: "speak" });
+      await expect(start(p, LINGO.speak, { lat: 26.9124, lng: 75.7873 })).resolves.toMatchObject({ type: "speak" }); // city centre
     } finally {
       await restore();
     }
+  });
+
+  it("speech: false refuses voice challenges without using an attempt or revealing them (PLAN 3.10)", async () => {
+    const p = await newPlayer();
+    for (const lingoId of [LINGO.speak, LINGO.pronounce]) {
+      const err = await start(p, lingoId, { speech: false }).catch((e) => e);
+      expect(err).toMatchObject({ code: "functions/failed-precondition", details: { code: "needs-speech" } });
+      expect(err.message).toContain("Open in Chrome or Safari for this Lingo");
+      expect(JSON.stringify(err)).not.toMatch(/Practice every day|programme|program/);
+    }
+    const u = (await adb.doc(`users/${p.uid}`).get()).data()!;
+    expect(u.attemptsToday).toBe(0);
+    const attempts = await adb.collection("attempts").where("uid", "==", p.uid).get();
+    expect(attempts.size).toBe(0);
+    // Meaning and question still work without speech recognition.
+    await expect(start(p, LINGO.meaning, { speech: false })).resolves.toMatchObject({ type: "meaning", attemptsLeft: 3 });
+    await expect(start(p, LINGO.question, { speech: false })).resolves.toMatchObject({ type: "question", attemptsLeft: 2 });
   });
 
   it("is closed before start, after lock, and when locked", async () => {

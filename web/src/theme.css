@@ -823,3 +823,103 @@ a {
   font-size: 0.6rem;
   opacity: 0.75;
 }
+
+/* ---------- Win celebration (PLAN 4.7) ---------- */
+.win {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.win .points-pop {
+  animation: pop 0.6s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+  font-size: 2.6rem;
+  text-shadow: 0 2px 12px rgb(88 204 2 / 0.45);
+}
+
+.result[data-outcome="won"] .result-icon {
+  animation: bounce 0.9s ease-out both;
+}
+
+.breakdown {
+  margin: 0;
+}
+
+.celebrate {
+  margin: 0;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-weight: 800;
+  text-align: center;
+  animation: slide-up 0.5s 0.3s ease-out both;
+}
+
+.celebrate.level-up {
+  background: #1b3f5c;
+}
+
+.celebrate.streak-text {
+  background: #3a2a0c;
+}
+
+.celebrate.max {
+  background: linear-gradient(90deg, #ffc800, #ff9600);
+  color: #000;
+  animation: slide-up 0.5s 0.3s ease-out both, glow 1.2s 0.8s ease-in-out infinite alternate;
+}
+
+.celebrate.all-ten {
+  background: linear-gradient(90deg, #7c4dff, #1cb0f6);
+}
+
+.confetti {
+  position: absolute;
+  inset: -40px 0 auto;
+  height: 0;
+  pointer-events: none;
+}
+
+.confetti i {
+  position: absolute;
+  left: calc(50% + (var(--i) - 12) * 12px);
+  top: 0;
+  width: 8px;
+  height: 12px;
+  border-radius: 2px;
+  opacity: 0;
+  animation: confetti 1.4s calc(var(--i) * 25ms) ease-out both;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bounce {
+  0% { transform: scale(0.2) rotate(-20deg); }
+  60% { transform: scale(1.25) rotate(8deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 0 rgb(255 200 0 / 0); }
+  to { box-shadow: 0 0 22px rgb(255 200 0 / 0.7); }
+}
+
+@keyframes confetti {
+  0% { opacity: 1; transform: translateY(0) rotate(0); }
+  100% { opacity: 0; transform: translateY(calc(140px + var(--i) * 4px)) translateX(calc((var(--i) - 12) * 6px)) rotate(calc(var(--i) * 47deg)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .win *, .result-icon, .celebrate { animation: none !important; }
+  .confetti { display: none; }
+}

@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import type { ChallengeType } from "@shared/types";
+import type { ChallengeType, Level } from "@shared/types";
 import { BRAND } from "../config/brand";
 import type { Outcome } from "../screens/Catch";
+import WinCelebration from "./WinCelebration";
 
 /** End of an attempt (PLAN 3.9): won / failed / forfeit (+ late, error) and attempts left today. */
 export default function Result({
@@ -12,6 +13,7 @@ export default function Result({
   attemptsLeft,
   attemptsPerDay,
   onRetry,
+  prevLevel = null,
 }: {
   outcome: Outcome;
   lingoName: string;
@@ -21,6 +23,8 @@ export default function Result({
   attemptsLeft: number | null;
   attemptsPerDay: number | null;
   onRetry: () => void;
+  /** Level of this Lingo before the attempt (null if never caught). */
+  prevLevel?: Level | null;
 }) {
   const left = attemptsLeft ?? 0;
   let icon: string;
@@ -33,7 +37,7 @@ export default function Result({
       title = `${lingoName} caught!`;
       body = (
         <>
-          {outcome.data.pointsAdded > 0 && <p className="points-pop">+{outcome.data.pointsAdded}</p>}
+          <WinCelebration data={outcome.data} lingoName={lingoName} prevLevel={prevLevel} />
           {outcome.data.needsFavorites && (
             <Link className="btn" to="/favorites" data-needs-favorites>
               ⭐ Pick your 2 favourites

@@ -254,6 +254,7 @@ export default function Catch() {
           attemptsLeft={attemptsLeft}
           attemptsPerDay={me?.attemptsPerDay ?? null}
           onRetry={retry}
+          prevLevel={me?.catches.find((x) => x.lingoId === lingoId && x.timesCaught > 0)?.level ?? null}
         />
       )}
     </main>

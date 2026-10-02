@@ -405,3 +405,59 @@ a {
   font-size: 0.8rem;
   font-weight: 700;
 }
+
+/* ---------- Catch screen ---------- */
+.checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.check-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.check-row p {
+  margin: 4px 0 0;
+}
+
+.check-icon {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+.check-row[data-state="ok"] .check-icon {
+  background: var(--primary);
+  color: #fff;
+}
+
+.check-row[data-state="denied"] .check-icon,
+.check-row[data-state="unavailable"] .check-icon {
+  background: var(--danger);
+  color: #fff;
+}
+
+.catch-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.catch-head .swatch {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  flex: none;
+}

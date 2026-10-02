@@ -4,6 +4,10 @@ import type {
   CompleteProfileOutput,
   GetMyStateInput,
   GetMyStateOutput,
+  StartAttemptInput,
+  StartAttemptOutput,
+  SubmitAttemptInput,
+  SubmitAttemptOutput,
 } from "@shared/types";
 import { functions } from "./firebase";
 
@@ -18,6 +22,8 @@ const call =
 export const api = {
   completeProfile: call<CompleteProfileInput, CompleteProfileOutput>("completeProfile"),
   getMyState: call<GetMyStateInput, GetMyStateOutput>("getMyState"),
+  startAttempt: call<StartAttemptInput, StartAttemptOutput>("startAttempt"),
+  submitAttempt: call<SubmitAttemptInput, SubmitAttemptOutput>("submitAttempt"),
 };
 
 /** User-facing text for a callable error. Server HttpsErrors already carry friendly messages. */

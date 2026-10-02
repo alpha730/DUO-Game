@@ -16,3 +16,9 @@ functions/src/shared/
 !web/.env.development
 *.tsbuildinfo
 web/public/assets/
+
+# Never commit Firebase admin / service-account keys
+*service-account*.json
+*serviceAccount*.json
+*-firebase-adminsdk-*.json
+.firebaserc.local

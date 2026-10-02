@@ -56,6 +56,20 @@ describe("startAttempt", () => {
     expect(open.size).toBe(1);
   });
 
+  it("PLAN 4.3: won, failed and forfeited all count — the 5th attempt is rejected", async () => {
+    const p = await newPlayer();
+    const submit = p.call<object, unknown>("submitAttempt");
+    await submit({ attemptId: (await start(p, LINGO.meaning)).attemptId, choice: 0 }); // won
+    await submit({ attemptId: (await start(p, LINGO.question)).attemptId, choice: 3 }); // failed
+    await start(p, LINGO.speak); // left open…
+    await start(p, LINGO.pronounce); // …forfeited by this start; this one is open (4th)
+    const err = await start(p, LINGO.question).catch((e) => e);
+    expect(err).toMatchObject({ details: { code: "no-attempts" } });
+    const u = (await adb.doc(`users/${p.uid}`).get()).data()!;
+    expect(u).toMatchObject({ attemptsToday: 4, attemptsDate: istToday(), wins: 1, losses: 2 });
+    expect((await adb.collection("attempts").where("uid", "==", p.uid).get()).size).toBe(4);
+  });
+
   it("resets the daily count on a new IST day", async () => {
     const p = await newPlayer();
     await adb.doc(`users/${p.uid}`).update({ attemptsToday: 4, attemptsDate: "2026-01-01" });

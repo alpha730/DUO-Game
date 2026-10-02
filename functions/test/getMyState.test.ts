@@ -1,42 +1,17 @@
 // getMyState against the emulators. Admin SDK plants server-only data (attempts, catches).
-import { deleteApp as deleteAdminApp, initializeApp as initAdmin } from "firebase-admin/app";
-import { getFirestore as adminFirestore, Timestamp } from "firebase-admin/firestore";
-import { deleteApp, initializeApp, type FirebaseApp } from "firebase/app";
-import { connectAuthEmulator, createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { Timestamp } from "firebase-admin/firestore";
+import { initializeApp } from "firebase/app";
 import { connectFunctionsEmulator, getFunctions, httpsCallable } from "firebase/functions";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { GetMyStateOutput } from "../src/shared/types";
+import { adb, cleanupApps, istToday, newPlayer } from "./helpers";
 
-process.env.FIRESTORE_EMULATOR_HOST ??= "127.0.0.1:8085";
-const admin = initAdmin({ projectId: "demo-decade-hunt" }, `admin-${Date.now()}`);
-const adb = adminFirestore(admin);
-
-const istToday = () => new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().slice(0, 10);
-const apps: FirebaseApp[] = [];
-
-async function player() {
-  const app = initializeApp({ projectId: "demo-decade-hunt", apiKey: "demo-key" }, `gms-${apps.length}-${Date.now()}`);
-  apps.push(app);
-  const auth = getAuth(app);
-  connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
-  const fns = getFunctions(app, "asia-south1");
-  connectFunctionsEmulator(fns, "127.0.0.1", 5001);
-  const cred = await createUserWithEmailAndPassword(auth, `g${Date.now()}${apps.length}@example.com`, "password123");
-  return {
-    uid: cred.user.uid,
-    completeProfile: httpsCallable(fns, "completeProfile"),
-    getMyState: async () => (await httpsCallable<unknown, GetMyStateOutput>(fns, "getMyState")({})).data,
-  };
-}
-
-let p: Awaited<ReturnType<typeof player>>;
+let p: Awaited<ReturnType<typeof newPlayer>> & { getMyState(): Promise<GetMyStateOutput>; completeProfile(d: unknown): Promise<unknown> };
 beforeAll(async () => {
-  p = await player();
+  const base = await newPlayer({ profile: false });
+  p = { ...base, getMyState: () => base.call<object, GetMyStateOutput>("getMyState")({}), completeProfile: base.call("completeProfile") };
 });
-afterAll(async () => {
-  await Promise.all(apps.map((a) => deleteApp(a)));
-  await deleteAdminApp(admin);
-});
+afterAll(cleanupApps);
 
 describe("getMyState", () => {
   it("works before the profile exists", async () => {
@@ -49,7 +24,7 @@ describe("getMyState", () => {
   });
 
   it("returns the user, catches and attempts left", async () => {
-    await p.completeProfile({ name: "State Tester", dept: "EE", year: 2, roll: `GS${Date.now().toString(36)}` });
+    await p.completeProfile({ name: "State Tester" });
     await adb.doc(`users/${p.uid}`).update({ attemptsToday: 3, attemptsDate: istToday() });
     await adb.doc(`users/${p.uid}/catches/lingo-2019`).set({
       firstCaughtAt: Timestamp.now(),
@@ -87,7 +62,6 @@ describe("getMyState", () => {
 
   it("rejects signed-out callers", async () => {
     const app = initializeApp({ projectId: "demo-decade-hunt", apiKey: "demo-key" }, `anon-${Date.now()}`);
-    apps.push(app);
     const fns = getFunctions(app, "asia-south1");
     connectFunctionsEmulator(fns, "127.0.0.1", 5001);
     await expect(httpsCallable(fns, "getMyState")({})).rejects.toMatchObject({ code: "functions/unauthenticated" });

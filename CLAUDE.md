@@ -33,7 +33,7 @@ firestore.rules, firestore.indexes.json, firebase.json
 ## Hard rules (never break these)
 1. **The phone never writes to Firestore.** Every write goes through a Cloud Function.
 2. **Points are only calculated on the server.** The client only displays them.
-3. Collections `attempts`, `challenges`, `rollNumbers`, `pointsLog`, `redemptions` are **never readable** from the client.
+3. Collections `attempts`, `challenges`, `pointsLog`, `redemptions` are **never readable** from the client.
 4. The correct answer of a challenge (`correctIndex`, the phrase for future days) is **never sent** to the client before it answers.
 5. The server is the timer: an answer received after `expiresAt` (+2 s grace) is rejected, whatever the client says.
 6. Every callable function checks: signed in → profile done → game open (`now` between `startAt` and `lockAt`, `locked == false`).

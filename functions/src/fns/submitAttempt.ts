@@ -75,7 +75,7 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
       answerMs,
       speedBonus: bonus,
     });
-    // Points, catches, streaks and depts are wired in on Day 4 (PLAN 4.2).
+    // Points, catches and streaks are wired in on Day 4 (PLAN 4.2).
     tx.update(
       userRef(uid),
       result.won

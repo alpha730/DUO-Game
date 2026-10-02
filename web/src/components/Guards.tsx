@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { Role } from "@shared/types";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../lib/auth";
+import VerifyEmail from "../screens/VerifyEmail";
 
 export function Loading() {
   return (
@@ -20,12 +21,13 @@ export function PublicOnly({ children }: { children: ReactNode }) {
   return <Navigate to={profile?.profileDone ? "/home" : "/setup"} replace />;
 }
 
-/** `/setup` only: must be signed in and not yet set up. */
+/** `/setup` only: must be signed in and not yet set up; unverified emails see "Verify your email". */
 export function SetupOnly({ children }: { children: ReactNode }) {
-  const { user, profile } = useAuth();
+  const { user, profile, emailVerified } = useAuth();
   if (user === undefined || (user && profile === undefined)) return <Loading />;
   if (!user) return <Navigate to="/" replace />;
   if (profile?.profileDone) return <Navigate to="/home" replace />;
+  if (!emailVerified) return <VerifyEmail />;
   return <>{children}</>;
 }
 

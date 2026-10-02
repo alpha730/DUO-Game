@@ -1,30 +1,18 @@
-import { useState } from "react";
 import Placeholder from "../components/Placeholder";
+import { useAuth } from "../lib/auth";
 
+/** One student list (rank, name, points) with your own row pinned at the bottom (SPEC §7). */
 export default function Leaderboard() {
-  const [tab, setTab] = useState<"students" | "depts">("students");
+  const { profile } = useAuth();
   return (
     <main className="screen with-nav stack">
       <h1>Leaderboard</h1>
-      <div className="row" role="tablist">
-        <button
-          role="tab"
-          aria-selected={tab === "students"}
-          className={`btn ${tab === "students" ? "" : "secondary"}`}
-          onClick={() => setTab("students")}
-        >
-          Students
-        </button>
-        <button
-          role="tab"
-          aria-selected={tab === "depts"}
-          className={`btn ${tab === "depts" ? "" : "secondary"}`}
-          onClick={() => setTab("depts")}
-        >
-          Departments
-        </button>
-      </div>
-      <Placeholder day={5}>{tab === "students" ? "Top 100 students, your rank pinned" : "Department totals"}</Placeholder>
+      <Placeholder day={5}>Top 100 students: rank, name, points</Placeholder>
+      <section className="card row board-me" aria-label="Your rank" style={{ justifyContent: "space-between" }}>
+        <span className="muted">—</span>
+        <strong style={{ flex: 1 }}>{profile?.name} (you)</strong>
+        <span>{profile?.points ?? 0} pts</span>
+      </section>
     </main>
   );
 }

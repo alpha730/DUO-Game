@@ -2,20 +2,21 @@ import { describe, expect, it } from "vitest";
 import { parseProfile } from "./completeProfile";
 
 describe("parseProfile", () => {
-  const ok = { name: "  Asha   Verma ", dept: "CSE", year: 2, roll: " 22ejccs001 " };
-
-  it("normalises name and roll", () => {
-    expect(parseProfile(ok)).toEqual({ name: "Asha Verma", dept: "CSE", year: 2, roll: "22EJCCS001" });
+  it("trims and collapses spaces", () => {
+    expect(parseProfile({ name: "  Asha   Verma " })).toEqual({ name: "Asha Verma" });
   });
-  it("accepts year as a string", () => {
-    expect(parseProfile({ ...ok, year: "3" }).year).toBe(3);
+  it("accepts 2 and 40 characters", () => {
+    expect(parseProfile({ name: "Al" }).name).toBe("Al");
+    expect(parseProfile({ name: "x".repeat(40) }).name).toHaveLength(40);
   });
-  it("rejects bad input", () => {
-    expect(() => parseProfile({ ...ok, name: "A" })).toThrow(/name/);
-    expect(() => parseProfile({ ...ok, dept: "Law" })).toThrow(/department/);
-    expect(() => parseProfile({ ...ok, year: 5 })).toThrow(/year/);
-    expect(() => parseProfile({ ...ok, roll: "22/CS/1" })).toThrow(/roll/);
-    expect(() => parseProfile({ ...ok, roll: "" })).toThrow(/roll/);
-    expect(() => parseProfile(null)).toThrow();
+  it("rejects too short, too long, missing", () => {
+    expect(() => parseProfile({ name: "A" })).toThrow(/name/);
+    expect(() => parseProfile({ name: "   A   " })).toThrow(/name/);
+    expect(() => parseProfile({ name: "x".repeat(41) })).toThrow(/name/);
+    expect(() => parseProfile({})).toThrow(/name/);
+    expect(() => parseProfile(null)).toThrow(/name/);
+  });
+  it("ignores any extra fields (no dept/year/roll)", () => {
+    expect(parseProfile({ name: "Asha", dept: "CSE", roll: "22X" })).toEqual({ name: "Asha" });
   });
 });

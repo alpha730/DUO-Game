@@ -7,9 +7,6 @@ export default function Me() {
     <main className="screen with-nav stack">
       <h1>{profile?.name}</h1>
       <section className="card small">
-        <p>
-          {profile?.dept} · Year {profile?.year} · {profile?.roll}
-        </p>
         <p className="muted" style={{ margin: 0 }}>
           {user?.email}
         </p>

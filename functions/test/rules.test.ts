@@ -15,17 +15,14 @@ let env: RulesTestEnvironment;
 const NEVER_READABLE = [
   "attempts/a1",
   "challenges/2026-10-10_lingo1",
-  "rollNumbers/22CS001",
   "pointsLog/p1",
   "redemptions/r1",
   "raids/raid1/players/alice",
-  "depts/CSE",
 ];
 const SIGNED_IN_READABLE = [
   "lingos/lingo1",
   "config/game",
   "leaderboard/students",
-  "leaderboard/depts",
   "raids/raid1",
   "prizes/prize1",
   "final/state",

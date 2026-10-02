@@ -1,6 +1,6 @@
 import { onAuthStateChanged, signOut as fbSignOut, type User } from "firebase/auth";
 import { doc, onSnapshot } from "firebase/firestore";
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { COL, type Role, type UserDoc } from "@shared/types";
 import { auth, db } from "./firebase";
 
@@ -11,6 +11,10 @@ interface AuthState {
   profile: UserDoc | null | undefined;
   /** undefined while loading; null for players */
   role: Role | null | undefined;
+  /** Email verified (Google accounts always are). Required before Setup (SPEC §4). */
+  emailVerified: boolean;
+  /** Re-reads the account after the player clicked the verification link (and refreshes the token). */
+  refreshUser: () => Promise<boolean>;
   signOut: () => Promise<void>;
 }
 
@@ -20,8 +24,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [profile, setProfile] = useState<UserDoc | null | undefined>(undefined);
   const [role, setRole] = useState<Role | null | undefined>(undefined);
+  const [emailVerified, setEmailVerified] = useState(false);
 
-  useEffect(() => onAuthStateChanged(auth, setUser), []);
+  useEffect(
+    () =>
+      onAuthStateChanged(auth, (u) => {
+        setUser(u);
+        setEmailVerified(!!u?.emailVerified);
+      }),
+    [],
+  );
+
+  const refreshUser = useCallback(async () => {
+    const u = auth.currentUser;
+    if (!u) return false;
+    await u.reload();
+    // A fresh ID token carries email_verified, which completeProfile checks on the server.
+    if (u.emailVerified) await u.getIdToken(true);
+    setEmailVerified(u.emailVerified);
+    return u.emailVerified;
+  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -51,7 +73,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = () => fbSignOut(auth);
 
-  return <AuthContext.Provider value={{ user, profile, role, signOut }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, profile, role, emailVerified, refreshUser, signOut }}>{children}</AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

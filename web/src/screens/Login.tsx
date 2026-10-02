@@ -1,5 +1,6 @@
 import {
   createUserWithEmailAndPassword,
+  sendEmailVerification,
   GoogleAuthProvider,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -52,7 +53,10 @@ export default function Login() {
     run(() =>
       mode === "signIn"
         ? signInWithEmailAndPassword(auth, trimmed, password)
-        : createUserWithEmailAndPassword(auth, trimmed, password),
+        : createUserWithEmailAndPassword(auth, trimmed, password).then((cred) =>
+            // Verification link first; /setup shows "Verify your email" until it's clicked.
+            sendEmailVerification(cred.user).catch(() => {}),
+          ),
     );
   };
 

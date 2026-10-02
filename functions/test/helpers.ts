@@ -1,16 +1,19 @@
 // Shared helpers for emulator tests: real client-SDK players + an admin handle for server-only data.
 import { deleteApp as deleteAdminApp, initializeApp as initAdmin } from "firebase-admin/app";
+import { getAuth as getAdminAuth } from "firebase-admin/auth";
 import { getFirestore as adminFirestore } from "firebase-admin/firestore";
 import { deleteApp, initializeApp, type FirebaseApp } from "firebase/app";
 import { connectAuthEmulator, createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import { connectFunctionsEmulator, getFunctions, httpsCallable } from "firebase/functions";
 
 process.env.FIRESTORE_EMULATOR_HOST ??= "127.0.0.1:8085";
+process.env.FIREBASE_AUTH_EMULATOR_HOST ??= "127.0.0.1:9099";
 export const PROJECT = "demo-decade-hunt";
 export const FUNCTIONS_ORIGIN = `http://127.0.0.1:5001/${PROJECT}/asia-south1`;
 
 const admin = initAdmin({ projectId: PROJECT }, `admin-${Math.random().toString(36).slice(2)}`);
 export const adb = adminFirestore(admin);
+export const adminAuth = getAdminAuth(admin);
 
 export const istToday = () => new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().slice(0, 10);
 /** Inside the seeded (huge) campus radius. */
@@ -19,7 +22,11 @@ export const CAMPUS = { lat: 26.7838, lng: 75.8225 };
 const apps: FirebaseApp[] = [];
 let n = 0;
 
-export async function newPlayer({ profile = true }: { profile?: boolean } = {}) {
+/**
+ * A signed-up player. `verified` marks the email verified (like clicking the link) and refreshes the
+ * token; `profile` also runs completeProfile.
+ */
+export async function newPlayer({ profile = true, verified = true }: { profile?: boolean; verified?: boolean } = {}) {
   const app = initializeApp({ projectId: PROJECT, apiKey: "demo-key" }, `p-${Date.now()}-${n++}`);
   apps.push(app);
   const auth = getAuth(app);
@@ -28,9 +35,11 @@ export async function newPlayer({ profile = true }: { profile?: boolean } = {}) 
   connectFunctionsEmulator(fns, "127.0.0.1", 5001);
   const cred = await createUserWithEmailAndPassword(auth, `t${Date.now()}${n}${Math.random().toString(36).slice(2, 6)}@example.com`, "password123");
   const call = <I, O = unknown>(name: string) => async (data: I) => (await httpsCallable<I, O>(fns, name)(data)).data;
-  if (profile) {
-    await call("completeProfile")({ name: "Test Player", dept: "CSE", year: 2, roll: `T${Date.now().toString(36)}${n}`.toUpperCase() });
+  if (verified) {
+    await adminAuth.updateUser(cred.user.uid, { emailVerified: true });
+    await cred.user.getIdToken(true); // new token carries email_verified
   }
+  if (profile) await call("completeProfile")({ name: "Test Player" });
   return { uid: cred.user.uid, auth, call, idToken: () => cred.user.getIdToken() };
 }
 

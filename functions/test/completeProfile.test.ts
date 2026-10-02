@@ -1,49 +1,29 @@
-// Calls the deployed-to-emulator completeProfile through the client SDK, like the phone does.
-// Needs Auth + Firestore + Functions emulators: `npm run test:emu`.
-import { deleteApp, initializeApp, type FirebaseApp } from "firebase/app";
-import { connectAuthEmulator, createUserWithEmailAndPassword, getAuth, signOut } from "firebase/auth";
-import { connectFirestoreEmulator, doc, getDoc, getFirestore } from "firebase/firestore";
-import { connectFunctionsEmulator, getFunctions, httpsCallable } from "firebase/functions";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+// completeProfile against the emulators (PLAN 1.9): name only, verified email required.
+import { signOut } from "firebase/auth";
+import { afterAll, describe, expect, it } from "vitest";
+import { adb, cleanupApps, newPlayer } from "./helpers";
 
-const apps: FirebaseApp[] = [];
+afterAll(cleanupApps);
 
-async function newPlayer() {
-  const app = initializeApp({ projectId: "demo-decade-hunt", apiKey: "demo-key" }, `p${apps.length}-${Date.now()}`);
-  apps.push(app);
-  const auth = getAuth(app);
-  connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
-  const fns = getFunctions(app, "asia-south1");
-  connectFunctionsEmulator(fns, "127.0.0.1", 5001);
-  const db = getFirestore(app);
-  connectFirestoreEmulator(db, "127.0.0.1", 8085);
-  const email = `t${Date.now()}${Math.random().toString(36).slice(2, 6)}@example.com`;
-  await createUserWithEmailAndPassword(auth, email, "password123");
-  return { auth, db, completeProfile: httpsCallable(fns, "completeProfile") };
-}
-
-const roll = `T${Date.now().toString(36).toUpperCase()}`;
-const profile = (r = roll) => ({ name: "Test Player", dept: "CSE", year: 1, roll: r });
-
-let a: Awaited<ReturnType<typeof newPlayer>>;
-let b: Awaited<ReturnType<typeof newPlayer>>;
-
-beforeAll(async () => {
-  [a, b] = await Promise.all([newPlayer(), newPlayer()]);
-});
-afterAll(async () => {
-  await Promise.all(apps.map((app) => deleteApp(app)));
-});
+const user = async (uid: string) => (await adb.doc(`users/${uid}`).get()).data();
 
 describe("completeProfile", () => {
-  it("creates the profile with SPEC §4 defaults", async () => {
-    await expect(a.completeProfile(profile())).resolves.toMatchObject({ data: { ok: true } });
-    const snap = await getDoc(doc(a.db, "users", a.auth.currentUser!.uid));
-    expect(snap.data()).toMatchObject({
-      name: "Test Player",
-      dept: "CSE",
-      year: 1,
-      roll,
+  it("rejects an unverified email (no profile written)", async () => {
+    const p = await newPlayer({ profile: false, verified: false });
+    await expect(p.call("completeProfile")({ name: "Unverified Person" })).rejects.toMatchObject({
+      code: "functions/failed-precondition",
+      details: { code: "email-unverified" },
+    });
+    expect(await user(p.uid)).toBeUndefined();
+  });
+
+  it("creates the profile with SPEC §4 defaults: name + email only", async () => {
+    const p = await newPlayer({ profile: false });
+    await expect(p.call("completeProfile")({ name: "  Asha   Verma " })).resolves.toEqual({ ok: true });
+    const u = await user(p.uid);
+    expect(u).toMatchObject({
+      name: "Asha Verma",
+      email: p.auth.currentUser!.email,
       points: 0,
       attemptsToday: 0,
       attemptsDate: null,
@@ -59,31 +39,31 @@ describe("completeProfile", () => {
       pointsReachedAt: null,
       profileDone: true,
     });
-    for (const old of ["todayPoints", "todayDate", "streak", "lastWinDate"]) expect(snap.data()).not.toHaveProperty(old);
+    for (const gone of ["dept", "year", "roll", "todayPoints", "streak"]) expect(u).not.toHaveProperty(gone);
   });
 
-  it("rejects a second call by the same user", async () => {
-    await expect(a.completeProfile(profile(`${roll}X`))).rejects.toMatchObject({
+  it("ignores client-sent extras and rejects a second call", async () => {
+    const p = await newPlayer({ profile: false });
+    await p.call("completeProfile")({ name: "First Name", dept: "CSE", email: "spoof@evil.example" });
+    const u = await user(p.uid);
+    expect(u!.email).toBe(p.auth.currentUser!.email);
+    expect(u).not.toHaveProperty("dept");
+    await expect(p.call("completeProfile")({ name: "Second Name" })).rejects.toMatchObject({
       code: "functions/already-exists",
       details: { code: "profile-done" },
     });
+    expect((await user(p.uid))!.name).toBe("First Name");
   });
 
-  it("rejects a duplicate roll (case/space-insensitive) from another user", async () => {
-    await expect(b.completeProfile(profile(`  ${roll.toLowerCase()} `))).rejects.toMatchObject({
-      code: "functions/already-exists",
-      details: { code: "roll-taken" },
-    });
-  });
-
-  it("rejects invalid input", async () => {
-    await expect(b.completeProfile({ ...profile("ZZ999"), dept: "Law" })).rejects.toMatchObject({
-      code: "functions/invalid-argument",
-    });
+  it("rejects a bad name", async () => {
+    const p = await newPlayer({ profile: false });
+    await expect(p.call("completeProfile")({ name: "A" })).rejects.toMatchObject({ code: "functions/invalid-argument" });
+    await expect(p.call("completeProfile")({ name: "x".repeat(41) })).rejects.toMatchObject({ code: "functions/invalid-argument" });
   });
 
   it("rejects signed-out callers", async () => {
-    await signOut(b.auth);
-    await expect(b.completeProfile(profile("ZZ998"))).rejects.toMatchObject({ code: "functions/unauthenticated" });
+    const p = await newPlayer({ profile: false });
+    await signOut(p.auth);
+    await expect(p.call("completeProfile")({ name: "Nobody" })).rejects.toMatchObject({ code: "functions/unauthenticated" });
   });
 });

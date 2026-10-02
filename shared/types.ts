@@ -13,15 +13,13 @@ export interface FireTimestamp {
 /** IST calendar date, `YYYY-MM-DD` in Asia/Kolkata. */
 export type IstDate = string;
 
-// ---------- Fixed lists ----------
-
-export const DEPARTMENTS = ["CSE", "AI&DS", "AI&ML", "IT", "ECE", "EE", "ME", "CE", "Other"] as const;
-export type Department = (typeof DEPARTMENTS)[number];
-
-export const YEARS = [1, 2, 3, 4] as const;
-export type Year = (typeof YEARS)[number];
+// ---------- Fixed values ----------
 
 export const LINGO_COUNT = 10;
+
+/** Profile = name + email only (SPEC §4). */
+export const NAME_MIN = 2;
+export const NAME_MAX = 40;
 
 export type Role = "admin" | "volunteer";
 /** pronounce/speak are voice (mic); meaning/question are 4-option taps. */
@@ -41,21 +39,18 @@ export const COL = {
   config: "config",
   challenges: "challenges",
   attempts: "attempts",
-  rollNumbers: "rollNumbers",
   pointsLog: "pointsLog",
   leaderboard: "leaderboard",
   raids: "raids",
   players: "players", // subcollection of raids/{id}
   prizes: "prizes",
   redemptions: "redemptions",
-  depts: "depts", // depts/{dept}: running totals, server-only
   final: "final",
 } as const;
 
 export const DOC = {
   gameConfig: "game", // config/game
   studentsBoard: "students", // leaderboard/students
-  deptsBoard: "depts", // leaderboard/depts
   finalState: "state", // final/state
 } as const;
 
@@ -68,9 +63,6 @@ export const challengeId = (date: IstDate, lingoId: string) => `${date}_${lingoI
 export interface UserDoc {
   name: string;
   email: string;
-  dept: Department;
-  year: Year;
-  roll: string; // trimmed + uppercased, unique
   points: number;
   /** Non-raid attempts used on `attemptsDate`; treat as 0 when attemptsDate ≠ today. */
   attemptsToday: number;
@@ -245,11 +237,6 @@ export interface AttemptDoc {
   speedBonus?: number;
 }
 
-/** rollNumbers/{roll} — never client-readable */
-export interface RollNumberDoc {
-  uid: string;
-}
-
 export type PointsReason =
   | "firstCatch"
   | "repeatCatch"
@@ -273,7 +260,6 @@ export interface PointsLogDoc {
 export interface StudentRow {
   uid: string;
   name: string;
-  dept: Department;
   points: number;
   /** wins ÷ (wins + losses), 0–1 */
   accuracy: number;
@@ -285,24 +271,6 @@ export interface StudentRow {
 export interface StudentsBoardDoc {
   /** Top 100 in tie-break order: points → accuracy → avgAnswerMs (low first) → pointsReachedAt. */
   top: StudentRow[];
-  updatedAt: FireTimestamp;
-}
-
-/** depts/{dept} — server-only running totals, updated inside submitAttempt; copied to leaderboard/depts. */
-export interface DeptDoc {
-  points: number;
-  players: number;
-}
-
-export interface DeptRow {
-  dept: Department;
-  points: number;
-  players: number;
-}
-
-/** leaderboard/depts — signed-in read */
-export interface DeptsBoardDoc {
-  rows: DeptRow[];
   updatedAt: FireTimestamp;
 }
 
@@ -342,7 +310,6 @@ export interface RedemptionDoc {
 export interface FinalContestant {
   uid: string;
   name: string;
-  dept: Department;
   eliminated: boolean;
 }
 
@@ -357,11 +324,9 @@ export interface FinalStateDoc {
 
 // ---------- Function I/O (SPEC §5) ----------
 
+/** The email comes from the (verified) login, not from the client. */
 export interface CompleteProfileInput {
   name: string;
-  dept: Department;
-  year: Year;
-  roll: string;
 }
 export interface CompleteProfileOutput {
   ok: true;

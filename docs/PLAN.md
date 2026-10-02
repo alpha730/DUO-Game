@@ -28,12 +28,12 @@ Human does first: create Firebase project (asia-south1), Blaze plan + ₹500 bud
 | 1.1 | Init git repo + folder structure from CLAUDE.md, `.gitignore` (node_modules, .env, dist) | Structure exists |
 | 1.2 | `firebase init`: Firestore, Functions (TS, Node 20), Hosting (`web/dist`, SPA rewrite), Emulators (Auth, Firestore, Functions, Hosting) | `firebase emulators:start` runs |
 | 1.3 | Functions: `setGlobalOptions({region:'asia-south1'})`; folders `fns/`, `lib/`; vitest set up | `npm test` runs (0 tests ok) |
-| 1.4 | `/shared/types.ts`: every type in SPEC §4 + all function inputs/outputs from SPEC §5 + DEPARTMENTS, YEARS; prebuild script copies to `functions/src/shared` | Functions build |
+| 1.4 | `/shared/types.ts`: every type in SPEC §4 + all function inputs/outputs from SPEC §5 ; prebuild script copies to `functions/src/shared` | Functions build |
 | 1.5 | `lib/date.ts`, `lib/geo.ts`, `lib/match.ts` + tests | Tests pass (IST date edge at 23:59/00:01, 80% match cases, punctuation, extra words) |
 | 1.6 | `lib/guards.ts`: `requireAuth`, `requireProfile`, `requireGameOpen`, `requireRole` | Used by later functions |
 | 1.7 | `firestore.rules` per SPEC §6 + rules unit tests with `@firebase/rules-unit-testing` | Client can't read attempts/challenges, can't write anything |
 | 1.8 | `scripts/seed.ts`: 10 lingos (placeholder model URLs), `config/game` (dates, rules, campus centre placeholder), 2 challenges for today (1 speak, 1 meaning), 2 prizes | Emulator has data |
-| 1.9 | `completeProfile` (transaction, unique roll) | Duplicate roll rejected; second call rejected |
+| 1.9 | `completeProfile` (name only, verified email required) | Unverified email rejected; second call rejected |
 | 1.10 | `/web`: Vite React TS, react-router, Firebase client (`lib/firebase.ts`, connect to emulators on localhost), `config/brand.ts` | App runs |
 | 1.11 | Auth context + Login screen (Google + email/password sign-in/sign-up, errors shown) | Can log in with any email |
 | 1.12 | Setup screen → `completeProfile`; route guard (logged out → `/`, no profile → `/setup`) | Can't skip setup |
@@ -83,7 +83,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 | # | Task | Done when |
 |---|---|---|
 | 5.1 | `refreshLeaderboard` scheduled every 5 min (+ admin "refresh now"), tie-break order: points → accuracy → avg answer time → reached first; unit test the sort | Two users with equal points rank by accuracy, then speed |
-| 5.2 | Leaderboard screen: Students / Departments tabs, own rank pinned (own points from user doc; rank "100+" if outside top 100) | Shows correctly |
+| 5.2 | Leaderboard screen: one student list, own rank pinned (own points from user doc; rank "100+" if outside top 100) | Shows correctly |
 | 5.3 | Me screen: QR of uid (`qrcode` lib), stats, logout | QR scannable |
 | 5.4 | Firestore index for points ordering | No index errors |
 
@@ -109,7 +109,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 - [ ] 10+ phones: cheap Android, mid Android, iPhone; Chrome + Safari; campus Wi-Fi + mobile data
 - [ ] Models load < 5 s; scan works in daylight and indoor light
 - [ ] Cheating tests: switch tab mid-attempt, reload, kill app, change phone clock, call functions from console with fake data, submit after timer, two tabs at once, fake location
-- [ ] Same roll number twice → blocked
+- [ ] Unverified email can't finish Setup
 - [ ] 4-attempt limit (fail + forfeit count, raids don't); same Lingo can't be caught twice a day
 - [ ] Favourite streaks across midnight IST; missed day resets streak but keeps level; MAX at day 10
 - [ ] Favourite change allowed once only; all-10 bonus given once
@@ -135,4 +135,4 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 
 ## Oct 22
 - 12:00 IST: `lockGame` (also enforced by `lockAt`); leaderboard final refresh; export top 20
-- Afternoon: `/stage` final round → winner; redemption desk with ID-card check (roll number must match)
+- Afternoon: `/stage` final round → winner; redemption desk: student shows the Me screen while logged in; name must match the college ID card

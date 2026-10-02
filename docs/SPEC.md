@@ -14,7 +14,7 @@
 - Each student picks **2 favourite Lingos**. Only favourites build a streak; a 10-day streak turns a favourite into its **MAX** form.
 - Non-favourites level up by total catches, so everyone can collect all 10 (2 favourites + 2 others per day).
 - **One-chance rule:** leaving the app during a challenge (close, tab switch, lock screen, call) forfeits it.
-- Leaderboards (students + departments) live until Oct 22, 12:00 IST. Final round on stage Oct 22.
+- One student leaderboard (no departments) live until Oct 22, 12:00 IST. Final round on stage Oct 22.
 
 ## 2. Game rules & numbers (all stored in `config/game`, editable by admin)
 | Rule | Value |
@@ -73,38 +73,35 @@ The same order picks the top 20 for the final round. The live final round on Oct
 ## 4. Data model (Firestore)
 | Path | Fields | Client read |
 |---|---|---|
-| `users/{uid}` | name, email, dept, year, roll, points, attemptsToday, attemptsDate, dayStreak, lastPlayDate, lingosCaught (number), allTenBonus (bool), favorites (lingoId[] max 2), favoriteChangesLeft (1), wins, losses, totalAnswerMs, pointsReachedAt, profileDone, createdAt | owner only |
+| `users/{uid}` | name, email, points, attemptsToday, attemptsDate, dayStreak, lastPlayDate, lingosCaught (number), allTenBonus (bool), favorites (lingoId[] max 2), favoriteChangesLeft (1), wins, losses, totalAnswerMs, pointsReachedAt, profileDone, createdAt | owner only |
 | `users/{uid}/catches/{lingoId}` | firstCaughtAt, timesCaught, lastCaughtDate, level (1\|2\|3\|'MAX'), favStreak, maxBonusGiven (bool) | owner only |
 | `lingos/{lingoId}` | name, detYear, posterIndex (0–9), modelUrl, rarity, color | signed-in |
 | `config/game` | startAt, lockAt, locked, campusLat, campusLng, campusRadiusM, rules (table above) | signed-in |
 | `challenges/{date}_{lingoId}` | type ('pronounce'\|'speak'\|'meaning'\|'question'), word? (pronounce/meaning), accept? (string[], pronounce), phrase? (speak), prompt? (question text), options? (4), correctIndex? | **never** |
 | `attempts/{id}` | uid, lingoId, date, type, raidId?, startedAt, expiresAt, status ('open'\|'won'\|'failed'\|'forfeit'), score?, receivedAt?, answerMs?, speedBonus? | **never** |
-| `rollNumbers/{roll}` | uid | **never** |
 | `pointsLog/{id}` | uid, amount, reason, attemptId?, createdAt | **never** |
-| `leaderboard/students` | top: [{uid, name, dept, points, accuracy, avgAnswerMs}] (top 100, in tie-break order), updatedAt | signed-in |
-| `depts/{dept}` | points, players | **never** (copied into `leaderboard/depts`) |
-| `leaderboard/depts` | rows: [{dept, points, players}], updatedAt | signed-in |
+| `leaderboard/students` | top: [{uid, name, points, accuracy, avgAnswerMs}] (top 100, in tie-break order), updatedAt | signed-in |
 | `raids/{id}` | posterIndex, lingoId, startAt, endAt, minPlayers (20), joined (count), unlocked, status | signed-in |
 | `raids/{id}/players/{uid}` | joinedAt | **never** |
 | `prizes/{id}` | name, cost, stock | signed-in |
 | `redemptions/{id}` | uid, prizeId, cost, byUid, createdAt | **never** |
 | `final/state` | round, phrase, contestants[], scores{}, status | signed-in |
 
-Departments (fixed list in `shared/types.ts`): CSE, AI&DS, AI&ML, IT, ECE, EE, ME, CE, Other. Years: 1–4.
-Roll number: trim + uppercase before storing; must be unique.
+**Profile = name + email only.** No department, year or roll number anywhere in the app.
+**Fake-account guard:** email must be verified before Setup (Google accounts are already verified; email/password users must click the verification link first). Prizes are handed over only to the logged-in account shown on the Me screen, and the name must match the student's college ID card.
 
 ## 5. Cloud Functions
 All callable (`onCall`) unless noted. Every one runs the checks in CLAUDE.md rule 6 (except `completeProfile`, `getMyState`, admin ones).
 
 | Function | Input | Logic | Returns |
 |---|---|---|---|
-| `completeProfile` | name, dept, year, roll | Validate; transaction: fail if `rollNumbers/{roll}` exists or profile done; create user + roll doc | `{ok}` |
+| `completeProfile` | name | Require verified email; name 2–40 chars, trimmed; fail if profile already done; create user with defaults (email from the auth token) | `{ok}` |
 | `getMyState` | – | Auto-forfeit open attempts; return user, catches, today's tries | `{user, catches, serverNow}` |
 | `startAttempt` | lingoId, lat, lng, raidId? | Game open; on campus; no open attempt; Lingo not already caught today; attemptsToday < 4 (reset when attemptsDate ≠ today; skipped for raids); load `challenges/{today}_{lingoId}`; create attempt; increment attemptsToday | `{attemptId, type, word?, phrase?, prompt?, options?, expiresAt, serverNow, attemptsLeft}` (never `accept` or `correctIndex`) |
-| `submitAttempt` | attemptId, transcript? , choice? | Owner + open + in time; score (pronounce: word or accept[] in transcript; speak: word match ≥ 80%; meaning/question: choice == correctIndex); on win → one transaction: catch doc (timesCaught, favStreak, level), points per §2 incl. speed bonus, MAX + all-10 bonuses, wins++, totalAnswerMs += answerMs, pointsReachedAt = now, dayStreak, `depts/{dept}` total, pointsLog; on fail → losses++ (forfeits also do losses++) | `{result:'won'\|'failed', pointsAdded, speedBonus, bonuses[], newLevel, favStreak?, newTotal, missedWords?, needsFavorites}` |
+| `submitAttempt` | attemptId, transcript? , choice? | Owner + open + in time; score (pronounce: word or accept[] in transcript; speak: word match ≥ 80%; meaning/question: choice == correctIndex); on win → one transaction: catch doc (timesCaught, favStreak, level), points per §2 incl. speed bonus, MAX + all-10 bonuses, wins++, totalAnswerMs += answerMs, pointsReachedAt = now, dayStreak, pointsLog; on fail → losses++ (forfeits also do losses++) | `{result:'won'\|'failed', pointsAdded, speedBonus, bonuses[], newLevel, favStreak?, newTotal, missedWords?, needsFavorites}` |
 | `setFavorites` | lingoIds (exactly 2, both already caught) | First time: save. Later: only if favoriteChangesLeft > 0; decrement; new favourite starts favStreak 0 | `{favorites, favoriteChangesLeft}` |
 | `forfeitAttempt` | **HTTP `onRequest`**, header `Authorization: Bearer <idToken>`, body `{attemptId}` | Verify token; if owner + open → `forfeit` and the user's losses++ (same when an expired or auto-forfeited attempt is closed) | 204 |
-| `refreshLeaderboard` | **scheduled**, every 5 min | Query top 300 users by points, sort in code by the tie-break order in §2, keep top 100; dept totals come from `depts/{dept}` docs updated inside `submitAttempt` (never read all users) | – |
+| `refreshLeaderboard` | **scheduled**, every 5 min | Query top 300 users by points, sort in code by the tie-break order in §2, keep top 100 | – |
 | `joinRaid` | raidId, lat, lng | Raid active; on campus; add player; if joined ≥ minPlayers → unlocked | `{joined, unlocked}` |
 | `redeemPrize` | uid, prizeId | Caller has role volunteer/admin; balance ≥ cost; stock > 0; deduct + log | `{newBalance}` |
 | `adminSetConfig`, `adminUpsertChallenges`, `adminCreateRaid`, `lockGame`, `finalControl` | – | Role admin only | – |
@@ -127,12 +124,12 @@ Roles = custom claims `{role:'admin'|'volunteer'}` set by `scripts/setRole.ts`.
 | Route | Screen | Contents |
 |---|---|---|
 | `/` | Login | Google button, email/password form, sign-up toggle |
-| `/setup` | Profile | name, dept, year, roll → `completeProfile` |
+| `/setup` | Profile | name only (email shown read-only) → `completeProfile`; email/password users see "Verify your email" first |
 | `/home` | Collection | top: 2 favourite cards (Lingo, level, 🔥 streak "Day 6/10", "caught today ✓/not yet"); 10-slot grid (caught = colour + level badge, not caught = silhouette); points, "Attempts left today: 3/4", "Scan" button, raid banner if active |
 | `/favorites` | Pick favourites | shown after the first 2 catches (and from Me, if a change is left); choose 2 of caught Lingos → `setFavorites`; warns that changing resets the streak |
 | `/scan` | AR | camera + MindAR (`/assets/targets.mind`, 10 targets); target found → show that Lingo's model + "Catch it" |
 | `/catch/:lingoId` | Challenge | pre-flight (mic + location) → Start → timer → pronounce / speak (mic + live transcript) or meaning / question (prompt + 4 buttons) → result |
-| `/leaderboard` | Rankings | tabs Students / Departments, own rank pinned at bottom |
+| `/leaderboard` | Rankings | one list of students (rank, name, points), own rank pinned at bottom |
 | `/me` | Profile | QR of uid (for prizes), stats, share card button, logout |
 | `/admin` | Admin | config, upload challenges JSON, create raid, stats, lock game (role admin) |
 | `/redeem` | Volunteer | scan QR → user + balance → pick prize → confirm (role volunteer/admin) |

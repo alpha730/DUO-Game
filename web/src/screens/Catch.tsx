@@ -7,6 +7,7 @@ import {
   type SubmitAttemptInput,
   type SubmitAttemptOutput,
 } from "@shared/types";
+import { activeAttempt, sendForfeit } from "../catch/forfeit";
 import { requestLocation, requestMic, type CheckState, type Position } from "../catch/preflight";
 import { useCountdown } from "../catch/useCountdown";
 import ChoiceChallenge from "../components/ChoiceChallenge";
@@ -48,25 +49,68 @@ function Active({ challenge, onSubmit }: { challenge: StartAttemptOutput; onSubm
   );
 }
 
+// An attempt that was running when the page was reloaded/closed (read once per page load).
+let reloadedAttempt = activeAttempt.take();
+
 export default function Catch() {
   const { lingoId = "" } = useParams();
+  // Reload mid-attempt → the pagehide forfeit already went out: show "Chance lost" straight away.
+  const [reloaded] = useState(() => (reloadedAttempt?.lingoId === lingoId ? reloadedAttempt : null));
   const [lingo, setLingo] = useState<Lingo | null>(null);
   const [me, setMe] = useState<GetMyStateOutput | null>(null);
-  const [phase, setPhase] = useState<Phase>("preflight");
+  const [phase, setPhase] = useState<Phase>(reloaded ? "done" : "preflight");
   const [mic, setMic] = useState<CheckState>("idle");
   const [loc, setLoc] = useState<CheckState>("idle");
   const [position, setPosition] = useState<Position | null>(null);
   const [error, setError] = useState("");
   const [challenge, setChallenge] = useState<StartAttemptOutput | null>(null);
-  const [outcome, setOutcome] = useState<Outcome | null>(null);
+  const [outcome, setOutcome] = useState<Outcome | null>(reloaded ? { kind: "forfeit" } : null);
   const token = useRef<string | null>(null);
   const submitted = useRef(false);
 
   // Mount: auto-forfeit any open attempt (SPEC §3.5) + attempts left; Lingo name/colour.
   useEffect(() => {
+    if (reloaded) reloadedAttempt = null; // show it once
     api.getMyState({}).then(setMe, () => {});
     loadLingos().then((ls) => setLingo(ls.find((l) => l.id === lingoId) ?? null), () => {});
-  }, [lingoId]);
+  }, [lingoId, reloaded]);
+
+  // One-chance rule (SPEC §3.4): hiding the page (tab switch, lock screen, call, app switch) or
+  // closing/reloading it while the challenge runs forfeits it. Not `blur` — that fires on harmless things.
+  useEffect(() => {
+    if (phase !== "active" || !challenge) return;
+    activeAttempt.set(lingoId, challenge.attemptId);
+    const lose = () => {
+      if (submitted.current) return; // answer already on its way
+      submitted.current = true;
+      sendForfeit(token.current, challenge.attemptId);
+      setOutcome({ kind: "forfeit" });
+      setPhase("done");
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") lose();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", lose);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", lose);
+    };
+  }, [phase, challenge, lingoId]);
+
+  // Leaving the Catch screen inside the app mid-challenge also loses it (no peeking and coming back).
+  const running = useRef<string | null>(null);
+  running.current = phase === "active" && challenge ? challenge.attemptId : null;
+  useEffect(
+    () => () => {
+      if (running.current && !submitted.current) {
+        submitted.current = true;
+        sendForfeit(token.current, running.current);
+      }
+      activeAttempt.clear();
+    },
+    [],
+  );
 
   // Pre-flight: mic, then location — one prompt at a time, all before Start.
   const preflightRunning = useRef(false);
@@ -86,8 +130,8 @@ export default function Catch() {
   }, []);
 
   useEffect(() => {
-    void runPreflight();
-  }, [runPreflight]);
+    if (!reloaded) void runPreflight();
+  }, [runPreflight, reloaded]);
 
   async function start() {
     if (!position) return;
@@ -113,6 +157,7 @@ export default function Catch() {
       setPhase("submitting");
       try {
         const data = await api.submitAttempt({ attemptId: challenge.attemptId, ...answer });
+        activeAttempt.clear(); // answered: a reload now is harmless
         setOutcome({ kind: data.result, data });
       } catch (err) {
         const code = (err as { details?: { code?: string } }).details?.code;

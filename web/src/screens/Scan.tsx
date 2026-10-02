@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { GetMyStateOutput } from "@shared/types";
+import { LINGO_COUNT, type GetMyStateOutput } from "@shared/types";
 import { CameraError } from "../ar/cameraError";
 import { cachedModel, loadModel } from "../ar/models";
 import { createScanner, type Scanner } from "../ar/scanner";
@@ -13,10 +13,16 @@ import { loadLingos, type Lingo } from "../lib/lingos";
 
 type Status = "starting" | "scanning" | "problem";
 
+declare const __TARGETS_VERSION__: string;
+
 const IN_APP = inAppBrowser();
 
 // Lazy-loaded route: MindAR + three.js live in this chunk only.
-export default function Scan() {
+/**
+ * @param testMode `/ar-test`: no sign-in, no server calls, catching off — for camera/tracking tests
+ *   on real phones before the game backend is live.
+ */
+export default function Scan({ testMode = false }: { testMode?: boolean }) {
   const container = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<Status>("starting");
   const [problem, setProblem] = useState<ScanProblem | null>(IN_APP ? { kind: "inApp", app: IN_APP } : null);
@@ -24,18 +30,31 @@ export default function Scan() {
   const [lingo, setLingo] = useState<Lingo | null>(null);
   const [modelReady, setModelReady] = useState(false);
   const [me, setMe] = useState<GetMyStateOutput | null>(null);
+  const [meState, setMeState] = useState<"loading" | "ok" | "error">("loading");
+  const [meRun, setMeRun] = useState(0); // bump to retry getMyState
+  // Poster recognised but the `lingos` collection is empty (game data not seeded yet).
+  const [bareposter, setBarePoster] = useState<number | null>(null);
 
   // Today's catches + attempts left; also auto-forfeits any open attempt (SPEC §3.5).
   useEffect(() => {
+    if (testMode) return;
     let cancelled = false;
+    setMeState("loading");
     api
       .getMyState({})
-      .then((s) => !cancelled && setMe(s))
-      .catch((err) => console.warn("getMyState failed; overlay falls back to 'Catch it'", err));
+      .then((s) => {
+        if (cancelled) return;
+        setMe(s);
+        setMeState("ok");
+      })
+      .catch((err) => {
+        console.warn("getMyState failed", err);
+        if (!cancelled) setMeState("error");
+      });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [meRun, testMode]);
 
   const blocked = problem !== null;
 
@@ -51,17 +70,26 @@ export default function Scan() {
       let lingos: Lingo[];
       let targets: string;
       try {
-        [lingos, targets] = await Promise.all([loadLingos(), loadTargets()]);
+        // Test mode is signed out, so lingos may be unreadable: track bare posters instead.
+        const lingosP = testMode ? loadLingos().catch(() => [] as Lingo[]) : loadLingos();
+        [lingos, targets] = await Promise.all([lingosP, loadTargets()]);
       } catch (err) {
         throw Object.assign(new Error((err as Error).message), { data: true });
       }
       if (cancelled) return;
       const byPoster = new Map(lingos.map((l) => [l.posterIndex, l]));
+      // DECISION: with no game data yet (e.g. production before seeding), still track every poster
+      // so the camera and tracking can be tested; the card says the game isn't set up.
+      const posters = byPoster.size ? [...byPoster.keys()] : Array.from({ length: LINGO_COUNT }, (_, i) => i);
 
-      const s = createScanner(container.current!, targets, [...byPoster.keys()], {
+      const s = createScanner(container.current!, targets, posters, {
         onFound: (i) => {
           current = i;
-          const l = byPoster.get(i)!;
+          const l = byPoster.get(i);
+          if (!l) {
+            setBarePoster(i);
+            return;
+          }
           setLingo(l);
           if (!loaded.has(i)) {
             const cached = cachedModel(l.modelUrl); // loaded on an earlier visit → instant
@@ -85,6 +113,7 @@ export default function Scan() {
           if (current !== i) return;
           current = null;
           setLingo(null);
+          setBarePoster(null);
         },
       });
       scanner = s;
@@ -117,12 +146,13 @@ export default function Scan() {
   };
 
   return (
-    <main className="ar-screen">
+    <main className={testMode ? "ar-screen no-nav" : "ar-screen"}>
+      {testMode && <p className="ar-test-banner">AR test mode · {__TARGETS_VERSION__}</p>}
       <div
         ref={container}
         className="ar-stage"
         data-status={problem ? "problem" : status}
-        data-found={lingo?.posterIndex ?? ""}
+        data-found={lingo?.posterIndex ?? bareposter ?? ""}
         data-lingo={lingo?.id ?? ""}
         data-model={modelReady ? "ready" : ""}
       />
@@ -141,17 +171,37 @@ export default function Scan() {
                 <p>Starting camera…</p>
               </div>
             )}
-            {status === "scanning" && !lingo && <p className="ar-hint">Point your camera at a poster</p>}
+            {status === "scanning" && !lingo && bareposter === null && (
+              <p className="ar-hint">Point your camera at a poster</p>
+            )}
+            {status === "scanning" && bareposter !== null && (
+              <section className="scan-card" role="status" data-kind="noGameData">
+                <h2 style={{ margin: 0 }}>Poster {bareposter + 1} recognised</h2>
+                <p className="done">
+                  {testMode ? "Test mode — catching is off." : "The game isn't set up yet — check back when it starts."}
+                </p>
+              </section>
+            )}
             {status === "scanning" && lingo && !modelReady && (
               <div className="ar-hint model-loading" aria-live="polite">
                 <div className="spinner" />
                 <p>{lingo.name} is appearing…</p>
               </div>
             )}
-            {status === "scanning" && lingo && (
+            {status === "scanning" && lingo && testMode && (
+              <section className="scan-card" role="status" data-kind="test">
+                <h2 style={{ margin: 0 }}>
+                  {lingo.name} · poster {lingo.posterIndex + 1}
+                </h2>
+                <p className="done">Test mode — catching is off.</p>
+              </section>
+            )}
+            {status === "scanning" && lingo && !testMode && (
               <ScanOverlay
                 lingo={lingo}
                 status={catchStatus(lingo.id, me)}
+                server={meState}
+                onRetryServer={() => setMeRun((n) => n + 1)}
                 attemptsLeft={me?.attemptsLeft ?? null}
                 attemptsPerDay={me?.attemptsPerDay ?? null}
               />

@@ -1,5 +1,10 @@
-/** Compiled from the 10 posters; target index = posterIndex (SPEC §8). Replace the file, not the code. */
-export const TARGETS_URL = "/assets/targets.mind";
+declare const __TARGETS_VERSION__: string;
+
+/**
+ * Compiled from the 10 posters; target index = posterIndex (SPEC §8). Replace the file, not the code.
+ * The ?v= content hash (vite.config.ts) lets Hosting cache it for 30 days.
+ */
+export const TARGETS_URL = `/assets/targets.mind?v=${__TARGETS_VERSION__}`;
 
 let cached: Promise<string> | null = null;
 

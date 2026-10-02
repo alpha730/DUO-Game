@@ -2,7 +2,7 @@
 // TensorFlow.js and three.js never land in the bundle for other screens.
 // DECISION: three is pinned to 0.151.3 — mind-ar 1.2.5 imports `sRGBEncoding`, removed in three r152.
 import { MindARThree, type MindARAnchor } from "mind-ar/dist/mindar-image-three.prod.js";
-import { Clock, DirectionalLight, HemisphereLight, Texture, type Mesh, type Object3D } from "three";
+import { Clock, DirectionalLight, HemisphereLight, Texture, Vector3, type Mesh, type Object3D } from "three";
 import { withCameraErrors } from "./cameraError";
 
 export interface ScannerEvents {
@@ -67,6 +67,18 @@ export function createScanner(
   const clock = new Clock();
   let starting = false;
   let stopped = false;
+
+  // Dev-only probe for automated tracking tests (which poster is tracked, where it is on screen).
+  if (import.meta.env.DEV) {
+    const v = new Vector3();
+    (window as unknown as { __arDebug?: unknown }).__arDebug = {
+      tracked: () => [...anchors].filter(([, a]) => a.group.visible).map(([i]) => i),
+      screen: (i: number) => {
+        anchors.get(i)!.group.getWorldPosition(v).project(mindar.camera);
+        return [((v.x + 1) / 2) * root.clientWidth, ((1 - v.y) / 2) * root.clientHeight];
+      },
+    };
+  }
 
   /** Camera off + everything freed. Safe in any state, including after a failed start. */
   function teardown() {

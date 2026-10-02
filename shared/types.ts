@@ -71,8 +71,12 @@ export interface UserDoc {
   /** Non-raid attempts used on `attemptsDate`; treat as 0 when attemptsDate ≠ today. */
   attemptsToday: number;
   attemptsDate: IstDate | null;
-  /** Overall "days played in a row" — display only, no points. */
+  /**
+   * IST days in a row with at least one WIN — display only, 0 points. Days with only failed or
+   * forfeited attempts don't count; a day without a win resets it to 0.
+   */
   dayStreak: number;
+  /** Last IST date with a win (drives dayStreak). */
   lastPlayDate: IstDate | null;
   lingosCaught: number;
   allTenBonus: boolean;

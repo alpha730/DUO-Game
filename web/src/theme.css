@@ -386,3 +386,22 @@ a {
   transform: translate(-50%, -50%);
   border-radius: var(--radius);
 }
+
+.ar-screen.no-nav {
+  bottom: 0;
+}
+
+.ar-test-banner {
+  position: absolute;
+  top: calc(8px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  margin: 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--warn);
+  color: #000;
+  font-size: 0.8rem;
+  font-weight: 700;
+}

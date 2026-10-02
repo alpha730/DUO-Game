@@ -8,10 +8,12 @@ const status = document.getElementById("status")!;
 
 let images: HTMLImageElement[] = [];
 
-// DECISION: posters are scaled to ≤ 1000 px on the long side before compiling. Full-size A4 renders
-// (1240×1754) give a ~10 MB targets.mind, too heavy for cheap phones on campus Wi-Fi; MindAR tracks
-// fine at this size. Override with ?max=<px> (0 = no resize).
-const MAX_SIDE = Number(new URLSearchParams(location.search).get("max") ?? 1000);
+// Posters are scaled down to this width before compiling: full-size renders give a huge targets.mind.
+// Override with ?width=<px> (0 = no resize).
+// DECISION: 600 px — tested 400/600/800 at 1–3 m, angled, blurred and dim: all tracked equally well, and
+// 600 is the smallest of the two shortlisted widths (7.0 MB raw, 2.4 MB with brotli for 10 posters).
+const DEFAULT_WIDTH = 600;
+const WIDTH = Number(new URLSearchParams(location.search).get("width") ?? DEFAULT_WIDTH);
 
 function loadImage(file: File) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -23,7 +25,7 @@ function loadImage(file: File) {
 }
 
 async function shrink(img: HTMLImageElement): Promise<HTMLImageElement> {
-  const scale = MAX_SIDE > 0 ? Math.min(1, MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight)) : 1;
+  const scale = WIDTH > 0 ? Math.min(1, WIDTH / img.naturalWidth) : 1;
   if (scale === 1) return img;
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(img.naturalWidth * scale);

@@ -7,10 +7,13 @@ import type {
 } from "@shared/types";
 import { functions } from "./firebase";
 
+// The SDK default is 70 s; on bad campus Wi-Fi we'd rather fail fast and show "Try again".
+const DEFAULT_TIMEOUT_MS = 15_000;
+
 const call =
-  <I, O>(name: string) =>
+  <I, O>(name: string, timeout = DEFAULT_TIMEOUT_MS) =>
   async (data: I): Promise<O> =>
-    (await httpsCallable<I, O>(functions, name)(data)).data;
+    (await httpsCallable<I, O>(functions, name, { timeout })(data)).data;
 
 export const api = {
   completeProfile: call<CompleteProfileInput, CompleteProfileOutput>("completeProfile"),

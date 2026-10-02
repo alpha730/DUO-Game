@@ -6,18 +6,24 @@ import type { Lingo } from "../lib/lingos";
 export default function ScanOverlay({
   lingo,
   status,
+  server,
+  onRetryServer,
   attemptsLeft,
   attemptsPerDay,
 }: {
   lingo: Lingo;
   status: CatchStatus;
+  /** getMyState: until it answers we can't tell which button is right. */
+  server: "loading" | "ok" | "error";
+  onRetryServer: () => void;
   attemptsLeft: number | null;
   attemptsPerDay: number | null;
 }) {
   const streak = status.favorite && status.favStreak > 0 ? status.favStreak : 0;
+  const kind = server === "ok" ? status.kind : `server-${server}`;
 
   return (
-    <section className="scan-card" aria-live="polite" data-kind={status.kind}>
+    <section className="scan-card" aria-live="polite" data-kind={kind}>
       <div className="row" style={{ justifyContent: "space-between" }}>
         <div className="row" style={{ gap: 10 }}>
           <span className="swatch" style={{ background: lingo.color }} aria-hidden="true" />
@@ -29,14 +35,29 @@ export default function ScanOverlay({
             </p>
           </div>
         </div>
-        {attemptsLeft !== null && attemptsPerDay !== null && (
+        {server === "ok" && attemptsLeft !== null && attemptsPerDay !== null && (
           <span className="small muted" title="Attempts left today">
             {attemptsLeft}/{attemptsPerDay}
           </span>
         )}
       </div>
 
-      {status.kind === "catch" && (
+      {server === "loading" && (
+        <button className="btn" disabled>
+          Checking…
+        </button>
+      )}
+
+      {server === "error" && (
+        <>
+          <p className="done">Can't reach the game server right now.</p>
+          <button className="btn secondary" onClick={onRetryServer}>
+            Try again
+          </button>
+        </>
+      )}
+
+      {server === "ok" && status.kind === "catch" && (
         <>
           {status.favorite && (
             <p className="streak">{streak > 0 ? `🔥 Day ${streak} — keep it going` : "🔥 Start your streak today"}</p>
@@ -47,14 +68,16 @@ export default function ScanOverlay({
         </>
       )}
 
-      {status.kind === "caughtToday" && (
+      {server === "ok" && status.kind === "caughtToday" && (
         <p className="done">
           Caught today ✓ — come back tomorrow
           {streak > 0 && <span className="streak"> · 🔥 Day {streak}</span>}
         </p>
       )}
 
-      {status.kind === "noAttempts" && <p className="done">No attempts left today — come back tomorrow</p>}
+      {server === "ok" && status.kind === "noAttempts" && (
+        <p className="done">No attempts left today — come back tomorrow</p>
+      )}
     </section>
   );
 }

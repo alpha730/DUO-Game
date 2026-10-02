@@ -23,6 +23,9 @@ export default function App() {
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/" element={<PublicOnly><Login /></PublicOnly>} />
+          {/* DECISION: public camera/tracking test page for real-phone testing before the backend is
+              live (no sign-in, no server calls, catching off). Remove at the Day 9 freeze. */}
+          <Route path="/ar-test" element={<Scan testMode />} />
           <Route path="/setup" element={<SetupOnly><Setup /></SetupOnly>} />
 
           <Route element={<RequireProfile><NavLayout /></RequireProfile>}>

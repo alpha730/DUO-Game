@@ -8,3 +8,4 @@ setGlobalOptions({ region: "asia-south1", maxInstances: 20 });
 export { completeProfile } from "./fns/completeProfile";
 export { getMyState } from "./fns/getMyState";
 export { startAttempt } from "./fns/startAttempt";
+export { submitAttempt } from "./fns/submitAttempt";

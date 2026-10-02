@@ -19,10 +19,26 @@ const call =
   async (data: I): Promise<O> =>
     (await httpsCallable<I, O>(functions, name, { timeout })(data)).data;
 
+// getMyState auto-forfeits open attempts (SPEC §3.5). If one is still in flight when the player taps
+// Start, it could reach the server after startAttempt and forfeit the brand-new attempt.
+// DECISION: startAttempt waits for this app's in-flight getMyState calls first (a received
+// response means the server has already done its auto-forfeit).
+const inflightState = new Set<Promise<unknown>>();
+const getMyState = call<GetMyStateInput, GetMyStateOutput>("getMyState");
+const startAttempt = call<StartAttemptInput, StartAttemptOutput>("startAttempt");
+
 export const api = {
   completeProfile: call<CompleteProfileInput, CompleteProfileOutput>("completeProfile"),
-  getMyState: call<GetMyStateInput, GetMyStateOutput>("getMyState"),
-  startAttempt: call<StartAttemptInput, StartAttemptOutput>("startAttempt"),
+  getMyState(data: GetMyStateInput): Promise<GetMyStateOutput> {
+    const p = getMyState(data);
+    inflightState.add(p);
+    void p.finally(() => inflightState.delete(p)).catch(() => {});
+    return p;
+  },
+  async startAttempt(data: StartAttemptInput): Promise<StartAttemptOutput> {
+    await Promise.allSettled([...inflightState]);
+    return startAttempt(data);
+  },
   submitAttempt: call<SubmitAttemptInput, SubmitAttemptOutput>("submitAttempt"),
 };
 

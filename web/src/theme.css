@@ -493,3 +493,52 @@ a {
   font-size: 1.2rem;
   font-variant-numeric: tabular-nums;
 }
+
+.say-word {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 800;
+  text-align: center;
+  word-break: break-word;
+}
+
+.say-phrase {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.heard {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 52px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.heard-text {
+  font-size: 1.05rem;
+}
+
+.mic-dot {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.voice[data-listening="true"] .mic-dot {
+  background: var(--danger);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    transform: scale(1.4);
+    opacity: 0.6;
+  }
+}

@@ -1,10 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import type { GetMyStateOutput, StartAttemptOutput, SubmitAttemptInput, SubmitAttemptOutput } from "@shared/types";
+import {
+  isVoiceChallenge,
+  type GetMyStateOutput,
+  type StartAttemptOutput,
+  type SubmitAttemptInput,
+  type SubmitAttemptOutput,
+} from "@shared/types";
 import { requestLocation, requestMic, type CheckState, type Position } from "../catch/preflight";
 import { useCountdown } from "../catch/useCountdown";
 import Preflight from "../components/Preflight";
 import TimerBar from "../components/TimerBar";
+import VoiceChallenge from "../components/VoiceChallenge";
 import { api, apiErrorMessage } from "../lib/api";
 import { auth } from "../lib/firebase";
 import { loadLingos, type Lingo } from "../lib/lingos";
@@ -22,10 +29,20 @@ function Active({ challenge, onSubmit }: { challenge: StartAttemptOutput; onSubm
   const answer = useRef<Answer>({});
   // Time's up → submit whatever we have; the server decides (and rejects anything past the grace).
   const { leftMs, totalMs } = useCountdown(challenge.expiresAt, challenge.serverNow, () => onSubmit(answer.current));
+  // Stable callbacks: a new function each render would restart speech recognition.
+  const onTranscript = useCallback((t: string) => {
+    answer.current = { transcript: t };
+  }, []);
+  const onVoice = useCallback((t: string) => onSubmit({ transcript: t }), [onSubmit]);
+
   return (
     <section className="card stack" data-type={challenge.type}>
       <TimerBar leftMs={leftMs} totalMs={totalMs} />
-      <p className="small muted">Challenge: {challenge.type}</p>
+      {isVoiceChallenge(challenge.type) ? (
+        <VoiceChallenge challenge={challenge} onTranscript={onTranscript} onSubmit={onVoice} />
+      ) : (
+        <p className="small muted">Challenge: {challenge.type}</p>
+      )}
     </section>
   );
 }

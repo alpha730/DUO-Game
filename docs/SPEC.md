@@ -102,7 +102,7 @@ All callable (`onCall`) unless noted. Every one runs the checks in CLAUDE.md rul
 | `submitAttempt` | attemptId, transcript? , choice? | Owner + open + in time; score (pronounce: word or accept[] in transcript; speak: word match ≥ 80%; meaning/question: choice == correctIndex); on win → one transaction: catch doc (timesCaught, favStreak, level), points per §2 incl. speed bonus, MAX + all-10 bonuses, wins++, totalAnswerMs += answerMs, pointsReachedAt = now, dayStreak, pointsLog; on fail → losses++ (forfeits also do losses++) | `{result:'won'\|'failed', pointsAdded, speedBonus, bonuses[], newLevel, favStreak?, newTotal, missedWords?, needsFavorites}` |
 | `setFavorites` | lingoIds (exactly 2, both already caught) | First time: save. Later: only if favoriteChangesLeft > 0; decrement; new favourite starts favStreak 0 | `{favorites, favoriteChangesLeft}` |
 | `forfeitAttempt` | **HTTP `onRequest`**, header `Authorization: Bearer <idToken>`, body `{attemptId}` | Verify token; if owner + open → `forfeit` and the user's losses++ (same when an expired or auto-forfeited attempt is closed) | 204 |
-| `refreshLeaderboard` | **scheduled**, every 5 min | Query top 300 users by points, sort in code by the tie-break order in §2, keep top 100 | – |
+| `refreshLeaderboard` | **scheduled**, every 10 min | Query top 300 users by points, sort in code by the tie-break order in §2, keep top 100 | – |
 | `joinRaid` | raidId, lat, lng | Raid active; on campus; add player; if joined ≥ minPlayers → unlocked | `{joined, unlocked}` |
 | `redeemPrize` | uid, prizeId | Caller has role volunteer/admin; balance ≥ cost; stock > 0; deduct + log | `{newBalance}` |
 | `adminSetConfig`, `adminUpsertChallenges`, `adminCreateRaid`, `lockGame`, `finalControl` | – | Role admin only | – |

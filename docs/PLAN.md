@@ -41,7 +41,7 @@ Human does first: create Firebase project (asia-south1), Blaze plan + ₹500 bud
 | 1.14 | `firebase deploy`, open on a real phone | Login + setup work over HTTPS |
 
 ## Day 2 — AR scanning (Oct 2)
-Human: 10 poster images final (high contrast, lots of detail), `targets.mind` compiled, 10 `.glb` models (< 2 MB; placeholder cubes ok).
+Human: 10 poster images final (high contrast, lots of detail), `targets.mind` compiled, 10 `.glb` models (< 500 KB, Draco; placeholder cubes ok).
 
 | # | Task | Done when |
 |---|---|---|
@@ -82,7 +82,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 ## Day 5 — Leaderboards + Me (Oct 5)
 | # | Task | Done when |
 |---|---|---|
-| 5.1 | `refreshLeaderboard` scheduled every 5 min (+ admin "refresh now"), tie-break order: points → accuracy → avg answer time → reached first; unit test the sort | Two users with equal points rank by accuracy, then speed |
+| 5.1 | `refreshLeaderboard` scheduled every 10 min (+ admin "refresh now"), tie-break order: points → accuracy → avg answer time → reached first; unit test the sort | Two users with equal points rank by accuracy, then speed |
 | 5.2 | Leaderboard screen: one student list, own rank pinned (own points from user doc; rank "100+" if outside top 100) | Shows correctly |
 | 5.3 | Me screen: QR of uid (`qrcode` lib), stats, logout | QR scannable |
 | 5.4 | Firestore index for points ordering | No index errors |
@@ -113,7 +113,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 - [ ] 4-attempt limit (fail + forfeit count, raids don't); same Lingo can't be caught twice a day
 - [ ] Favourite streaks across midnight IST; missed day resets streak but keeps level; MAX at day 10
 - [ ] Favourite change allowed once only; all-10 bonus given once
-- [ ] Leaderboard updates within 5 min
+- [ ] Leaderboard updates within 10 min
 - [ ] Fix everything found
 
 ## Day 9 — Freeze (Oct 9)

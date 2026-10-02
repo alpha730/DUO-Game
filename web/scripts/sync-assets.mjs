@@ -1,18 +1,23 @@
 // Copies the repo-level /assets (targets.mind + Lingo models) into web/public/assets so Vite serves
-// them at /assets/... in dev and ships them in the build. Drop a new assets/targets.mind in and
-// rerun `npm run dev` / `npm run build` — no code changes needed.
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
+// them at /assets/... in dev and ships them in the build. Drop new files into /assets and rerun
+// `npm run dev` / `npm run build` — no code changes needed.
+// Cost rules (CLAUDE.md): models must be ≤ 500 KB (Draco) — the build fails otherwise.
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+const MAX_MODEL_BYTES = 500 * 1024;
 const here = dirname(fileURLToPath(import.meta.url));
 const src = resolve(here, "../../assets");
 const dest = resolve(here, "../public/assets");
+const threeDir = resolve(here, "../node_modules/three");
+const threeRev = JSON.parse(readFileSync(join(threeDir, "package.json"), "utf8")).version.split(".")[1]; // e.g. "151"
 
 rmSync(dest, { recursive: true, force: true });
 mkdirSync(join(dest, "models"), { recursive: true });
 
 const copied = [];
+const tooBig = [];
 if (existsSync(join(src, "targets.mind"))) {
   cpSync(join(src, "targets.mind"), join(dest, "targets.mind"));
   copied.push("targets.mind");
@@ -22,8 +27,21 @@ if (existsSync(join(src, "targets.mind"))) {
 for (const f of existsSync(join(src, "models")) ? readdirSync(join(src, "models")) : []) {
   if (!f.endsWith(".glb")) continue;
   const size = statSync(join(src, "models", f)).size;
-  if (size > 2 * 1024 * 1024) console.warn(`! ${f} is ${(size / 1048576).toFixed(1)} MB (limit 2 MB)`);
+  if (size > MAX_MODEL_BYTES) tooBig.push(`${f} is ${(size / 1024).toFixed(0)} KB`);
   cpSync(join(src, "models", f), join(dest, "models", f));
   copied.push(`models/${f}`);
 }
-console.log(`assets synced: ${copied.length ? copied.join(", ") : "nothing"}`);
+
+// Draco decoder for compressed models, in a three-revision folder so the 30-day cache is safe.
+const draco = join(threeDir, "examples/jsm/libs/draco/gltf");
+mkdirSync(join(dest, "draco", `r${threeRev}`), { recursive: true });
+for (const f of ["draco_decoder.wasm", "draco_wasm_wrapper.js", "draco_decoder.js"]) {
+  cpSync(join(draco, f), join(dest, "draco", `r${threeRev}`, f));
+}
+copied.push(`draco/r${threeRev}/`);
+
+console.log(`assets synced: ${copied.join(", ")}`);
+if (tooBig.length) {
+  console.error(`✖ Models over 500 KB (Draco-compress them, see CLAUDE.md): ${tooBig.join("; ")}`);
+  process.exit(1);
+}

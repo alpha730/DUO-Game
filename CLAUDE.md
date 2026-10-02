@@ -45,9 +45,16 @@ firestore.rules, firestore.indexes.json, firebase.json
 - Commit messages: `day<N>: <task #> <short description>`.
 - Keep functions small: one file per function in `functions/src/fns/`, shared helpers in `functions/src/lib/`.
 - Mobile-first: design at 375 px wide; must run on a cheap Android phone over campus Wi-Fi.
-- 3D models under 2 MB each; lazy-load AR code only on the Scan screen.
+- 3D models under 500 KB each (Draco-compressed); lazy-load AR code only on the Scan screen.
 - If a task is ambiguous, follow `docs/SPEC.md`; if SPEC is silent, choose the simplest option and leave a `// DECISION:` comment.
 - Write unit tests for scoring/matching/date helpers (`functions/src/lib/*.test.ts`, vitest).
+
+## Cost rules (expect 10,000–20,000 daily players)
+- **Never read all users** for any total or ranking (leaderboard = top-N query by points only).
+- 3D models **under 500 KB** each, **Draco-compressed** (`npx @gltf-transform/cli optimize in.glb out.glb --compress draco`); `npm run build` fails above 500 KB.
+- Hosting caches **`/assets/**` for 30 days**; anything that can change there is requested with a content-hash `?v=` (targets.mind, models).
+- **Leaderboard and raid listeners only while their screen is open** (no app-wide listeners).
+- Leaderboard refresh **every 10 minutes**.
 
 ## Commands
 - Emulators: `firebase emulators:start`

@@ -7,6 +7,8 @@ import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { dayBefore } from "../lib/catchStatus";
 import { loadLingos, type Lingo } from "../lib/lingos";
+import { useOpenRaids } from "../lib/raids";
+import RaidBanner from "../components/RaidBanner";
 
 const MAX_DAY = 10;
 
@@ -43,10 +45,15 @@ export default function Home() {
   const { profile } = useAuth();
   const [me, setMe] = useState<GetMyStateOutput | null>(null);
   const [lingos, setLingos] = useState<Lingo[]>([]);
+  const [offsetMs, setOffsetMs] = useState(0); // server clock − phone clock (for countdowns)
+  const raids = useOpenRaids();
 
   // Fresh on every visit (e.g. right after a catch); also auto-forfeits any open attempt.
   useEffect(() => {
-    api.getMyState({}).then(setMe, () => {});
+    api.getMyState({}).then((s) => {
+      setMe(s);
+      setOffsetMs(s.serverNow - Date.now());
+    }, () => {});
     loadLingos().then(setLingos, () => {});
   }, []);
 
@@ -76,6 +83,8 @@ export default function Home() {
           </span>
         </div>
       </header>
+
+      <RaidBanner raids={raids} offsetMs={offsetMs} />
 
       {me && (
         <p className="attempts-pill" data-left={me.attemptsLeft}>

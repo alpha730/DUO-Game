@@ -1029,3 +1029,36 @@ a {
   height: auto;
   animation: bounce 0.9s ease-out both;
 }
+
+/* ---------- Owl Raid ---------- */
+.raid-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, var(--all-ten-from), var(--all-ten-to));
+  color: var(--on-primary);
+  text-decoration: none;
+  box-shadow: 0 4px 16px var(--shadow);
+}
+
+.raid-banner[data-phase="active"] {
+  animation: glow 1.2s ease-in-out infinite alternate;
+}
+
+.raid-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.raid-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.raid-text [data-countdown] {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}

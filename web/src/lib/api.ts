@@ -1,11 +1,19 @@
 import { httpsCallable } from "firebase/functions";
 import type {
+  AdminCreateRaidInput,
+  AdminCreateRaidOutput,
+  AdminSetConfigInput,
+  AdminStatsOutput,
+  AdminUpsertChallengesInput,
+  AdminUpsertChallengesOutput,
   CompleteProfileInput,
   CompleteProfileOutput,
   GetMyStateInput,
   GetMyStateOutput,
   JoinRaidInput,
   JoinRaidOutput,
+  LockGameInput,
+  LockGameOutput,
   StartAttemptInput,
   StartAttemptOutput,
   SetFavoritesInput,
@@ -48,6 +56,12 @@ export const api = {
   joinRaid: call<JoinRaidInput, JoinRaidOutput>("joinRaid"),
   /** Admin "refresh now" (any player on the emulator). */
   refreshLeaderboard: call<Record<string, never>, { rows: number }>("adminRefreshLeaderboard"),
+  // Admin (/admin, role admin — the server checks).
+  adminStats: call<Record<string, never>, AdminStatsOutput>("adminStats"),
+  adminSetConfig: call<AdminSetConfigInput, { ok: true }>("adminSetConfig"),
+  adminUpsertChallenges: call<AdminUpsertChallengesInput, AdminUpsertChallengesOutput>("adminUpsertChallenges", 60_000),
+  adminCreateRaid: call<AdminCreateRaidInput, AdminCreateRaidOutput>("adminCreateRaid"),
+  lockGame: call<LockGameInput, LockGameOutput>("lockGame"),
 };
 
 /** User-facing text for a callable error. Server HttpsErrors already carry friendly messages. */

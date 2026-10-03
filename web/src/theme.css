@@ -1071,3 +1071,99 @@ a {
 .raid-room [data-raid-unlocked] {
   animation: slide-up 0.5s ease-out both;
 }
+
+/* ---------- /admin (PLAN 7.2) ---------- */
+.admin-section h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.admin .done {
+  color: var(--primary);
+  margin: 0;
+  font-weight: 600;
+}
+.admin .error {
+  margin: 0;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.stat-grid > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 4px;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+.stat-grid strong {
+  font-size: 1.4rem;
+}
+.admin-pair {
+  gap: 10px;
+  align-items: stretch;
+}
+.admin-pair > .field {
+  flex: 1;
+  min-width: 0;
+}
+.admin-pair input {
+  width: 100%;
+  box-sizing: border-box;
+}
+.rules-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+.rules-grid .field input {
+  min-height: 44px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.rules-grid .field span {
+  overflow-wrap: anywhere;
+}
+.field textarea {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font: 0.85rem/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  resize: vertical;
+}
+.raid-challenge {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  margin: 0;
+  min-width: 0;
+}
+.raid-challenge legend {
+  font-weight: 600;
+  padding: 0 6px;
+}
+.option-row {
+  gap: 10px;
+  align-items: flex-end;
+}
+.option-row input[type="radio"] {
+  width: 22px;
+  height: 22px;
+  margin-bottom: 15px;
+  accent-color: var(--primary);
+}
+.row-errors {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--danger-text);
+}
+.btn.danger {
+  background: var(--danger);
+  color: var(--on-primary);
+  box-shadow: none;
+}

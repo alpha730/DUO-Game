@@ -497,6 +497,25 @@ export interface AdminCreateRaidOutput {
 export interface LockGameInput {
   locked: boolean;
 }
+export interface LockGameOutput {
+  locked: boolean;
+}
+
+export interface AdminUploadError {
+  /** 1-based row in the uploaded array (0 = the whole upload). */
+  row: number;
+  message: string;
+}
+
+export interface AdminStatsOutput {
+  today: IstDate;
+  users: number;
+  attemptsToday: number;
+  winsToday: number;
+  /** Game days × Lingos with no challenge (ids like 2026-10-12_lingo-2018); first 20 + count. */
+  missingChallenges: string[];
+  missingCount: number;
+}
 
 export type FinalControlInput =
   | { action: "start"; topN?: number } // default 20

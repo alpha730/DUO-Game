@@ -3,7 +3,11 @@ import { COL, DOC, type StudentsBoardDoc, type UserDoc } from "../shared/types";
 import { db } from "./db";
 import { CANDIDATES, rankStudents } from "./rank";
 
-/** The query refreshLeaderboard runs: single-field (points) — never reads all users (cost rules). */
+/**
+ * The query refreshLeaderboard runs (PLAN 5.4): filter + order on the SAME single field, so Firestore
+ * serves it from the users.points single-field index (declared in firestore.indexes.json) — no
+ * composite index. Reads at most 300 docs; never all users (cost rules).
+ */
 export const topUsersQuery = () =>
   db().collection(COL.users).where("points", ">", 0).orderBy("points", "desc").limit(CANDIDATES);
 

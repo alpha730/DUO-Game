@@ -57,6 +57,11 @@ export default function Leaderboard() {
         <h1 style={{ margin: 0 }}>Leaderboard</h1>
         {board?.updatedAt && <span className="small muted">Updated {ago(board.updatedAt)}</span>}
       </header>
+      {usingEmulators && (
+        <button className="btn link small" onClick={refresh} style={{ minHeight: 36, alignSelf: "flex-start", width: "auto", padding: 0 }}>
+          ↻ Refresh now (emulator)
+        </button>
+      )}
       <p className="small muted" style={{ margin: 0 }}>
         Ties: more accurate first, then faster answers, then who got there first. Updates every 10 minutes.
       </p>
@@ -76,11 +81,6 @@ export default function Leaderboard() {
         </ol>
       )}
 
-      {usingEmulators && (
-        <button className="btn link small" onClick={refresh}>
-          ↻ Refresh now (emulator)
-        </button>
-      )}
       {msg && <p className="error small">{msg}</p>}
 
       <section className="board-me" aria-label="Your rank" data-rank={myRank}>

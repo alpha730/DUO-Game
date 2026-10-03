@@ -2,7 +2,7 @@ import QRCode from "qrcode";
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { LINGO_COUNT } from "@shared/types";
-import Placeholder from "../components/Placeholder";
+import ShareCard from "../components/ShareCard";
 import { BRAND } from "../config/brand";
 import { useAuth } from "../lib/auth";
 
@@ -76,7 +76,7 @@ export default function Me() {
           {profile.favorites.length === 0 ? "⭐ Pick your 2 favourites" : `⭐ Change favourites (${profile.favoriteChangesLeft} left)`}
         </Link>
       )}
-      <Placeholder day={7}>Share card</Placeholder>
+      {profile && <ShareCard stats={{ name: profile.name, caught: profile.lingosCaught, points: profile.points }} />}
       <button className="btn secondary" onClick={signOut}>
         Log out
       </button>

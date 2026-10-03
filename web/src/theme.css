@@ -1167,3 +1167,19 @@ a {
   color: var(--on-primary);
   box-shadow: none;
 }
+
+/* ---------- Share card on Me (PLAN 7.5) ---------- */
+.share-card {
+  align-items: center;
+}
+.share-preview {
+  width: 60%;
+  max-width: 220px;
+  aspect-ratio: 9 / 16;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+.share-card .btn {
+  width: 100%;
+}

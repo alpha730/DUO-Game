@@ -210,7 +210,19 @@ export const OFFICIAL: BrandSet = {
     hero: supplied("mascot: welcome", "mascots/hero.png", PLACEHOLDER.mascots.hero),
     celebrate: supplied("mascot: celebrate", "mascots/celebrate.png", PLACEHOLDER.mascots.celebrate),
   },
-  lingoNames: pending("Lingo display names", PLACEHOLDER.lingoNames),
+  // The characters on the official posters (assets/posters/official), posterIndex 0–9 = 2016–2025.
+  lingoNames: {
+    "lingo-2016": "Duo",
+    "lingo-2017": "Lily",
+    "lingo-2018": "Zari",
+    "lingo-2019": "Bea",
+    "lingo-2020": "Vikram",
+    "lingo-2021": "Junior",
+    "lingo-2022": "Oscar",
+    "lingo-2023": "Eddy",
+    "lingo-2024": "Lin",
+    "lingo-2025": "Lucy",
+  },
 };
 
 export const BRAND: BrandSet = ACTIVE_BRAND === "official" ? OFFICIAL : PLACEHOLDER;

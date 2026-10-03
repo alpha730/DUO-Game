@@ -11,3 +11,5 @@ export { startAttempt } from "./fns/startAttempt";
 export { submitAttempt } from "./fns/submitAttempt";
 export { forfeitAttempt } from "./fns/forfeitAttempt";
 export { setFavorites } from "./fns/setFavorites";
+export { refreshLeaderboard } from "./fns/refreshLeaderboard";
+export { adminRefreshLeaderboard } from "./fns/adminRefreshLeaderboard";

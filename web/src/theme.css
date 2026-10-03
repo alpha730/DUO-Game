@@ -982,3 +982,46 @@ a {
   box-shadow: 0 -4px 16px rgb(0 0 0 / 0.4);
   z-index: 5;
 }
+
+/* ---------- Me ---------- */
+.qr-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.qr {
+  width: 220px;
+  height: 220px;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 6px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.stat-box strong {
+  font-size: 1.15rem;
+}
+
+.stat-box span {
+  font-size: 0.72rem;
+  color: var(--muted);
+}

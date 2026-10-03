@@ -19,6 +19,8 @@ export default function Raid() {
   const [step, setStep] = useState<Step>("locating");
   const [error, setError] = useState("");
   const [offsetMs, setOffsetMs] = useState(0);
+  // This player already used their one try at this raid (from joinRaid).
+  const [tried, setTried] = useState(false);
   const now = useServerNow(offsetMs);
   const joining = useRef(false);
 
@@ -51,7 +53,8 @@ export default function Raid() {
         return;
       }
       setStep("joining");
-      await api.joinRaid({ raidId, lat: loc.position.lat, lng: loc.position.lng });
+      const out = await api.joinRaid({ raidId, lat: loc.position.lat, lng: loc.position.lng });
+      setTried(out.tried);
       setStep("in");
     } catch (err) {
       setError(apiErrorMessage(err));
@@ -90,7 +93,7 @@ export default function Raid() {
           </div>
           {raid.unlocked ? (
             <p className="done" data-raid-unlocked>
-              🔓 Unlocked! The raid challenge opens here.
+              🔓 Unlocked! {tried ? "You've had your one try at this raid." : "One try each — make it count."}
             </p>
           ) : (
             <p className="small muted" style={{ margin: 0 }}>
@@ -103,6 +106,11 @@ export default function Raid() {
       {step === "locating" && <p className="muted">Checking you're on campus…</p>}
       {step === "joining" && <p className="muted">Joining…</p>}
       {step === "in" && <p className="small" data-joined-me>✓ You're in.</p>}
+      {step === "in" && raid?.unlocked && phase === "active" && !tried && (
+        <Link className="btn" to={`/catch/${raid.lingoId}?raid=${raid.id}`} data-raid-start>
+          Start the raid challenge
+        </Link>
+      )}
       {step === "error" && (
         <>
           <p className="error" role="alert">

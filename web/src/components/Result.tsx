@@ -14,6 +14,7 @@ export default function Result({
   attemptsPerDay,
   onRetry,
   prevLevel = null,
+  raid = false,
 }: {
   outcome: Outcome;
   lingoName: string;
@@ -25,6 +26,8 @@ export default function Result({
   onRetry: () => void;
   /** Level of this Lingo before the attempt (null if never caught). */
   prevLevel?: Level | null;
+  /** An Owl Raid try: one only, so no retry and no daily-attempts line. */
+  raid?: boolean;
 }) {
   const left = attemptsLeft ?? 0;
   let icon: string;
@@ -44,7 +47,7 @@ export default function Result({
             </Link>
           )}
           <p className="muted">
-            Nice one. Come back tomorrow to catch it again.
+            {raid ? `${BRAND.raidName} won — great teamwork!` : "Nice one. Come back tomorrow to catch it again."}
           </p>
         </>
       );
@@ -78,7 +81,11 @@ export default function Result({
     case "forfeit":
       icon = "💨";
       title = "Chance lost";
-      body = <p className="muted">You left the app during the challenge, so this attempt is gone. One chance only!</p>;
+      body = (
+        <p className="muted">
+          You left the app during the challenge, so this {raid ? "raid try" : "attempt"} is gone. One chance only!
+        </p>
+      );
       break;
     case "late":
       icon = "⏰";
@@ -92,7 +99,7 @@ export default function Result({
       break;
   }
 
-  const canRetry = outcome.kind !== "won" && outcome.kind !== "error" && left > 0;
+  const canRetry = !raid && outcome.kind !== "won" && outcome.kind !== "error" && left > 0;
   return (
     <section className="card stack result" data-outcome={outcome.kind}>
       <div className="result-icon" aria-hidden="true">

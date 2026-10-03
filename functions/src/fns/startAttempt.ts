@@ -4,10 +4,13 @@ import {
   COL,
   challengeId,
   isVoiceChallenge,
+  raidChallengeId,
   timerSeconds,
   type AttemptDoc,
   type CatchDoc,
   type ChallengeDoc,
+  type RaidDoc,
+  type RaidPlayerDoc,
   type StartAttemptOutput,
   type UserDoc,
 } from "../shared/types";
@@ -17,6 +20,7 @@ import { istDate } from "../lib/date";
 import { catchRef, db, userRef } from "../lib/db";
 import { campusCheck, isEmulator, isValidLatLng } from "../lib/geo";
 import { requirePlayer } from "../lib/guards";
+import { raidPhase } from "../lib/raids";
 import { attemptsUsedToday } from "../lib/state";
 
 const fail = (code: string, message: string): never => {
@@ -31,8 +35,9 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
   if (typeof lingoId !== "string" || !/^[\w-]{1,40}$/.test(lingoId)) {
     throw new HttpsError("invalid-argument", "Unknown Lingo.");
   }
-  // DECISION: raids arrive on Day 6; until then a raidId is refused rather than silently ignored.
-  if (raidId !== undefined) throw new HttpsError("unimplemented", "Owl Raids aren't open yet.", { code: "no-raids" });
+  if (raidId != null && (typeof raidId !== "string" || !/^[\w-]{1,64}$/.test(raidId))) {
+    throw new HttpsError("invalid-argument", "Unknown raid.");
+  }
   if (!isValidLatLng(lat, lng)) throw new HttpsError("invalid-argument", "We need your location.", { code: "bad-location" });
   if (campusCheck(lat as number, lng as number, config, isEmulator()) === "off-campus") {
     fail("off-campus", "You need to be on campus to catch Lingos.");
@@ -44,23 +49,38 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
   if (!lingoSnap.exists) throw new HttpsError("not-found", "Unknown Lingo.");
 
   const attemptRef = db().collection(COL.attempts).doc();
+  const raidRef = raidId ? db().collection(COL.raids).doc(raidId as string) : null;
   const result = await db().runTransaction(async (tx) => {
     // All reads first (Firestore transactions require it).
-    const [open, userSnap, catchSnap, challengeSnap] = await Promise.all([
+    const [open, userSnap, catchSnap, challengeSnap, raidSnap, playerSnap] = await Promise.all([
       readOpenAttemptsTx(tx, uid),
       tx.get(userRef(uid)),
       tx.get(catchRef(uid, lingoId)),
-      tx.get(db().collection(COL.challenges).doc(challengeId(today, lingoId))),
+      tx.get(db().collection(COL.challenges).doc(raidRef ? raidChallengeId(raidRef.id) : challengeId(today, lingoId))),
+      raidRef ? tx.get(raidRef) : null,
+      raidRef ? tx.get(raidRef.collection(COL.players).doc(uid)) : null,
     ]);
     const user = userSnap.data() as UserDoc;
     const caught = catchSnap.data() as CatchDoc | undefined;
-
-    if (caught?.lastCaughtDate === today) fail("already-caught", "You already caught this Lingo today. Come back tomorrow!");
     const used = attemptsUsedToday(user, today);
-    if (used >= rules.attemptsPerDay) fail("no-attempts", "No attempts left today. Come back tomorrow!");
-    if (!challengeSnap.exists) fail("no-challenge", "This Lingo has no challenge today.");
+
+    if (raidRef) {
+      // Owl Raid (SPEC §2, §5): joined players only, once unlocked and before endAt, exactly one try
+      // each. Outside the daily 4 and the once-a-day catch rule.
+      const raid = raidSnap!.data() as RaidDoc | undefined;
+      if (!raid || raid.lingoId !== lingoId) throw new HttpsError("not-found", "Unknown raid.");
+      const player = playerSnap!.data() as RaidPlayerDoc | undefined;
+      if (!player) fail("not-joined", "Join the raid at the poster first.");
+      if (player!.attemptId) fail("raid-tried", "You've already had your one try at this raid.");
+      if (raidPhase(raid, now) !== "active") fail("raid-ended", "This raid is over.");
+      if (!raid.unlocked) fail("raid-locked", "The raid isn't unlocked yet — it needs more players.");
+    } else {
+      if (caught?.lastCaughtDate === today) fail("already-caught", "You already caught this Lingo today. Come back tomorrow!");
+      if (used >= rules.attemptsPerDay) fail("no-attempts", "No attempts left today. Come back tomorrow!");
+    }
+    if (!challengeSnap.exists) fail("no-challenge", raidRef ? "This raid has no challenge." : "This Lingo has no challenge today.");
     // No speech recognition in this browser + a voice challenge: refuse BEFORE any write, so no
-    // attempt is used and nothing but "it needs your voice" is revealed (SPEC §3.8).
+    // attempt (or raid try) is used and nothing but "it needs your voice" is revealed (SPEC §3.8).
     if (speech === false && isVoiceChallenge((challengeSnap.data() as ChallengeDoc).type)) {
       fail("needs-speech", "Open in Chrome or Safari for this Lingo — it needs your voice.");
     }
@@ -76,11 +96,17 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
       lingoId,
       date: today,
       type: challenge.type,
+      ...(raidRef ? { raidId: raidRef.id } : {}),
       startedAt: Timestamp.fromMillis(now),
       expiresAt: Timestamp.fromMillis(expiresAt),
       status: "open",
     };
     tx.create(attemptRef, attempt);
+    if (raidRef) {
+      // The one try is used the moment it starts: won, failed and forfeit all count.
+      tx.update(raidRef.collection(COL.players).doc(uid), { attemptId: attemptRef.id });
+      return { challenge, expiresAt, attemptsLeft: Math.max(0, rules.attemptsPerDay - used), closed };
+    }
     tx.update(userRef(uid), { attemptsToday: used + 1, attemptsDate: today });
 
     return { challenge, expiresAt, attemptsLeft: rules.attemptsPerDay - used - 1, closed };

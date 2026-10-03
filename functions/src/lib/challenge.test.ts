@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ChallengeDoc } from "../shared/types";
-import { publicChallenge } from "./challenge";
+import { parseChallenge, publicChallenge } from "./challenge";
 
 const all: ChallengeDoc[] = [
   { type: "pronounce", word: "programme", accept: ["program"] },
@@ -31,5 +31,32 @@ describe("publicChallenge", () => {
   it("drops unknown extra fields stored on the doc", () => {
     const sneaky = { ...all[2], answer: "unwilling", notes: "x" } as unknown as ChallengeDoc;
     expect(Object.keys(publicChallenge(sneaky)).sort()).toEqual(["options", "type", "word"]);
+  });
+});
+
+describe("parseChallenge", () => {
+  it("accepts every valid type and trims text", () => {
+    for (const ch of all) expect(parseChallenge(ch)).toEqual(ch);
+    expect(parseChallenge({ type: "speak", phrase: "  Hello there  " })).toEqual({ type: "speak", phrase: "Hello there" });
+  });
+
+  it("rejects bad challenges", () => {
+    const meaning = { type: "meaning", word: "keen", options: ["eager", "sad", "slow", "late"], correctIndex: 0 };
+    for (const bad of [
+      null,
+      {},
+      { type: "dance" },
+      { type: "pronounce", word: "" },
+      { type: "pronounce", word: "x", accept: "y" },
+      { type: "speak" },
+      { ...meaning, options: ["a", "b", "c"] },
+      { ...meaning, options: ["a", "a", "b", "c"] },
+      { ...meaning, correctIndex: 4 },
+      { ...meaning, correctIndex: 1.5 },
+      { ...meaning, word: undefined },
+      { ...meaning, type: "question" }, // no prompt
+    ]) {
+      expect(parseChallenge(bad)).toBeNull();
+    }
   });
 });

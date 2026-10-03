@@ -3,6 +3,7 @@ import { HttpsError, onCall } from "firebase-functions/v2/https";
 import {
   COL,
   challengeId,
+  raidChallengeId,
   timerSeconds,
   type AttemptDoc,
   type CatchDoc,
@@ -14,7 +15,7 @@ import {
 } from "../shared/types";
 import { catchRef, db, userRef } from "../lib/db";
 import { requirePlayer } from "../lib/guards";
-import { scoreCatch } from "../lib/points";
+import { scoreCatch, scoreRaidCatch } from "../lib/points";
 import { scoreAnswer } from "../lib/score";
 import { speedBonus } from "../lib/speed";
 
@@ -50,7 +51,11 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
     }
 
     const [challengeSnap, userSnap, catchSnap] = await Promise.all([
-      tx.get(db().collection(COL.challenges).doc(challengeId(attempt.date, attempt.lingoId))),
+      tx.get(
+        db()
+          .collection(COL.challenges)
+          .doc(attempt.raidId ? raidChallengeId(attempt.raidId) : challengeId(attempt.date, attempt.lingoId)),
+      ),
       tx.get(userRef(uid)),
       tx.get(catchRef(uid, attempt.lingoId)),
     ]);
@@ -93,6 +98,52 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
         newLevel: caught?.level ?? 1,
         newTotal: user.points,
         needsFavorites: false,
+        ...(attempt.raidId ? { raid: true } : {}),
+        ...missed,
+      };
+      return { late: false as const, response };
+    }
+
+    const log = (amount: number, reason: PointsReason) => {
+      if (amount <= 0) return;
+      const entry: Omit<PointsLogDoc, "createdAt"> & { createdAt: Timestamp } = {
+        uid,
+        amount,
+        reason,
+        attemptId,
+        createdAt: receivedAt,
+      };
+      tx.create(db().collection(COL.pointsLog).doc(), entry);
+    };
+    // DECISION: a raid answer counts in wins/losses and answer time like any other (leaderboard accuracy).
+    const stats = {
+      wins: FieldValue.increment(1),
+      totalAnswerMs: FieldValue.increment(answerMs),
+      pointsReachedAt: receivedAt, // tie-break: who reached this total first
+    };
+
+    if (attempt.raidId) {
+      // Owl Raid win (SPEC §2): raidCatchPoints + speed instead of the catch points; collection only —
+      // no favourite streak, MAX, day streak or "caught today".
+      const r = scoreRaidCatch({ user, catchDoc: caught, lingoId: attempt.lingoId, rules, speedBonus: bonus });
+      tx.set(
+        catchRef(uid, attempt.lingoId),
+        { ...r.catchDoc, ...(r.firstCatch ? { firstCaughtAt: receivedAt } : {}) },
+        { merge: true },
+      );
+      tx.update(userRef(uid), { points: FieldValue.increment(r.pointsAdded), ...r.user, ...stats });
+      log(r.base, "raid");
+      log(r.speedBonus, "speed");
+      for (const b of r.bonuses) log(b.points, b.kind);
+      const response: SubmitAttemptOutput = {
+        result: "won",
+        pointsAdded: r.pointsAdded,
+        speedBonus: r.speedBonus,
+        bonuses: r.bonuses,
+        newLevel: r.newLevel,
+        newTotal: user.points + r.pointsAdded,
+        needsFavorites: r.needsFavorites,
+        raid: true,
         ...missed,
       };
       return { late: false as const, response };
@@ -105,24 +156,7 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
       { ...o.catchDoc, ...(o.firstCatch ? { firstCaughtAt: receivedAt } : {}) },
       { merge: true },
     );
-    tx.update(userRef(uid), {
-      points: FieldValue.increment(o.pointsAdded),
-      ...o.user,
-      wins: FieldValue.increment(1),
-      totalAnswerMs: FieldValue.increment(answerMs),
-      pointsReachedAt: receivedAt, // tie-break: who reached this total first
-    });
-    const log = (amount: number, reason: PointsReason) => {
-      if (amount <= 0) return;
-      const entry: Omit<PointsLogDoc, "createdAt"> & { createdAt: Timestamp } = {
-        uid,
-        amount,
-        reason,
-        attemptId,
-        createdAt: receivedAt,
-      };
-      tx.create(db().collection(COL.pointsLog).doc(), entry);
-    };
+    tx.update(userRef(uid), { points: FieldValue.increment(o.pointsAdded), ...o.user, ...stats });
     log(o.base, o.baseReason);
     log(o.speedBonus, "speed");
     for (const b of o.bonuses) log(b.points, b.kind);

@@ -55,7 +55,8 @@ export default function WinCelebration({
         +{fmt(shown)}
       </p>
       <p className="breakdown small muted">
-        {prevLevel === null ? "First catch" : data.favStreak ? `Favourite · day ${data.favStreak}` : "Catch"} +{fmt(base)}
+        {data.raid ? BRAND.raidName : prevLevel === null ? "First catch" : data.favStreak ? `Favourite · day ${data.favStreak}` : "Catch"} +
+        {fmt(base)}
         {data.speedBonus > 0 && <> · Speed +{data.speedBonus}</>}
       </p>
       {data.favStreak !== undefined && data.favStreak > 0 && !max && (

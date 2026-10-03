@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_RULES as rules } from "../shared/types";
 import { addDays } from "./date";
-import { scoreCatch, type CatchInput } from "./points";
+import { scoreCatch, scoreRaidCatch, type CatchInput } from "./points";
 import { speedBonus } from "./speed";
 
 const today = "2026-10-15";
@@ -136,5 +136,37 @@ describe("day streak (display only) + favourites prompt", () => {
     expect(run({ user: user({ lingosCaught: 0 }) }).needsFavorites).toBe(false);
     expect(run({ user: user({ lingosCaught: 1 }) }).needsFavorites).toBe(true);
     expect(run({ user: user({ lingosCaught: 1, favorites: ["a", "b"] }) }).needsFavorites).toBe(false);
+  });
+});
+
+describe("Owl Raid catch", () => {
+  const raid = (i: Partial<CatchInput>) =>
+    scoreRaidCatch({ user: user(), catchDoc: undefined, lingoId: "lingo-2016", rules, speedBonus: 0, ...i });
+
+  it("+150 + speed instead of the normal catch points", () => {
+    const o = raid({ catchDoc: caught({ timesCaught: 3 }), speedBonus: 9 });
+    expect(o).toMatchObject({ base: 150, pointsAdded: 159, speedBonus: 9, bonuses: [], firstCatch: false });
+  });
+
+  it("first catch via a raid: Level 1 catch doc, counts toward lingosCaught, never 'caught today'", () => {
+    const o = raid({ user: user({ lingosCaught: 1 }) });
+    expect(o.pointsAdded).toBe(150);
+    expect(o.firstCatch).toBe(true);
+    expect(o.catchDoc).toEqual({ timesCaught: 1, level: 1, lastCaughtDate: null, favStreak: 0, maxBonusGiven: false });
+    expect(o.user.lingosCaught).toBe(2);
+    expect(o.needsFavorites).toBe(true);
+  });
+
+  it("raises non-favourite levels by total catches, leaves favourites and the day streak alone", () => {
+    expect(raid({ catchDoc: caught({ timesCaught: 2 }) }).catchDoc).toEqual({ timesCaught: 3, level: 2 });
+    const fav = raid({ user: user({ favorites: ["lingo-2016"], lingosCaught: 2 }), catchDoc: caught({ timesCaught: 5, level: 2, favStreak: 4 }) });
+    expect(fav.catchDoc).toEqual({ timesCaught: 6, level: 2 }); // no favStreak / lastCaughtDate / MAX change
+    expect(fav.base).toBe(150);
+    expect(fav.user).not.toHaveProperty("dayStreak");
+  });
+
+  it("completing all 10 via a raid gives the all-10 bonus once", () => {
+    expect(raid({ user: user({ lingosCaught: 9 }) }).bonuses).toEqual([{ kind: "allTen", points: 1000 }]);
+    expect(raid({ user: user({ lingosCaught: 10, allTenBonus: true }), catchDoc: caught() }).bonuses).toEqual([]);
   });
 });

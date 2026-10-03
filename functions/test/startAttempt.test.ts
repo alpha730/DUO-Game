@@ -17,7 +17,8 @@ describe("startAttempt", () => {
     const p = await newPlayer();
     for (const [type, lingoId] of Object.entries(LINGO)) {
       const before = Date.now();
-      const out = await start(p, lingoId);
+      // raidId: null (what the web SDK sends for undefined) is a normal attempt.
+      const out = await start(p, lingoId, { raidId: null } as never);
       expect(out.type).toBe(type);
       const raw = JSON.stringify(out);
       expect(raw).not.toMatch(/accept|correctIndex/);
@@ -100,7 +101,8 @@ describe("startAttempt", () => {
       if (saved) await ch.set(saved);
     }
     await expect(start(p, LINGO.speak, { lat: 999 } as never)).rejects.toMatchObject({ details: { code: "bad-location" } });
-    await expect(start(p, LINGO.speak, { raidId: "r1" })).rejects.toMatchObject({ details: { code: "no-raids" } });
+    await expect(start(p, LINGO.speak, { raidId: "r1" })).rejects.toMatchObject({ code: "functions/not-found" });
+    await expect(start(p, LINGO.speak, { raidId: 5 } as never)).rejects.toMatchObject({ code: "functions/invalid-argument" });
     // None of these used an attempt.
     expect((await adb.doc(`users/${p.uid}`).get()).data()!.attemptsToday).toBe(0);
   });

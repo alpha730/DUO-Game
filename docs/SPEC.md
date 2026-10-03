@@ -39,7 +39,7 @@
 | Favourite reaches 10-day streak | **MAX** form + 1,000 bonus (once per Lingo) |
 | Non-favourite levels | Level 2 at 3 total catches, Level 3 at 6 total catches (no MAX) |
 | All 10 Lingos collected | +1,000 bonus (once) |
-| Owl Raid catch | +150 (outside the daily 4) |
+| Owl Raid catch | **+150 + speed bonus, instead of** the normal catch points (never +100 / +20 / favourite points); outside the daily 4 (see **Owl Raids** below) |
 | **Speed bonus** (every correct answer, incl. raids) | +1 per full second left on the server timer: `floor((expiresAt − receivedAt)/1000)`, clamped 0…timer length |
 | Wrong / failed / forfeited attempt | 0 points (and it uses one of the 4 attempts) |
 | Logging in, opening the app, days played | 0 points |
@@ -47,6 +47,15 @@
 
 **Favourite streak:** +1 when the favourite is caught on the IST day right after its last catch. A missed day resets the streak to 0, but **levels never go down**. MAX is permanent once reached.
 **Choosing favourites:** after a user's first 2 catches, the app asks them to pick 2 favourites from Lingos they have caught. Until then no streaks count. Last day a 10-day streak can still be completed: start by Oct 12.
+**Owl Raids:**
+- **Who:** only players who joined that raid (`joinRaid`, on campus). Joining stays open until `endAt`, also after unlock.
+- **When:** a raid try can start only while `unlocked == true` and `now < endAt`. A try started before `endAt` may finish after it (normal timer + grace).
+- **Tries:** exactly **1 per player per raid**; won, failed and forfeited all use it. Raid tries never use the daily 4.
+- **Challenge:** the raid's own challenge (`challenges/raid_{raidId}`, set by the admin when creating the raid), never that day's normal challenge. Same rules: server-only, answer never sent.
+- **A raid win counts for the collection:** first catch of that Lingo → catch doc at Level 1, counts toward `lingosCaught` and the all-10 bonus; `timesCaught`++ (so non-favourite levels can rise).
+- **A raid win does NOT:** change the favourite streak, MAX, `dayStreak` or `attemptsToday`, or set `lastCaughtDate` ("caught today") — the player can still do a normal catch of that Lingo the same day.
+- Logged in `pointsLog` with reason `raid` (+ `speed`, + `allTen` if it completes the set). Wins/losses and answer time count like any attempt.
+
 **Points come only from correct answers.** Every point source above requires a win (catch); nothing is given for logging in or trying.
 
 **Leaderboard order (students):**
@@ -78,12 +87,12 @@ The same order picks the top 20 for the final round. The live final round on Oct
 | `users/{uid}/catches/{lingoId}` | firstCaughtAt, timesCaught, lastCaughtDate, level (1\|2\|3\|'MAX'), favStreak, maxBonusGiven (bool) | owner only |
 | `lingos/{lingoId}` | name, detYear, posterIndex (0–9), modelUrl, rarity, color | signed-in |
 | `config/game` | startAt, lockAt, locked, campusLat, campusLng, campusRadiusM, rules (table above) | signed-in |
-| `challenges/{date}_{lingoId}` | type ('pronounce'\|'speak'\|'meaning'\|'question'), word? (pronounce/meaning), accept? (string[], pronounce), phrase? (speak), prompt? (question text), options? (4), correctIndex? | **never** |
+| `challenges/{date}_{lingoId}`, `challenges/raid_{raidId}` | type ('pronounce'\|'speak'\|'meaning'\|'question'), word? (pronounce/meaning), accept? (string[], pronounce), phrase? (speak), prompt? (question text), options? (4), correctIndex? | **never** |
 | `attempts/{id}` | uid, lingoId, date, type, raidId?, startedAt, expiresAt, status ('open'\|'won'\|'failed'\|'forfeit'), score?, receivedAt?, answerMs?, speedBonus? | **never** |
 | `pointsLog/{id}` | uid, amount, reason, attemptId?, createdAt | **never** |
 | `leaderboard/students` | top: [{uid, name, points, accuracy, avgAnswerMs}] (top 100, in tie-break order), updatedAt | signed-in |
 | `raids/{id}` | posterIndex, lingoId, startAt, endAt, minPlayers (20), joined (count), unlocked, status | signed-in |
-| `raids/{id}/players/{uid}` | joinedAt | **never** |
+| `raids/{id}/players/{uid}` | joinedAt, attemptId? (the player's one raid try) | **never** |
 | `prizes/{id}` | name, cost, stock | signed-in |
 | `redemptions/{id}` | uid, prizeId, cost, byUid, createdAt | **never** |
 | `final/state` | round, phrase, contestants[], scores{}, status | signed-in |
@@ -98,14 +107,15 @@ All callable (`onCall`) unless noted. Every one runs the checks in CLAUDE.md rul
 |---|---|---|---|
 | `completeProfile` | name | Require verified email; name 2–40 chars, trimmed; fail if profile already done; create user with defaults (email from the auth token) | `{ok}` |
 | `getMyState` | – | Auto-forfeit open attempts; return user, catches, today's tries | `{user, catches, serverNow}` |
-| `startAttempt` | lingoId, lat, lng, raidId?, speech? | Game open; on campus; no open attempt; Lingo not already caught today; attemptsToday < 4 (reset when attemptsDate ≠ today; skipped for raids); load `challenges/{today}_{lingoId}`; if `speech === false` and the type is pronounce/speak → refuse (no attempt used, §3.8); create attempt; increment attemptsToday | `{attemptId, type, word?, phrase?, prompt?, options?, expiresAt, serverNow, attemptsLeft}` (never `accept` or `correctIndex`) |
-| `submitAttempt` | attemptId, transcript? , choice? | Owner + open + in time; score (pronounce: word or accept[] in transcript; speak: word match ≥ 80%; meaning/question: choice == correctIndex); on win → one transaction: catch doc (timesCaught, favStreak, level), points per §2 incl. speed bonus, MAX + all-10 bonuses, wins++, totalAnswerMs += answerMs, pointsReachedAt = now, dayStreak, pointsLog; on fail → losses++ (forfeits also do losses++) | `{result:'won'\|'failed', pointsAdded, speedBonus, bonuses[], newLevel, favStreak?, newTotal, missedWords?, needsFavorites}` |
+| `startAttempt` | lingoId, lat, lng, raidId?, speech? | Game open; on campus; no open attempt; Lingo not already caught today; attemptsToday < 4 (reset when attemptsDate ≠ today); load `challenges/{today}_{lingoId}`. **With raidId:** raid's Lingo = lingoId; player joined; no try used yet; `unlocked` and `now < endAt`; load `challenges/raid_{raidId}`; skip the caught-today and daily-4 checks; record the try on the player doc; don't touch attemptsToday; if `speech === false` and the type is pronounce/speak → refuse (no attempt used, §3.8); create attempt; increment attemptsToday | `{attemptId, type, word?, phrase?, prompt?, options?, expiresAt, serverNow, attemptsLeft}` (never `accept` or `correctIndex`) |
+| `submitAttempt` | attemptId, transcript? , choice? | Owner + open + in time; score (pronounce: word or accept[] in transcript; speak: word match ≥ 80%; meaning/question: choice == correctIndex); on win → one transaction: catch doc (timesCaught, favStreak, level), points per §2 incl. speed bonus, MAX + all-10 bonuses, wins++, totalAnswerMs += answerMs, pointsReachedAt = now, dayStreak, pointsLog; on fail → losses++ (forfeits also do losses++). **Raid attempt** (challenge `raid_{raidId}`): win = raidCatchPoints + speed (+ all-10) per §2 Owl Raids, no favourite/day-streak/caught-today changes | `{result:'won'\|'failed', pointsAdded, speedBonus, bonuses[], newLevel, favStreak?, newTotal, missedWords?, needsFavorites, raid?}` |
 | `setFavorites` | lingoIds (exactly 2, both already caught) | First time: save. Later: only if favoriteChangesLeft > 0; decrement; new favourite starts favStreak 0 | `{favorites, favoriteChangesLeft}` |
 | `forfeitAttempt` | **HTTP `onRequest`**, header `Authorization: Bearer <idToken>`, body `{attemptId}` | Verify token; if owner + open → `forfeit` and the user's losses++ (same when an expired or auto-forfeited attempt is closed) | 204 |
 | `refreshLeaderboard` | **scheduled**, every 10 min | Query top 300 users by points, sort in code by the tie-break order in §2, keep top 100 | – |
-| `joinRaid` | raidId, lat, lng | Raid active; on campus; add player; if joined ≥ minPlayers → unlocked | `{joined, unlocked}` |
+| `joinRaid` | raidId, lat, lng | Raid active (until endAt, also after unlock); on campus; add player (once); if joined ≥ minPlayers → unlocked | `{joined, unlocked, tried}` |
 | `redeemPrize` | uid, prizeId | Caller has role volunteer/admin; balance ≥ cost; stock > 0; deduct + log | `{newBalance}` |
-| `adminSetConfig`, `adminUpsertChallenges`, `adminCreateRaid`, `lockGame`, `finalControl` | – | Role admin only | – |
+| `adminCreateRaid` | posterIndex, lingoId, startAt, minutes? (15), minPlayers? (20), challenge (same shape as a normal challenge) | Role admin only; Lingo on that poster; validate the challenge; write `raids/{id}` + `challenges/raid_{id}` together | `{raidId}` |
+| `adminSetConfig`, `adminUpsertChallenges`, `lockGame`, `finalControl` | – | Role admin only | – |
 
 Roles = custom claims `{role:'admin'|'volunteer'}` set by `scripts/setRole.ts`.
 

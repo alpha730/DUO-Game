@@ -115,3 +115,54 @@ export function scoreCatch({ user, catchDoc, lingoId, today, rules, speedBonus }
     needsFavorites: user.favorites.length === 0 && lingosCaught >= rules.favoritesCount,
   };
 }
+
+export interface RaidCatchOutcome {
+  pointsAdded: number;
+  base: number;
+  speedBonus: number;
+  bonuses: Bonus[];
+  firstCatch: boolean;
+  /** Catch-doc fields to merge: never lastCaughtDate / favStreak / maxBonusGiven (a raid is not a daily catch). */
+  catchDoc: Pick<CatchDoc, "timesCaught" | "level"> & Partial<Pick<CatchDoc, "lastCaughtDate" | "favStreak" | "maxBonusGiven">>;
+  user: Pick<UserDoc, "lingosCaught" | "allTenBonus">;
+  newLevel: Level;
+  needsFavorites: boolean;
+}
+
+/**
+ * Points + catch/user changes for an Owl Raid WIN (SPEC §2). Pure. raidCatchPoints + speed bonus
+ * INSTEAD of the normal catch points; counts for the collection (first catch → catch doc at Level 1,
+ * lingosCaught, all-10 bonus) and timesCaught (non-favourite levels can rise). No effect on the
+ * favourite streak, MAX, the day streak or "caught today".
+ */
+export function scoreRaidCatch({ user, catchDoc, lingoId, rules, speedBonus }: Omit<CatchInput, "today">): RaidCatchOutcome {
+  const firstCatch = !catchDoc || catchDoc.timesCaught <= 0;
+  const timesCaught = (catchDoc?.timesCaught ?? 0) + 1;
+  const oldLevel: Level = catchDoc?.level ?? 1;
+  const favorite = !firstCatch && user.favorites.includes(lingoId);
+  // A favourite's level comes from its streak only, so a raid leaves it alone.
+  const level = firstCatch ? 1 : favorite ? oldLevel : maxLevel(oldLevel, nonFavLevel(timesCaught, rules));
+
+  const bonuses: Bonus[] = [];
+  const lingosCaught = user.lingosCaught + (firstCatch ? 1 : 0);
+  let allTenBonus = user.allTenBonus;
+  if (!allTenBonus && lingosCaught >= LINGO_COUNT) {
+    bonuses.push({ kind: "allTen", points: rules.allTenBonus });
+    allTenBonus = true;
+  }
+
+  const base = rules.raidCatchPoints;
+  return {
+    pointsAdded: base + speedBonus + bonuses.reduce((s, b) => s + b.points, 0),
+    base,
+    speedBonus,
+    bonuses,
+    firstCatch,
+    catchDoc: firstCatch
+      ? { timesCaught, level, lastCaughtDate: catchDoc?.lastCaughtDate ?? null, favStreak: catchDoc?.favStreak ?? 0, maxBonusGiven: catchDoc?.maxBonusGiven ?? false }
+      : { timesCaught, level },
+    user: { lingosCaught, allTenBonus },
+    newLevel: level,
+    needsFavorites: user.favorites.length === 0 && lingosCaught >= rules.favoritesCount,
+  };
+}

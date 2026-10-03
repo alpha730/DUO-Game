@@ -56,6 +56,8 @@ export const DOC = {
 
 /** challenges/{date}_{lingoId} */
 export const challengeId = (date: IstDate, lingoId: string) => `${date}_${lingoId}`;
+/** challenges/raid_{raidId} — an Owl Raid's own challenge (never today's normal one). */
+export const raidChallengeId = (raidId: string) => `raid_${raidId}`;
 
 // ---------- Documents (SPEC §4) ----------
 
@@ -289,6 +291,8 @@ export interface RaidDoc {
 /** raids/{id}/players/{uid} — never client-readable */
 export interface RaidPlayerDoc {
   joinedAt: FireTimestamp;
+  /** Set by startAttempt: the player's one try at this raid (won, failed or forfeit). */
+  attemptId?: string;
 }
 
 /** prizes/{id} — signed-in read */
@@ -408,6 +412,8 @@ export interface SubmitAttemptOutput {
   missedWords?: string[];
   /** True when the user has ≥ 2 catches and hasn't chosen favourites → open /favorites. */
   needsFavorites: boolean;
+  /** An Owl Raid attempt (base = raidCatchPoints instead of the normal catch points). */
+  raid?: boolean;
 }
 
 export interface SetFavoritesInput {
@@ -432,6 +438,8 @@ export interface JoinRaidInput {
 export interface JoinRaidOutput {
   joined: number;
   unlocked: boolean;
+  /** This player already used their one try at this raid. */
+  tried: boolean;
 }
 
 export interface RedeemPrizeInput {
@@ -466,12 +474,21 @@ export interface AdminUpsertChallengesOutput {
   written: number;
 }
 
+/** A challenge without its date/Lingo key (same shape as challenges/*). */
+export type ChallengeInput =
+  | { type: "pronounce"; word: string; accept?: string[] }
+  | { type: "speak"; phrase: string }
+  | { type: "meaning"; word: string; options: string[]; correctIndex: number }
+  | { type: "question"; prompt: string; options: string[]; correctIndex: number };
+
 export interface AdminCreateRaidInput {
   posterIndex: number;
   lingoId: string;
   startAt: number;
   minutes?: number; // default 15
   minPlayers?: number; // default 20
+  /** The raid's own challenge, stored server-only at challenges/raid_{raidId}. */
+  challenge: ChallengeInput;
 }
 export interface AdminCreateRaidOutput {
   raidId: string;

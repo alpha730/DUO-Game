@@ -1,6 +1,6 @@
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
-import { COL, type JoinRaidOutput, type RaidDoc } from "../shared/types";
+import { COL, type JoinRaidOutput, type RaidDoc, type RaidPlayerDoc } from "../shared/types";
 import { db } from "../lib/db";
 import { campusCheck, isEmulator, isValidLatLng } from "../lib/geo";
 import { requirePlayer } from "../lib/guards";
@@ -40,11 +40,13 @@ export const joinRaid = onCall<unknown, Promise<JoinRaidOutput>>(async (req) => 
   const batch = db().batch();
   batch.create(playerRef, { joinedAt: Timestamp.fromMillis(now) });
   batch.update(raidRef, { joined: FieldValue.increment(1) });
+  let tried = false;
   try {
     await batch.commit();
   } catch (err) {
-    // ALREADY_EXISTS (code 6): already joined — fall through and report the current state.
+    // ALREADY_EXISTS (code 6): already joined — report the current state (and whether the one try is used).
     if ((err as { code?: number }).code !== 6) throw err;
+    tried = !!((await playerRef.get()).data() as RaidPlayerDoc | undefined)?.attemptId;
   }
 
   const fresh = (await raidRef.get()).data() as RaidDoc;
@@ -53,5 +55,5 @@ export const joinRaid = onCall<unknown, Promise<JoinRaidOutput>>(async (req) => 
     await raidRef.update({ unlocked: true });
     unlocked = true;
   }
-  return { joined: fresh.joined, unlocked };
+  return { joined: fresh.joined, unlocked, tried };
 });

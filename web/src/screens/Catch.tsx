@@ -1,6 +1,6 @@
 import { BRAND, lingoName } from "../config/brand";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import {
   isVoiceChallenge,
   type GetMyStateOutput,
@@ -58,6 +58,8 @@ let reloadedAttempt = activeAttempt.take();
 
 export default function Catch() {
   const { lingoId = "" } = useParams();
+  // Owl Raid try (from the raid waiting room): the raid's own challenge, outside the daily 4, one try.
+  const raidId = useSearchParams()[0].get("raid") ?? undefined;
   // Reload mid-attempt → the pagehide forfeit already went out: show "Chance lost" straight away.
   const [reloaded] = useState(() => (reloadedAttempt?.lingoId === lingoId ? reloadedAttempt : null));
   const [lingo, setLingo] = useState<Lingo | null>(null);
@@ -74,6 +76,8 @@ export default function Catch() {
   const [position, setPosition] = useState<Position | null>(null);
   const [error, setError] = useState("");
   const [needsSpeech, setNeedsSpeech] = useState(false);
+  // The raid refused this player for good (already tried, over, not joined): no Start button.
+  const [raidClosed, setRaidClosed] = useState(false);
   const [challenge, setChallenge] = useState<StartAttemptOutput | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(reloaded ? { kind: "forfeit" } : null);
   const token = useRef<string | null>(null);
@@ -153,13 +157,15 @@ export default function Catch() {
       // Cache the ID token now so the one-chance forfeit needs no async work later (SPEC §3.4).
       token.current = (await auth.currentUser?.getIdToken()) ?? null;
       // No SpeechRecognition here → the server refuses voice challenges up front (no attempt used).
-      const out = await api.startAttempt({ lingoId, lat: position.lat, lng: position.lng, speech: speechSupported() });
+      const out = await api.startAttempt({ lingoId, lat: position.lat, lng: position.lng, speech: speechSupported(), ...(raidId ? { raidId } : {}) });
       submitted.current = false;
       setAttemptsLeft(out.attemptsLeft);
       setChallenge(out);
       setPhase("active");
     } catch (err) {
-      setNeedsSpeech((err as { details?: { code?: string } }).details?.code === "needs-speech");
+      const code = (err as { details?: { code?: string } }).details?.code;
+      setNeedsSpeech(code === "needs-speech");
+      setRaidClosed(code === "raid-tried" || code === "raid-ended" || code === "not-joined");
       setError(apiErrorMessage(err));
       setPhase("ready");
     }
@@ -208,8 +214,13 @@ export default function Catch() {
       <header className="catch-head">
         <span className="swatch" style={{ background: lingo?.color ?? "var(--surface-2)" }} aria-hidden="true" />
         <div>
-          <h1 style={{ margin: 0 }}>Catch {name}</h1>
-          {me && attemptsLeft !== null && (phase === "preflight" || phase === "ready" || phase === "starting") && (
+          <h1 style={{ margin: 0 }}>{raidId ? `${BRAND.raidName} · ${name}` : `Catch ${name}`}</h1>
+          {raidId && (phase === "preflight" || phase === "ready" || phase === "starting") && (
+            <p className="small muted" style={{ margin: 0 }} data-raid-try>
+              One try · doesn't use your daily attempts
+            </p>
+          )}
+          {!raidId && me && attemptsLeft !== null && (phase === "preflight" || phase === "ready" || phase === "starting") && (
             <p className="small muted" style={{ margin: 0 }}>
               Attempts left today: {attemptsLeft}/{me.attemptsPerDay}
             </p>
@@ -226,7 +237,7 @@ export default function Catch() {
             </p>
           )}
           {needsSpeech && <OpenInBrowser />}
-          {phase !== "preflight" && !needsSpeech && (
+          {phase !== "preflight" && !needsSpeech && !raidClosed && (
             <button className="btn" onClick={start} disabled={phase === "starting"}>
               {phase === "starting" ? "Starting…" : "Start"}
             </button>
@@ -252,8 +263,9 @@ export default function Catch() {
           lingoName={name}
           type={challenge?.type ?? null}
           heard={lastAnswer.current.transcript}
-          attemptsLeft={attemptsLeft}
+          attemptsLeft={raidId ? null : attemptsLeft}
           attemptsPerDay={me?.attemptsPerDay ?? null}
+          raid={!!raidId}
           onRetry={retry}
           prevLevel={me?.catches.find((x) => x.lingoId === lingoId && x.timesCaught > 0)?.level ?? null}
         />

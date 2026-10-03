@@ -74,7 +74,7 @@ export function scoreCatch({ user, catchDoc, lingoId, today, rules, speedBonus }
   } else if (favorite) {
     // +1 if caught on the IST day right after its last catch; a missed day starts again at day 1.
     favStreak = isYesterday(catchDoc!.lastCaughtDate, today) ? catchDoc!.favStreak + 1 : 1;
-    // DECISION: SPEC lists day 1 = 20 … day 10 = 200; longer streaks stay at the day-10 rate.
+    // SPEC §2: 20 × streak day, capped at 200 per catch from day 10 on.
     base = rules.favoriteCatchPointsPerDay * Math.min(favStreak, rules.favMaxStreak);
     baseReason = "favoriteCatch";
     level = maxLevel(oldLevel, favLevel(favStreak, rules));

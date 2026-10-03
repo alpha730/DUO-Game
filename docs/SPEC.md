@@ -33,7 +33,7 @@
 | meaning / question pass mark | choice == correctIndex |
 | First-ever catch of any Lingo | +100 (Level 1) |
 | Repeat catch, non-favourite | +20 |
-| Favourite catch | +20 × that favourite's streak day (day 1 = 20 … day 10 = 200) |
+| Favourite catch | +20 × that favourite's streak day (day 1 = 20 … day 10 = 200); **capped at 200 per catch from day 10 on** (day 11, 12, … = 200) |
 | Favourite reaches 3-day streak | Level 2 |
 | Favourite reaches 6-day streak | Level 3 |
 | Favourite reaches 10-day streak | **MAX** form + 1,000 bonus (once per Lingo) |

@@ -23,3 +23,6 @@ web/public/assets/
 *-firebase-adminsdk-*.json
 .firebaserc.local
 web/public/brand/
+
+# Local AI scratch output (not part of the app)
+Claude outputs/

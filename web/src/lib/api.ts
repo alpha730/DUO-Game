@@ -43,6 +43,8 @@ export const api = {
   },
   submitAttempt: call<SubmitAttemptInput, SubmitAttemptOutput>("submitAttempt"),
   setFavorites: call<SetFavoritesInput, SetFavoritesOutput>("setFavorites"),
+  /** Admin "refresh now" (any player on the emulator). */
+  refreshLeaderboard: call<Record<string, never>, { rows: number }>("adminRefreshLeaderboard"),
 };
 
 /** User-facing text for a callable error. Server HttpsErrors already carry friendly messages. */

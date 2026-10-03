@@ -923,3 +923,62 @@ a {
   .win *, .result-icon, .celebrate { animation: none !important; }
   .confetti { display: none; }
 }
+
+/* ---------- Leaderboard ---------- */
+.board-screen {
+  padding-bottom: calc(var(--nav-h) + 96px + var(--safe-bottom));
+}
+
+.board {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.board-row,
+.board-me {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.board-row[data-me="true"] {
+  outline: 2px solid var(--primary);
+}
+
+.board-rank {
+  font-weight: 800;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.board-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.board-points {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.board-me {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(448px, calc(100% - 32px));
+  bottom: calc(var(--nav-h) + var(--safe-bottom) + 10px);
+  background: #24371b;
+  border: 2px solid var(--primary);
+  box-shadow: 0 -4px 16px rgb(0 0 0 / 0.4);
+  z-index: 5;
+}

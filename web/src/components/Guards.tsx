@@ -42,7 +42,7 @@ export function RequireProfile({ children }: { children: ReactNode }) {
 
 /** Role-gated screens (custom claim `role`, set by scripts/setRole.ts). */
 export function RequireRole({ roles, children }: { roles: Role[]; children: ReactNode }) {
-  const { user, role } = useAuth();
+  const { user, role, refreshRole } = useAuth();
   if (user === undefined || (user && role === undefined)) return <Loading />;
   if (!user) return <Navigate to="/" replace />;
   if (!role || !roles.includes(role)) {
@@ -50,7 +50,10 @@ export function RequireRole({ roles, children }: { roles: Role[]; children: Reac
       <main className="screen center">
         <h2>Staff only</h2>
         <p className="muted">This page is for {roles.join(" / ")} accounts.</p>
-        <Link className="btn secondary" to="/home">Back to the hunt</Link>
+        <button className="btn secondary" onClick={() => void refreshRole()}>
+          Just got access? Refresh
+        </button>
+        <Link className="btn link" to="/home">Back to the hunt</Link>
       </main>
     );
   }

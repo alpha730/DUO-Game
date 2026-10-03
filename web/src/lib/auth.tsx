@@ -15,6 +15,8 @@ interface AuthState {
   emailVerified: boolean;
   /** Re-reads the account after the player clicked the verification link (and refreshes the token). */
   refreshUser: () => Promise<boolean>;
+  /** Fresh token → re-reads the `role` claim (after scripts/setRole.ts). */
+  refreshRole: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -45,17 +47,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return u.emailVerified;
   }, []);
 
+  const loadRole = useCallback((u: User, force = false) => {
+    setRole(undefined);
+    return u
+      .getIdTokenResult(force)
+      .then((t) => setRole((t.claims.role as Role | undefined) ?? null))
+      .catch(() => setRole(null));
+  }, []);
+
   useEffect(() => {
     if (!user) {
       setRole(user === null ? null : undefined);
       return;
     }
-    setRole(undefined);
-    user
-      .getIdTokenResult()
-      .then((t) => setRole((t.claims.role as Role | undefined) ?? null))
-      .catch(() => setRole(null));
-  }, [user]);
+    void loadRole(user);
+  }, [user, loadRole]);
+
+  /** Fetches a fresh token, so a role just given by scripts/setRole.ts applies without signing out. */
+  const refreshRole = useCallback(async () => {
+    if (auth.currentUser) await loadRole(auth.currentUser, true);
+  }, [loadRole]);
 
   // Live user doc (owner-readable per firestore.rules), so points/profile update after function calls.
   useEffect(() => {
@@ -74,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = () => fbSignOut(auth);
 
   return (
-    <AuthContext.Provider value={{ user, profile, role, emailVerified, refreshUser, signOut }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, profile, role, emailVerified, refreshUser, refreshRole, signOut }}>{children}</AuthContext.Provider>
   );
 }
 

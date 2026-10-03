@@ -1,7 +1,10 @@
 // Seeds lingos, config/game, today's challenges and prizes.
 //   Emulator (default):  npx tsx scripts/seed.ts
 //   Real launch dates:   npx tsx scripts/seed.ts --real-dates
-//   Production:          GOOGLE_APPLICATION_CREDENTIALS=key.json npx tsx scripts/seed.ts --prod --project <id> --real-dates
+//   Production:          GOOGLE_APPLICATION_CREDENTIALS=key.json npx tsx scripts/seed.ts --prod --project <id> --real-dates --campus <lat>,<lng>,<radiusM>
+//                        then: npx tsx scripts/loadChallenges.ts --prod --project <id>
+// --real-dates writes no sample challenges (the real ones come from scripts/loadChallenges.ts, and a
+// re-seed must never overwrite them).
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import {
@@ -21,6 +24,12 @@ const prod = args.includes("--prod");
 const realDates = args.includes("--real-dates");
 const projectArg = args.indexOf("--project");
 const projectId = projectArg >= 0 ? args[projectArg + 1] : "demo-decade-hunt";
+const campusArg = args.indexOf("--campus");
+const campus = campusArg >= 0 ? args[campusArg + 1].split(",").map(Number) : null;
+if (campus && (campus.length !== 3 || campus.some((n) => !Number.isFinite(n)) || campus[2] < 50)) {
+  throw new Error("--campus needs <lat>,<lng>,<radiusM>, e.g. --campus 26.7838,75.8225,600");
+}
+if (prod && !campus) throw new Error("--prod needs the real campus: --campus <lat>,<lng>,<radiusM>");
 
 if (!prod) process.env.FIRESTORE_EMULATOR_HOST ??= "127.0.0.1:8085";
 if (prod && projectId.startsWith("demo-")) throw new Error("--prod needs --project <real project id>");
@@ -55,10 +64,10 @@ async function main() {
     startAt: Timestamp.fromDate(new Date(startAt)),
     lockAt: Timestamp.fromDate(new Date(lockAt)),
     locked: false,
-    // Placeholder: JECRC, Sitapura, Jaipur — set the real centre on Day 7 (task 7.4).
-    campusLat: 26.7838,
-    campusLng: 75.8225,
-    campusRadiusM: prod ? 600 : 20_000_000,
+    // Emulator default: around JECRC, Sitapura, Jaipur with a huge radius (playable from anywhere).
+    campusLat: campus?.[0] ?? 26.7838,
+    campusLng: campus?.[1] ?? 75.8225,
+    campusRadiusM: campus?.[2] ?? 20_000_000,
     rules: DEFAULT_RULES, // exactly SPEC §2 (see shared/types.ts)
   };
   batch.set(db.collection(COL.config).doc(DOC.gameConfig), config);
@@ -91,7 +100,7 @@ async function main() {
   // exactly the samples above (the tests rely on that).
   const samples = challenges.map(([, ch]) => ch);
   let written = 0;
-  for (let day = 0; day < 7; day++) {
+  for (let day = 0; day < (realDates ? 0 : 7); day++) {
     const date = istDate(Date.now() + day * 86_400_000);
     LINGOS.forEach(([, year], i) => {
       batch.set(db.collection(COL.challenges).doc(challengeId(date, lingoId(year))), samples[(i + day) % samples.length]);
@@ -108,7 +117,7 @@ async function main() {
   await batch.commit();
   console.log(
     `Seeded ${prod ? "PROD" : "emulator"} (${projectId}): ${LINGOS.length} lingos, config/game ` +
-      `(start ${startAt}, lock ${lockAt}), ${written} challenges (10 Lingos × 7 days from ${today}), ${prizes.length} prizes.`,
+      `(start ${startAt}, lock ${lockAt}), ${written} sample challenges${realDates ? " (real ones: scripts/loadChallenges.ts)" : ` (10 Lingos × 7 days from ${today})`}, ${prizes.length} prizes.`,
   );
 }
 

@@ -12,6 +12,7 @@ import { api } from "../lib/api";
 import { inAppBrowser } from "../lib/browser";
 import { catchStatus } from "../lib/catchStatus";
 import { loadLingos, type Lingo } from "../lib/lingos";
+import { raidPhase, useOpenRaids } from "../lib/raids";
 
 type Status = "starting" | "scanning" | "problem";
 
@@ -34,6 +35,7 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
   const [me, setMe] = useState<GetMyStateOutput | null>(null);
   const [meState, setMeState] = useState<"loading" | "ok" | "error">("loading");
   const [meRun, setMeRun] = useState(0); // bump to retry getMyState
+  const raids = useOpenRaids(!testMode); // polled (cost rules), for the "Join raid" button
   // Poster recognised but the `lingos` collection is empty (game data not seeded yet).
   const [bareposter, setBarePoster] = useState<number | null>(null);
 
@@ -220,6 +222,7 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
                 status={catchStatus(lingo.id, me)}
                 server={meState}
                 onRetryServer={() => setMeRun((n) => n + 1)}
+                raid={raids.find((r) => r.posterIndex === lingo.posterIndex && raidPhase(r, Date.now()) === "active") ?? null}
                 attemptsLeft={me?.attemptsLeft ?? null}
                 attemptsPerDay={me?.attemptsPerDay ?? null}
               />

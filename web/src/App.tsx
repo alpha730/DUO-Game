@@ -13,6 +13,7 @@ import Setup from "./screens/Setup";
 // Heavy or staff-only screens load on demand (AR code only on /scan — CLAUDE.md).
 const Scan = lazy(() => import("./screens/Scan"));
 const Catch = lazy(() => import("./screens/Catch"));
+const Raid = lazy(() => import("./screens/Raid"));
 const Admin = lazy(() => import("./screens/Admin"));
 const Redeem = lazy(() => import("./screens/Redeem"));
 const Stage = lazy(() => import("./screens/Stage"));
@@ -35,6 +36,7 @@ export default function App() {
             <Route path="/me" element={<Me />} />
           </Route>
           <Route path="/catch/:lingoId" element={<RequireProfile><Catch /></RequireProfile>} />
+          <Route path="/raid/:raidId" element={<RequireProfile><Raid /></RequireProfile>} />
           <Route path="/favorites" element={<RequireProfile><Favorites /></RequireProfile>} />
 
           <Route path="/admin" element={<RequireRole roles={["admin"]}><Admin /></RequireRole>} />

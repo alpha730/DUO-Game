@@ -1062,3 +1062,12 @@ a {
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
+
+.raid-join {
+  background: linear-gradient(90deg, var(--all-ten-from), var(--all-ten-to));
+  box-shadow: 0 4px 0 var(--level-three);
+}
+
+.raid-room [data-raid-unlocked] {
+  animation: slide-up 0.5s ease-out both;
+}

@@ -4,6 +4,8 @@ import type {
   CompleteProfileOutput,
   GetMyStateInput,
   GetMyStateOutput,
+  JoinRaidInput,
+  JoinRaidOutput,
   StartAttemptInput,
   StartAttemptOutput,
   SetFavoritesInput,
@@ -43,6 +45,7 @@ export const api = {
   },
   submitAttempt: call<SubmitAttemptInput, SubmitAttemptOutput>("submitAttempt"),
   setFavorites: call<SetFavoritesInput, SetFavoritesOutput>("setFavorites"),
+  joinRaid: call<JoinRaidInput, JoinRaidOutput>("joinRaid"),
   /** Admin "refresh now" (any player on the emulator). */
   refreshLeaderboard: call<Record<string, never>, { rows: number }>("adminRefreshLeaderboard"),
 };

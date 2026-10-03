@@ -1,4 +1,5 @@
-import { lingoName } from "../config/brand";
+import { BRAND, lingoName } from "../config/brand";
+import type { Raid } from "../lib/raids";
 import { Link } from "react-router-dom";
 import type { CatchStatus } from "../lib/catchStatus";
 import type { Lingo } from "../lib/lingos";
@@ -11,6 +12,7 @@ export default function ScanOverlay({
   onRetryServer,
   attemptsLeft,
   attemptsPerDay,
+  raid = null,
 }: {
   lingo: Lingo;
   status: CatchStatus;
@@ -19,6 +21,8 @@ export default function ScanOverlay({
   onRetryServer: () => void;
   attemptsLeft: number | null;
   attemptsPerDay: number | null;
+  /** Live Owl Raid on this poster, if any. */
+  raid?: Raid | null;
 }) {
   const streak = status.favorite && status.favStreak > 0 ? status.favStreak : 0;
   const kind = server === "ok" ? status.kind : `server-${server}`;
@@ -42,6 +46,12 @@ export default function ScanOverlay({
           </span>
         )}
       </div>
+
+      {raid && (
+        <Link className="btn raid-join" to={`/raid/${raid.id}`} data-raid={raid.id}>
+          🦉 Join the {BRAND.raidName}
+        </Link>
+      )}
 
       {server === "loading" && (
         <button className="btn" disabled>

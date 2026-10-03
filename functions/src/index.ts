@@ -13,3 +13,6 @@ export { forfeitAttempt } from "./fns/forfeitAttempt";
 export { setFavorites } from "./fns/setFavorites";
 export { refreshLeaderboard } from "./fns/refreshLeaderboard";
 export { adminRefreshLeaderboard } from "./fns/adminRefreshLeaderboard";
+export { adminCreateRaid } from "./fns/adminCreateRaid";
+export { joinRaid } from "./fns/joinRaid";
+export { raidTicker } from "./fns/raidTicker";

@@ -64,9 +64,10 @@ export default function Login() {
     <main className="screen center">
       <div className="stack" style={{ width: "100%" }}>
         <div style={{ marginBottom: 12 }}>
-          <img src={BRAND.logoUrl} alt="" width={72} height={72} />
-          <h1>{BRAND.gameName}</h1>
-          <p className="muted">{BRAND.tagline}</p>
+          {BRAND.mascots.hero && <img className="mascot-hero" src={BRAND.mascots.hero} alt="" />}
+          <img src={BRAND.logo.full} alt={BRAND.partnerName} width={72} height={72} />
+          <h1>{BRAND.appName}</h1>
+          <p className="muted">{BRAND.campaignName}</p>
         </div>
 
         <button className="btn secondary" onClick={google} disabled={busy}>

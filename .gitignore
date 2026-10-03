@@ -22,3 +22,4 @@ web/public/assets/
 *serviceAccount*.json
 *-firebase-adminsdk-*.json
 .firebaserc.local
+web/public/brand/

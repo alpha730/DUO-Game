@@ -40,6 +40,21 @@ for (const f of ["draco_decoder.wasm", "draco_wasm_wrapper.js", "draco_decoder.j
 }
 copied.push(`draco/r${threeRev}/`);
 
+// Brand files supplied by the Duolingo team (CLAUDE.md rule 8) → /brand/. Guidelines stay private.
+const brandSrc = join(src, "brand");
+const brandDest = resolve(here, "../public/brand");
+rmSync(brandDest, { recursive: true, force: true });
+const brandCopied = [];
+for (const d of ["fonts", "logos", "mascots", "models"]) {
+  const dir = join(brandSrc, d);
+  for (const f of existsSync(dir) ? readdirSync(dir).filter((x) => !x.startsWith(".")) : []) {
+    mkdirSync(join(brandDest, d), { recursive: true });
+    cpSync(join(dir, f), join(brandDest, d, f));
+    brandCopied.push(`${d}/${f}`);
+  }
+}
+copied.push(brandCopied.length ? `brand: ${brandCopied.join(", ")}` : "brand: (no files supplied yet)");
+
 console.log(`assets synced: ${copied.join(", ")}`);
 if (tooBig.length) {
   console.error(`✖ Models over 500 KB (Draco-compress them, see CLAUDE.md): ${tooBig.join("; ")}`);

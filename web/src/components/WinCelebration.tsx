@@ -23,7 +23,7 @@ function useCountUp(value: number) {
   return shown;
 }
 
-const CONFETTI = ["#58CC02", "#1CB0F6", "#FF9600", "#CE82FF", "#FF4B4B", "#FFC800"];
+const CONFETTI = BRAND.colors.confetti;
 
 /** PLAN 4.7: "+100" pop, breakdown, level-up / MAX / all-10 celebrations. */
 export default function WinCelebration({
@@ -50,6 +50,7 @@ export default function WinCelebration({
           <i key={i} style={{ "--i": i, background: CONFETTI[i % CONFETTI.length] } as React.CSSProperties} />
         ))}
       </div>
+      {BRAND.mascots.celebrate && <img className="mascot-celebrate" src={BRAND.mascots.celebrate} alt="" />}
       <p className="points-pop" aria-label={`plus ${data.pointsAdded} points`}>
         +{fmt(shown)}
       </p>

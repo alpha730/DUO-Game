@@ -1,3 +1,4 @@
+import { BRAND, lingoName } from "../config/brand";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -200,7 +201,7 @@ export default function Catch() {
     else void runPreflight();
   }
 
-  const name = lingo?.name ?? "this Lingo";
+  const name = lingo ? lingoName(lingo) : `this ${BRAND.creatureName}`;
 
   return (
     <main className="screen stack" data-phase={phase}>

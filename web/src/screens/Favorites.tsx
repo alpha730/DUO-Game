@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { GetMyStateOutput } from "@shared/types";
 import LevelBadge from "../components/LevelBadge";
-import { BRAND } from "../config/brand";
+import { BRAND, lingoName } from "../config/brand";
 import { api, apiErrorMessage } from "../lib/api";
 import { loadLingos, type Lingo } from "../lib/lingos";
 
@@ -90,7 +90,7 @@ export default function Favorites() {
             aria-pressed={picked.includes(c.lingoId)}
           >
             <span className="swatch" style={{ background: c.lingo.color }} aria-hidden="true" />
-            <strong>{c.lingo.name}</strong>
+            <strong>{lingoName(c.lingo)}</strong>
             <span className="small muted">{c.lingo.detYear}</span>
             <LevelBadge level={c.level} />
             {current.includes(c.lingoId) && c.favStreak > 0 && <span className="small streak-text">🔥 Day {c.favStreak}</span>}

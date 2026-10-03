@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { LINGO_COUNT, type CatchView, type GetMyStateOutput } from "@shared/types";
 import LevelBadge from "../components/LevelBadge";
-import { BRAND } from "../config/brand";
+import { BRAND, lingoName } from "../config/brand";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { dayBefore } from "../lib/catchStatus";
@@ -24,7 +24,7 @@ function FavoriteCard({ lingo, c, today }: { lingo: Lingo; c: CatchView | undefi
       <span className="swatch" style={{ background: lingo.color }} aria-hidden="true" />
       <div className="fav-card-body">
         <div className="row" style={{ gap: 6, justifyContent: "space-between" }}>
-          <strong>{lingo.name}</strong>
+          <strong>{lingoName(lingo)}</strong>
           {c && <LevelBadge level={c.level} />}
         </div>
         <div className="fav-streak" aria-label={`Streak day ${streak} of ${MAX_DAY}`}>
@@ -65,7 +65,7 @@ export default function Home() {
           <p className="muted small" style={{ margin: 0 }}>
             Hi {profile?.name.split(" ")[0]}
           </p>
-          <h1 style={{ margin: 0 }}>{BRAND.gameName}</h1>
+          <h1 style={{ margin: 0 }}>{BRAND.appName}</h1>
         </div>
         <div className="row small" style={{ gap: 8 }}>
           <span className="card stat" title="Days in a row with a catch">
@@ -115,11 +115,11 @@ export default function Home() {
                 data-caught={caught}
                 data-lingo={l?.id}
                 style={caught ? { background: l!.color } : undefined}
-                aria-label={l ? `${l.name} (${l.detYear}): ${caught ? `caught, level ${c!.level}` : "not caught"}` : undefined}
+                aria-label={l ? `${lingoName(l)} (${l.detYear}): ${caught ? `caught, level ${c!.level}` : "not caught"}` : undefined}
               >
                 {caught ? (
                   <>
-                    <span className="slot-name">{l!.name}</span>
+                    <span className="slot-name">{lingoName(l!)}</span>
                     <LevelBadge level={c!.level} />
                   </>
                 ) : (

@@ -38,7 +38,7 @@ firestore.rules, firestore.indexes.json, firebase.json
 5. The server is the timer: an answer received after `expiresAt` (+2 s grace) is rejected, whatever the client says.
 6. Every callable function checks: signed in → profile done → game open (`now` between `startAt` and `lockAt`, `locked == false`).
 7. Never commit secrets. Firebase web config lives in `web/.env` (`VITE_FIREBASE_*`), which is git-ignored.
-8. Don't use Duolingo's logo, name or the Duo owl in code/assets until we confirm approval. Use the placeholder `BRAND` constants in `web/src/config/brand.ts`.
+8. **Official Duolingo branding is approved (pending final review on Wed Oct 7).** Use the real Duo / DET mascots, logos, fonts and colours, but ONLY through `web/src/config/brand.ts` (names, colours, font families, logo + mascot file paths) and files in `web/public/brand/`. Never hard-code a brand colour, name, font or image path in a component. Keep a `PLACEHOLDER` brand set in the same file and switch with one constant (`ACTIVE_BRAND = 'official' | 'placeholder'`), so if approval is withdrawn on Oct 7 we revert in one line. Use only files supplied by the Duolingo team in `assets/brand/`; never download or redraw brand art yourself. Brand files are not to be reused outside this project.
 
 ## How to work
 - Do one task at a time from `docs/PLAN.md`. After each task: run it in the emulator, tick the "done when" check, commit.

@@ -1,3 +1,4 @@
+import { lingoName } from "../config/brand";
 import { useEffect, useRef, useState } from "react";
 import { LINGO_COUNT, type GetMyStateOutput } from "@shared/types";
 import type { Object3D } from "three";
@@ -202,13 +203,13 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
             {status === "scanning" && lingo && !modelReady && (
               <div className="ar-hint model-loading" aria-live="polite">
                 <div className="spinner" />
-                <p>{lingo.name} is appearing…</p>
+                <p>{lingoName(lingo)} is appearing…</p>
               </div>
             )}
             {status === "scanning" && lingo && testMode && (
               <section className="scan-card" role="status" data-kind="test">
                 <h2 style={{ margin: 0 }}>
-                  {lingo.name} · poster {lingo.posterIndex + 1}
+                  {lingoName(lingo)} · poster {lingo.posterIndex + 1}
                 </h2>
                 <p className="done">Test mode — catching is off.</p>
               </section>

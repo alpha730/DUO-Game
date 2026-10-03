@@ -1,3 +1,4 @@
+import { lingoName } from "../config/brand";
 import { Link } from "react-router-dom";
 import type { CatchStatus } from "../lib/catchStatus";
 import type { Lingo } from "../lib/lingos";
@@ -28,7 +29,7 @@ export default function ScanOverlay({
         <div className="row" style={{ gap: 10 }}>
           <span className="swatch" style={{ background: lingo.color }} aria-hidden="true" />
           <div>
-            <h2 style={{ margin: 0 }}>{lingo.name}</h2>
+            <h2 style={{ margin: 0 }}>{lingoName(lingo)}</h2>
             <p className="small muted" style={{ margin: 0 }}>
               {lingo.detYear} · {lingo.rarity}
               {status.favorite && " · ⭐ favourite"}

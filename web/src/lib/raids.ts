@@ -8,7 +8,6 @@ export interface Raid {
   startAt: number;
   endAt: number;
   minPlayers: number;
-  joined: number;
   unlocked: boolean;
 }
 
@@ -19,7 +18,6 @@ export const toRaid = (id: string, d: RaidDoc): Raid => ({
   startAt: d.startAt.toMillis(),
   endAt: d.endAt.toMillis(),
   minPlayers: d.minPlayers,
-  joined: d.joined,
   unlocked: d.unlocked,
 });
 
@@ -32,7 +30,7 @@ const POLL_MS = 30_000;
 
 /**
  * Upcoming + live raids, re-fetched every 30 s and when the app comes back to the foreground.
- * DECISION (cost rules): not a live listener — `joined` changes on every join, and a listener on
+ * DECISION (cost rules): not a live listener — the raid's counter changes on every join, and a listener on
  * every open Home/Scan screen would re-read the raid on each of them (≈1M reads per raid at 2k
  * screens × 500 joins). Polling costs ≈60k. Only the waiting room listens live.
  */

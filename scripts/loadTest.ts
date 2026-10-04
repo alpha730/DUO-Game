@@ -4,6 +4,8 @@
 // Reports errors by type and latency (p50 / p95 / slowest). The emulator runs every call in ONE
 // local process, so it is a stress test of our code and transactions, not of Cloud Functions scaling
 // (production starts more instances automatically).
+export {};
+
 const PROJECT = "demo-decade-hunt";
 const AUTH = "http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1";
 const FN = `http://127.0.0.1:5001/${PROJECT}/asia-south1`;

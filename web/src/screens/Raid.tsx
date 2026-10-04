@@ -1,7 +1,7 @@
-import { db, doc, onSnapshot } from "../lib/firestore";
+import { collection, db, doc, onSnapshot } from "../lib/firestore";
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { COL, type RaidDoc } from "@shared/types";
+import { COL, type RaidDoc, type RaidShardDoc } from "@shared/types";
 import { requestLocation } from "../catch/preflight";
 import { BRAND, lingoName } from "../config/brand";
 import { api, apiErrorMessage } from "../lib/api";
@@ -14,6 +14,8 @@ type Step = "locating" | "joining" | "in" | "error";
 export default function Raid() {
   const { raidId = "" } = useParams();
   const [raid, setRaid] = useState<RaidT | null>(null);
+  // Joined count = sum of the raid's 10 counter shards (Day 8 sharded counter).
+  const [joined, setJoined] = useState(0);
   const [lingo, setLingo] = useState<Lingo | null>(null);
   const [step, setStep] = useState<Step>("locating");
   const [error, setError] = useState("");
@@ -29,6 +31,15 @@ export default function Raid() {
       onSnapshot(
         doc(db, COL.raids, raidId),
         (snap) => setRaid(snap.exists() ? toRaid(snap.id, snap.data() as RaidDoc) : null),
+        () => {},
+      ),
+    [raidId],
+  );
+  useEffect(
+    () =>
+      onSnapshot(
+        collection(db, COL.raids, raidId, COL.shards),
+        (snap) => setJoined(snap.docs.reduce((sum, d) => sum + ((d.data() as RaidShardDoc).count ?? 0), 0)),
         () => {},
       ),
     [raidId],
@@ -68,7 +79,7 @@ export default function Raid() {
   }, [raidId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const phase = raid ? raidPhase(raid, now) : null;
-  const pct = raid ? Math.min(100, (raid.joined / raid.minPlayers) * 100) : 0;
+  const pct = raid ? Math.min(100, (joined / raid.minPlayers) * 100) : 0;
 
   return (
     <main className="screen stack raid-room" data-step={step} data-unlocked={raid?.unlocked ?? false}>
@@ -81,8 +92,8 @@ export default function Raid() {
       {raid && (
         <section className="card stack" aria-live="polite">
           <div className="row" style={{ justifyContent: "space-between" }}>
-            <strong data-joined={raid.joined}>
-              {raid.joined}/{raid.minPlayers} joined
+            <strong data-joined={joined}>
+              {joined}/{raid.minPlayers} joined
             </strong>
             {phase === "active" && <span className="small muted">Ends in {mmss(raid.endAt - now)}</span>}
             {phase === "ended" && <span className="small muted">Raid over</span>}
@@ -96,7 +107,7 @@ export default function Raid() {
             </p>
           ) : (
             <p className="small muted" style={{ margin: 0 }}>
-              {Math.max(0, raid.minPlayers - raid.joined)} more players needed — bring your friends to the poster!
+              {Math.max(0, raid.minPlayers - joined)} more players needed — bring your friends to the poster!
             </p>
           )}
         </section>

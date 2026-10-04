@@ -24,6 +24,7 @@ const SIGNED_IN_READABLE = [
   "config/game",
   "leaderboard/students",
   "raids/raid1",
+  "raids/raid1/shards/3",
   "prizes/prize1",
   "final/state",
 ];

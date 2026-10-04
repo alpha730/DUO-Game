@@ -34,6 +34,11 @@ service cloud.firestore {
     match /raids/{id} {
       allow read: if signedIn();
       allow write: if false;
+      // The joined counter's shards: the waiting room sums them live.
+      match /shards/{shard} {
+        allow read: if signedIn();
+        allow write: if false;
+      }
       // raids/{id}/players/* falls through to default deny.
     }
     match /prizes/{id} {

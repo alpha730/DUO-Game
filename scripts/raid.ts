@@ -23,7 +23,6 @@ const raid: Omit<RaidDoc, "startAt" | "endAt"> & { startAt: Timestamp; endAt: Ti
   startAt: Timestamp.fromMillis(now),
   endAt: Timestamp.fromMillis(now + minutes * 60_000),
   minPlayers,
-  joined: 0,
   unlocked: false,
   status: "active",
 };

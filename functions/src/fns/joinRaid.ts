@@ -1,6 +1,6 @@
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
-import { COL, type JoinRaidOutput, type RaidDoc, type RaidPlayerDoc } from "../shared/types";
+import { COL, RAID_SHARDS, type JoinRaidOutput, type RaidDoc, type RaidPlayerDoc, type RaidShardDoc } from "../shared/types";
 import { serverNow } from "../lib/clock";
 import { db } from "../lib/db";
 import { campusCheck, isEmulator, isValidLatLng } from "../lib/geo";
@@ -11,10 +11,11 @@ import { raidPhase } from "../lib/raids";
  * Join an active Owl Raid (SPEC §5, PLAN 6.1): on campus; counted once per player; unlocks at
  * minPlayers. Idempotent — joining twice just returns the current count.
  *
- * DECISION (cost/contention): no transaction on the raid doc. Hundreds of players may join within a
- * minute; a transaction per join would keep colliding on that one document. Instead: create the
- * player doc with a "must not exist" precondition + atomic increment in one batch, then flip
- * `unlocked` (idempotent) once the count reaches minPlayers.
+ * DECISION (cost/contention): no transaction, and joins never write the raid doc. Hundreds of
+ * players may join within a minute, more than one document takes. Each join creates the player doc
+ * with a "must not exist" precondition (counted once) and +1 on ONE random shard of 10
+ * (raids/{id}/shards/{0..9}) in one batch; the count is the sum of the shards. The raid doc is
+ * written once, when the sum first reaches minPlayers (`unlocked`, idempotent).
  */
 export const joinRaid = onCall<unknown, Promise<JoinRaidOutput>>(async (req) => {
   const now = await serverNow();
@@ -40,7 +41,8 @@ export const joinRaid = onCall<unknown, Promise<JoinRaidOutput>>(async (req) => 
   const playerRef = raidRef.collection(COL.players).doc(uid);
   const batch = db().batch();
   batch.create(playerRef, { joinedAt: Timestamp.fromMillis(now) });
-  batch.update(raidRef, { joined: FieldValue.increment(1) });
+  const shard = raidRef.collection(COL.shards).doc(String(Math.floor(Math.random() * RAID_SHARDS)));
+  batch.set(shard, { count: FieldValue.increment(1) }, { merge: true });
   let tried = false;
   try {
     await batch.commit();
@@ -50,11 +52,13 @@ export const joinRaid = onCall<unknown, Promise<JoinRaidOutput>>(async (req) => 
     tried = !!((await playerRef.get()).data() as RaidPlayerDoc | undefined)?.attemptId;
   }
 
-  const fresh = (await raidRef.get()).data() as RaidDoc;
-  let unlocked = fresh.unlocked;
-  if (!unlocked && fresh.joined >= fresh.minPlayers) {
+  const shardRefs = Array.from({ length: RAID_SHARDS }, (_, i) => raidRef.collection(COL.shards).doc(String(i)));
+  const [fresh, ...shards] = await db().getAll(raidRef, ...shardRefs);
+  const joined = shards.reduce((sum, s) => sum + ((s.data() as RaidShardDoc | undefined)?.count ?? 0), 0);
+  let unlocked = (fresh.data() as RaidDoc).unlocked;
+  if (!unlocked && joined >= raid.minPlayers) {
     await raidRef.update({ unlocked: true });
     unlocked = true;
   }
-  return { joined: fresh.joined, unlocked, tried };
+  return { joined, unlocked, tried };
 });

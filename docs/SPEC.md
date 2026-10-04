@@ -93,7 +93,8 @@ The same order picks the top 20 for the final round. The live final round on Oct
 | `attempts/{id}` | uid, lingoId, date, type, raidId?, startedAt, expiresAt, status ('open'\|'won'\|'failed'\|'forfeit'), score?, receivedAt?, answerMs?, speedBonus?, flagged?, flagReason? | **never** |
 | `pointsLog/{id}` | uid, amount, reason, attemptId?, createdAt | **never** |
 | `leaderboard/students` | top: [{uid, name, points, accuracy, avgAnswerMs}] (top 100, in tie-break order), updatedAt | signed-in |
-| `raids/{id}` | posterIndex, lingoId, startAt, endAt, minPlayers (20), joined (count), unlocked, status | signed-in |
+| `raids/{id}` | posterIndex, lingoId, startAt, endAt, minPlayers (20), unlocked, status (joins never write this doc) | signed-in |
+| `raids/{id}/shards/{0..9}` | count — the joined counter, one random shard +1 per join; joined = sum | signed-in |
 | `raids/{id}/players/{uid}` | joinedAt, attemptId? (the player's one raid try) | **never** |
 | `prizes/{id}` | name, cost, stock | signed-in |
 | `redemptions/{id}` | uid, prizeId, cost, byUid, createdAt | **never** |
@@ -114,7 +115,7 @@ All callable (`onCall`) unless noted. Every one runs the checks in CLAUDE.md rul
 | `setFavorites` | lingoIds (exactly 2, both already caught) | First time: save. Later: only if favoriteChangesLeft > 0; decrement; new favourite starts favStreak 0 | `{favorites, favoriteChangesLeft}` |
 | `forfeitAttempt` | **HTTP `onRequest`**, header `Authorization: Bearer <idToken>`, body `{attemptId}` | Verify token; if owner + open → `forfeit` and the user's losses++ (same when an expired or auto-forfeited attempt is closed) | 204 |
 | `refreshLeaderboard` | **scheduled**, every 10 min | Query top 300 users by points, sort in code by the tie-break order in §2, keep top 100 | – |
-| `joinRaid` | raidId, lat, lng | Raid active (until endAt, also after unlock); on campus; add player (once); if joined ≥ minPlayers → unlocked | `{joined, unlocked, tried}` |
+| `joinRaid` | raidId, lat, lng | Raid active (until endAt, also after unlock); on campus; add player (once, create-if-absent) + increment one random shard in the same batch; read the 10 shards; if sum ≥ minPlayers → unlocked | `{joined, unlocked, tried}` |
 | `redeemPrize` | uid, prizeId | Caller has role volunteer/admin; balance ≥ cost; stock > 0; deduct + log | `{newBalance}` |
 | `adminCreateRaid` | posterIndex, lingoId, startAt, minutes? (15), minPlayers? (20), challenge (same shape as a normal challenge) | Role admin only; Lingo on that poster; validate the challenge; write `raids/{id}` + `challenges/raid_{id}` together | `{raidId}` |
 | `adminSetConfig`, `adminUpsertChallenges`, `lockGame`, `finalControl` | – | Role admin only | – |

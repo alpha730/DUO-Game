@@ -43,6 +43,7 @@ export const COL = {
   leaderboard: "leaderboard",
   raids: "raids",
   players: "players", // subcollection of raids/{id}
+  shards: "shards", // subcollection of raids/{id}: the joined counter, RAID_SHARDS docs
   prizes: "prizes",
   redemptions: "redemptions",
   final: "final",
@@ -291,9 +292,15 @@ export interface RaidDoc {
   startAt: FireTimestamp;
   endAt: FireTimestamp;
   minPlayers: number; // 20
-  joined: number;
   unlocked: boolean;
   status: RaidStatus;
+}
+
+/** Shards of a raid's joined counter (Day 8): one random shard per join, summed for the count. */
+export const RAID_SHARDS = 10;
+/** raids/{id}/shards/{0..9} — signed-in read; the waiting room sums them live. */
+export interface RaidShardDoc {
+  count: number;
 }
 
 /** raids/{id}/players/{uid} — never client-readable */

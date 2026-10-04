@@ -41,6 +41,10 @@ const start = (p: Player, input: Partial<StartAttemptInput>) =>
 const submit = (p: Player, input: SubmitAttemptInput) => p.call<SubmitAttemptInput, SubmitAttemptOutput>("submitAttempt")(input);
 const userDoc = async (p: Player) => (await adb.doc(`users/${p.uid}`).get()).data()!;
 const catchDoc = async (p: Player, lingoId = "lingo-2018") => (await adb.doc(`users/${p.uid}/catches/${lingoId}`).get()).data();
+/** Sum of a raid's counter shards + how many shard docs exist. */
+async function shardSum(raidId: string) {
+  return (await adb.collection(`raids/${raidId}/shards`).get()).docs.reduce((s, d) => s + d.data().count, 0);
+}
 /** An active raid on poster 3 (lingo-2018) that unlocks with `minPlayers` joins. */
 async function openRaid(minPlayers = 1) {
   return (await create(await admin(), { posterIndex: 2, lingoId: "lingo-2018", startAt: Date.now(), minPlayers })).raidId;
@@ -51,7 +55,8 @@ describe("Owl Raids", () => {
     const a = await admin();
     const { raidId } = await create(a, { posterIndex: 2, lingoId: "lingo-2018", startAt: Date.now() });
     const raid = (await adb.doc(`raids/${raidId}`).get()).data()!;
-    expect(raid).toMatchObject({ posterIndex: 2, lingoId: "lingo-2018", minPlayers: 20, joined: 0, unlocked: false, status: "active" });
+    expect(raid).toMatchObject({ posterIndex: 2, lingoId: "lingo-2018", minPlayers: 20, unlocked: false, status: "active" });
+    expect(raid).not.toHaveProperty("joined"); // the count lives in raids/{id}/shards
     expect(raid.endAt.toMillis() - raid.startAt.toMillis()).toBe(15 * 60_000);
 
     const players = await Promise.all(Array.from({ length: 20 }, () => newPlayer()));
@@ -62,11 +67,25 @@ describe("Owl Raids", () => {
     // Repeat join: no double count.
     await expect(join(players[0], raidId)).resolves.toEqual({ joined: 19, unlocked: false, tried: false });
     await expect(join(players[19], raidId)).resolves.toEqual({ joined: 20, unlocked: true, tried: false });
-    expect((await adb.doc(`raids/${raidId}`).get()).data()).toMatchObject({ joined: 20, unlocked: true });
+    expect((await adb.doc(`raids/${raidId}`).get()).data()).toMatchObject({ unlocked: true });
+    expect(await shardSum(raidId)).toBe(20);
     expect((await adb.collection(`raids/${raidId}/players`).get()).size).toBe(20);
     // A late joiner after unlock still counts.
     await expect(join(await newPlayer(), raidId)).resolves.toEqual({ joined: 21, unlocked: true, tried: false });
   }, 120_000);
+
+  it("sharded counter: 60 concurrent joins spread over the 10 shards, each player counted once", async () => {
+    const raidId = await openRaid(1000);
+    const players = await Promise.all(Array.from({ length: 60 }, () => newPlayer()));
+    const outs = await Promise.all([...players, ...players.slice(0, 15)].map((p) => join(p, raidId))); // 15 join twice
+    expect(Math.max(...outs.map((o) => o.joined))).toBe(60);
+    expect(await shardSum(raidId)).toBe(60);
+    const shards = (await adb.collection(`raids/${raidId}/shards`).get()).docs;
+    expect(shards.length).toBeGreaterThanOrEqual(5); // random spread (P(< 5 of 10 used) is negligible)
+    expect(shards.every((d) => Number(d.id) >= 0 && Number(d.id) <= 9)).toBe(true);
+    expect((await adb.collection(`raids/${raidId}/players`).get()).size).toBe(60);
+    expect((await adb.doc(`raids/${raidId}`).get()).data()!.unlocked).toBe(false);
+  }, 180_000);
 
   it("can't join before the start or after the end", async () => {
     const a = await admin();

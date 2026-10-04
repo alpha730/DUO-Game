@@ -36,7 +36,6 @@ export const adminCreateRaid = onCall<unknown, Promise<AdminCreateRaidOutput>>(a
     startAt: Timestamp.fromMillis(plan.startAt),
     endAt: Timestamp.fromMillis(plan.endAt),
     minPlayers: plan.minPlayers,
-    joined: 0,
     unlocked: false,
     status: plan.status,
   };

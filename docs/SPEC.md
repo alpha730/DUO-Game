@@ -56,6 +56,8 @@
 - **A raid win does NOT:** change the favourite streak, MAX, `dayStreak` or `attemptsToday`, or set `lastCaughtDate` ("caught today") — the player can still do a normal catch of that Lingo the same day.
 - Logged in `pointsLog` with reason `raid` (+ `speed`, + `allTen` if it completes the set). Wins/losses and answer time count like any attempt.
 
+**Cheat flags (flag only, never block):** an answer arriving < 1.5 s (speak/pronounce) or < 0.8 s (meaning/question) after `startedAt` sets `flagged` + `flagReason` on the attempt and `users.flags`++. Points and results are never changed by a flag; admins review the Suspicious players list before prizes and the final.
+
 **Points come only from correct answers.** Every point source above requires a win (catch); nothing is given for logging in or trying.
 
 **Leaderboard order (students):**
@@ -83,12 +85,12 @@ The same order picks the top 20 for the final round. The live final round on Oct
 ## 4. Data model (Firestore)
 | Path | Fields | Client read |
 |---|---|---|
-| `users/{uid}` | name, email, points, openAttemptId? (the one open attempt; no queries on `attempts` in transactions), attemptsToday, attemptsDate, dayStreak, lastPlayDate, lingosCaught (number), allTenBonus (bool), favorites (lingoId[] max 2), favoriteChangesLeft (1), wins, losses, totalAnswerMs, pointsReachedAt, profileDone, createdAt | owner only |
+| `users/{uid}` | name, email, points, openAttemptId? (the one open attempt; no queries on `attempts` in transactions), flags? (too-fast answers), suspect? (≥ 10 wins, ≥ 95 % accuracy, avg < 3 s), attemptsToday, attemptsDate, dayStreak, lastPlayDate, lingosCaught (number), allTenBonus (bool), favorites (lingoId[] max 2), favoriteChangesLeft (1), wins, losses, totalAnswerMs, pointsReachedAt, profileDone, createdAt | owner only |
 | `users/{uid}/catches/{lingoId}` | firstCaughtAt, timesCaught, lastCaughtDate, level (1\|2\|3\|'MAX'), favStreak, maxBonusGiven (bool) | owner only |
 | `lingos/{lingoId}` | name, detYear, posterIndex (0–9), modelUrl, rarity, color | signed-in |
 | `config/game` | startAt, lockAt, locked, campusLat, campusLng, campusRadiusM, rules (table above) | signed-in |
 | `challenges/{date}_{lingoId}`, `challenges/raid_{raidId}` | type ('pronounce'\|'speak'\|'meaning'\|'question'), word? (pronounce/meaning), accept? (string[], pronounce), phrase? (speak), prompt? (question text), options? (4), correctIndex? | **never** |
-| `attempts/{id}` | uid, lingoId, date, type, raidId?, startedAt, expiresAt, status ('open'\|'won'\|'failed'\|'forfeit'), score?, receivedAt?, answerMs?, speedBonus? | **never** |
+| `attempts/{id}` | uid, lingoId, date, type, raidId?, startedAt, expiresAt, status ('open'\|'won'\|'failed'\|'forfeit'), score?, receivedAt?, answerMs?, speedBonus?, flagged?, flagReason? | **never** |
 | `pointsLog/{id}` | uid, amount, reason, attemptId?, createdAt | **never** |
 | `leaderboard/students` | top: [{uid, name, points, accuracy, avgAnswerMs}] (top 100, in tie-break order), updatedAt | signed-in |
 | `raids/{id}` | posterIndex, lingoId, startAt, endAt, minPlayers (20), joined (count), unlocked, status | signed-in |
@@ -142,7 +144,7 @@ Roles = custom claims `{role:'admin'|'volunteer'}` set by `scripts/setRole.ts`.
 | `/catch/:lingoId` | Challenge | pre-flight (mic + location) → Start → timer → pronounce / speak (mic + live transcript) or meaning / question (prompt + 4 buttons) → result |
 | `/leaderboard` | Rankings | one list of students (rank, name, points), own rank pinned at bottom |
 | `/me` | Profile | QR of uid (for prizes), stats, share card button, logout |
-| `/admin` | Admin | config, upload challenges JSON, create raid, stats, lock game (role admin) |
+| `/admin` | Admin | config, upload challenges JSON, create raid, stats, lock game, suspicious players (on click), top-20 CSV export with flags (role admin) |
 | `/redeem` | Volunteer | scan QR → user + balance → pick prize → confirm (role volunteer/admin) |
 | `/stage` | Big screen | live leaderboard, raid status, final round view |
 

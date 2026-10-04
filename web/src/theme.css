@@ -1183,3 +1183,28 @@ a {
 .share-card .btn {
   width: 100%;
 }
+
+/* ---------- /admin player tables (Day 8) ---------- */
+.table-scroll {
+  overflow-x: auto;
+  margin: 0 -4px;
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.admin-table th,
+.admin-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.admin-table th {
+  color: var(--muted);
+  font-weight: 600;
+}
+.admin-table tr.flagged td {
+  color: var(--danger-text);
+}

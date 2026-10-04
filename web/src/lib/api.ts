@@ -2,6 +2,7 @@ import { httpsCallable } from "firebase/functions";
 import type {
   AdminCreateRaidInput,
   AdminCreateRaidOutput,
+  AdminPlayersOutput,
   AdminSetConfigInput,
   AdminStatsOutput,
   AdminUpsertChallengesInput,
@@ -83,6 +84,8 @@ export const api = {
   adminUpsertChallenges: call<AdminUpsertChallengesInput, AdminUpsertChallengesOutput>("adminUpsertChallenges", 60_000),
   adminCreateRaid: call<AdminCreateRaidInput, AdminCreateRaidOutput>("adminCreateRaid"),
   lockGame: call<LockGameInput, LockGameOutput>("lockGame"),
+  adminSuspicious: call<Record<string, never>, AdminPlayersOutput>("adminSuspicious"),
+  adminTop20: call<Record<string, never>, AdminPlayersOutput>("adminTop20", 60_000),
 };
 
 /** User-facing text for a callable error. Server HttpsErrors already carry friendly messages. */

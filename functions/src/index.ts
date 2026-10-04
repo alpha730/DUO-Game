@@ -18,5 +18,7 @@ export { adminSetConfig } from "./fns/adminSetConfig";
 export { adminUpsertChallenges } from "./fns/adminUpsertChallenges";
 export { adminStats } from "./fns/adminStats";
 export { lockGame } from "./fns/lockGame";
+export { adminSuspicious } from "./fns/adminSuspicious";
+export { adminTop20 } from "./fns/adminTop20";
 export { joinRaid } from "./fns/joinRaid";
 export { raidTicker } from "./fns/raidTicker";

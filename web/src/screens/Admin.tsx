@@ -5,6 +5,7 @@ import {
   COL,
   DEFAULT_RULES,
   DOC,
+  type AdminPlayerRow,
   type AdminStatsOutput,
   type AdminUploadError,
   type ChallengeInput,
@@ -428,6 +429,111 @@ function LeaderboardRefresh() {
   );
 }
 
+const pct = (x: number) => `${Math.round(x * 100)}%`;
+const secs = (ms: number) => (ms ? `${(ms / 1000).toFixed(1)} s` : "—");
+
+function PlayersTable({ rows, showRank }: { rows: AdminPlayerRow[]; showRank?: boolean }) {
+  if (!rows.length) return <p className="small muted" style={{ margin: 0 }}>Nobody.</p>;
+  return (
+    <div className="table-scroll">
+      <table className="admin-table" data-rows={rows.length}>
+        <thead>
+          <tr>
+            {showRank && <th>#</th>}
+            <th>Name</th>
+            <th>Email</th>
+            <th>Points</th>
+            <th>Accuracy</th>
+            <th>Avg time</th>
+            <th>Flags</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.uid} data-uid={r.uid} className={r.flags > 0 || r.suspect ? "flagged" : undefined}>
+              {showRank && <td>{r.rank}</td>}
+              <td>{r.name}</td>
+              <td>{r.email}</td>
+              <td>{r.points.toLocaleString("en-IN")}</td>
+              <td>{pct(r.accuracy)}</td>
+              <td>{secs(r.avgAnswerMs)}</td>
+              <td>
+                {r.flags}
+                {r.suspect ? " ⚠" : ""}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function Suspicious() {
+  const [rows, setRows] = useState<AdminPlayerRow[] | null>(null);
+  const { busy, status, run } = useAction();
+  return (
+    <Section title="Suspicious players">
+      <p className="small muted" style={{ margin: 0 }}>
+        Flags = answers faster than a human could (voice &lt; 1.5 s, tap &lt; 0.8 s). ⚠ = ≥ 10 wins, ≥ 95 % accuracy and
+        &lt; 3 s average. Signals only — nobody is blocked; check before handing out prizes.
+      </p>
+      <button
+        className="btn secondary"
+        disabled={busy}
+        onClick={() => run(async () => ((r) => (setRows(r.rows), `${r.rows.length} player(s).`))(await api.adminSuspicious({}))).catch(() => {})}
+      >
+        {busy ? "Loading…" : rows ? "Reload" : "Load suspicious players"}
+      </button>
+      <StatusLine status={status} />
+      {rows && <PlayersTable rows={rows} />}
+    </Section>
+  );
+}
+
+/** CSV (Excel-friendly) of the top 20 for the final, flags column included. */
+function toCsv(rows: AdminPlayerRow[]): string {
+  const q = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`;
+  const head = ["rank", "name", "email", "points", "accuracy_pct", "avg_answer_s", "wins", "flags", "suspect"];
+  const body = rows.map((r) =>
+    [r.rank ?? "", r.name, r.email, r.points, Math.round(r.accuracy * 100), (r.avgAnswerMs / 1000).toFixed(2), r.wins, r.flags, r.suspect ? "yes" : "no"]
+      .map(q)
+      .join(","),
+  );
+  return [head.join(","), ...body].join(String.fromCharCode(13, 10));
+}
+
+function Top20() {
+  const [rows, setRows] = useState<AdminPlayerRow[] | null>(null);
+  const { busy, status, run } = useAction();
+  function exportTop20() {
+    run(async () => {
+      const out = await api.adminTop20({});
+      setRows(out.rows);
+      // Leading BOM so Excel reads the names as UTF-8.
+      const blob = new Blob([String.fromCharCode(0xfeff) + toCsv(out.rows)], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `top20-${new Date(Date.now() + IST_MS).toISOString().slice(0, 16).replace(/[T:]/g, "-")}-IST.csv`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
+      return `Top ${out.rows.length} downloaded (ranked just now).`;
+    }).catch(() => {});
+  }
+  return (
+    <Section title="Top 20 for the final">
+      <p className="small muted" style={{ margin: 0 }}>
+        Re-ranks now (points → accuracy → avg time → reached first) and downloads a CSV with emails and flags.
+      </p>
+      <button className="btn secondary" disabled={busy} onClick={exportTop20} data-export-top20>
+        {busy ? "Ranking…" : "Export top 20 (CSV)"}
+      </button>
+      <StatusLine status={status} />
+      {rows && <PlayersTable rows={rows} showRank />}
+    </Section>
+  );
+}
+
 /** /admin (PLAN 7.2, role admin): stats, lock, config, challenges upload, raids, leaderboard refresh. */
 export default function Admin() {
   const [config, setConfig] = useState<GameConfigDoc | null>(null);
@@ -462,6 +568,8 @@ export default function Admin() {
       <ChallengeUpload onDone={() => setStatsKey((k) => k + 1)} />
       {lingos.length > 0 && <CreateRaid lingos={lingos} />}
       <LeaderboardRefresh />
+      <Suspicious />
+      <Top20 />
     </main>
   );
 }

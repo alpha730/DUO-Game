@@ -66,6 +66,9 @@ export interface UserDoc {
   name: string;
   email: string;
   points: number;
+  /** Admin-only cheat signals: count of too-fast answers, and "too good to be true" (lib/cheat.ts). */
+  flags?: number;
+  suspect?: boolean;
   /** The user's one open attempt (set by startAttempt, cleared when it ends); avoids querying attempts. */
   openAttemptId?: string | null;
   /** Non-raid attempts used on `attemptsDate`; treat as 0 when attemptsDate ≠ today. */
@@ -239,6 +242,9 @@ export interface AttemptDoc {
   answerMs?: number;
   /** floor((expiresAt − receivedAt)/1000), clamped 0…timer; only counts on a win. */
   speedBonus?: number;
+  /** Cheat signal (flag only): answered faster than a human could (functions/src/lib/cheat.ts). */
+  flagged?: boolean;
+  flagReason?: string;
 }
 
 export type PointsReason =
@@ -507,6 +513,27 @@ export interface AdminUploadError {
   /** 1-based row in the uploaded array (0 = the whole upload). */
   row: number;
   message: string;
+}
+
+/** One row of the admin's player lists (suspicious players, top-20 export). */
+export interface AdminPlayerRow {
+  rank?: number;
+  uid: string;
+  name: string;
+  email: string;
+  points: number;
+  wins: number;
+  /** 0–1 */
+  accuracy: number;
+  /** ms per win (0 with no wins) */
+  avgAnswerMs: number;
+  flags: number;
+  suspect: boolean;
+}
+export interface AdminPlayersOutput {
+  rows: AdminPlayerRow[];
+  /** leaderboard time the top 20 come from (top-20 export) */
+  updatedAt?: number;
 }
 
 export interface AdminStatsOutput {

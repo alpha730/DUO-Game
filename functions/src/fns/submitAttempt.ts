@@ -17,6 +17,7 @@ import { serverNow } from "../lib/clock";
 import { catchRef, db, userRef } from "../lib/db";
 import { requirePlayer } from "../lib/guards";
 import { scoreCatch, scoreRaidCatch } from "../lib/points";
+import { fastAnswerFlag, isSuspect } from "../lib/cheat";
 import { scoreAnswer } from "../lib/score";
 import { speedBonus } from "../lib/speed";
 
@@ -78,19 +79,29 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
     const bonus = result.won ? speedBonus(expiresAt, now, timerSeconds(attempt.type, rules), rules.speedBonusPerSecond) : 0;
 
     const receivedAt = Timestamp.fromMillis(now);
+    // Cheat signals (Day 8): flag only — points and the result are never affected.
+    const flagReason = fastAnswerFlag(attempt.type, answerMs);
     tx.update(attemptRef, {
       status: result.won ? "won" : "failed",
       score: result.score,
       receivedAt,
       answerMs,
       speedBonus: bonus,
+      ...(flagReason ? { flagged: true, flagReason } : {}),
     });
+    // Admin signals on the user: fast-answer count + "too good to be true" (re-evaluated each answer).
+    const after = {
+      wins: (user.wins ?? 0) + (result.won ? 1 : 0),
+      losses: (user.losses ?? 0) + (result.won ? 0 : 1),
+      totalAnswerMs: (user.totalAnswerMs ?? 0) + (result.won ? answerMs : 0),
+    };
+    const signals = { suspect: isSuspect(after), ...(flagReason ? { flags: FieldValue.increment(1) } : {}) };
     const caught = catchSnap.data() as CatchDoc | undefined;
     const missed = result.missedWords ? { missedWords: result.missedWords } : {};
 
     if (!result.won) {
       // Wrong / failed = 0 points (SPEC §2); it only counts as a loss.
-      tx.update(userRef(uid), { losses: FieldValue.increment(1), openAttemptId: null });
+      tx.update(userRef(uid), { losses: FieldValue.increment(1), openAttemptId: null, ...signals });
       const response: SubmitAttemptOutput = {
         result: "failed",
         pointsAdded: 0,
@@ -118,6 +129,7 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
     };
     // DECISION: a raid answer counts in wins/losses and answer time like any other (leaderboard accuracy).
     const stats = {
+      ...signals,
       openAttemptId: null, // this was the open attempt (only one can be open)
       wins: FieldValue.increment(1),
       totalAnswerMs: FieldValue.increment(answerMs),

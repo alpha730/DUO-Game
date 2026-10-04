@@ -16,7 +16,8 @@ describe("cheating with fake data", () => {
     const p = await newPlayer();
     const before = Date.now();
     const a = await start(p, { lingoId: "lingo-2018", expiresAt: before + 3_600_000, attemptsLeft: 99, status: "won", date: "2030-01-01" });
-    expect(a.expiresAt - before).toBeLessThanOrEqual(16_000); // meaning = 15 s, server-set
+    expect(a.expiresAt - a.serverNow).toBe(15_000); // meaning = 15 s, set by the server
+    expect(a.expiresAt).toBeLessThan(before + 3_600_000);
     expect(a.attemptsLeft).toBe(3);
     const doc = (await adb.doc(`attempts/${a.attemptId}`).get()).data()!;
     expect(doc).toMatchObject({ status: "open", lingoId: "lingo-2018" });

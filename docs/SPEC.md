@@ -119,7 +119,7 @@ All callable (`onCall`) unless noted. Every one runs the checks in CLAUDE.md rul
 
 Roles = custom claims `{role:'admin'|'volunteer'}` set by `scripts/setRole.ts`.
 
-**Speech matching helper** (`functions/src/lib/match.ts`): lowercase, remove punctuation, collapse spaces, split words; score = phrase words found in transcript words ÷ phrase words; pass ≥ 0.8. Return missed words.
+**Speech matching helper** (`functions/src/lib/match.ts`): lowercase, remove punctuation, collapse spaces, split words; normalise every word on BOTH sides (number words 0–20 ↔ digits, UK/US spellings: -our/-or, -ise/-ize, -isation/-ization, -yse/-yze, travelling/traveling, centre/center, practise/practice) — pronounce answers too; score = phrase words found in transcript words ÷ phrase words; pass ≥ 0.8. Return missed words.
 
 **Date helper** (`functions/src/lib/date.ts`): `istDate(now)` → `YYYY-MM-DD` in Asia/Kolkata; `isYesterday(a,b)`.
 

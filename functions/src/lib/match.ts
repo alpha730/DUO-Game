@@ -18,28 +18,65 @@ export function words(text: string): string[] {
   );
 }
 
+const NUMBERS = [
+  "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+  "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty",
+];
+const NUMBER_WORD = new Map(NUMBERS.map((w, i) => [w, String(i)]));
+
+// UK/US spellings. Explicit stems where a blanket rule would merge different words ("our" ≠ "or",
+// "filling" ≠ "filing"); a general rule for -ise/-isation, which only ever maps both sides alike.
+const OUR = /^(colou?r|favou?r|behaviou?r|neighbou?r|honou?r|labou?r|humou?r|flavou?r|harbou?r|rumou?r|endeavou?r|armou?r|odou?r|vigou?r|savou?r|vapou?r)(.*)$/;
+const DOUBLE_L = /^(travel|cancel|label|model|fuel|level|counsel|signal|marvel|dial|quarrel|channel|tunnel|panel|total|equal|jewel)l(ing|ed|er|ers)$/;
+const RE_ER = /^(cent|theat|met|lit|fib|calib|somb|spect|meag|lust)re(s|d)?$/;
+const SPECIAL: Record<string, string> = {
+  practise: "practice", practised: "practiced", practising: "practicing", practises: "practices",
+  licence: "license", licences: "licenses", defence: "defense", offence: "offense",
+};
+
+/**
+ * One word in a canonical form, applied to BOTH the phrase/word and the transcript: number words
+ * 0–20 → digits ("ten" == "10") and UK → US spelling (favourite → favorite, organise → organize,
+ * organisation → organization, analyse → analyze, travelling → traveling, centre → center,
+ * practise → practice).
+ */
+export function normWord(w: string): string {
+  const n = NUMBER_WORD.get(w);
+  if (n) return n;
+  if (SPECIAL[w]) return SPECIAL[w];
+  let m = OUR.exec(w);
+  if (m) return m[1].replace(/ou?r$/, "or") + m[2];
+  m = DOUBLE_L.exec(w);
+  if (m) return m[1] + m[2];
+  m = RE_ER.exec(w);
+  if (m) return `${m[1]}er${m[2] ?? ""}`;
+  return w
+    .replace(/(\w{2,})is(e|es|ed|ing|er|ers|ation|ations)$/, "$1iz$2")
+    .replace(/(\w{2,})ys(e|es|ed|ing)$/, "$1yz$2");
+}
+
 /**
  * Pronounce match (SPEC §2): pass if the transcript contains the word or one of its `accept`
  * spellings as whole words ("schedule" ≠ "schedules"). Multi-word spellings ("all right") must
- * appear as consecutive words. Normalised like `words()`.
+ * appear as consecutive words. Normalised like `words()` + `normWord()`.
  */
 export function matchWord(word: string, transcript: string, accept: string[] = []): { passed: boolean } {
-  const heard = ` ${words(transcript).join(" ")} `;
-  const targets = [word, ...accept].map((t) => words(t).join(" ")).filter(Boolean);
+  const heard = ` ${words(transcript).map(normWord).join(" ")} `;
+  const targets = [word, ...accept].map((t) => words(t).map(normWord).join(" ")).filter(Boolean);
   return { passed: targets.some((t) => heard.includes(` ${t} `)) };
 }
 
 /**
  * Speech match (SPEC §5): each phrase word counts if it appears anywhere in the transcript.
- * Extra words and word order don't matter. Phrases should spell out numbers, since speech
- * recognition may return either "10" or "ten".
+ * Extra words and word order don't matter. Both sides go through `normWord()`, so "ten"/"10" and
+ * UK/US spellings match; missed words are reported as written in the phrase.
  */
 export function matchPhrase(phrase: string, transcript: string, passRatio = 0.8): MatchResult {
   const target = words(phrase);
-  const heard = new Set(words(transcript));
+  const heard = new Set(words(transcript).map(normWord));
   if (target.length === 0) return { score: 0, passed: false, missedWords: [] };
 
-  const missedWords = target.filter((w) => !heard.has(w));
+  const missedWords = target.filter((w) => !heard.has(normWord(w)));
   const score = (target.length - missedWords.length) / target.length;
   // Small epsilon so 4/5 = 0.8 passes despite float rounding.
   return { score, passed: score + 1e-9 >= passRatio, missedWords };

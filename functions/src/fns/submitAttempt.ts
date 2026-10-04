@@ -13,6 +13,7 @@ import {
   type SubmitAttemptOutput,
   type UserDoc,
 } from "../shared/types";
+import { serverNow } from "../lib/clock";
 import { catchRef, db, userRef } from "../lib/db";
 import { requirePlayer } from "../lib/guards";
 import { scoreCatch, scoreRaidCatch } from "../lib/points";
@@ -36,7 +37,7 @@ function parseInput(data: unknown) {
 }
 
 export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async (req) => {
-  const now = Date.now(); // the server is the timer (CLAUDE.md rule 5)
+  const now = await serverNow(); // the server is the timer (CLAUDE.md rule 5)
   const { uid, config } = await requirePlayer(req, now);
   const { attemptId, transcript, choice } = parseInput(req.data);
   const { rules } = config;

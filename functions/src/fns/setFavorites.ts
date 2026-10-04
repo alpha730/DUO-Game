@@ -1,5 +1,6 @@
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { COL, type CatchDoc, type SetFavoritesOutput, type UserDoc } from "../shared/types";
+import { serverNow } from "../lib/clock";
 import { catchRef, db, userRef } from "../lib/db";
 import { planFavorites } from "../lib/favorites";
 import { requirePlayer } from "../lib/guards";
@@ -11,7 +12,7 @@ const MESSAGES = {
 } as const;
 
 export const setFavorites = onCall<unknown, Promise<SetFavoritesOutput>>(async (req) => {
-  const { uid, config } = await requirePlayer(req);
+  const { uid, config } = await requirePlayer(req, await serverNow());
   const requested = (req.data as { lingoIds?: unknown } | undefined)?.lingoIds;
 
   return db().runTransaction(async (tx) => {

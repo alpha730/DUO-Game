@@ -1,5 +1,6 @@
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { COL, type AdminStatsOutput } from "../shared/types";
+import { serverNow } from "../lib/clock";
 import { missingChallenges } from "../lib/admin";
 import { istDate } from "../lib/date";
 import { db, loadConfig } from "../lib/db";
@@ -16,7 +17,7 @@ export const adminStats = onCall<unknown, Promise<AdminStatsOutput>>(async (req)
   requireRole(req, ["admin"]);
   const config = await loadConfig();
   if (!config) throw new HttpsError("failed-precondition", "Game is not configured — run the seed first.");
-  const today = istDate();
+  const today = istDate(await serverNow());
   const attempts = db().collection(COL.attempts).where("date", "==", today);
   const [users, attemptsToday, winsToday, lingos, challenges] = await Promise.all([
     db().collection(COL.users).count().get(),

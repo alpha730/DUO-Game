@@ -14,6 +14,7 @@ import {
   type StartAttemptOutput,
   type UserDoc,
 } from "../shared/types";
+import { serverNow } from "../lib/clock";
 import { forfeitTx, readOpenAttemptsTx } from "../lib/attempts";
 import { publicChallenge } from "../lib/challenge";
 import { istDate } from "../lib/date";
@@ -28,7 +29,7 @@ const fail = (code: string, message: string): never => {
 };
 
 export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (req) => {
-  const now = Date.now();
+  const now = await serverNow();
   const { uid, config } = await requirePlayer(req, now);
   const { lingoId, lat, lng, raidId, speech } = (req.data ?? {}) as Record<string, unknown>;
 

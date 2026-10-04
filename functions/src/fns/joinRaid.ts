@@ -1,6 +1,7 @@
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { COL, type JoinRaidOutput, type RaidDoc, type RaidPlayerDoc } from "../shared/types";
+import { serverNow } from "../lib/clock";
 import { db } from "../lib/db";
 import { campusCheck, isEmulator, isValidLatLng } from "../lib/geo";
 import { requirePlayer } from "../lib/guards";
@@ -16,7 +17,7 @@ import { raidPhase } from "../lib/raids";
  * `unlocked` (idempotent) once the count reaches minPlayers.
  */
 export const joinRaid = onCall<unknown, Promise<JoinRaidOutput>>(async (req) => {
-  const now = Date.now();
+  const now = await serverNow();
   const { uid, config } = await requirePlayer(req, now);
   const { raidId, lat, lng } = (req.data ?? {}) as Record<string, unknown>;
   if (typeof raidId !== "string" || !/^[\w-]{1,64}$/.test(raidId)) throw new HttpsError("invalid-argument", "Unknown raid.");

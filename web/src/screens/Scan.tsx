@@ -3,8 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { LINGO_COUNT, type GetMyStateOutput } from "@shared/types";
 import type { Object3D } from "three";
 import { CameraError } from "../ar/cameraError";
-import { cachedModel, loadModel } from "../ar/models";
-import { createScanner, type Scanner } from "../ar/scanner";
+import type { Scanner } from "../ar/scanner";
 import { loadTargets } from "../ar/targets";
 import CameraHelp, { type ScanProblem } from "../components/CameraHelp";
 import ScanOverlay from "../components/ScanOverlay";
@@ -73,14 +72,19 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
     (async () => {
       let lingos: Lingo[];
       let targets: string;
+      let ar: [typeof import("../ar/scanner"), typeof import("../ar/models")];
       try {
         // Test mode is signed out, so lingos may be unreadable: track bare posters instead.
         const lingosP = testMode ? loadLingos().catch(() => [] as Lingo[]) : loadLingos();
-        [lingos, targets] = await Promise.all([lingosP, loadTargets()]);
+        // Day 8: the AR code (three.js + MindAR, ~470 KB) downloads in parallel with the targets and
+        // Lingos instead of before the Scan screen can draw (camera prompt and help show at once).
+        const arP = Promise.all([import("../ar/scanner"), import("../ar/models")]);
+        [lingos, targets, ar] = await Promise.all([lingosP, loadTargets(), arP]);
       } catch (err) {
         throw Object.assign(new Error((err as Error).message), { data: true });
       }
       if (cancelled) return;
+      const [{ createScanner }, { cachedModel, loadModel }] = ar;
       const byPoster = new Map(lingos.map((l) => [l.posterIndex, l]));
       // DECISION: with no game data yet (e.g. production before seeding), still track every poster
       // so the camera and tracking can be tested; the card says the game isn't set up.

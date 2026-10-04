@@ -1,4 +1,4 @@
-import { doc, getDoc } from "firebase/firestore";
+import { db, doc, getDoc } from "../lib/firestore";
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -14,7 +14,6 @@ import {
 } from "@shared/types";
 import { BRAND, lingoName } from "../config/brand";
 import { api, apiErrorMessage } from "../lib/api";
-import { db } from "../lib/firebase";
 import { loadLingos, type Lingo } from "../lib/lingos";
 
 // All admin times are typed and shown in IST (CLAUDE.md: Asia/Kolkata), whatever the laptop's zone.

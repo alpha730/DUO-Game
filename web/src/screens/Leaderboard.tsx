@@ -1,9 +1,9 @@
-import { doc, onSnapshot } from "firebase/firestore";
+import { db, doc, onSnapshot } from "../lib/firestore";
 import { useEffect, useState } from "react";
 import { COL, DOC, type StudentRow } from "@shared/types";
 import { api, apiErrorMessage } from "../lib/api";
 import { useAuth } from "../lib/auth";
-import { db, usingEmulators } from "../lib/firebase";
+import { usingEmulators } from "../lib/firebase";
 
 interface Board {
   top: StudentRow[];

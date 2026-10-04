@@ -1,11 +1,10 @@
-import { doc, onSnapshot } from "firebase/firestore";
+import { db, doc, onSnapshot } from "../lib/firestore";
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { COL, type RaidDoc } from "@shared/types";
 import { requestLocation } from "../catch/preflight";
 import { BRAND, lingoName } from "../config/brand";
 import { api, apiErrorMessage } from "../lib/api";
-import { db } from "../lib/firebase";
 import { loadLingos, type Lingo } from "../lib/lingos";
 import { mmss, raidPhase, toRaid, useServerNow, type Raid as RaidT } from "../lib/raids";
 

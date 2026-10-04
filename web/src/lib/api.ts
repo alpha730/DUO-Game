@@ -39,12 +39,33 @@ const inflightState = new Set<Promise<unknown>>();
 const getMyState = call<GetMyStateInput, GetMyStateOutput>("getMyState");
 const startAttempt = call<StartAttemptInput, StartAttemptOutput>("startAttempt");
 
+// Day 8 (slow networks): getMyState is started as soon as a signed-in session is restored, in
+// parallel with the profile listener, instead of after Home mounts. The first caller within 15 s
+// takes that response.
+let early: { p: Promise<GetMyStateOutput>; at: number } | null = null;
+
 export const api = {
   completeProfile: call<CompleteProfileInput, CompleteProfileOutput>("completeProfile"),
   getMyState(data: GetMyStateInput): Promise<GetMyStateOutput> {
+    if (early && Date.now() - early.at < 15_000) {
+      const { p } = early;
+      early = null;
+      return p;
+    }
+    early = null;
     const p = getMyState(data);
     inflightState.add(p);
     void p.finally(() => inflightState.delete(p)).catch(() => {});
+    return p;
+  },
+  /** Starts getMyState now; the next api.getMyState() call (within 15 s) gets its result. */
+  prefetchMyState(): Promise<GetMyStateOutput> {
+    if (early) return early.p;
+    const p = api.getMyState({});
+    p.catch(() => {
+      if (early?.p === p) early = null; // a failed prefetch is never handed out
+    });
+    early = { p, at: Date.now() };
     return p;
   },
   async startAttempt(data: StartAttemptInput): Promise<StartAttemptOutput> {

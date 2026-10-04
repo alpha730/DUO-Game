@@ -1,6 +1,5 @@
 import { initializeApp } from "firebase/app";
 import { connectAuthEmulator, getAuth } from "firebase/auth";
-import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import { connectFunctionsEmulator, getFunctions } from "firebase/functions";
 
 const env = import.meta.env;
@@ -15,7 +14,6 @@ export const app = initializeApp({
 });
 
 export const auth = getAuth(app);
-export const db = getFirestore(app);
 export const functions = getFunctions(app, "asia-south1");
 
 const onLocalhost = ["localhost", "127.0.0.1"].includes(location.hostname);
@@ -25,6 +23,6 @@ if (usingEmulators) {
   // Same host the page was loaded from, so a phone on the LAN can reach the dev machine's emulators.
   const host = location.hostname;
   connectAuthEmulator(auth, `http://${host}:9099`, { disableWarnings: true });
-  connectFirestoreEmulator(db, host, 8085);
+  // Firestore connects in ./firestore.ts (loaded on demand).
   connectFunctionsEmulator(functions, host, 5001);
 }

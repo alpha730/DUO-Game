@@ -1,8 +1,9 @@
 import { onAuthStateChanged, signOut as fbSignOut, type User } from "firebase/auth";
-import { doc, onSnapshot } from "firebase/firestore";
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { COL, type Role, type UserDoc } from "@shared/types";
-import { auth, db } from "./firebase";
+import { api } from "./api";
+import { auth } from "./firebase";
+import { loadLingos } from "./lingos";
 
 interface AuthState {
   /** undefined while Firebase restores the session */
@@ -33,6 +34,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       onAuthStateChanged(auth, (u) => {
         setUser(u);
         setEmailVerified(!!u?.emailVerified);
+        // Day 8: Home's data starts loading now, not after the profile arrives and Home mounts.
+        if (u?.emailVerified) {
+          // Its user copy unblocks the profile guard if it beats the realtime listener (usually on
+          // 3G); the listener then takes over. No screen reads the profile's timestamp fields.
+          api.prefetchMyState().then(
+            (s) => {
+              if (s.user && auth.currentUser?.uid === u.uid) setProfile((p) => p ?? (s.user as unknown as UserDoc));
+            },
+            () => {},
+          );
+          loadLingos().catch(() => {});
+        }
       }),
     [],
   );
@@ -75,11 +88,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     setProfile(undefined);
-    return onSnapshot(
-      doc(db, COL.users, user.uid),
-      (snap) => setProfile(snap.exists() ? (snap.data() as UserDoc) : null),
-      () => setProfile(null),
-    );
+    let live = true;
+    let unsubscribe = () => {};
+    void import("./firestore").then(({ db, doc, onSnapshot }) => {
+      if (!live) return;
+      unsubscribe = onSnapshot(
+        doc(db, COL.users, user.uid),
+        (snap) => setProfile(snap.exists() ? (snap.data() as UserDoc) : null),
+        () => setProfile(null),
+      );
+    });
+    return () => {
+      live = false;
+      unsubscribe();
+    };
   }, [user]);
 
   const signOut = () => fbSignOut(auth);

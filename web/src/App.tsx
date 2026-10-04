@@ -3,14 +3,15 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { Loading, PublicOnly, RequireProfile, RequireRole, SetupOnly } from "./components/Guards";
 import NavLayout from "./components/NavLayout";
 import { AuthProvider } from "./lib/auth";
-import Favorites from "./screens/Favorites";
 import Home from "./screens/Home";
-import Leaderboard from "./screens/Leaderboard";
 import Login from "./screens/Login";
-import Me from "./screens/Me";
-import Setup from "./screens/Setup";
 
-// Heavy or staff-only screens load on demand (AR code only on /scan — CLAUDE.md).
+// Heavy or staff-only screens load on demand (AR code only on /scan — CLAUDE.md). Day 8: the first
+// load carries only Login + Home; Me (QR code), Leaderboard, Favorites and Setup load when opened.
+const Setup = lazy(() => import("./screens/Setup"));
+const Leaderboard = lazy(() => import("./screens/Leaderboard"));
+const Me = lazy(() => import("./screens/Me"));
+const Favorites = lazy(() => import("./screens/Favorites"));
 const Scan = lazy(() => import("./screens/Scan"));
 const Catch = lazy(() => import("./screens/Catch"));
 const Raid = lazy(() => import("./screens/Raid"));

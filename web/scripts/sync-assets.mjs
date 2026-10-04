@@ -2,7 +2,8 @@
 // them at /assets/... in dev and ships them in the build. Drop new files into /assets and rerun
 // `npm run dev` / `npm run build` — no code changes needed.
 // Cost rules (CLAUDE.md): models must be ≤ 500 KB (Draco) — the build fails otherwise.
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { gzipSync } from "node:zlib";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -20,7 +21,10 @@ const copied = [];
 const tooBig = [];
 if (existsSync(join(src, "targets.mind"))) {
   cpSync(join(src, "targets.mind"), join(dest, "targets.mind"));
-  copied.push("targets.mind");
+  // Day 8: Hosting doesn't compress .mind files (7.3 MB raw → ~3.8 MB gzipped); the app downloads
+  // this .gz and unpacks it in the browser (DecompressionStream), falling back to the raw file.
+  writeFileSync(join(dest, "targets.mind.gz"), gzipSync(readFileSync(join(src, "targets.mind")), { level: 9 }));
+  copied.push("targets.mind (+ .gz)");
 } else {
   console.warn("! assets/targets.mind missing — the Scan screen will show an error");
 }

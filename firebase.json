@@ -51,7 +51,7 @@
         ]
       },
       {
-        "source": "/assets/targets.mind",
+        "source": "/assets/targets.mind*",
         "headers": [
           {
             "key": "Content-Type",

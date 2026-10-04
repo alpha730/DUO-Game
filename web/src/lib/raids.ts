@@ -1,7 +1,5 @@
-import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { COL, type RaidDoc, type RaidStatus } from "@shared/types";
-import { db } from "./firebase";
 
 export interface Raid {
   id: string;
@@ -44,7 +42,10 @@ export function useOpenRaids(enabled = true): Raid[] {
     if (!enabled) return;
     let cancelled = false;
     const load = () =>
-      getDocs(query(collection(db, COL.raids), where("status", "in", ["scheduled", "active"])))
+      import("./firestore")
+        .then(({ db, collection, getDocs, query, where }) =>
+          getDocs(query(collection(db, COL.raids), where("status", "in", ["scheduled", "active"]))),
+        )
         .then((snap) => !cancelled && setRaids(snap.docs.map((d) => toRaid(d.id, d.data() as RaidDoc))))
         .catch(() => {});
     void load();

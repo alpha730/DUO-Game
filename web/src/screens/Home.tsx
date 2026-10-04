@@ -57,6 +57,14 @@ export default function Home() {
     loadLingos().then(setLingos, () => {});
   }, []);
 
+  // DECISION (Day 8): once Home is usable, the poster data (~3.8 MB, cached 30 days) starts
+  // downloading in the background, so the first scan doesn't wait for it on 3G. Skipped on Save-Data.
+  useEffect(() => {
+    if (!me || (navigator as { connection?: { saveData?: boolean } }).connection?.saveData) return;
+    const t = setTimeout(() => void import("../ar/targets").then((m) => m.loadTargets()).catch(() => {}), 1500);
+    return () => clearTimeout(t);
+  }, [me]);
+
   const today = me?.today ?? "";
   const catches = new Map((me?.catches ?? []).map((c) => [c.lingoId, c]));
   const favorites = (me?.user?.favorites ?? profile?.favorites ?? [])

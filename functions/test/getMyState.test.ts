@@ -54,10 +54,12 @@ describe("getMyState", () => {
     const base = { lingoId: "lingo-2016", date: istToday(), type: "speak", startedAt: Timestamp.now(), expiresAt: Timestamp.now() };
     await mine.set({ ...base, uid: p.uid, status: "open" });
     await theirs.set({ ...base, uid: "someone-else", status: "open" });
+    await adb.doc(`users/${p.uid}`).update({ openAttemptId: mine.id }); // as startAttempt sets it
     await p.getMyState();
     expect((await mine.get()).data()?.status).toBe("forfeit");
     expect((await adb.doc(`users/${p.uid}`).get()).data()?.losses).toBe(1); // a forfeit is a loss
     expect((await theirs.get()).data()?.status).toBe("open");
+    expect((await adb.doc(`users/${p.uid}`).get()).data()?.openAttemptId).toBeNull();
   });
 
   it("rejects signed-out callers", async () => {

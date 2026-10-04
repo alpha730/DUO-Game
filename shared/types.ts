@@ -66,6 +66,8 @@ export interface UserDoc {
   name: string;
   email: string;
   points: number;
+  /** The user's one open attempt (set by startAttempt, cleared when it ends); avoids querying attempts. */
+  openAttemptId?: string | null;
   /** Non-raid attempts used on `attemptsDate`; treat as 0 when attemptsDate ≠ today. */
   attemptsToday: number;
   attemptsDate: IstDate | null;

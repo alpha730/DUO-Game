@@ -83,7 +83,7 @@ The same order picks the top 20 for the final round. The live final round on Oct
 ## 4. Data model (Firestore)
 | Path | Fields | Client read |
 |---|---|---|
-| `users/{uid}` | name, email, points, attemptsToday, attemptsDate, dayStreak, lastPlayDate, lingosCaught (number), allTenBonus (bool), favorites (lingoId[] max 2), favoriteChangesLeft (1), wins, losses, totalAnswerMs, pointsReachedAt, profileDone, createdAt | owner only |
+| `users/{uid}` | name, email, points, openAttemptId? (the one open attempt; no queries on `attempts` in transactions), attemptsToday, attemptsDate, dayStreak, lastPlayDate, lingosCaught (number), allTenBonus (bool), favorites (lingoId[] max 2), favoriteChangesLeft (1), wins, losses, totalAnswerMs, pointsReachedAt, profileDone, createdAt | owner only |
 | `users/{uid}/catches/{lingoId}` | firstCaughtAt, timesCaught, lastCaughtDate, level (1\|2\|3\|'MAX'), favStreak, maxBonusGiven (bool) | owner only |
 | `lingos/{lingoId}` | name, detYear, posterIndex (0–9), modelUrl, rarity, color | signed-in |
 | `config/game` | startAt, lockAt, locked, campusLat, campusLng, campusRadiusM, rules (table above) | signed-in |

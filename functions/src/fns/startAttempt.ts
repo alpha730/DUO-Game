@@ -15,7 +15,7 @@ import {
   type UserDoc,
 } from "../shared/types";
 import { serverNow } from "../lib/clock";
-import { forfeitTx, readOpenAttemptsTx } from "../lib/attempts";
+import { forfeitTx, readOpenAttemptTx } from "../lib/attempts";
 import { publicChallenge } from "../lib/challenge";
 import { istDate } from "../lib/date";
 import { catchRef, db, userRef } from "../lib/db";
@@ -51,17 +51,22 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
 
   const attemptRef = db().collection(COL.attempts).doc();
   const raidRef = raidId ? db().collection(COL.raids).doc(raidId as string) : null;
+  // DECISION (Day 8 load test): the challenge is read outside the transaction — every player of a
+  // Lingo reads the same document, and it doesn't change during play.
+  const challengeSnap = await db()
+    .collection(COL.challenges)
+    .doc(raidRef ? raidChallengeId(raidRef.id) : challengeId(today, lingoId))
+    .get();
   const result = await db().runTransaction(async (tx) => {
-    // All reads first (Firestore transactions require it).
-    const [open, userSnap, catchSnap, challengeSnap, raidSnap, playerSnap] = await Promise.all([
-      readOpenAttemptsTx(tx, uid),
+    // All reads first (Firestore transactions require it). Only this player's own documents.
+    const [userSnap, catchSnap, raidSnap, playerSnap] = await Promise.all([
       tx.get(userRef(uid)),
       tx.get(catchRef(uid, lingoId)),
-      tx.get(db().collection(COL.challenges).doc(raidRef ? raidChallengeId(raidRef.id) : challengeId(today, lingoId))),
       raidRef ? tx.get(raidRef) : null,
       raidRef ? tx.get(raidRef.collection(COL.players).doc(uid)) : null,
     ]);
     const user = userSnap.data() as UserDoc;
+    const open = await readOpenAttemptTx(tx, user);
     const caught = catchSnap.data() as CatchDoc | undefined;
     const used = attemptsUsedToday(user, today);
 
@@ -103,6 +108,7 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
       status: "open",
     };
     tx.create(attemptRef, attempt);
+    tx.update(userRef(uid), { openAttemptId: attemptRef.id });
     if (raidRef) {
       // The one try is used the moment it starts: won, failed and forfeit all count.
       tx.update(raidRef.collection(COL.players).doc(uid), { attemptId: attemptRef.id });

@@ -53,7 +53,8 @@ export const forfeitAttempt = onRequest({ cors: ORIGINS }, async (req, res) => {
     const attempt = (await tx.get(ref)).data() as AttemptDoc | undefined;
     if (!attempt || attempt.uid !== uid || attempt.status !== "open") return false;
     tx.update(ref, { status: "forfeit" });
-    tx.update(userRef(uid), { losses: FieldValue.increment(1) });
+    // An open attempt is always the one users/{uid}.openAttemptId points to.
+    tx.update(userRef(uid), { losses: FieldValue.increment(1), openAttemptId: null });
     return true;
   });
   if (closed) logger.info("attempt forfeited", { uid, attemptId });

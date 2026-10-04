@@ -1,7 +1,7 @@
 import { onCall } from "firebase-functions/v2/https";
 import { COL, DEFAULT_RULES, type CatchDoc, type GetMyStateOutput, type UserDoc } from "../shared/types";
 import { serverNow } from "../lib/clock";
-import { forfeitOpenAttempts } from "../lib/attempts";
+import { forfeitOpenAttempt } from "../lib/attempts";
 import { istDate } from "../lib/date";
 import { loadConfig, userRef } from "../lib/db";
 import { requireAuth } from "../lib/guards";
@@ -13,13 +13,14 @@ export const getMyState = onCall<unknown, Promise<GetMyStateOutput>>(async (req)
   const now = await serverNow();
   const today = istDate(now);
 
-  // Auto-forfeit first (it bumps losses), then read the user.
-  await forfeitOpenAttempts(uid);
-  const [userSnap, catchesSnap, config] = await Promise.all([
+  let [userSnap, catchesSnap, config] = await Promise.all([
     userRef(uid).get(),
     userRef(uid).collection(COL.catches).get(),
     loadConfig(),
   ]);
+  // Auto-forfeit (SPEC §3.5): only when the user doc points at an open attempt; then re-read the user
+  // (losses changed).
+  if (await forfeitOpenAttempt(uid, userSnap.data() as UserDoc | undefined)) userSnap = await userRef(uid).get();
   const rules = config?.rules ?? DEFAULT_RULES;
   const user = userSnap.exists ? (userSnap.data() as UserDoc) : null;
 

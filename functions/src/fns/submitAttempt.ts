@@ -67,7 +67,7 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
     // forfeit, then report the error outside the transaction (a throw here would roll it back).
     if (now > expiresAt + rules.graceSeconds * 1000) {
       tx.update(attemptRef, { status: "forfeit", receivedAt: Timestamp.fromMillis(now) });
-      tx.update(userRef(uid), { losses: FieldValue.increment(1) });
+      tx.update(userRef(uid), { losses: FieldValue.increment(1), openAttemptId: null });
       return { late: true as const };
     }
 
@@ -90,7 +90,7 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
 
     if (!result.won) {
       // Wrong / failed = 0 points (SPEC §2); it only counts as a loss.
-      tx.update(userRef(uid), { losses: FieldValue.increment(1) });
+      tx.update(userRef(uid), { losses: FieldValue.increment(1), openAttemptId: null });
       const response: SubmitAttemptOutput = {
         result: "failed",
         pointsAdded: 0,
@@ -118,6 +118,7 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
     };
     // DECISION: a raid answer counts in wins/losses and answer time like any other (leaderboard accuracy).
     const stats = {
+      openAttemptId: null, // this was the open attempt (only one can be open)
       wins: FieldValue.increment(1),
       totalAnswerMs: FieldValue.increment(answerMs),
       pointsReachedAt: receivedAt, // tie-break: who reached this total first

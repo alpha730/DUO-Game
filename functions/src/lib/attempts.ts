@@ -1,21 +1,40 @@
-import { FieldValue, type QuerySnapshot, type Transaction } from "firebase-admin/firestore";
-import { COL } from "../shared/types";
+import { FieldValue, type DocumentSnapshot, type Transaction } from "firebase-admin/firestore";
+import { COL, type AttemptDoc, type UserDoc } from "../shared/types";
 import { db, userRef } from "./db";
 
-/** Transaction read: the user's open attempts. Do all reads before calling forfeitTx (Firestore rule). */
-export function readOpenAttemptsTx(tx: Transaction, uid: string): Promise<QuerySnapshot> {
-  return tx.get(db().collection(COL.attempts).where("uid", "==", uid).where("status", "==", "open"));
+// DECISION (Day 8 load test): the user's open attempt is found through `users/{uid}.openAttemptId`,
+// never by querying `attempts` inside a transaction. A collection query in hundreds of concurrent
+// transactions (all inserting into that same collection) caused lock timeouts; with the pointer,
+// each transaction only touches the player's own documents.
+
+/** Transaction read: the attempt the user doc points to (null if none). Read the user doc first. */
+export function readOpenAttemptTx(tx: Transaction, user: Pick<UserDoc, "openAttemptId"> | undefined): Promise<DocumentSnapshot> | null {
+  return user?.openAttemptId ? tx.get(db().collection(COL.attempts).doc(user.openAttemptId)) : null;
 }
 
-/** Transaction write: marks the given open attempts forfeit and adds them to losses (SPEC §3.5, §5). */
-export function forfeitTx(tx: Transaction, uid: string, open: QuerySnapshot): number {
-  if (open.empty) return 0;
-  for (const d of open.docs) tx.update(d.ref, { status: "forfeit" });
-  tx.update(userRef(uid), { losses: FieldValue.increment(open.size) });
-  return open.size;
+/**
+ * Transaction write: forfeits that attempt if it's still open and counts a loss (SPEC §3.5, §5).
+ * Returns how many were closed (0/1). The caller sets or clears `openAttemptId`.
+ */
+export function forfeitTx(tx: Transaction, uid: string, snap: DocumentSnapshot | null): number {
+  if (!snap?.exists || (snap.data() as AttemptDoc).status !== "open") return 0;
+  tx.update(snap.ref, { status: "forfeit" });
+  tx.update(userRef(uid), { losses: FieldValue.increment(1) });
+  return 1;
 }
 
-/** Standalone version (getMyState). Safe against concurrent callers: the transaction retries. */
-export function forfeitOpenAttempts(uid: string): Promise<number> {
-  return db().runTransaction(async (tx) => forfeitTx(tx, uid, await readOpenAttemptsTx(tx, uid)));
+/**
+ * Auto-forfeit (getMyState): closes the user's open attempt, if any. Costs one user read when there
+ * is none (the common case), and only then runs a transaction.
+ */
+export async function forfeitOpenAttempt(uid: string, user: Pick<UserDoc, "openAttemptId"> | undefined): Promise<number> {
+  if (!user?.openAttemptId) return 0;
+  return db().runTransaction(async (tx) => {
+    const fresh = (await tx.get(userRef(uid))).data() as UserDoc | undefined;
+    const snap = await readOpenAttemptTx(tx, fresh);
+    if (!fresh?.openAttemptId) return 0;
+    const closed = forfeitTx(tx, uid, snap);
+    tx.update(userRef(uid), { openAttemptId: null });
+    return closed;
+  });
 }

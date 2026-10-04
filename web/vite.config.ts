@@ -6,11 +6,8 @@ import { defineConfig, loadEnv, type Plugin } from "vite";
 
 // Content hash of assets/targets.mind: the app requests /assets/targets.mind?v=<hash>, so Hosting can
 // cache it for 30 days and a new file (e.g. the real posters) is still picked up on the next deploy.
-const targetsFile = fileURLToPath(
-  new URL("../assets/targets.mind", import.meta.url),
-);
-const hash = (file: string) =>
-  createHash("sha1").update(readFileSync(file)).digest("hex").slice(0, 10);
+const targetsFile = fileURLToPath(new URL("../assets/targets.mind", import.meta.url));
+const hash = (file: string) => createHash("sha1").update(readFileSync(file)).digest("hex").slice(0, 10);
 const targetsVersion = existsSync(targetsFile) ? hash(targetsFile) : "missing";
 
 // Same for every Lingo model: /assets/models/<file>?v=<hash> (30-day cache, CLAUDE.md cost rules).
@@ -21,10 +18,7 @@ const modelVersions = Object.fromEntries(
     .map((f) => [f, hash(`${modelsDir}/${f}`)]),
 );
 const threeRev = JSON.parse(
-  readFileSync(
-    new URL("./node_modules/three/package.json", import.meta.url),
-    "utf8",
-  ),
+  readFileSync(new URL("./node_modules/three/package.json", import.meta.url), "utf8"),
 ).version.split(".")[1];
 
 // Brand files supplied by the Duolingo team (CLAUDE.md rule 8), e.g. "logos/logo.svg". brand.ts only
@@ -44,8 +38,7 @@ async function brandHtml(preconnect: string[]): Promise<Plugin> {
   (globalThis as { __BRAND_FILES__?: string[] }).__BRAND_FILES__ = brandFiles;
   const { BRAND } = await import("./src/config/brand");
   const { brandCss } = await import("./src/config/applyBrand");
-  const esc = (s: string) =>
-    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
   return {
     name: "brand-html",
     transformIndexHtml: {
@@ -62,9 +55,7 @@ async function brandHtml(preconnect: string[]): Promise<Plugin> {
               `<meta name="theme-color" content="${esc(BRAND.colors.themeColor)}" />`,
               `<style id="brand-vars">${brandCss(BRAND)}</style>`,
               // TLS to Firebase starts while the JS downloads (several round trips saved on 3G).
-              ...preconnect.map(
-                (h) => `<link rel="preconnect" href="${h}" crossorigin />`,
-              ),
+              ...preconnect.map((h) => `<link rel="preconnect" href="${h}" crossorigin />`),
             ].join("\n    "),
           )
           .replace(
@@ -80,9 +71,7 @@ export default defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "VITE_");
   // Production only (the emulators are plain http on localhost).
   const preconnect =
-    mode === "production" &&
-    env.VITE_USE_EMULATORS !== "true" &&
-    env.VITE_FIREBASE_PROJECT_ID
+    mode === "production" && env.VITE_USE_EMULATORS !== "true" && env.VITE_FIREBASE_PROJECT_ID
       ? [
           "https://identitytoolkit.googleapis.com",
           "https://securetoken.googleapis.com",

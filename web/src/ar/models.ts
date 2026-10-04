@@ -1,6 +1,7 @@
 import type { Object3D } from "three";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { cachedFetch } from "../lib/assetCache";
 
 declare const __MODEL_VERSIONS__: Record<string, string>;
 declare const __THREE_REV__: string;
@@ -29,16 +30,23 @@ export function versionedUrl(url: string): string {
 function load(url: string): Promise<GLTF> {
   let p = pending.get(url);
   if (!p) {
-    p = loader.loadAsync(versionedUrl(url)).then(
-      (gltf) => {
-        ready.set(url, gltf);
-        return gltf;
-      },
-      (err: unknown) => {
-        pending.delete(url); // let the next scan retry
-        throw err;
-      },
-    );
+    // Bytes come from the phone's asset cache after the first download (lib/assetCache.ts).
+    p = cachedFetch(versionedUrl(url))
+      .then((res) => {
+        if (!res.ok) throw new Error(`Model ${url}: HTTP ${res.status}`);
+        return res.arrayBuffer();
+      })
+      .then((buf) => loader.parseAsync(buf, url.slice(0, url.lastIndexOf("/") + 1)))
+      .then(
+        (gltf) => {
+          ready.set(url, gltf);
+          return gltf;
+        },
+        (err: unknown) => {
+          pending.delete(url); // let the next scan retry
+          throw err;
+        },
+      );
     pending.set(url, p);
   }
   return p;

@@ -1,3 +1,5 @@
+import { cachedFetch } from "../lib/assetCache";
+
 declare const __TARGETS_VERSION__: string;
 
 /**
@@ -26,7 +28,8 @@ let cached: Promise<string> | null = null;
  */
 export function loadTargets(): Promise<string> {
   // Browsers without DecompressionStream (iOS < 16.4) download the raw file.
-  cached ??= fetch(canGunzip ? TARGETS_GZ_URL : TARGETS_URL)
+  // Kept on the phone after the first download (lib/assetCache.ts).
+  cached ??= cachedFetch(canGunzip ? TARGETS_GZ_URL : TARGETS_URL)
     .then(async (res) => {
       // The SPA rewrite answers a missing file with index.html (200), so check the type too.
       if (!res.ok || res.headers.get("content-type")?.includes("text/html")) {

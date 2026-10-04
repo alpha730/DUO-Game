@@ -157,6 +157,7 @@ Bottom nav on Home / Scan / Leaderboard / Me. Large tap targets. Works in portra
 - If the user already caught this Lingo today → "Caught today ✓ — come back tomorrow"; if 0 attempts left today → "No attempts left today". Otherwise "Catch it" (favourites also show their streak, e.g. "🔥 Day 4 — keep it going").
 - Stop camera + dispose three.js scene when leaving `/scan`.
 - iOS Safari and Android Chrome both supported; show "Open in Chrome/Safari" if inside an in-app browser (Instagram/WhatsApp) that blocks camera.
+- targets.mind ships gzipped (`targets.mind.gz`, unpacked in the browser; raw fallback) and, with the .glb models, is kept in Cache Storage after the first download (`web/src/lib/assetCache.ts`). Only `?v=<hash>` URLs are cached; a new hash downloads once and replaces the old version.
 
 ## 9. Content
 - `challenges` for 13 days × 10 Lingos = 130 docs, uploaded via `/admin` as JSON:

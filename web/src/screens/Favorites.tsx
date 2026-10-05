@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { GetMyStateOutput } from "@shared/types";
 import LevelBadge from "../components/LevelBadge";
+import LingoArt from "../components/LingoArt";
 import { BRAND, lingoName } from "../config/brand";
 import { api, apiErrorMessage } from "../lib/api";
 import { loadLingos, type Lingo } from "../lib/lingos";
@@ -89,7 +90,9 @@ export default function Favorites() {
             onClick={() => toggle(c.lingoId)}
             aria-pressed={picked.includes(c.lingoId)}
           >
-            <span className="swatch" style={{ background: c.lingo.color }} aria-hidden="true" />
+            <span className="fav-option-art" aria-hidden="true">
+              <LingoArt lingo={c.lingo} mood={picked.includes(c.lingoId) ? "happy" : "calm"} />
+            </span>
             <strong>{lingoName(c.lingo)}</strong>
             <span className="small muted">{c.lingo.detYear}</span>
             <LevelBadge level={c.level} />

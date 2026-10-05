@@ -1552,7 +1552,7 @@ a {
 
 
 .streak-text {
-  color: var(--warn);
+  color: var(--warn-text);
   font-weight: 700;
 }
 
@@ -1568,32 +1568,50 @@ a {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 14px 8px;
+  padding: 12px 8px 14px;
+  margin-bottom: var(--edge);
   border-radius: var(--radius);
   border: 2px solid var(--border);
   background: var(--surface);
+  box-shadow: 0 var(--edge) 0 var(--border);
   color: var(--text);
   font: inherit;
   cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
 }
 
-.fav-option .swatch {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+.fav-option:active:not(:disabled) {
+  transform: translateY(var(--edge));
+  box-shadow: 0 0 0 var(--border);
+}
+
+.fav-option strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.fav-option-art {
+  width: 64px;
+  height: 66px;
 }
 
 .fav-option[data-picked="true"] {
   border-color: var(--warn);
   background: var(--favorite-bg);
+  box-shadow: 0 var(--edge) 0 var(--warn-dark);
+}
+
+.fav-option[data-picked="true"] .fav-option-art {
+  animation: bob 2s ease-in-out infinite;
 }
 
 .fav-check {
   position: absolute;
   top: 6px;
   right: 10px;
-  color: var(--warn);
-  font-size: 1.2rem;
+  color: var(--warn-text);
+  font-size: 1.4rem;
 }
 
 /* ---------- Home ---------- */

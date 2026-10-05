@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { NAME_MAX, NAME_MIN } from "@shared/types";
+import Mascot from "../components/Mascot";
 import { api, apiErrorMessage } from "../lib/api";
 import { useAuth } from "../lib/auth";
 
@@ -28,9 +29,14 @@ export default function Setup() {
   }
 
   return (
-    <main className="screen">
-      <h1>Set up your profile</h1>
-      <p className="muted">Use the name on your college ID card — prizes are only handed over if it matches.</p>
+    <main className="screen stack setup">
+      <section className="login-hero compact">
+        <div className="login-hero-art">
+          <Mascot slot="hero" mood="wow" />
+        </div>
+        <h1>Set up your profile</h1>
+        <p className="muted">Use the name on your college ID card — prizes are only handed over if it matches.</p>
+      </section>
 
       <form className="stack" onSubmit={submit} noValidate>
         <label className="field">
@@ -49,12 +55,12 @@ export default function Setup() {
           </p>
         )}
 
-        <button className="btn" type="submit" disabled={busy}>
+        <button className="btn big" type="submit" disabled={busy}>
           {busy ? "Saving…" : "Start hunting"}
         </button>
       </form>
 
-      <button className="btn link" onClick={signOut} style={{ marginTop: 8 }}>
+      <button className="btn link" onClick={signOut}>
         Not you? Log out
       </button>
     </main>

@@ -7,6 +7,7 @@ import {
   signInWithRedirect,
 } from "firebase/auth";
 import { useState, type FormEvent } from "react";
+import Mascot from "../components/Mascot";
 import { BRAND } from "../config/brand";
 import { authErrorMessage } from "../lib/auth";
 import { auth } from "../lib/firebase";
@@ -61,14 +62,17 @@ export default function Login() {
   };
 
   return (
-    <main className="screen center">
-      <div className="stack" style={{ width: "100%" }}>
-        <div style={{ marginBottom: 12 }}>
-          {BRAND.mascots.hero && <img className="mascot-hero" src={BRAND.mascots.hero} alt="" />}
-          <img src={BRAND.logo.full} alt={BRAND.partnerName} width={72} height={72} />
-          <h1>{BRAND.appName}</h1>
-          <p className="muted">{BRAND.campaignName}</p>
+    <main className="screen login">
+      <section className="login-hero">
+        <div className="login-hero-art">
+          <Mascot slot="hero" mood="happy" />
         </div>
+        <img className="login-logo" src={BRAND.logo.full} alt={BRAND.partnerName} width={44} height={44} />
+        <h1>{BRAND.appName}</h1>
+        <p className="login-campaign">{BRAND.campaignName}</p>
+        <p className="login-tagline">{BRAND.tagline}</p>
+      </section>
+      <div className="stack login-form">
 
         <button className="btn secondary" onClick={google} disabled={busy}>
           <GoogleIcon /> Continue with Google
@@ -106,7 +110,7 @@ export default function Login() {
             </p>
           )}
 
-          <button className="btn" type="submit" disabled={busy}>
+          <button className="btn big" type="submit" disabled={busy}>
             {busy ? "Please wait…" : mode === "signIn" ? "Sign in" : "Create account"}
           </button>
         </form>

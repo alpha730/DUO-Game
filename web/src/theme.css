@@ -2187,3 +2187,78 @@ a {
   font-weight: 600;
 }
 
+/* ---------- Login ---------- */
+.login {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.login-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 0 -16px;
+  padding: 8px 16px 4px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 34%, var(--bg-alt) 0, transparent 60%);
+}
+
+.login-hero-art {
+  position: relative;
+  margin: 6px 0 2px;
+}
+
+.login-hero-art::before {
+  content: "";
+  position: absolute;
+  inset: 12% -14% -4%;
+  border-radius: 50%;
+  border: 3px dashed var(--primary);
+  opacity: 0.35;
+  animation: spin 18s linear infinite;
+}
+
+.login-hero .mascot {
+  width: 150px;
+}
+
+.login-hero.compact .mascot {
+  width: 112px;
+}
+
+.login-logo {
+  margin-top: 4px;
+  border-radius: 12px;
+}
+
+.login-hero h1 {
+  margin: 6px 0 2px;
+  font-size: 2.3rem;
+  letter-spacing: 0.01em;
+}
+
+.login-hero.compact h1 {
+  font-size: 1.7rem;
+}
+
+.login-campaign {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--primary-text);
+}
+
+.login-tagline {
+  max-width: 30ch;
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.login-form {
+  width: 100%;
+}
+

@@ -1,5 +1,6 @@
 import { sendEmailVerification } from "firebase/auth";
 import { useCallback, useEffect, useState } from "react";
+import Mascot from "../components/Mascot";
 import { authErrorMessage, useAuth } from "../lib/auth";
 import { app, auth, usingEmulators } from "../lib/firebase";
 
@@ -69,11 +70,16 @@ export default function VerifyEmail() {
 
   return (
     <main className="screen stack">
-      <h1>Verify your email</h1>
-      <p>
-        We sent a link to <strong>{user?.email}</strong>. Open it, then come back here.
-      </p>
-      <p className="small muted">This keeps the leaderboard fair: one real account per student.</p>
+      <section className="login-hero compact">
+        <div className="login-hero-art">
+          <Mascot slot="hero" mood="wow" badge="✉️" />
+        </div>
+        <h1>Verify your email</h1>
+        <p>
+          We sent a link to <strong>{user?.email}</strong>. Open it, then come back here.
+        </p>
+        <p className="small muted">This keeps the leaderboard fair: one real account per student.</p>
+      </section>
       {msg && (
         <p className="card small" role="status">
           {msg}

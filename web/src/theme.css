@@ -2261,7 +2261,22 @@ a {
 
 /* ---------- Leaderboard ---------- */
 .board-screen {
-  padding-bottom: calc(var(--nav-h) + 96px + var(--safe-bottom));
+  padding-bottom: calc(var(--nav-h) + 136px + var(--safe-bottom));
+}
+
+.board-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.board-tab {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: 0 3px 0 var(--primary-dark);
+  font-family: var(--font-display);
+  font-weight: 800;
 }
 
 .board {
@@ -2270,38 +2285,181 @@ a {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
-.board-row,
+/* Podium: DOM order 1, 2, 3 (for screen readers); shown 2 · 1 · 3 */
+.podium-row {
+  list-style: none;
+  margin: 8px 0 6px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: 8px;
+}
+
+.podium-spot {
+  --medal: var(--gold);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  text-align: center;
+}
+
+.podium-spot[data-medal="gold"] {
+  order: 2;
+}
+
+.podium-spot[data-medal="silver"] {
+  --medal: var(--silver);
+  order: 1;
+}
+
+.podium-spot[data-medal="bronze"] {
+  --medal: var(--bronze);
+  order: 3;
+}
+
+.podium-avatar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 4px solid var(--medal);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--medal) 70%, black);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.6rem;
+  animation: pop 0.45s var(--pop) both;
+}
+
+.podium-spot[data-medal="gold"] .podium-avatar {
+  width: 80px;
+  height: 80px;
+  font-size: 2rem;
+  box-shadow: 0 4px 0 var(--gold-dark), 0 0 24px var(--gold-glow);
+}
+
+.podium-crown {
+  position: absolute;
+  top: -14px;
+  right: -8px;
+  display: grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--medal);
+  color: var(--on-gold);
+  font-size: 0.85rem;
+}
+
+.podium-spot[data-medal="gold"] .podium-crown {
+  top: -20px;
+  right: 50%;
+  transform: translateX(50%);
+  background: none;
+  font-size: 1.6rem;
+}
+
+.podium-spot .board-name {
+  max-width: 100%;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.podium-spot .board-points {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.podium-spot .podium-block {
+  display: grid;
+  place-items: start center;
+  width: 100%;
+  padding-top: 8px;
+  border-radius: 16px 16px 6px 6px;
+  background: var(--medal);
+  color: var(--on-gold);
+  box-shadow: inset 0 -6px 0 rgb(0 0 0 / 0.12);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.6rem;
+  height: 58px;
+  animation: grow 0.5s ease-out both;
+  transform-origin: bottom;
+}
+
+.podium-spot[data-medal="gold"] .podium-block {
+  height: 86px;
+}
+
+.podium-spot[data-medal="bronze"] .podium-block {
+  height: 44px;
+}
+
+.podium-spot[data-me="true"] .podium-avatar {
+  background: var(--primary-soft);
+}
+
+@keyframes grow {
+  from {
+    transform: scaleY(0.2);
+  }
+}
+
+.board-row:not(.podium-spot),
 .board-me {
   display: grid;
-  grid-template-columns: 44px 1fr auto;
+  grid-template-columns: 34px 36px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 8px 12px;
-  border-radius: 12px;
+  gap: 10px;
+  min-height: 56px;
+  padding: 8px 14px 8px 10px;
+  border-radius: 16px;
   background: var(--surface);
+  border: 2px solid var(--border);
 }
 
-.board-row[data-me="true"] {
-  outline: 2px solid var(--primary);
+.board-row[data-me="true"]:not(.podium-spot) {
+  border-color: var(--primary);
+  background: var(--primary-soft);
 }
 
 .board-rank {
+  font-family: var(--font-display);
   font-weight: 800;
   text-align: center;
   font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.board-avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  font-family: var(--font-display);
+  font-weight: 800;
 }
 
 .board-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-weight: 700;
 }
 
 .board-points {
+  font-family: var(--font-display);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
@@ -2310,12 +2468,21 @@ a {
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  width: min(448px, calc(100% - 32px));
-  bottom: calc(var(--nav-h) + var(--safe-bottom) + 10px);
-  background: var(--surface-2);
-  border: 2px solid var(--primary);
-  box-shadow: 0 -4px 16px var(--shadow);
+  width: min(448px, calc(100% - 24px));
+  bottom: calc(var(--nav-h) + var(--safe-bottom) + 42px); /* clears the raised Scan button */
+  background: var(--surface);
+  border-color: var(--primary);
+  box-shadow: 0 var(--edge) 0 var(--primary-dark), 0 -4px 20px var(--shadow);
   z-index: 5;
+}
+
+.board-me .board-rank {
+  color: var(--text);
+}
+
+.board-me .board-avatar {
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 /* ---------- Me ---------- */

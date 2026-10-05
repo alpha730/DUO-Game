@@ -26,6 +26,16 @@ export interface Scanner {
   setModel(posterIndex: number, model: Object3D): void;
 }
 
+// MindAR binds window "resize" to this.resize in its constructor and never removes it; after a failed
+// start (camera denied) or a stop it throws on the next resize/rotation. Guard it on the prototype, so
+// the bound copy each instance makes is the guarded one.
+type ResizeGuard = { resize(): void; controller?: unknown; __stopped?: boolean };
+const proto = MindARThree.prototype as unknown as ResizeGuard;
+const mindarResize = proto.resize;
+proto.resize = function (this: ResizeGuard) {
+  if (this.controller && !this.__stopped) mindarResize.call(this);
+};
+
 // Anchor space: the poster is the XY plane, 1 unit = poster width, +Z points at the camera.
 const MODEL_SIZE = 0.45;
 const HOVER_Z = 0.3;
@@ -132,8 +142,8 @@ export function createScanner(
     mindar.renderer.dispose();
     mindar.renderer.forceContextLoss();
 
-    // MindAR registers window "resize" with an anonymous bound function we can't remove; neuter it.
-    mindar.resize = () => {};
+    // MindAR's window "resize" listener can't be removed; the prototype guard above makes it a no-op.
+    (mindar as unknown as ResizeGuard).__stopped = true;
     // Each MindAR instance adds its UI <style> to <head>; drop them so visits don't pile up.
     for (const s of document.head.querySelectorAll("style")) {
       if (s.textContent?.startsWith(".mindar-ui-overlay")) s.remove();

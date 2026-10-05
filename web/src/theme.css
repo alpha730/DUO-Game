@@ -3291,3 +3291,35 @@ a {
   width: 100%;
 }
 
+/* ---------- Empty / error states (screens) ---------- */
+.empty-body p {
+  margin: 0 0 8px;
+}
+
+.empty-body p:last-child {
+  margin: 0;
+}
+
+.camera-help {
+  text-align: center;
+}
+
+.offline-pill {
+  position: fixed;
+  z-index: 60;
+  top: calc(8px + var(--safe-top));
+  left: 12px;
+  right: 12px;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--danger);
+  color: var(--on-danger);
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-align: center;
+  box-shadow: 0 4px 16px var(--shadow);
+  animation: slide-up 0.3s ease-out both;
+}
+

@@ -13,6 +13,7 @@ import { requestLocation, requestMic, type CheckState, type Position } from "../
 import { speechSupported } from "../catch/speech";
 import { useCountdown } from "../catch/useCountdown";
 import ChoiceChallenge from "../components/ChoiceChallenge";
+import EmptyState from "../components/EmptyState";
 import { OpenInBrowser } from "../components/CameraHelp";
 import Preflight from "../components/Preflight";
 import Result from "../components/Result";
@@ -105,6 +106,7 @@ export default function Catch() {
   const [position, setPosition] = useState<Position | null>(null);
   const [error, setError] = useState("");
   const [needsSpeech, setNeedsSpeech] = useState(false);
+  const [errorCode, setErrorCode] = useState("");
   // Refused for good today (Lingo already tried / 4 Lingos tried / raid over…): no Start button.
   const [closed, setClosed] = useState(false);
   const [challenge, setChallenge] = useState<StartAttemptOutput | null>(null);
@@ -194,6 +196,7 @@ export default function Catch() {
     } catch (err) {
       const code = (err as { details?: { code?: string } }).details?.code;
       setNeedsSpeech(code === "needs-speech");
+      setErrorCode(code ?? (err as { code?: string }).code ?? "");
       setClosed(["raid-tried", "raid-ended", "not-joined", "already-tried", "no-attempts"].includes(code ?? ""));
       // The server names the Lingo by its id-level name; show the brand's display name instead.
       setError(code === "already-tried" ? `You've already tried ${name} today — come back tomorrow` : apiErrorMessage(err));
@@ -255,10 +258,20 @@ export default function Catch() {
       {(phase === "preflight" || phase === "ready" || phase === "starting") && (
         <>
           <Preflight mic={mic} location={loc} onRetry={runPreflight} />
-          {error && (
-            <p className="error" role="alert">
-              {error}
-            </p>
+          {error && errorCode === "off-campus" ? (
+            <EmptyState mood="lost" badge="📍" title="You're off campus" role="alert" data-empty="off-campus">
+              <p className="muted">{error} Head back to {BRAND.campusName} and find a poster — then tap Start again.</p>
+            </EmptyState>
+          ) : error && (errorCode === "functions/unavailable" || errorCode === "functions/deadline-exceeded") ? (
+            <EmptyState badge="📶" title="You're offline" role="alert" data-empty="offline">
+              <p className="muted">{error}</p>
+            </EmptyState>
+          ) : (
+            error && (
+              <p className="error" role="alert">
+                {error}
+              </p>
+            )
           )}
           {needsSpeech && <OpenInBrowser />}
           {phase !== "preflight" && !needsSpeech && !closed && (

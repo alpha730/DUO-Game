@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { CameraProblem } from "../ar/cameraError";
 import { openInChromeUrl, platform } from "../lib/browser";
+import type { Mood } from "./Critter";
+import EmptyState from "./EmptyState";
 
 export type ScanProblem = { kind: CameraProblem | "inApp" | "data"; app?: string; message?: string };
 
@@ -64,9 +66,13 @@ export default function CameraHelp({
   let title: string;
   let body: React.ReactNode;
   let actions: React.ReactNode;
+  let mood: Mood = "camera";
+  let badge = "📷";
 
   switch (problem.kind) {
     case "inApp":
+      mood = "lost";
+      badge = "🔗";
       title = "Open in your browser";
       body = (
         <>
@@ -90,6 +96,8 @@ export default function CameraHelp({
       );
       break;
     case "denied":
+      mood = "sad";
+      badge = "🚫";
       title = "Camera is blocked";
       body = (
         <>
@@ -131,6 +139,8 @@ export default function CameraHelp({
       actions = openBrowser;
       break;
     case "data":
+      mood = "sad";
+      badge = "📶";
       title = "Couldn't load the posters";
       body = <p>{problem.message ?? "Check your internet connection."}</p>;
       actions = (
@@ -150,10 +160,8 @@ export default function CameraHelp({
   }
 
   return (
-    <section className="camera-help" role="alert" data-problem={problem.kind}>
-      <h2>{title}</h2>
-      {body}
-      <div className="stack">{actions}</div>
-    </section>
+    <EmptyState className="camera-help" role="alert" data-problem={problem.kind} mood={mood} badge={badge} title={title} actions={actions}>
+      <div className="empty-body">{body}</div>
+    </EmptyState>
   );
 }

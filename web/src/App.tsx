@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Loading, PublicOnly, RequireProfile, RequireRole, SetupOnly } from "./components/Guards";
 import NavLayout from "./components/NavLayout";
+import OfflineBanner from "./components/OfflineBanner";
 import { AuthProvider } from "./lib/auth";
 import Home from "./screens/Home";
 import Login from "./screens/Login";
@@ -51,6 +52,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </Suspense>
+      <OfflineBanner />
       <div className="rotate-notice">
         <p>Please turn your phone upright 📱</p>
       </div>

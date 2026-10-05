@@ -16,25 +16,17 @@ export default function RaidBanner({ raids, offsetMs }: { raids: Raid[]; offsetM
         🦉
       </span>
       <span className="raid-text">
-        {live ? (
-          <>
-            <strong>
-              {BRAND.raidName} live at poster {raid.posterIndex + 1}!
-            </strong>
-            <span className="small">
-              Ends in <span data-countdown>{mmss(raid.endAt - now)}</span> · {raid.unlocked ? "unlocked — go!" : "scan the poster to join"}
-            </span>
-          </>
-        ) : (
-          <>
-            <strong>
-              {BRAND.raidName} at poster {raid.posterIndex + 1}
-            </strong>
-            <span className="small">
-              Starts in <span data-countdown>{mmss(raid.startAt - now)}</span>
-            </span>
-          </>
-        )}
+        <span className="raid-kicker">{live ? "Live now" : "Coming up"}</span>
+        <strong>
+          {`${BRAND.raidName}${live ? " live" : ""} at poster ${raid.posterIndex + 1}${live ? "!" : ""}`}
+        </strong>
+        <span className="small">
+          {live ? (raid.unlocked ? "Unlocked — go!" : "Scan the poster to join") : "Get there with your friends"}
+        </span>
+      </span>
+      <span className="raid-clock">
+        <span className="raid-clock-label">{live ? "Ends in" : "Starts in"}</span>
+        <span data-countdown>{mmss((live ? raid.endAt : raid.startAt) - now)}</span>
       </span>
     </Link>
   );

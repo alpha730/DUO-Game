@@ -37,7 +37,7 @@ const brandFiles = ["fonts", "logos", "mascots", "models"].flatMap((d) =>
 async function brandHtml(preconnect: string[]): Promise<Plugin> {
   (globalThis as { __BRAND_FILES__?: string[] }).__BRAND_FILES__ = brandFiles;
   const { BRAND } = await import("./src/config/brand");
-  const { brandCss } = await import("./src/config/applyBrand");
+  const { brandCss, themeColorMetas } = await import("./src/config/applyBrand");
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
   return {
     name: "brand-html",
@@ -52,8 +52,10 @@ async function brandHtml(preconnect: string[]): Promise<Plugin> {
             [
               `<title>${esc(BRAND.appName)}</title>`,
               `<link rel="icon" href="${esc(BRAND.logo.mark)}" />`,
-              `<meta name="theme-color" content="${esc(BRAND.colors.themeColor)}" />`,
+              ...themeColorMetas(BRAND).map((m) => `<meta name="theme-color" media="${m.media}" content="${esc(m.content)}" />`),
               `<style id="brand-vars">${brandCss(BRAND)}</style>`,
+              // The rounded display font starts downloading with the HTML (no wait for the CSS).
+              ...BRAND.fontFiles.map((f) => `<link rel="preload" href="${esc(f.src)}" as="font" type="font/woff2" crossorigin />`),
               // TLS to Firebase starts while the JS downloads (several round trips saved on 3G).
               ...preconnect.map((h) => `<link rel="preconnect" href="${h}" crossorigin />`),
             ].join("\n    "),
@@ -61,7 +63,7 @@ async function brandHtml(preconnect: string[]): Promise<Plugin> {
           .replace(
             '<div id="root"></div>',
             // Painted straight from the HTML (before any JS); React replaces it when it mounts.
-            `<div id="root"><div class="boot" style="min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:var(--bg);color:var(--text);font-family:var(--font-family)"><img src="${esc(BRAND.logo.full)}" alt="" width="72" height="72" /><strong style="font-size:1.6rem">${esc(BRAND.appName)}</strong><span style="opacity:.7">${esc(BRAND.campaignName)}</span></div></div>`,
+            `<div id="root"><div class="boot" style="min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:var(--bg);color:var(--text);font-family:var(--font-family)"><img src="${esc(BRAND.logo.full)}" alt="" width="72" height="72" /><strong style="font-size:1.8rem;font-family:var(--font-display);font-weight:800">${esc(BRAND.appName)}</strong><span style="color:var(--muted)">${esc(BRAND.campaignName)}</span></div></div>`,
           ),
     },
   };

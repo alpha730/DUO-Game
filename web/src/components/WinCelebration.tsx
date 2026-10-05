@@ -23,7 +23,7 @@ function useCountUp(value: number) {
   return shown;
 }
 
-const CONFETTI = BRAND.colors.confetti;
+const CONFETTI = BRAND.themes.light.confetti;
 
 /** PLAN 4.7: "+100" pop, breakdown, level-up / MAX / all-10 celebrations. */
 export default function WinCelebration({

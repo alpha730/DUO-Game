@@ -29,7 +29,7 @@ function loadImage(src: string): Promise<HTMLImageElement | null> {
  * all come from brand.ts (CLAUDE.md rule 8); only same-origin images, so the canvas can be exported.
  */
 export async function drawShareCard(canvas: HTMLCanvasElement, s: ShareStats): Promise<void> {
-  const c = BRAND.colors;
+  const c = BRAND.themes.dark; // the shared image always uses the dark look
   const font = BRAND.fontFamily;
   canvas.width = SHARE_W;
   canvas.height = SHARE_H;

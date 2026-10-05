@@ -23,6 +23,7 @@ import type {
   SubmitAttemptOutput,
 } from "@shared/types";
 import { functions } from "./firebase";
+import { publishMyState } from "./myState";
 
 // The SDK default is 70 s; on bad campus Wi-Fi we'd rather fail fast and show "Try again".
 const DEFAULT_TIMEOUT_MS = 15_000;
@@ -37,7 +38,12 @@ const call =
 // DECISION: startAttempt waits for this app's in-flight getMyState calls first (a received
 // response means the server has already done its auto-forfeit).
 const inflightState = new Set<Promise<unknown>>();
-const getMyState = call<GetMyStateInput, GetMyStateOutput>("getMyState");
+const fetchMyState = call<GetMyStateInput, GetMyStateOutput>("getMyState");
+const getMyState = (data: GetMyStateInput) =>
+  fetchMyState(data).then((s) => {
+    publishMyState(s); // HUD + other screens see the newest numbers
+    return s;
+  });
 const startAttempt = call<StartAttemptInput, StartAttemptOutput>("startAttempt");
 
 // Day 8 (slow networks): getMyState is started as soon as a signed-in session is restored, in

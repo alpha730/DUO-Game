@@ -11,6 +11,8 @@ item on **only when its file exists** — otherwise it keeps the placeholder and
 | Square mark | `logos/mark.svg` | Favicon / browser tab |
 | Welcome mascot | `mascots/hero.png` | Login screen (above the logo) |
 | Celebrate mascot | `mascots/celebrate.png` | Win screen |
+| "Oops" mascot | `mascots/oops.png` | Error states (offline, off campus, camera blocked, in-app browser) |
+| Lingo art (one per character) | `mascots/lingo-2016.png` … `mascots/lingo-2025.png` (poster order) | Dex cards, Dex detail, Catch screen |
 | Brand font | `fonts/brand-regular.woff2`, `fonts/brand-bold.woff2` | All text (`@font-face` "BrandFont") |
 | Colours, campaign name, Lingo names | `guidelines/` (PDF / notes) | Typed into `OFFICIAL` in brand.ts by hand |
 

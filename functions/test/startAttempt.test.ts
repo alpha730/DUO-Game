@@ -49,7 +49,7 @@ describe("startAttempt", () => {
 
     await start(p, LINGO.question);
     await start(p, LINGO.pronounce);
-    await expect(start(p, LINGO.speak)).rejects.toMatchObject({ details: { code: "no-attempts" } });
+    await expect(start(p, "lingo-2020")).rejects.toMatchObject({ details: { code: "no-attempts" } }); // 5th different Lingo
     user = (await adb.doc(`users/${p.uid}`).get()).data()!;
     expect(user.attemptsToday).toBe(4);
     // Only one attempt is ever open.
@@ -64,7 +64,7 @@ describe("startAttempt", () => {
     await submit({ attemptId: (await start(p, LINGO.question)).attemptId, choice: 3 }); // failed
     await start(p, LINGO.speak); // left open…
     await start(p, LINGO.pronounce); // …forfeited by this start; this one is open (4th)
-    const err = await start(p, LINGO.question).catch((e) => e);
+    const err = await start(p, "lingo-2020").catch((e) => e); // a 5th different Lingo
     expect(err).toMatchObject({ details: { code: "no-attempts" } });
     const u = (await adb.doc(`users/${p.uid}`).get()).data()!;
     expect(u).toMatchObject({ attemptsToday: 4, attemptsDate: istToday(), wins: 1, losses: 2 });
@@ -78,13 +78,11 @@ describe("startAttempt", () => {
     expect(out.attemptsLeft).toBe(3);
   });
 
-  it("refuses a Lingo already caught today, but allows retrying one that was only failed", async () => {
+  it("refuses a Lingo already tried today; tries from an earlier day don't count", async () => {
     const p = await newPlayer();
-    await adb.doc(`users/${p.uid}/catches/${LINGO.meaning}`).set({
-      firstCaughtAt: Timestamp.now(), timesCaught: 1, lastCaughtDate: istToday(), level: 1, favStreak: 0, maxBonusGiven: false,
-    });
-    await expect(start(p, LINGO.meaning)).rejects.toMatchObject({ details: { code: "already-caught" } });
-    await adb.doc(`users/${p.uid}/catches/${LINGO.meaning}`).update({ lastCaughtDate: "2026-01-01" });
+    await adb.doc(`users/${p.uid}`).update({ triedToday: [LINGO.meaning], triedDate: istToday() });
+    await expect(start(p, LINGO.meaning)).rejects.toMatchObject({ details: { code: "already-tried" } });
+    await adb.doc(`users/${p.uid}`).update({ triedDate: "2026-01-01" });
     await expect(start(p, LINGO.meaning)).resolves.toMatchObject({ type: "meaning" });
   });
 

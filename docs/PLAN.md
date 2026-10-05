@@ -48,7 +48,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 | 2.1 | Install `mind-ar` + `three`; `Scan` screen lazy-loaded | Bundle for other screens unaffected |
 | 2.2 | Start MindAR image tracking with `/assets/targets.mind` (10 targets) | Camera opens on Android + iPhone |
 | 2.3 | Load `lingos` once; on `targetFound(i)` show matching `.glb` with idle animation; hide on `targetLost` | Pointing at poster 3 shows Lingo 3 |
-| 2.4 | Overlay: Lingo name + "Catch it" (→ `/catch/:lingoId`), or "Caught today ✓" / "No attempts left today" (from `getMyState`) | Correct button shows |
+| 2.4 | Overlay: Lingo name + "Catch it" (→ `/catch/:lingoId`), or "Tried today ✓/✗" / "You've tried 4 Lingos today" (from `getMyState`) | Correct button shows |
 | 2.5 | `getMyState` function (auto-forfeits open attempts) | Returns user + catches + serverNow |
 | 2.6 | Clean-up: stop camera + dispose scene on leave | No camera light after leaving |
 | 2.7 | Camera permission denied / in-app browser → helpful message | Tested inside Instagram browser |
@@ -65,7 +65,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 | 3.6 | Pronounce + speak UI: SpeechRecognition `en-IN`, interim transcript shown, stop on final result → submit | Saying the word / sentence wins |
 | 3.7 | Meaning + question UI: word or question prompt + 4 big buttons → submit | Right option wins, wrong fails |
 | 3.8 | One-chance: `visibilitychange`(hidden) + `pagehide` → `fetch(keepalive)` forfeit with cached token → "Chance lost" | Switching tab mid-attempt forfeits; reload shows attempt forfeited |
-| 3.9 | Result screen: won / failed (missed words) / forfeit; attempts left today (x/4) | All 3 states shown |
+| 3.9 | Result screen: won / failed (missed words) / forfeit; Lingos left today (x/4) | All 3 states shown |
 | 3.10 | Browser without SpeechRecognition → client sends `speech: false` with `startAttempt`; a pronounce/speak challenge is refused server-side with "Open in Chrome or Safari for this Lingo" (no attempt used, content never revealed); meaning/question work normally (SPEC §3.8) | Firefox: voice Lingo shows the message, attempts unchanged; meaning Lingo playable |
 
 ## Day 4 — Points, favourites, Lingo streaks + levels, Home (Oct 4)
@@ -76,7 +76,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 | 4.3 | `attemptsToday` resets when `attemptsDate` ≠ today; limit 4; raid attempts skip it | 5th attempt rejected |
 | 4.4 | `setFavorites` (exactly 2, both caught; 1 change allowed; changed favourite streak → 0) + tests | Second change rejected |
 | 4.5 | `/favorites` picker: opens after the 2nd catch (`needsFavorites`), also from Me if a change is left | Can pick 2 favourites |
-| 4.6 | Home: 2 favourite cards (level, 🔥 "Day 6/10", caught today ✓), 10-slot grid with level badges, points, "Attempts left 3/4", Scan button | Updates after a catch |
+| 4.6 | Home: 2 favourite cards (level, 🔥 "Day 6/10", caught today ✓), 10-slot grid with level badges, points, "Lingos left today: 3/4", Scan button | Updates after a catch |
 | 4.7 | Win animation + "+100" pop + level-up / MAX / all-10 celebrations | Looks good on phone |
 
 ## Day 5 — Leaderboards + Me (Oct 5)
@@ -110,7 +110,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 - [ ] Models load < 5 s; scan works in daylight and indoor light
 - [ ] Cheating tests: switch tab mid-attempt, reload, kill app, change phone clock, call functions from console with fake data, submit after timer, two tabs at once, fake location
 - [ ] Unverified email can't finish Setup
-- [ ] 4-attempt limit (fail + forfeit count, raids don't); same Lingo can't be caught twice a day
+- [ ] 4 different Lingos a day, ONE try per Lingo (won, failed and forfeit all close it; raids don't count); next IST day it's open again
 - [ ] Favourite streaks across midnight IST; missed day resets streak but keeps level; MAX at day 10
 - [ ] Favourite change allowed once only; all-10 bonus given once
 - [ ] Leaderboard updates within 10 min

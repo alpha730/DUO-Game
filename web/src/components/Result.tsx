@@ -12,7 +12,6 @@ export default function Result({
   heard,
   attemptsLeft,
   attemptsPerDay,
-  onRetry,
   prevLevel = null,
   raid = false,
 }: {
@@ -23,7 +22,6 @@ export default function Result({
   heard?: string;
   attemptsLeft: number | null;
   attemptsPerDay: number | null;
-  onRetry: () => void;
   /** Level of this Lingo before the attempt (null if never caught). */
   prevLevel?: Level | null;
   /** An Owl Raid try: one only, so no retry and no daily-attempts line. */
@@ -83,7 +81,7 @@ export default function Result({
       title = "Chance lost";
       body = (
         <p className="muted">
-          You left the app during the challenge, so this {raid ? "raid try" : "attempt"} is gone. One chance only!
+          You left the app during the challenge, so this {raid ? "raid try" : "try"} is gone. One chance only!
         </p>
       );
       break;
@@ -99,7 +97,6 @@ export default function Result({
       break;
   }
 
-  const canRetry = !raid && outcome.kind !== "won" && outcome.kind !== "error" && left > 0;
   return (
     <section className="card stack result" data-outcome={outcome.kind}>
       <div className="result-icon" aria-hidden="true">
@@ -109,15 +106,16 @@ export default function Result({
       {body}
       {attemptsLeft !== null && attemptsPerDay !== null && (
         <p className="attempts-left" data-left={attemptsLeft}>
-          Attempts left today: <strong>{attemptsLeft}/{attemptsPerDay}</strong>
+          Lingos left today: <strong>{attemptsLeft}/{attemptsPerDay}</strong>
         </p>
       )}
-      {canRetry && (
-        <button className="btn" onClick={onRetry}>
-          Try this {BRAND.creatureName} again
-        </button>
+      {!raid && outcome.kind !== "won" && outcome.kind !== "error" && (
+        // SPEC §2: one try per Lingo per day — won, failed or forfeit, this one is closed until tomorrow.
+        <p className="small muted" style={{ margin: 0, textAlign: "center" }} data-closed-today>
+          {lingoName} is closed for today — {left > 0 ? "try another poster" : "come back tomorrow"}.
+        </p>
       )}
-      <Link className={canRetry ? "btn secondary" : "btn"} to="/scan">
+      <Link className="btn" to="/scan">
         Scan another poster
       </Link>
       <Link className="btn link" to="/home">

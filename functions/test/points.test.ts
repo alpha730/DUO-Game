@@ -38,7 +38,7 @@ describe("submitAttempt points (PLAN 4.2)", () => {
   it("a caught Lingo can't be started again today; a 2nd Lingo asks for favourites", async () => {
     const p = await newPlayer();
     await submit(p, { attemptId: (await start(p, MEANING)).attemptId, choice: 0 });
-    await expect(start(p, MEANING)).rejects.toMatchObject({ details: { code: "already-caught" } });
+    await expect(start(p, MEANING)).rejects.toMatchObject({ details: { code: "already-tried" } });
     const second = await submit(p, { attemptId: (await start(p, QUESTION)).attemptId, choice: 0 });
     expect(second.needsFavorites).toBe(true);
     expect((await user(p)).lingosCaught).toBe(2);

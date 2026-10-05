@@ -41,7 +41,7 @@ export default function ScanOverlay({
           </div>
         </div>
         {server === "ok" && attemptsLeft !== null && attemptsPerDay !== null && (
-          <span className="small muted" title="Attempts left today">
+          <span className="small muted" title="Lingos left today">
             {attemptsLeft}/{attemptsPerDay}
           </span>
         )}
@@ -81,13 +81,15 @@ export default function ScanOverlay({
 
       {server === "ok" && status.kind === "caughtToday" && (
         <p className="done">
-          Caught today ✓ — come back tomorrow
+          Tried today ✓ — come back tomorrow
           {streak > 0 && <span className="streak"> · 🔥 Day {streak}</span>}
         </p>
       )}
 
+      {server === "ok" && status.kind === "triedToday" && <p className="done">Tried today ✗ — back tomorrow</p>}
+
       {server === "ok" && status.kind === "noAttempts" && (
-        <p className="done">No attempts left today — come back tomorrow</p>
+        <p className="done">You've tried {attemptsPerDay ?? 4} Lingos today — come back tomorrow</p>
       )}
     </section>
   );

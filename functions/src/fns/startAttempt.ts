@@ -7,8 +7,8 @@ import {
   raidChallengeId,
   timerSeconds,
   type AttemptDoc,
-  type CatchDoc,
   type ChallengeDoc,
+  type LingoDoc,
   type RaidDoc,
   type RaidPlayerDoc,
   type StartAttemptOutput,
@@ -18,11 +18,11 @@ import { serverNow } from "../lib/clock";
 import { forfeitTx, readOpenAttemptTx } from "../lib/attempts";
 import { publicChallenge } from "../lib/challenge";
 import { istDate } from "../lib/date";
-import { catchRef, db, userRef } from "../lib/db";
+import { db, userRef } from "../lib/db";
 import { campusCheck, isEmulator, isValidLatLng } from "../lib/geo";
 import { requirePlayer } from "../lib/guards";
 import { raidPhase } from "../lib/raids";
-import { attemptsUsedToday } from "../lib/state";
+import { attemptsUsedToday, triedToday } from "../lib/state";
 
 const fail = (code: string, message: string): never => {
   throw new HttpsError("failed-precondition", message, { code });
@@ -59,20 +59,19 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
     .get();
   const result = await db().runTransaction(async (tx) => {
     // All reads first (Firestore transactions require it). Only this player's own documents.
-    const [userSnap, catchSnap, raidSnap, playerSnap] = await Promise.all([
+    const [userSnap, raidSnap, playerSnap] = await Promise.all([
       tx.get(userRef(uid)),
-      tx.get(catchRef(uid, lingoId)),
       raidRef ? tx.get(raidRef) : null,
       raidRef ? tx.get(raidRef.collection(COL.players).doc(uid)) : null,
     ]);
     const user = userSnap.data() as UserDoc;
     const open = await readOpenAttemptTx(tx, user);
-    const caught = catchSnap.data() as CatchDoc | undefined;
     const used = attemptsUsedToday(user, today);
+    const tried = triedToday(user, today);
 
     if (raidRef) {
       // Owl Raid (SPEC §2, §5): joined players only, once unlocked and before endAt, exactly one try
-      // each. Outside the daily 4 and the once-a-day catch rule.
+      // each. Outside the daily 4 and the one-try-per-Lingo rule.
       const raid = raidSnap!.data() as RaidDoc | undefined;
       if (!raid || raid.lingoId !== lingoId) throw new HttpsError("not-found", "Unknown raid.");
       const player = playerSnap!.data() as RaidPlayerDoc | undefined;
@@ -81,8 +80,13 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
       if (raidPhase(raid, now) !== "active") fail("raid-ended", "This raid is over.");
       if (!raid.unlocked) fail("raid-locked", "The raid isn't unlocked yet — it needs more players.");
     } else {
-      if (caught?.lastCaughtDate === today) fail("already-caught", "You already caught this Lingo today. Come back tomorrow!");
-      if (used >= rules.attemptsPerDay) fail("no-attempts", "No attempts left today. Come back tomorrow!");
+      // SPEC §2: ONE try per Lingo per IST day (won, failed or forfeit all close it), 4 different
+      // Lingos a day. Checked on the user doc alone — no query on attempts in the transaction.
+      const name = (lingoSnap.data() as LingoDoc).name;
+      if (tried.includes(lingoId)) fail("already-tried", `You've already tried ${name} today — come back tomorrow`);
+      if (used >= rules.attemptsPerDay || tried.length >= rules.attemptsPerDay) {
+        fail("no-attempts", `You've tried ${rules.attemptsPerDay} Lingos today — come back tomorrow`);
+      }
     }
     if (!challengeSnap.exists) fail("no-challenge", raidRef ? "This raid has no challenge." : "This Lingo has no challenge today.");
     // No speech recognition in this browser + a voice challenge: refuse BEFORE any write, so no
@@ -114,7 +118,8 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
       tx.update(raidRef.collection(COL.players).doc(uid), { attemptId: attemptRef.id });
       return { challenge, expiresAt, attemptsLeft: Math.max(0, rules.attemptsPerDay - used), closed };
     }
-    tx.update(userRef(uid), { attemptsToday: used + 1, attemptsDate: today });
+    // The try is used the moment Start succeeds (a forfeit closes the Lingo too).
+    tx.update(userRef(uid), { attemptsToday: used + 1, attemptsDate: today, triedToday: [...tried, lingoId], triedDate: today });
 
     return { challenge, expiresAt, attemptsLeft: rules.attemptsPerDay - used - 1, closed };
   });

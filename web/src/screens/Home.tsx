@@ -96,7 +96,7 @@ export default function Home() {
 
       {me && (
         <p className="attempts-pill" data-left={me.attemptsLeft}>
-          Attempts left today: <strong>{me.attemptsLeft}/{me.attemptsPerDay}</strong>
+          Lingos left today: <strong>{me.attemptsLeft}/{me.attemptsPerDay}</strong>
         </p>
       )}
 

@@ -76,8 +76,8 @@ export default function Catch() {
   const [position, setPosition] = useState<Position | null>(null);
   const [error, setError] = useState("");
   const [needsSpeech, setNeedsSpeech] = useState(false);
-  // The raid refused this player for good (already tried, over, not joined): no Start button.
-  const [raidClosed, setRaidClosed] = useState(false);
+  // Refused for good today (Lingo already tried / 4 Lingos tried / raid over…): no Start button.
+  const [closed, setClosed] = useState(false);
   const [challenge, setChallenge] = useState<StartAttemptOutput | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(reloaded ? { kind: "forfeit" } : null);
   const token = useRef<string | null>(null);
@@ -165,8 +165,9 @@ export default function Catch() {
     } catch (err) {
       const code = (err as { details?: { code?: string } }).details?.code;
       setNeedsSpeech(code === "needs-speech");
-      setRaidClosed(code === "raid-tried" || code === "raid-ended" || code === "not-joined");
-      setError(apiErrorMessage(err));
+      setClosed(["raid-tried", "raid-ended", "not-joined", "already-tried", "no-attempts"].includes(code ?? ""));
+      // The server names the Lingo by its id-level name; show the brand's display name instead.
+      setError(code === "already-tried" ? `You've already tried ${name} today — come back tomorrow` : apiErrorMessage(err));
       setPhase("ready");
     }
   }
@@ -196,16 +197,6 @@ export default function Catch() {
     [challenge],
   );
 
-  function retry() {
-    setChallenge(null);
-    setOutcome(null);
-    lastAnswer.current = {};
-    submitted.current = false;
-    activeAttempt.clear();
-    api.getMyState({}).then(setMe, () => {});
-    if (mic === "ok" && loc === "ok") setPhase("ready");
-    else void runPreflight();
-  }
 
   const name = lingo ? lingoName(lingo) : `this ${BRAND.creatureName}`;
 
@@ -222,7 +213,7 @@ export default function Catch() {
           )}
           {!raidId && me && attemptsLeft !== null && (phase === "preflight" || phase === "ready" || phase === "starting") && (
             <p className="small muted" style={{ margin: 0 }}>
-              Attempts left today: {attemptsLeft}/{me.attemptsPerDay}
+              Lingos left today: {attemptsLeft}/{me.attemptsPerDay}
             </p>
           )}
         </div>
@@ -237,7 +228,7 @@ export default function Catch() {
             </p>
           )}
           {needsSpeech && <OpenInBrowser />}
-          {phase !== "preflight" && !needsSpeech && !raidClosed && (
+          {phase !== "preflight" && !needsSpeech && !closed && (
             <button className="btn" onClick={start} disabled={phase === "starting"}>
               {phase === "starting" ? "Starting…" : "Start"}
             </button>
@@ -266,7 +257,6 @@ export default function Catch() {
           attemptsLeft={raidId ? null : attemptsLeft}
           attemptsPerDay={me?.attemptsPerDay ?? null}
           raid={!!raidId}
-          onRetry={retry}
           prevLevel={me?.catches.find((x) => x.lingoId === lingoId && x.timesCaught > 0)?.level ?? null}
         />
       )}

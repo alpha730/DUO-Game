@@ -9,8 +9,8 @@
   - **meaning** — pick the correct meaning of a word from 4 options (15 s)
   - **question** — answer an English question from 4 options: fill in the blank, pick the correct sentence, synonym/antonym, simple grammar (20 s)
 - **Difficulty: medium** (about CEFR B1–B2): not school-basic, not exam-hard. No trick questions.
-- Win → points. Fail / forfeit → no points, uses up one of the day's 4 attempts.
-- **4 attempts per day**, on any Lingos. A Lingo can be caught at most once per day.
+- Win → points. Fail / forfeit → no points. Either way that Lingo is done for the day.
+- **4 different Lingos per day, one try each.** Tapping Start uses that Lingo for the rest of the IST day, whatever the result (won, failed or forfeit), and uses 1 of the 4.
 - Each student picks **2 favourite Lingos**. Only favourites build a streak; a 10-day streak turns a favourite into its **MAX** form.
 - Non-favourites level up by total catches, so everyone can collect all 10 (2 favourites + 2 others per day).
 - **One-chance rule:** leaving the app during a challenge (close, tab switch, lock screen, call) forfeits it.
@@ -19,8 +19,8 @@
 ## 2. Game rules & numbers (all stored in `config/game`, editable by admin)
 | Rule | Value |
 |---|---|
-| Attempts per day (per user) | **4** (won, failed and forfeited all count; raid attempts do NOT count) |
-| Same Lingo per day | max 1 **catch** (win). A failed attempt may be retried on the same Lingo with another of the 4 |
+| Lingos per day (per user) | **4 different Lingos** (won, failed and forfeited all count; raid tries do NOT count) |
+| Same Lingo per day | **one try** (won, failed or forfeit) — that Lingo is closed for the rest of the IST day. Only a successful Start uses it: scanning, an off-campus refusal, denied mic/location or "needs your voice" don't |
 | Favourites | **2** per user |
 | Favourite changes | 1 allowed for the whole game; the replaced and the new favourite start at streak 0 |
 | pronounce timer | 15 s |
@@ -41,7 +41,7 @@
 | All 10 Lingos collected | +1,000 bonus (once) |
 | Owl Raid catch | **+150 + speed bonus, instead of** the normal catch points (never +100 / +20 / favourite points); outside the daily 4 (see **Owl Raids** below) |
 | **Speed bonus** (every correct answer, incl. raids) | +1 per full second left on the server timer: `floor((expiresAt − receivedAt)/1000)`, clamped 0…timer length |
-| Wrong / failed / forfeited attempt | 0 points (and it uses one of the 4 attempts) |
+| Wrong / failed / forfeited try | 0 points (and that Lingo is used for the day — 1 of the 4) |
 | Logging in, opening the app, days played | 0 points |
 | Location check | must be within `campusRadiusM` of campus centre (on the **emulators only** an off-campus player is let through with a logged warning, for testing from home; never skipped in production) |
 
@@ -85,7 +85,7 @@ The same order picks the top 20 for the final round. The live final round on Oct
 ## 4. Data model (Firestore)
 | Path | Fields | Client read |
 |---|---|---|
-| `users/{uid}` | name, email, points, openAttemptId? (the one open attempt; no queries on `attempts` in transactions), flags? (too-fast answers), suspect? (≥ 10 wins, ≥ 95 % accuracy, avg < 3 s), attemptsToday, attemptsDate, dayStreak, lastPlayDate, lingosCaught (number), allTenBonus (bool), favorites (lingoId[] max 2), favoriteChangesLeft (1), wins, losses, totalAnswerMs, pointsReachedAt, profileDone, createdAt | owner only |
+| `users/{uid}` | name, email, points, triedToday (lingoId[]) + triedDate (one try per Lingo per day), openAttemptId? (the one open attempt; no queries on `attempts` in transactions), flags? (too-fast answers), suspect? (≥ 10 wins, ≥ 95 % accuracy, avg < 3 s), attemptsToday, attemptsDate, dayStreak, lastPlayDate, lingosCaught (number), allTenBonus (bool), favorites (lingoId[] max 2), favoriteChangesLeft (1), wins, losses, totalAnswerMs, pointsReachedAt, profileDone, createdAt | owner only |
 | `users/{uid}/catches/{lingoId}` | firstCaughtAt, timesCaught, lastCaughtDate, level (1\|2\|3\|'MAX'), favStreak, maxBonusGiven (bool) | owner only |
 | `lingos/{lingoId}` | name, detYear, posterIndex (0–9), modelUrl, rarity, color | signed-in |
 | `config/game` | startAt, lockAt, locked, campusLat, campusLng, campusRadiusM, rules (table above) | signed-in |
@@ -110,7 +110,7 @@ All callable (`onCall`) unless noted. Every one runs the checks in CLAUDE.md rul
 |---|---|---|---|
 | `completeProfile` | name | Require verified email; name 2–40 chars, trimmed; fail if profile already done; create user with defaults (email from the auth token) | `{ok}` |
 | `getMyState` | – | Auto-forfeit open attempts; return user, catches, today's tries | `{user, catches, serverNow}` |
-| `startAttempt` | lingoId, lat, lng, raidId?, speech? | Game open; on campus; no open attempt; Lingo not already caught today; attemptsToday < 4 (reset when attemptsDate ≠ today); load `challenges/{today}_{lingoId}`. **With raidId:** raid's Lingo = lingoId; player joined; no try used yet; `unlocked` and `now < endAt`; load `challenges/raid_{raidId}`; skip the caught-today and daily-4 checks; record the try on the player doc; don't touch attemptsToday; if `speech === false` and the type is pronounce/speak → refuse (no attempt used, §3.8); create attempt; increment attemptsToday | `{attemptId, type, word?, phrase?, prompt?, options?, expiresAt, serverNow, attemptsLeft}` (never `accept` or `correctIndex`) |
+| `startAttempt` | lingoId, lat, lng, raidId?, speech? | Game open; on campus; no open attempt; Lingo not already TRIED today (`triedToday`, single user-doc check → "You've already tried <Lingo> today — come back tomorrow"); fewer than 4 Lingos tried today (reset when the date ≠ today; → "You've tried 4 Lingos today — come back tomorrow"); add the Lingo to `triedToday`; load `challenges/{today}_{lingoId}`. **With raidId:** raid's Lingo = lingoId; player joined; no try used yet; `unlocked` and `now < endAt`; load `challenges/raid_{raidId}`; skip the caught-today and daily-4 checks; record the try on the player doc; don't touch attemptsToday; if `speech === false` and the type is pronounce/speak → refuse (no attempt used, §3.8); create attempt; increment attemptsToday | `{attemptId, type, word?, phrase?, prompt?, options?, expiresAt, serverNow, attemptsLeft}` (never `accept` or `correctIndex`) |
 | `submitAttempt` | attemptId, transcript? , choice? | Owner + open + in time; score (pronounce: word or accept[] in transcript; speak: word match ≥ 80%; meaning/question: choice == correctIndex); on win → one transaction: catch doc (timesCaught, favStreak, level), points per §2 incl. speed bonus, MAX + all-10 bonuses, wins++, totalAnswerMs += answerMs, pointsReachedAt = now, dayStreak, pointsLog; on fail → losses++ (forfeits also do losses++). **Raid attempt** (challenge `raid_{raidId}`): win = raidCatchPoints + speed (+ all-10) per §2 Owl Raids, no favourite/day-streak/caught-today changes | `{result:'won'\|'failed', pointsAdded, speedBonus, bonuses[], newLevel, favStreak?, newTotal, missedWords?, needsFavorites, raid?}` |
 | `setFavorites` | lingoIds (exactly 2, both already caught) | First time: save. Later: only if favoriteChangesLeft > 0; decrement; new favourite starts favStreak 0 | `{favorites, favoriteChangesLeft}` |
 | `forfeitAttempt` | **HTTP `onRequest`**, header `Authorization: Bearer <idToken>`, body `{attemptId}` | Verify token; if owner + open → `forfeit` and the user's losses++ (same when an expired or auto-forfeited attempt is closed) | 204 |
@@ -139,7 +139,7 @@ Roles = custom claims `{role:'admin'|'volunteer'}` set by `scripts/setRole.ts`.
 |---|---|---|
 | `/` | Login | Google button, email/password form, sign-up toggle |
 | `/setup` | Profile | name only (email shown read-only) → `completeProfile`; email/password users see "Verify your email" first |
-| `/home` | Collection | top: 2 favourite cards (Lingo, level, 🔥 streak "Day 6/10", "caught today ✓/not yet"); 10-slot grid (caught = colour + level badge, not caught = silhouette); points, "Attempts left today: 3/4", "Scan" button, raid banner if active |
+| `/home` | Collection | top: 2 favourite cards (Lingo, level, 🔥 streak "Day 6/10", "caught today ✓/not yet"); 10-slot grid (caught = colour + level badge, not caught = silhouette); points, "Lingos left today: 3/4", "Scan" button, raid banner if active |
 | `/favorites` | Pick favourites | shown after the first 2 catches (and from Me, if a change is left); choose 2 of caught Lingos → `setFavorites`; warns that changing resets the streak |
 | `/scan` | AR | camera + MindAR (`/assets/targets.mind`, 10 targets); target found → show that Lingo's model + "Catch it" |
 | `/catch/:lingoId` | Challenge | pre-flight (mic + location) → Start → timer → pronounce / speak (mic + live transcript) or meaning / question (prompt + 4 buttons) → result |
@@ -154,7 +154,7 @@ Bottom nav on Home / Scan / Leaderboard / Me. Large tap targets. Works in portra
 ## 8. AR details
 - Build `targets.mind` from the 10 poster images with the MindAR compiler; target index = `posterIndex`.
 - On `targetFound(i)` → load `lingos` where posterIndex == i → show its `.glb` with a gentle idle bob; show "Catch it".
-- If the user already caught this Lingo today → "Caught today ✓ — come back tomorrow"; if 0 attempts left today → "No attempts left today". Otherwise "Catch it" (favourites also show their streak, e.g. "🔥 Day 4 — keep it going").
+- If the user already tried this Lingo today → "Tried today ✓" (caught) or "Tried today ✗ — back tomorrow" (failed/forfeit); if 4 Lingos tried today → "You've tried 4 Lingos today — come back tomorrow". Otherwise "Catch it" (favourites also show their streak, e.g. "🔥 Day 4 — keep it going").
 - Stop camera + dispose three.js scene when leaving `/scan`.
 - iOS Safari and Android Chrome both supported; show "Open in Chrome/Safari" if inside an in-app browser (Instagram/WhatsApp) that blocks camera.
 - targets.mind ships gzipped (`targets.mind.gz`, unpacked in the browser; raw fallback) and, with the .glb models, is kept in Cache Storage after the first download (`web/src/lib/assetCache.ts`). Only `?v=<hash>` URLs are cached; a new hash downloads once and replaces the old version.

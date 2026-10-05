@@ -72,6 +72,12 @@ export interface UserDoc {
   suspect?: boolean;
   /** The user's one open attempt (set by startAttempt, cleared when it ends); avoids querying attempts. */
   openAttemptId?: string | null;
+  /**
+   * Lingos tried on `triedDate` (SPEC §2: one try per Lingo per IST day, 4 different Lingos; won,
+   * failed and forfeit all count). Treat as [] when triedDate ≠ today. Raids are not listed here.
+   */
+  triedToday?: string[];
+  triedDate?: IstDate | null;
   /** Non-raid attempts used on `attemptsDate`; treat as 0 when attemptsDate ≠ today. */
   attemptsToday: number;
   attemptsDate: IstDate | null;
@@ -125,8 +131,8 @@ export interface LingoDoc {
 
 /** Editable game numbers (SPEC §2), stored in config/game.rules */
 export interface GameRules {
-  attemptsPerDay: number; // 4 — won, failed, forfeited all count; raids don't
-  catchesPerLingoPerDay: number; // 1 — a failed attempt may be retried on the same Lingo
+  attemptsPerDay: number; // 4 different Lingos a day, one try each — won, failed, forfeited all count; raids don't
+  catchesPerLingoPerDay: number; // 1 — ONE try per Lingo per day (won, failed or forfeit all close it)
   favoritesCount: number; // 2
   favoriteChanges: number; // 1 for the whole game
   pronounceSeconds: number; // 15

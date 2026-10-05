@@ -280,6 +280,7 @@ export default function Catch() {
         <Result
           outcome={outcome}
           lingoName={name}
+          lingo={lingo}
           type={challenge?.type ?? null}
           heard={lastAnswer.current.transcript}
           attemptsLeft={raidId ? null : attemptsLeft}

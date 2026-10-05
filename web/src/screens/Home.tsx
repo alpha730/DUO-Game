@@ -6,6 +6,7 @@ import Hud from "../components/Hud";
 import { ScanIcon } from "../components/Icons";
 import LevelBadge from "../components/LevelBadge";
 import LingoArt from "../components/LingoArt";
+import LingoPips from "../components/LingoPips";
 import RaidBanner from "../components/RaidBanner";
 import { BRAND, lingoName } from "../config/brand";
 import { useAuth } from "../lib/auth";
@@ -20,23 +21,6 @@ const MAX_DAY = 10;
 function liveStreak(c: CatchView | undefined, today: string): number {
   if (!c?.lastCaughtDate) return 0;
   return c.lastCaughtDate === today || c.lastCaughtDate === dayBefore(today) ? c.favStreak : 0;
-}
-
-/** "Lingos left today" as 4 pips (filled = still available). */
-export function LingoPips({ left, total, className = "" }: { left: number; total: number; className?: string }) {
-  return (
-    <p className={`attempts-pill ${className}`} data-left={left}>
-      <span className="pips-label">Lingos left today: </span>
-      <span className="pips" aria-hidden="true">
-        {Array.from({ length: total }, (_, i) => (
-          <i key={i} data-on={i < left} />
-        ))}
-      </span>
-      <strong>
-        {left}/{total}
-      </strong>
-    </p>
-  );
 }
 
 function FavoriteCard({ lingo, c, me }: { lingo: Lingo; c: CatchView | undefined; me: GetMyStateOutput | null }) {

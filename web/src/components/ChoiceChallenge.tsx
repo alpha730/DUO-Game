@@ -3,7 +3,7 @@ import type { StartAttemptOutput } from "@shared/types";
 
 const LETTERS = ["A", "B", "C", "D"];
 
-/** meaning / question (PLAN 3.7): prompt + 4 big buttons; a tap submits. */
+/** meaning / question (PLAN 3.7): the Lingo asks in a speech bubble; 4 big 3D buttons, a tap submits. */
 export default function ChoiceChallenge({
   challenge,
   onChoose,
@@ -15,17 +15,17 @@ export default function ChoiceChallenge({
   const meaning = challenge.type === "meaning";
 
   return (
-    <div className="stack">
-      {meaning ? (
-        <>
-          <p className="small muted" style={{ margin: 0 }}>
-            What does this word mean?
-          </p>
-          <p className="say-word">{challenge.word}</p>
-        </>
-      ) : (
-        <p className="say-phrase">{challenge.prompt}</p>
-      )}
+    <div className="stack challenge">
+      <div className="bubble">
+        {meaning ? (
+          <>
+            <p className="bubble-ask">What does this word mean?</p>
+            <p className="say-word">{challenge.word}</p>
+          </>
+        ) : (
+          <p className="say-phrase">{challenge.prompt}</p>
+        )}
+      </div>
       <div className="choices" role="group" aria-label="Answers">
         {(challenge.options ?? []).map((opt, i) => (
           <button
@@ -41,7 +41,7 @@ export default function ChoiceChallenge({
             <span className="choice-letter" aria-hidden="true">
               {LETTERS[i]}
             </span>
-            {opt}
+            <span className="choice-text">{opt}</span>
           </button>
         ))}
       </div>

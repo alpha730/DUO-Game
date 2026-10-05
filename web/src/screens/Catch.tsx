@@ -16,9 +16,11 @@ import ChoiceChallenge from "../components/ChoiceChallenge";
 import { OpenInBrowser } from "../components/CameraHelp";
 import Preflight from "../components/Preflight";
 import Result from "../components/Result";
-import TimerBar from "../components/TimerBar";
+import LingoArt from "../components/LingoArt";
+import TimerRing from "../components/TimerRing";
 import VoiceChallenge from "../components/VoiceChallenge";
 import { api, apiErrorMessage } from "../lib/api";
+import { haptic, play } from "../lib/feedback";
 import { auth } from "../lib/firebase";
 import { loadLingos, type Lingo } from "../lib/lingos";
 
@@ -30,11 +32,28 @@ export type Outcome =
   | { kind: "forfeit" }
   | { kind: "error"; message: string };
 
-/** The running challenge: timer + (from 3.6/3.7) the answer UI. */
-function Active({ challenge, onSubmit }: { challenge: StartAttemptOutput; onSubmit: (a: Answer) => void }) {
+/** The running challenge, battle style: the Lingo in a countdown ring, its question, the answer UI. */
+function Active({
+  challenge,
+  lingo,
+  checking,
+  onSubmit,
+}: {
+  challenge: StartAttemptOutput;
+  lingo: Lingo | null;
+  /** Answer sent, waiting for the server. */
+  checking: boolean;
+  onSubmit: (a: Answer) => void;
+}) {
   const answer = useRef<Answer>({});
   // Time's up → submit whatever we have; the server decides (and rejects anything past the grace).
-  const { leftMs, totalMs } = useCountdown(challenge.expiresAt, challenge.serverNow, () => onSubmit(answer.current));
+  const { leftMs, totalMs, seconds } = useCountdown(challenge.expiresAt, challenge.serverNow, () => onSubmit(answer.current));
+  // Last 5 seconds: tick + buzz once per second.
+  useEffect(() => {
+    if (checking || seconds > 5 || seconds <= 0) return;
+    play("tick");
+    haptic.tick();
+  }, [seconds, checking]);
   // Stable callbacks: a new function each render would restart speech recognition.
   const onTranscript = useCallback((t: string) => {
     answer.current = { transcript: t };
@@ -42,12 +61,22 @@ function Active({ challenge, onSubmit }: { challenge: StartAttemptOutput; onSubm
   const onVoice = useCallback((t: string) => onSubmit({ transcript: t }), [onSubmit]);
 
   return (
-    <section className="card stack" data-type={challenge.type}>
-      <TimerBar leftMs={leftMs} totalMs={totalMs} />
+    <section className="arena" data-type={challenge.type} data-checking={checking} style={{ "--lingo": lingo?.color } as React.CSSProperties}>
+      <div className="arena-stage">
+        <TimerRing leftMs={leftMs} totalMs={totalMs}>
+          {lingo && <LingoArt lingo={lingo} mood={checking ? "wow" : "happy"} className="arena-lingo" />}
+        </TimerRing>
+      </div>
       {isVoiceChallenge(challenge.type) ? (
         <VoiceChallenge challenge={challenge} onTranscript={onTranscript} onSubmit={onVoice} />
       ) : (
         <ChoiceChallenge challenge={challenge} onChoose={(choice) => onSubmit({ choice })} />
+      )}
+      {checking && (
+        <div className="arena-checking" role="status">
+          <div className="spinner" />
+          <p>Checking your answer…</p>
+        </div>
       )}
     </section>
   );
@@ -201,9 +230,13 @@ export default function Catch() {
   const name = lingo ? lingoName(lingo) : `this ${BRAND.creatureName}`;
 
   return (
-    <main className="screen stack" data-phase={phase}>
+    <main className="screen stack catch" data-phase={phase}>
+      {(phase === "preflight" || phase === "ready" || phase === "starting") && lingo && (
+        <div className="catch-spotlight" style={{ "--lingo": lingo.color } as React.CSSProperties} aria-hidden="true">
+          <LingoArt lingo={lingo} />
+        </div>
+      )}
       <header className="catch-head">
-        <span className="swatch" style={{ background: lingo?.color ?? "var(--surface-2)" }} aria-hidden="true" />
         <div>
           <h1 style={{ margin: 0 }}>{raidId ? `${BRAND.raidName} · ${name}` : `Catch ${name}`}</h1>
           {raidId && (phase === "preflight" || phase === "ready" || phase === "starting") && (
@@ -229,7 +262,7 @@ export default function Catch() {
           )}
           {needsSpeech && <OpenInBrowser />}
           {phase !== "preflight" && !needsSpeech && !closed && (
-            <button className="btn" onClick={start} disabled={phase === "starting"}>
+            <button className="btn big" onClick={start} disabled={phase === "starting"}>
               {phase === "starting" ? "Starting…" : "Start"}
             </button>
           )}
@@ -239,13 +272,8 @@ export default function Catch() {
         </>
       )}
 
-      {phase === "active" && challenge && <Active challenge={challenge} onSubmit={submit} />}
-
-      {phase === "submitting" && (
-        <div className="center" style={{ padding: 24 }}>
-          <div className="spinner" />
-          <p className="muted">Checking your answer…</p>
-        </div>
+      {(phase === "active" || phase === "submitting") && challenge && (
+        <Active challenge={challenge} lingo={lingo} checking={phase === "submitting"} onSubmit={submit} />
       )}
 
       {phase === "done" && outcome && (

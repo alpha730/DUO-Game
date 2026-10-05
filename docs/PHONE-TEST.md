@@ -19,3 +19,7 @@
 10. **Leaderboard** → your row appears (≤ 10 min, or /admin → Refresh now).
 11. Off campus (e.g. at home): Catch → "You need to be on campus to catch Lingos"; Lingos left unchanged.
 12. Turn the phone sideways → "Please turn your phone upright".
+
+## Testing on Wi-Fi before the deploy (laptop + phone)
+- Run the emulators and `cd web && npm run dev`; open the "Network" address it prints (e.g. `http://192.168.0.144:5173`) on a phone on the same Wi-Fi. If it doesn't load, allow Node.js / Java through Windows Firewall (private networks).
+- That address is plain **http**, so phones block the camera, microphone and location there (the app says "This link isn't secure"). To test them anyway on Android Chrome: open `chrome://flags/#unsafely-treat-insecure-origin-as-secure`, set **Enabled**, enter the address (`http://192.168.0.144:5173`), tap **Relaunch**. Turn it off afterwards. iPhone Safari has no such switch — test it on the deployed https link.

@@ -133,6 +133,22 @@ export default function CameraHelp({
         </button>
       );
       break;
+    case "insecure":
+      mood = "lost";
+      badge = "🔒";
+      title = "This link isn't secure";
+      body = (
+        <>
+          <p>Phones only open the camera on secure (https) links, and this one starts with http.</p>
+          <p className="muted">Open the game from its official https link. Testing on Wi-Fi? See docs/PHONE-TEST.md.</p>
+        </>
+      );
+      actions = (
+        <button className="btn secondary" onClick={onRetry}>
+          Try again
+        </button>
+      );
+      break;
     case "unsupported":
       title = "Camera not supported here";
       body = <p>This browser can't open the camera. Open the game in Chrome (Android) or Safari (iPhone).</p>;

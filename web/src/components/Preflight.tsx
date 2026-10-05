@@ -42,6 +42,8 @@ export default function Preflight({
       : "Couldn't get your location. Turn on location/GPS, step outside if you can, and try again.";
 
   const stuck = [mic, location].some((s) => s === "denied" || s === "unavailable");
+  // Plain http (e.g. testing on a laptop's Wi-Fi address): phones block the mic and location outright.
+  const insecure = typeof window !== "undefined" && !window.isSecureContext;
   return (
     <section className="card stack" aria-live="polite">
       <h2 style={{ margin: 0 }}>Before you start</h2>
@@ -52,6 +54,11 @@ export default function Preflight({
         <Row label="Microphone" state={mic} help={micHelp} />
         <Row label="Location (on campus)" state={location} help={locHelp} />
       </ul>
+      {stuck && insecure && (
+        <p className="error" role="alert" data-insecure>
+          This link isn't secure (http), so the phone blocks the microphone and location. Open the game from its https link.
+        </p>
+      )}
       {stuck && (
         <button className="btn secondary" onClick={onRetry}>
           Try again

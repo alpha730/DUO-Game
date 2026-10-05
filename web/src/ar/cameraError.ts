@@ -1,4 +1,5 @@
-export type CameraProblem = "denied" | "noCamera" | "busy" | "unsupported" | "unknown";
+/** insecure = the page isn't https (browsers only open the camera on https or localhost). */
+export type CameraProblem = "denied" | "noCamera" | "busy" | "unsupported" | "insecure" | "unknown";
 
 export class CameraError extends Error {
   constructor(
@@ -21,6 +22,8 @@ export function classifyCameraError(err: unknown): CameraProblem {
 /** Runs `start` while recording the real getUserMedia error (MindAR swallows it and rejects with nothing). */
 export async function withCameraErrors(start: () => Promise<void>): Promise<void> {
   const md = navigator.mediaDevices;
+  // Plain http (e.g. a laptop's Wi-Fi address while testing): Chrome hides the camera API entirely.
+  if (!window.isSecureContext) throw new CameraError("insecure");
   if (!md?.getUserMedia) throw new CameraError("unsupported");
   const original = md.getUserMedia;
   let cameraErr: unknown;

@@ -43,7 +43,7 @@ export default function ScanOverlay({
             <span>{lingo.detYear}</span>
             <span className="dex-rarity">{lingo.rarity}</span>
             {level ? <LevelBadge level={level} /> : <span className="scan-new">New!</span>}
-            {status.favorite && <span title="Favourite">⭐</span>}
+            {status.favorite && <span className="scan-fav">⭐ Favourite</span>}
           </p>
         </div>
         {server === "ok" && attemptsLeft !== null && attemptsPerDay !== null && (

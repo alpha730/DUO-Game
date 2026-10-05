@@ -12,6 +12,7 @@ const Setup = lazy(() => import("./screens/Setup"));
 const Leaderboard = lazy(() => import("./screens/Leaderboard"));
 const Me = lazy(() => import("./screens/Me"));
 const Favorites = lazy(() => import("./screens/Favorites"));
+const Dex = lazy(() => import("./screens/Dex"));
 const Scan = lazy(() => import("./screens/Scan"));
 const Catch = lazy(() => import("./screens/Catch"));
 const Raid = lazy(() => import("./screens/Raid"));
@@ -32,6 +33,7 @@ export default function App() {
 
           <Route element={<RequireProfile><NavLayout /></RequireProfile>}>
             <Route path="/home" element={<Home />} />
+            <Route path="/dex" element={<Dex />} />
             <Route path="/scan" element={<Scan />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/me" element={<Me />} />

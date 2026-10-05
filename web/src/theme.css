@@ -1879,3 +1879,311 @@ a {
 .admin-table tr.flagged td {
   color: var(--danger-text);
 }
+
+/* ---------- Dex ---------- */
+.dex-count {
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.dex-count strong {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--text);
+}
+
+.dex-progress {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.dex-progress > div {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary);
+}
+
+.dex-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.dex-card {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 10px 12px;
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  background: var(--slot-empty);
+  box-shadow: 0 var(--edge) 0 var(--border);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+}
+
+.dex-card:active:not(:disabled) {
+  transform: translateY(var(--edge));
+  box-shadow: 0 0 0 var(--border);
+}
+
+.dex-card[data-caught="true"] {
+  background: var(--surface);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lingo) 34%, var(--surface)) 0, color-mix(in srgb, var(--lingo) 10%, var(--surface)) 62%);
+  border-color: color-mix(in srgb, var(--lingo) 60%, var(--border));
+  box-shadow: 0 var(--edge) 0 color-mix(in srgb, var(--lingo) 60%, var(--border));
+}
+
+/* MAX: shiny gold frame with a moving glint. */
+.dex-card[data-level="MAX"] {
+  border-color: var(--gold);
+  box-shadow: 0 var(--edge) 0 var(--gold-dark), 0 0 18px var(--gold-glow);
+  overflow: hidden;
+}
+
+.dex-card[data-level="MAX"]::after {
+  content: "";
+  position: absolute;
+  inset: -40% -60%;
+  background: linear-gradient(105deg, transparent 40%, rgb(255 255 255 / 0.45) 50%, transparent 60%);
+  animation: shine 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-60%);
+  }
+  60%,
+  100% {
+    transform: translateX(60%);
+  }
+}
+
+.dex-no {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.dex-fav {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  color: var(--warn);
+  filter: drop-shadow(0 1px 0 var(--warn-dark));
+}
+
+.dex-card-art {
+  width: 84px;
+  height: 88px;
+  margin-top: 6px;
+}
+
+.dex-card[data-caught="true"] .dex-card-art {
+  animation: bob 3s ease-in-out infinite;
+}
+
+.dex-card-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.dex-card[data-caught="false"] .dex-card-name {
+  color: var(--muted);
+  letter-spacing: 0.15em;
+}
+
+.dex-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dex-year {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.dex-times {
+  position: absolute;
+  right: 10px;
+  bottom: 50px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.75rem;
+}
+
+/* Bottom sheet (Dex detail, celebrations) */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: var(--scrim);
+  animation: fade-in 0.2s ease-out both;
+}
+
+.sheet {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 16px calc(16px + var(--safe-bottom));
+  border-radius: 28px 28px 0 0;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-bottom: 0;
+  box-shadow: 0 -10px 40px var(--shadow);
+  animation: sheet-up 0.32s var(--pop) both;
+}
+
+.sheet-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(60%);
+    opacity: 0;
+  }
+}
+
+.dex-sheet-art {
+  display: grid;
+  place-items: center;
+  height: 190px;
+  margin: -4px -4px 0;
+  border-radius: 22px;
+  background: var(--slot-empty);
+}
+
+.dex-sheet[data-caught="true"] .dex-sheet-art {
+  background: radial-gradient(circle at 50% 65%, color-mix(in srgb, var(--lingo) 55%, var(--surface)) 0, color-mix(in srgb, var(--lingo) 14%, var(--surface)) 72%);
+}
+
+.dex-sheet-art[data-level="MAX"] {
+  box-shadow: inset 0 0 0 3px var(--gold), 0 0 22px var(--gold-glow);
+}
+
+.dex-sheet-art .lingo-art {
+  width: 150px;
+  animation: bob 2.6s ease-in-out infinite;
+}
+
+.dex-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dex-sheet-head h2 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.dex-sheet-head .dex-no,
+.dex-sheet-head .dex-fav {
+  position: static;
+}
+
+.dex-rarity {
+  text-transform: capitalize;
+  font-weight: 700;
+}
+
+.dex-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.dex-stats > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 4px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  text-align: center;
+}
+
+.dex-stats strong {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+}
+
+.dex-stats span {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.dex-streak {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  background: var(--streak-bg);
+}
+
+.dex-hint {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  font-weight: 600;
+}
+

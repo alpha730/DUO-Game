@@ -725,7 +725,7 @@ a {
 /* ---------- AR scan screen ---------- */
 .ar-screen {
   position: fixed;
-  inset: 0 0 calc(var(--nav-h) + var(--safe-bottom)) 0;
+  inset: 0;
   background: var(--ar-stage);
   overflow: hidden;
 }
@@ -741,17 +741,171 @@ a {
   overflow: hidden;
 }
 
+/* Top mini-HUD over the camera */
+.scan-top {
+  position: absolute;
+  z-index: 3;
+  top: calc(12px + var(--safe-top));
+  left: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scan-chip {
+  background: var(--card-glass);
+  border-color: transparent;
+  color: var(--on-glass);
+  backdrop-filter: blur(8px);
+}
+
+.scan-chip[data-left="0"] strong {
+  color: var(--on-glass);
+}
+
+.scan-close {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: var(--card-glass);
+  color: var(--on-glass);
+  backdrop-filter: blur(8px);
+}
+
+/* Scan ring: rotates in the centre while searching, snaps onto the poster when found. */
+.scan-reticle {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.scan-marker {
+  --size: min(62vw, 240px);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  transform: translate(50vw, 42dvh);
+  transition: transform 0.14s linear;
+}
+
+.scan-marker[data-locked="true"] {
+  --size: var(--poster-w, 220px);
+}
+
+.scan-ring {
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  left: calc(var(--size) / -2);
+  top: calc(var(--size) / -2);
+  border-radius: 50%;
+  border: 4px dashed var(--on-glass);
+  opacity: 0.9;
+  filter: drop-shadow(0 0 6px var(--overlay));
+  animation: spin 9s linear infinite;
+  transition:
+    width 0.25s var(--pop),
+    height 0.25s var(--pop),
+    left 0.25s var(--pop),
+    top 0.25s var(--pop),
+    border-radius 0.25s ease-out;
+}
+
+.scan-ring.inner {
+  --inner: calc(var(--size) * 0.7);
+  width: var(--inner);
+  height: var(--inner);
+  left: calc(var(--inner) / -2);
+  top: calc(var(--inner) / -2);
+  border: 3px solid var(--primary);
+  animation: ring-pulse 1.6s ease-in-out infinite;
+}
+
+.scan-marker[data-locked="true"] .scan-ring {
+  /* Posters are portrait (A-series, 1 : 1.414). */
+  height: calc(var(--size) * 1.414);
+  top: calc(var(--size) * -0.707);
+  border-radius: 22px;
+  border-style: solid;
+  border-color: var(--primary);
+  box-shadow: 0 0 26px var(--primary-glow), inset 0 0 26px var(--primary-glow);
+  animation: snap 0.4s var(--pop) both;
+}
+
+.scan-marker[data-locked="true"] .scan-ring.inner {
+  opacity: 0;
+}
+
+@keyframes ring-pulse {
+  50% {
+    transform: scale(0.88);
+    opacity: 0.5;
+  }
+}
+
+@keyframes snap {
+  0% {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* Sparkle burst when a Lingo pops in */
+.sparkles i {
+  position: absolute;
+  left: -7px;
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  background: var(--gold);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  opacity: 0;
+  animation: sparkle 0.9s calc(var(--i) * 18ms) ease-out both;
+}
+
+.sparkles i:nth-child(even) {
+  background: var(--on-glass);
+  width: 10px;
+  height: 10px;
+}
+
+@keyframes sparkle {
+  0% {
+    opacity: 1;
+    transform: rotate(calc(var(--i) * 36deg)) translateY(0) scale(0.4);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(calc(var(--i) * 36deg + 40deg)) translateY(calc(var(--size) * -0.75)) scale(1.1);
+  }
+}
+
 .ar-overlay {
   position: absolute;
   inset: 0;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
-  padding: 16px;
+  padding: 12px 12px calc(12px + var(--safe-bottom));
   pointer-events: none;
-  z-index: 2;
 }
 
 .ar-overlay > * {
@@ -763,70 +917,24 @@ a {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  margin: 0;
-  padding: 10px 16px;
+  margin: 0 0 18px;
+  padding: 12px 20px;
   border-radius: 999px;
   background: var(--overlay);
-  color: var(--on-primary);
-  font-weight: 600;
+  color: var(--on-glass);
+  font-family: var(--font-display);
+  font-weight: 800;
   text-align: center;
+  backdrop-filter: blur(8px);
+}
+
+.ar-hint p {
+  margin: 0;
 }
 
 .ar-hint.error {
   border-radius: var(--radius);
   background: var(--error-glass);
-}
-
-.scan-card {
-  width: 100%;
-  max-width: 448px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  border-radius: var(--radius);
-  background: var(--card-glass);
-  border: 1px solid var(--border);
-  box-shadow: 0 8px 24px var(--shadow);
-}
-
-.scan-card p {
-  margin: 0;
-}
-
-.scan-card .swatch {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  flex: none;
-}
-
-.scan-card .streak {
-  color: var(--warn);
-  font-weight: 700;
-}
-
-.scan-card .done {
-  padding: 12px;
-  border-radius: 12px;
-  background: var(--surface-2);
-  text-align: center;
-  font-weight: 600;
-}
-
-.camera-help {
-  width: 100%;
-  max-width: 448px;
-  margin: auto 0;
-  padding: 20px 16px;
-  border-radius: var(--radius);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  text-align: left;
-}
-
-.camera-help h2 {
-  margin-bottom: 12px;
 }
 
 .ar-hint.model-loading {
@@ -837,13 +945,135 @@ a {
   border-radius: var(--radius);
 }
 
-.ar-screen.no-nav {
-  bottom: 0;
+/* Bottom sheet for the found Lingo */
+.scan-card {
+  width: 100%;
+  max-width: 456px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 26px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  box-shadow: 0 var(--edge) 0 var(--border), 0 12px 36px var(--shadow);
+  animation: sheet-up 0.38s var(--pop) both;
+}
+
+.scan-card p {
+  margin: 0;
+}
+
+.scan-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.scan-card-dot {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--lingo, var(--primary));
+  box-shadow: inset 0 -6px 0 rgb(0 0 0 / 0.15), 0 0 0 4px var(--surface-2);
+}
+
+.scan-card-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.scan-card-kicker {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary-text);
+}
+
+.scan-card h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scan-card-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.scan-new {
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.scan-card-left {
+  flex: none;
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.scan-card .streak {
+  color: var(--warn-text);
+  font-weight: 800;
+}
+
+.catch-it {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 1.45rem;
+  animation: cta-glow 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes cta-glow {
+  to {
+    box-shadow: 0 var(--edge) 0 var(--btn-edge), 0 0 24px var(--primary-glow);
+  }
+}
+
+/* "Closed today" states look like a disabled button. */
+.scan-card .done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 60px;
+  padding: 10px 14px;
+  border-radius: 18px;
+  background: var(--surface-2);
+  border: 2px dashed var(--border);
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-align: center;
+}
+
+.scan-card .done .small {
+  font-family: var(--font-family);
+  font-weight: 600;
 }
 
 .ar-test-banner {
   position: absolute;
-  top: calc(8px + env(safe-area-inset-top, 0px));
+  top: calc(8px + var(--safe-top));
   left: 50%;
   transform: translateX(-50%);
   z-index: 3;
@@ -854,6 +1084,13 @@ a {
   color: var(--on-gold);
   font-size: 0.8rem;
   font-weight: 700;
+}
+
+.camera-help {
+  width: 100%;
+  max-width: 456px;
+  margin: auto 0;
+  text-align: left;
 }
 
 /* ---------- Catch screen ---------- */

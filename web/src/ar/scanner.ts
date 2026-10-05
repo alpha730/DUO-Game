@@ -10,6 +10,15 @@ export interface ScannerEvents {
   onLost(posterIndex: number): void;
 }
 
+export interface ScannerOptions {
+  /**
+   * Element that follows the tracked poster on screen: each frame gets
+   * `transform: translate(x, y)` (poster centre, px) and `--poster-w` (poster width, px).
+   * Written straight to the DOM — no React render per frame.
+   */
+  marker?: HTMLElement | null;
+}
+
 export interface Scanner {
   start(): Promise<void>;
   stop(): void;
@@ -21,6 +30,9 @@ export interface Scanner {
 const MODEL_SIZE = 0.45;
 const HOVER_Z = 0.3;
 const BOB_HEIGHT = 0.04;
+/** Pop-in when a Lingo appears: 0 → full size with a little overshoot. */
+const POP_MS = 520;
+const popScale = (k: number) => (k >= 1 ? 1 : 1 + 2.2 * (k - 1) ** 3 + 1.2 * (k - 1) ** 2);
 
 /**
  * @param targetsSrc URL of the compiled targets (from loadTargets()).
@@ -31,6 +43,7 @@ export function createScanner(
   targetsSrc: string,
   posterIndexes: number[],
   events: ScannerEvents,
+  options: ScannerOptions = {},
 ): Scanner {
   // Each scanner gets its own root so stopping one (e.g. React StrictMode's double mount) never
   // removes another scanner's video/canvas.
@@ -57,9 +70,13 @@ export function createScanner(
 
   const anchors = new Map<number, MindARAnchor>();
   const models = new Map<number, Object3D>();
+  const popAt = new Map<number, number>(); // posterIndex → performance.now() when its pop-in started
   for (const i of posterIndexes) {
     const anchor = mindar.addAnchor(i);
-    anchor.onTargetFound = () => events.onFound(i);
+    anchor.onTargetFound = () => {
+      popAt.set(i, performance.now());
+      events.onFound(i);
+    };
     anchor.onTargetLost = () => events.onLost(i);
     anchors.set(i, anchor);
   }
@@ -126,13 +143,35 @@ export function createScanner(
     root.remove();
   }
 
+  const centre = new Vector3();
+  const edge = new Vector3();
+  function placeMarker() {
+    const marker = options.marker;
+    if (!marker) return;
+    const tracked = [...anchors.values()].find((a) => a.group.visible);
+    if (!tracked) return;
+    const w = root.clientWidth;
+    const h = root.clientHeight;
+    tracked.group.localToWorld(centre.set(0, 0, 0)).project(mindar.camera);
+    tracked.group.localToWorld(edge.set(0.5, 0, 0)).project(mindar.camera);
+    const x = ((centre.x + 1) / 2) * w;
+    const y = ((1 - centre.y) / 2) * h;
+    const half = Math.hypot(((edge.x - centre.x) / 2) * w, ((edge.y - centre.y) / 2) * h);
+    marker.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+    marker.style.setProperty("--poster-w", `${Math.min(Math.max(half * 2, 80), Math.max(w, h)).toFixed(0)}px`);
+  }
+
   function animate() {
     const t = clock.getElapsedTime();
-    // Gentle idle bob + sway on every model; MindAR hides anchors that aren't tracked.
-    for (const model of models.values()) {
+    const now = performance.now();
+    // Pop-in, then a gentle idle bob + sway on every model; MindAR hides anchors that aren't tracked.
+    for (const [i, model] of models) {
+      const k = Math.min(1, (now - (popAt.get(i) ?? 0)) / POP_MS);
+      model.scale.setScalar(MODEL_SIZE * Math.max(0.001, popScale(k)));
       model.position.z = HOVER_Z + Math.sin(t * 2.2) * BOB_HEIGHT;
-      model.rotation.y = Math.sin(t * 0.9) * 0.35;
+      model.rotation.y = Math.sin(t * 0.9) * 0.35 + (1 - k) * Math.PI * 1.5;
     }
+    placeMarker();
     mindar.renderer.render(mindar.scene, mindar.camera);
   }
 
@@ -164,6 +203,7 @@ export function createScanner(
       model.position.set(0, 0, HOVER_Z);
       anchor.group.add(model);
       models.set(i, model);
+      popAt.set(i, performance.now()); // the model just arrived (it may have loaded after the poster was found)
     },
   };
 }

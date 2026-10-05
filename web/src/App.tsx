@@ -34,10 +34,11 @@ export default function App() {
           <Route element={<RequireProfile><NavLayout /></RequireProfile>}>
             <Route path="/home" element={<Home />} />
             <Route path="/dex" element={<Dex />} />
-            <Route path="/scan" element={<Scan />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/me" element={<Me />} />
           </Route>
+          {/* Full-screen camera: no bottom nav (close X goes Home). */}
+          <Route path="/scan" element={<RequireProfile><Scan /></RequireProfile>} />
           <Route path="/catch/:lingoId" element={<RequireProfile><Catch /></RequireProfile>} />
           <Route path="/raid/:raidId" element={<RequireProfile><Raid /></RequireProfile>} />
           <Route path="/favorites" element={<RequireProfile><Favorites /></RequireProfile>} />

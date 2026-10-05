@@ -1,17 +1,22 @@
-import { lingoName } from "../config/brand";
+import { BRAND, lingoName } from "../config/brand";
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { LINGO_COUNT, type GetMyStateOutput } from "@shared/types";
 import type { Object3D } from "three";
 import { CameraError } from "../ar/cameraError";
 import type { Scanner } from "../ar/scanner";
 import { loadTargets } from "../ar/targets";
 import CameraHelp, { type ScanProblem } from "../components/CameraHelp";
+import { CloseIcon, CoinIcon } from "../components/Icons";
 import ScanOverlay from "../components/ScanOverlay";
 import { api } from "../lib/api";
+import { useAuth } from "../lib/auth";
 import { inAppBrowser } from "../lib/browser";
+import { haptic, play } from "../lib/feedback";
 import { catchStatus } from "../lib/catchStatus";
 import { loadLingos, type Lingo } from "../lib/lingos";
 import { raidPhase, useOpenRaids } from "../lib/raids";
+import { fmt } from "../lib/trainer";
 
 type Status = "starting" | "scanning" | "problem";
 
@@ -26,6 +31,9 @@ const IN_APP = inAppBrowser();
  */
 export default function Scan({ testMode = false }: { testMode?: boolean }) {
   const container = useRef<HTMLDivElement>(null);
+  const marker = useRef<HTMLDivElement>(null); // the scan ring; follows the tracked poster
+  const { profile } = useAuth();
+  const [found, setFound] = useState(0); // bumps on every "poster found" (restarts the sparkle burst)
   const [status, setStatus] = useState<Status>("starting");
   const [problem, setProblem] = useState<ScanProblem | null>(IN_APP ? { kind: "inApp", app: IN_APP } : null);
   const [run, setRun] = useState(0); // bump to retry
@@ -93,6 +101,9 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
       const s = createScanner(container.current!, targets, posters, {
         onFound: (i) => {
           current = i;
+          haptic.found();
+          play("found");
+          setFound((n) => n + 1);
           const l = byPoster.get(i);
           if (!l) {
             setBarePoster(i);
@@ -139,7 +150,7 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
           setLingo(null);
           setBarePoster(null);
         },
-      });
+      }, { marker: marker.current });
       scanner = s;
       await s.start();
       if (!cancelled) setStatus("scanning");
@@ -169,8 +180,15 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
     setRun((n) => n + 1);
   };
 
+  const tracking = status === "scanning" && (lingo !== null || bareposter !== null);
+  // Poster lost → the ring floats back to the centre (the scanner only moves it while tracking).
+  useEffect(() => {
+    if (!tracking && marker.current) marker.current.style.transform = "";
+  }, [tracking]);
+  const caught = lingo ? me?.catches.find((c) => c.lingoId === lingo.id && c.timesCaught > 0) : undefined;
+
   return (
-    <main className={testMode ? "ar-screen no-nav" : "ar-screen"}>
+    <main className="ar-screen no-nav" data-tracking={tracking}>
       {testMode && <p className="ar-test-banner">AR test mode · {__TARGETS_VERSION__}</p>}
       <div
         ref={container}
@@ -180,6 +198,40 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
         data-lingo={lingo?.id ?? ""}
         data-model={modelReady ? "ready" : ""}
       />
+      {!problem && (
+        <div className="scan-reticle" aria-hidden="true">
+          <div ref={marker} className="scan-marker" data-locked={tracking}>
+            <span className="scan-ring" />
+            <span className="scan-ring inner" />
+            {tracking && (
+              <span key={found} className="sparkles">
+                {Array.from({ length: 10 }, (_, i) => (
+                  <i key={i} style={{ "--i": i } as React.CSSProperties} />
+                ))}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+      {!testMode && (
+        <header className="scan-top">
+          <span className="hud-chip scan-chip" aria-label={`${fmt(profile?.points ?? 0)} points`}>
+            <CoinIcon />
+            <span>{fmt(profile?.points ?? 0)}</span>
+          </span>
+          {me && (
+            <span className="hud-chip scan-chip" data-left={me.attemptsLeft} title="Lingos left today">
+              <span className="hud-left-label">Lingos left </span>
+              <strong>
+                {me.attemptsLeft}/{me.attemptsPerDay}
+              </strong>
+            </span>
+          )}
+          <Link to="/home" className="scan-close" aria-label="Close scanner">
+            <CloseIcon />
+          </Link>
+        </header>
+      )}
       <div className="ar-overlay">
         {problem ? (
           <CameraHelp
@@ -196,7 +248,7 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
               </div>
             )}
             {status === "scanning" && !lingo && bareposter === null && (
-              <p className="ar-hint">Point your camera at a poster</p>
+              <p className="ar-hint">Point at a {BRAND.appName} poster</p>
             )}
             {status === "scanning" && bareposter !== null && (
               <section className="scan-card" role="status" data-kind="noGameData">
@@ -222,7 +274,9 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
             )}
             {status === "scanning" && lingo && !testMode && (
               <ScanOverlay
+                key={lingo.id}
                 lingo={lingo}
+                level={caught?.level ?? null}
                 status={catchStatus(lingo.id, me)}
                 server={meState}
                 onRetryServer={() => setMeRun((n) => n + 1)}

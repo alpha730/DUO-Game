@@ -139,17 +139,18 @@ Roles = custom claims `{role:'admin'|'volunteer'}` set by `scripts/setRole.ts`.
 |---|---|---|
 | `/` | Login | Google button, email/password form, sign-up toggle |
 | `/setup` | Profile | name only (email shown read-only) → `completeProfile`; email/password users see "Verify your email" first |
-| `/home` | Collection | top: 2 favourite cards (Lingo, level, 🔥 streak "Day 6/10", "caught today ✓/not yet"); 10-slot grid (caught = colour + level badge, not caught = silhouette); points, "Lingos left today: 3/4", "Scan" button, raid banner if active |
+| `/home` | Home | HUD (avatar + display-only level, 🔥 day streak, points, Lingos left); big pulsing "Scan a poster" button; "Lingos left today" as 4 pips; 2 favourite cards (Lingo, level, 🔥 "Day 6/10", caught/tried today); raid banner if active; "Your Dex 4/10" strip |
+| `/dex` | Dex | the 10 Lingos in year order 2016→2025: caught = card in the Lingo's colour + level badge (shiny MAX frame), times caught, favourite star; not caught = silhouette "???" + year; tap → detail sheet (big art, stats, streak) |
 | `/favorites` | Pick favourites | shown after the first 2 catches (and from Me, if a change is left); choose 2 of caught Lingos → `setFavorites`; warns that changing resets the streak |
-| `/scan` | AR | camera + MindAR (`/assets/targets.mind`, 10 targets); target found → show that Lingo's model + "Catch it" |
-| `/catch/:lingoId` | Challenge | pre-flight (mic + location) → Start → timer → pronounce / speak (mic + live transcript) or meaning / question (prompt + 4 buttons) → result |
-| `/leaderboard` | Rankings | one list of students (rank, name, points), own rank pinned at bottom |
-| `/me` | Profile | QR of uid (for prizes), stats, share card button, logout |
+| `/scan` | AR | full-screen camera + MindAR (`/assets/targets.mind`, 10 targets), small top HUD + close X; target found → ring snaps to the poster, that Lingo's model pops in, bottom sheet with "Catch it" |
+| `/catch/:lingoId` | Challenge | pre-flight (mic + location) → Start → the Lingo in a circular timer ring, question in its speech bubble → pronounce / speak (giant mic + live transcript) or meaning / question (4 big buttons) → result (win: count-up + breakdown, big moments on a full-screen card) |
+| `/leaderboard` | Rankings | Students only: podium for the top 3, then rank / name / points; own rank pinned at bottom |
+| `/me` | Profile | profile card (level, streak, points, accuracy, avg time), QR of uid (for prizes), share card button, sound on/off, logout |
 | `/admin` | Admin | config, upload challenges JSON, create raid, stats, lock game, suspicious players (on click), top-20 CSV export with flags (role admin) |
 | `/redeem` | Volunteer | scan QR → user + balance → pick prize → confirm (role volunteer/admin) |
 | `/stage` | Big screen | live leaderboard, raid status, final round view |
 
-Bottom nav on Home / Scan / Leaderboard / Me. Large tap targets. Works in portrait only.
+Bottom nav: Home · Dex · [raised round Scan button] · Ranks (leaderboard) · Me; Scan itself is full screen. Large tap targets (≥ 48 px). Works in portrait only. Light and dark theme follow the phone; all colours come from `web/src/config/brand.ts`. Haptics (where supported) and short sounds (mute on Me).
 
 ## 8. AR details
 - Build `targets.mind` from the 10 poster images with the MindAR compiler; target index = `posterIndex`.

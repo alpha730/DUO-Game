@@ -43,13 +43,18 @@ function unlock(): void {
   blank.buffer = ctx.createBuffer(1, 1, 22050);
   blank.connect(ctx.destination);
   blank.start(0);
-  for (const name of SOUNDS) {
-    fetch(`/sfx/${name}.mp3`)
-      .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
-      .then((b) => new Promise<AudioBuffer>((res, rej) => ctx.decodeAudioData(b, res, rej)))
-      .then((buf) => buffers.set(name, buf))
-      .catch(() => {});
-  }
+  // DECISION: the first tap is usually a navigation (e.g. the Scan button); on 3G the 5 sound
+  // downloads competed with that screen's code (Scan opened 0.5 s later on Fast 3G). Fetch them a
+  // moment later, at low priority — the first sound is needed when a poster is found, not instantly.
+  setTimeout(() => {
+    for (const name of SOUNDS) {
+      fetch(`/sfx/${name}.mp3`, { priority: "low" } as RequestInit)
+        .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
+        .then((b) => new Promise<AudioBuffer>((res, rej) => ctx.decodeAudioData(b, res, rej)))
+        .then((buf) => buffers.set(name, buf))
+        .catch(() => {});
+    }
+  }, 2500);
 }
 
 export function play(name: Sfx): void {

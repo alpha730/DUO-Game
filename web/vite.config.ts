@@ -54,11 +54,18 @@ async function brandHtml(preconnect: string[]): Promise<Plugin> {
               `<link rel="icon" href="${esc(BRAND.logo.mark)}" />`,
               ...themeColorMetas(BRAND).map((m) => `<meta name="theme-color" media="${m.media}" content="${esc(m.content)}" />`),
               `<style id="brand-vars">${brandCss(BRAND)}</style>`,
-              // The rounded display font starts downloading with the HTML (no wait for the CSS).
-              ...BRAND.fontFiles.map((f) => `<link rel="preload" href="${esc(f.src)}" as="font" type="font/woff2" crossorigin />`),
+              // DECISION (UI redesign): no preload for the display font — measured on Fast 3G it delayed the
+              // first paint; it loads with font-display: swap (system rounded font until then).
               // TLS to Firebase starts while the JS downloads (several round trips saved on 3G).
               ...preconnect.map((h) => `<link rel="preconnect" href="${h}" crossorigin />`),
             ].join("\n    "),
+          )
+          // The app stylesheet doesn't block the first paint: the splash below is styled inline. main.tsx
+          // waits for it before React renders, so the app itself never shows unstyled.
+          .replace(
+            /<link rel="stylesheet" crossorigin href="([^"]+\.css)">/,
+            `<link rel="stylesheet" crossorigin href="$1" media="print" onload="this.media='all'" data-app-css>` +
+              `<noscript><link rel="stylesheet" href="$1"></noscript>`,
           )
           .replace(
             '<div id="root"></div>',

@@ -3,12 +3,12 @@
 ## 1. The game in short
 - 10 posters on campus, one per DET year (2016–2025). Each poster = one Lingo.
 - Scan a poster → its Lingo appears on the camera → tap **Catch it** → one timed challenge.
-- Challenge types:
-  - **pronounce** — say the shown word out loud correctly (15 s)
-  - **speak** — say the shown English sentence out loud (20 s)
-  - **meaning** — pick the correct meaning of a word from 4 options (15 s)
-  - **question** — answer an English question from 4 options: fill in the blank, pick the correct sentence, synonym/antonym, simple grammar (20 s)
-- **Difficulty: medium** (about CEFR B1–B2): not school-basic, not exam-hard. No trick questions.
+- Each try asks one question from a shared **question pool** (§9), picked by the server:
+  - **meaning** — "What is the closest meaning of “word”?", 4 options (15 s) — 40 % of picks
+  - **question** — fill-in-the-blank sentence, 4 options (20 s) — 40 %
+  - **pronounce** — say the shown word out loud correctly (15 s) — 20 %
+  - (**speak** — say a sentence, 20 s — only in Owl Raids, which keep their own challenge.)
+- **Difficulty: medium**, and **hard** for a favourite on its 6th streak day or later (§9). No question repeats for a player while unseen ones are left; never the same word twice in a day.
 - Win → points. Fail / forfeit → no points. Either way that Lingo is done for the day.
 - **4 different Lingos per day, one try each.** Tapping Start uses that Lingo for the rest of the IST day, whatever the result (won, failed or forfeit), and uses 1 of the 4.
 - Each student picks **2 favourite Lingos**. Only favourites build a streak; a 10-day streak turns a favourite into its **MAX** form.
@@ -80,17 +80,18 @@ The same order picks the top 20 for the final round. The live final round on Oct
 5. On app start / Catch screen mount: server auto-forfeits any `open` attempt of this user (`startAttempt` and a `getMyState` call both do this).
 6. `submitAttempt` rejects if: not the owner, status ≠ open, or `now > expiresAt + grace` (then marks it `forfeit`).
 7. Only one open attempt per user at a time.
-8. **No speech recognition in the browser** (e.g. Firefox): the client sends `speech: false` with `startAttempt`. If that Lingo's challenge today is **pronounce** or **speak**, the server refuses with "Open in Chrome or Safari for this Lingo" — **no attempt is used** and the challenge content is never revealed. **meaning** and **question** work normally.
+8. **No speech recognition in the browser** (e.g. Firefox): the client sends `speech: false` with `startAttempt`. Normal tries then simply never pick a **pronounce** question. Only a raid whose challenge is **pronounce** or **speak** is refused ("Open in Chrome or Safari for this Lingo") — **no try is used** and the challenge content is never revealed.
 
 ## 4. Data model (Firestore)
 | Path | Fields | Client read |
 |---|---|---|
-| `users/{uid}` | name, email, points, triedToday (lingoId[]) + triedDate (one try per Lingo per day), openAttemptId? (the one open attempt; no queries on `attempts` in transactions), flags? (too-fast answers), suspect? (≥ 10 wins, ≥ 95 % accuracy, avg < 3 s), attemptsToday, attemptsDate, dayStreak, lastPlayDate, lingosCaught (number), allTenBonus (bool), favorites (lingoId[] max 2), favoriteChangesLeft (1), wins, losses, totalAnswerMs, pointsReachedAt, profileDone, createdAt | owner only |
+| `users/{uid}` | name, email, points, triedToday (lingoId[]) + triedDate (one try per Lingo per day), seenQ (question ids asked, never repeated), wordsToday + wordsDate (words asked today), openAttemptId? (the one open attempt; no queries on `attempts` in transactions), flags? (too-fast answers), suspect? (≥ 10 wins, ≥ 95 % accuracy, avg < 3 s), attemptsToday, attemptsDate, dayStreak, lastPlayDate, lingosCaught (number), allTenBonus (bool), favorites (lingoId[] max 2), favoriteChangesLeft (1), wins, losses, totalAnswerMs, pointsReachedAt, profileDone, createdAt | owner only |
 | `users/{uid}/catches/{lingoId}` | firstCaughtAt, timesCaught, lastCaughtDate, level (1\|2\|3\|'MAX'), favStreak, maxBonusGiven (bool) | owner only |
 | `lingos/{lingoId}` | name, detYear, posterIndex (0–9), modelUrl, rarity, color | signed-in |
 | `config/game` | startAt, lockAt, locked, campusLat, campusLng, campusRadiusM, rules (table above) | signed-in |
-| `challenges/{date}_{lingoId}`, `challenges/raid_{raidId}` | type ('pronounce'\|'speak'\|'meaning'\|'question'), word? (pronounce/meaning), accept? (string[], pronounce), phrase? (speak), prompt? (question text), options? (4), correctIndex? | **never** |
-| `attempts/{id}` | uid, lingoId, date, type, raidId?, startedAt, expiresAt, status ('open'\|'won'\|'failed'\|'forfeit'), score?, receivedAt?, answerMs?, speedBonus?, flagged?, flagReason? | **never** |
+| `questions/{id}` | the pool (§9): level ('medium'\|'hard'), type ('meaning'\|'question'\|'pronounce'), word? (meaning/pronounce), prompt? + target? (question), options? (4), correctIndex?, accept? (pronounce), explanation | **never** |
+| `challenges/raid_{raidId}` | an Owl Raid's own challenge: type ('pronounce'\|'speak'\|'meaning'\|'question'), word?, accept?, phrase?, prompt?, options? (4), correctIndex? (the old `challenges/{date}_{lingoId}` docs are no longer used) | **never** |
+| `attempts/{id}` | uid, lingoId, date, type, raidId?, questionId? + level? (pool question), question (server-only copy of what was asked, scored by submitAttempt), startedAt, expiresAt, status ('open'\|'won'\|'failed'\|'forfeit'), score?, receivedAt?, answerMs?, speedBonus?, flagged?, flagReason? | **never** |
 | `pointsLog/{id}` | uid, amount, reason, attemptId?, createdAt | **never** |
 | `leaderboard/students` | top: [{uid, name, points, accuracy, avgAnswerMs}] (top 100, in tie-break order), updatedAt | signed-in |
 | `raids/{id}` | posterIndex, lingoId, startAt, endAt, minPlayers (20), unlocked, status (joins never write this doc) | signed-in |
@@ -110,15 +111,16 @@ All callable (`onCall`) unless noted. Every one runs the checks in CLAUDE.md rul
 |---|---|---|---|
 | `completeProfile` | name | Require verified email; name 2–40 chars, trimmed; fail if profile already done; create user with defaults (email from the auth token) | `{ok}` |
 | `getMyState` | – | Auto-forfeit open attempts; return user, catches, today's tries | `{user, catches, serverNow}` |
-| `startAttempt` | lingoId, lat, lng, raidId?, speech? | Game open; on campus; no open attempt; Lingo not already TRIED today (`triedToday`, single user-doc check → "You've already tried <Lingo> today — come back tomorrow"); fewer than 4 Lingos tried today (reset when the date ≠ today; → "You've tried 4 Lingos today — come back tomorrow"); add the Lingo to `triedToday`; load `challenges/{today}_{lingoId}`. **With raidId:** raid's Lingo = lingoId; player joined; no try used yet; `unlocked` and `now < endAt`; load `challenges/raid_{raidId}`; skip the caught-today and daily-4 checks; record the try on the player doc; don't touch attemptsToday; if `speech === false` and the type is pronounce/speak → refuse (no attempt used, §3.8); create attempt; increment attemptsToday | `{attemptId, type, word?, phrase?, prompt?, options?, expiresAt, serverNow, attemptsLeft}` (never `accept` or `correctIndex`) |
-| `submitAttempt` | attemptId, transcript? , choice? | Owner + open + in time; score (pronounce: word or accept[] in transcript; speak: word match ≥ 80%; meaning/question: choice == correctIndex); on win → one transaction: catch doc (timesCaught, favStreak, level), points per §2 incl. speed bonus, MAX + all-10 bonuses, wins++, totalAnswerMs += answerMs, pointsReachedAt = now, dayStreak, pointsLog; on fail → losses++ (forfeits also do losses++). **Raid attempt** (challenge `raid_{raidId}`): win = raidCatchPoints + speed (+ all-10) per §2 Owl Raids, no favourite/day-streak/caught-today changes | `{result:'won'\|'failed', pointsAdded, speedBonus, bonuses[], newLevel, favStreak?, newTotal, missedWords?, needsFavorites, raid?}` |
+| `startAttempt` | lingoId, lat, lng, raidId?, speech? | Game open; on campus; no open attempt; Lingo not already TRIED today (`triedToday`, single user-doc check → "You've already tried <Lingo> today — come back tomorrow"); fewer than 4 Lingos tried today (reset when the date ≠ today; → "You've tried 4 Lingos today — come back tomorrow"); add the Lingo to `triedToday`; pick a pool question (§9: level from the favourite streak, weighted type, not in `seenQ`, word not in `wordsToday`) from the in-memory pool, add it to `seenQ`/`wordsToday`, store a server-only copy on the attempt. **With raidId:** raid's Lingo = lingoId; player joined; no try used yet; `unlocked` and `now < endAt`; load `challenges/raid_{raidId}`; skip the caught-today and daily-4 checks; record the try on the player doc; don't touch attemptsToday; if `speech === false` and the type is pronounce/speak → refuse (no attempt used, §3.8); create attempt; increment attemptsToday | `{attemptId, type, word?, phrase?, prompt?, options?, expiresAt, serverNow, attemptsLeft, level?}` (never `accept`, `correctIndex`, `target` or `explanation`) |
+| `submitAttempt` | attemptId, transcript? , choice? | Owner + open + in time; score against the question stored on the attempt (pronounce: word or accept[] in transcript, or a near miss — §9; speak: word match ≥ 80%; meaning/question: choice == correctIndex); on win → one transaction: catch doc (timesCaught, favStreak, level), points per §2 incl. speed bonus, MAX + all-10 bonuses, wins++, totalAnswerMs += answerMs, pointsReachedAt = now, dayStreak, pointsLog; on fail → losses++ (forfeits also do losses++). **Raid attempt** (challenge `raid_{raidId}`): win = raidCatchPoints + speed (+ all-10) per §2 Owl Raids, no favourite/day-streak/caught-today changes | `{result:'won'\|'failed', pointsAdded, speedBonus, bonuses[], newLevel, favStreak?, newTotal, missedWords?, needsFavorites, raid?, answer?: {text, explanation?}}` (answer: meaning/question only, after answering) |
 | `setFavorites` | lingoIds (exactly 2, both already caught) | First time: save. Later: only if favoriteChangesLeft > 0; decrement; new favourite starts favStreak 0 | `{favorites, favoriteChangesLeft}` |
 | `forfeitAttempt` | **HTTP `onRequest`**, header `Authorization: Bearer <idToken>`, body `{attemptId}` | Verify token; if owner + open → `forfeit` and the user's losses++ (same when an expired or auto-forfeited attempt is closed) | 204 |
 | `refreshLeaderboard` | **scheduled**, every 10 min | Query top 300 users by points, sort in code by the tie-break order in §2, keep top 100 | – |
 | `joinRaid` | raidId, lat, lng | Raid active (until endAt, also after unlock); on campus; add player (once, create-if-absent) + increment one random shard in the same batch; read the 10 shards; if sum ≥ minPlayers → unlocked | `{joined, unlocked, tried}` |
 | `redeemPrize` | uid, prizeId | Caller has role volunteer/admin; balance ≥ cost; stock > 0; deduct + log | `{newBalance}` |
 | `adminCreateRaid` | posterIndex, lingoId, startAt, minutes? (15), minPlayers? (20), challenge (same shape as a normal challenge) | Role admin only; Lingo on that poster; validate the challenge; write `raids/{id}` + `challenges/raid_{id}` together | `{raidId}` |
-| `adminSetConfig`, `adminUpsertChallenges`, `lockGame`, `finalControl` | – | Role admin only | – |
+| `adminUpsertQuestions` | questions (the whole pool) | Role admin only; validate every row (unique ids, level/type, 4 distinct options, correctIndex 0–3, explanation); all-or-nothing; replaces the pool | `{written, removed, counts}` |
+| `adminSetConfig`, `lockGame`, `finalControl` | – | Role admin only | – |
 
 Roles = custom claims `{role:'admin'|'volunteer'}` set by `scripts/setRole.ts`.
 
@@ -146,7 +148,7 @@ Roles = custom claims `{role:'admin'|'volunteer'}` set by `scripts/setRole.ts`.
 | `/catch/:lingoId` | Challenge | pre-flight (mic + location) → Start → the Lingo in a circular timer ring, question in its speech bubble → pronounce / speak (giant mic + live transcript) or meaning / question (4 big buttons) → result (win: count-up + breakdown, big moments on a full-screen card) |
 | `/leaderboard` | Rankings | Students only: podium for the top 3, then rank / name / points; own rank pinned at bottom |
 | `/me` | Profile | profile card (level, streak, points, accuracy, avg time), QR of uid (for prizes), share card button, sound on/off, logout |
-| `/admin` | Admin | config, upload challenges JSON, create raid, stats, lock game, suspicious players (on click), top-20 CSV export with flags (role admin) |
+| `/admin` | Admin | config, upload the question pool (JSON) + counts per level/type, create raid, stats, lock game, suspicious players (on click), top-20 CSV export with flags (role admin) |
 | `/redeem` | Volunteer | scan QR → user + balance → pick prize → confirm (role volunteer/admin) |
 | `/stage` | Big screen | live leaderboard, raid status, final round view |
 
@@ -160,16 +162,18 @@ Bottom nav: Home · Dex · [raised round Scan button] · Ranks (leaderboard) · 
 - iOS Safari and Android Chrome both supported; show "Open in Chrome/Safari" if inside an in-app browser (Instagram/WhatsApp) that blocks camera.
 - targets.mind ships gzipped (`targets.mind.gz`, unpacked in the browser; raw fallback) and, with the .glb models, is kept in Cache Storage after the first download (`web/src/lib/assetCache.ts`). Only `?v=<hash>` URLs are cached; a new hash downloads once and replaces the old version.
 
-## 9. Content
-- `challenges` for 13 days × 10 Lingos = 130 docs, uploaded via `/admin` as JSON:
-  `{date, lingoId, type:'pronounce', word, accept?}` · `{date, lingoId, type:'speak', phrase}` ·
-  `{date, lingoId, type:'meaning', word, options:[4], correctIndex}` · `{date, lingoId, type:'question', prompt, options:[4], correctIndex}`.
-- Mix: about 25% each type, spread so a student doesn't get the same type 4 times in a day.
-- All medium difficulty (B1–B2). Examples:
-  - pronounce: "comfortable", "entrepreneur", "schedule"
-  - speak: "Practice every day and you will see the difference."
-  - meaning: "Reluctant" → unwilling / excited / tired / careful
-  - question: "She has been working here ___ 2022." → since / for / from / at
+## 9. Content — the question pool
+- `scripts/content/question-pool-2026.json` (456 questions; review copy `docs/Decade_Hunt_Question_Pool.xlsx`), loaded with `scripts/loadQuestions.ts` (emulator, or `--prod --project <id>`) or uploaded on `/admin`. Validated first (unique ids, level, type, 4 different options, correctIndex 0–3, explanation); all-or-nothing; the upload replaces the pool. `challenges-2026.json` (the old date × Lingo set) stays in the repo as an archive and is not loaded.
+- Item: `{id, level:'medium'|'hard', type:'meaning'|'question'|'pronounce', word?, prompt?, target?, options?, correctIndex?, explanation}`.
+  - meaning: "What is the closest meaning of “<word>”?" + 4 options
+  - question: fill-in-the-blank `prompt` + 4 options (`target` = the answer word)
+  - pronounce: the student says `word` (existing pronounce screen and timer)
+- Pool: medium 100 meaning / 100 question / 30 pronounce; hard 100 / 96 / 30.
+- **Difficulty (normal tries only):** the streak day this catch would be for this Lingo = favourite and caught yesterday (IST) → favStreak + 1, else 1. Favourite and day ≥ 6 → **hard**; everything else (non-favourites, favourite days 1–5) → **medium**.
+- **Picking:** type by weight (meaning 40 % / question 40 % / pronounce 20 %), then a random question of that level + type the player has not seen (`users.seenQ`) and whose word they haven't had today (`users.wordsToday`). Runs out → another type → repeats (still not today's words) → anything of that level. No speech recognition in the browser → never pronounce. The server keeps the pool in memory (read once per instance, refreshed every 10 minutes) — no pool reads per attempt.
+- **Pronounce matching:** normalised as in §5; a single word also passes when a heard word is within edit distance 1 (6–9 letters) or 2 (10+ letters) of it — speech recognition misspells rare words ("grandilaquant" for "grandiloquent").
+- **Result screen:** after a meaning/question try (won or failed), the right answer + its explanation — never before answering.
+- Raids keep their own challenge (`challenges/raid_{raidId}`, any of the 4 types incl. speak). Timers, one try per Lingo per day, 4 Lingos a day, points and speed bonus are unchanged.
 
 ## 10. Final round (Oct 22)
 - Top 20 at lock, using the full leaderboard order (points → accuracy → avg answer time → reached first). Admin drives `final/state` from `/admin`; `/stage` shows it.

@@ -50,6 +50,6 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Everything else (attempts, challenges, pointsLog, redemptions, raid players): denied.
+    // Everything else (attempts, challenges, questions, pointsLog, redemptions, raid players): denied.
   }
 }

@@ -15,6 +15,7 @@ let env: RulesTestEnvironment;
 const NEVER_READABLE = [
   "attempts/a1",
   "challenges/2026-10-10_lingo1",
+  "questions/m-mean-001",
   "pointsLog/p1",
   "redemptions/r1",
   "raids/raid1/players/alice",
@@ -63,9 +64,10 @@ describe("never-readable collections", () => {
       await assertFails(getDoc(doc(anon(), path)));
     });
   }
-  it("cannot list attempts or challenges", async () => {
+  it("cannot list attempts, challenges or questions", async () => {
     await assertFails(getDocs(collection(alice(), "attempts")));
     await assertFails(getDocs(collection(alice(), "challenges")));
+    await assertFails(getDocs(collection(alice(), "questions")));
   });
 });
 

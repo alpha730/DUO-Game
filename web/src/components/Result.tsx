@@ -10,6 +10,19 @@ import LingoPips from "./LingoPips";
 import Mascot from "./Mascot";
 import WinCelebration, { Confetti } from "./WinCelebration";
 
+/** After a meaning / question try: the right answer and what it means (SPEC §9 — only after answering). */
+function AnswerCard({ answer, won }: { answer: { text: string; explanation?: string }; won: boolean }) {
+  return (
+    <div className="answer-card" data-answer data-won={won}>
+      <span className="answer-label">{won ? "✓ Right answer" : "The right answer"}</span>
+      <strong className="answer-text">{answer.text}</strong>
+      {answer.explanation && answer.explanation.toLowerCase() !== answer.text.toLowerCase() && (
+        <span className="answer-explain">{answer.explanation}</span>
+      )}
+    </div>
+  );
+}
+
 /** End of a try (PLAN 3.9): won / failed / forfeit (+ late, error) and Lingos left today. */
 export default function Result({
   outcome,
@@ -57,6 +70,7 @@ export default function Result({
       body = (
         <>
           <WinCelebration data={outcome.data} lingoName={lingoName} lingo={lingo} prevLevel={prevLevel} />
+          {outcome.data.answer && <AnswerCard answer={outcome.data.answer} won />}
           {outcome.data.needsFavorites && (
             <Link className="btn accent" to="/favorites" data-needs-favorites>
               ⭐ Pick your 2 favourites
@@ -91,6 +105,7 @@ export default function Result({
             <p className="small muted result-note">We heard: “{heard || "nothing"}”</p>
           )}
           {(type === "meaning" || type === "question") && <p className="muted result-note">That wasn't the right answer.</p>}
+          {outcome.data.answer && <AnswerCard answer={outcome.data.answer} won={false} />}
         </>
       );
       break;

@@ -3341,3 +3341,51 @@ a {
   animation: slide-up 0.3s ease-out both;
 }
 
+/* ---------- Answer card + hard badge (question pool) ---------- */
+.answer-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 2px solid var(--border);
+  text-align: left;
+  animation: slide-up 0.4s 0.3s ease-out both;
+}
+
+.answer-card[data-won="true"] {
+  background: var(--primary-soft);
+  border-color: transparent;
+}
+
+.answer-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.answer-text {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+}
+
+.answer-explain {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.hard-badge {
+  align-self: center;
+  margin-top: -6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--streak-bg);
+  color: var(--warn-text);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+

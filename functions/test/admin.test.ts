@@ -1,7 +1,10 @@
-// Admin functions against the emulators (PLAN 7.2): config, challenge upload, lock, stats.
+// Admin functions against the emulators (PLAN 7.2): config, question-pool upload, lock, stats.
 import { afterAll, describe, expect, it } from "vitest";
-import type { AdminSetConfigInput, AdminStatsOutput, AdminUpsertChallengesInput, StartAttemptOutput } from "../src/shared/types";
-import { adb, adminAuth, CAMPUS, cleanupApps, istToday, newPlayer } from "./helpers";
+import { readFileSync } from "node:fs";
+import type { AdminSetConfigInput, AdminStatsOutput, AdminUpsertQuestionsInput, AdminUpsertQuestionsOutput, StartAttemptOutput } from "../src/shared/types";
+import { adb, adminAuth, CAMPUS, cleanupApps, istToday, newPlayer, setQuestionPool } from "./helpers";
+
+const POOL = JSON.parse(readFileSync(new URL("../../scripts/content/question-pool-2026.json", import.meta.url), "utf8"));
 
 afterAll(cleanupApps);
 
@@ -27,7 +30,7 @@ const setConfig = (a: Player, d: AdminSetConfigInput) => a.call<AdminSetConfigIn
 describe("admin", () => {
   it("is admin-only", async () => {
     const p = await newPlayer();
-    for (const name of ["adminSetConfig", "adminUpsertChallenges", "adminStats", "lockGame"]) {
+    for (const name of ["adminSetConfig", "adminUpsertQuestions", "adminStats", "lockGame"]) {
       await expect(p.call(name)({})).rejects.toMatchObject({ code: "functions/permission-denied" });
     }
   });
@@ -61,28 +64,30 @@ describe("admin", () => {
     });
   });
 
-  it("uploads challenges all-or-nothing, with row errors", async () => {
+  it("uploads the question pool all-or-nothing (replacing it), with row errors and counts", async () => {
     const a = await admin();
-    const up = (d: AdminUpsertChallengesInput) => a.call<AdminUpsertChallengesInput, { written: number }>("adminUpsertChallenges")(d);
-    const today = istToday();
-    const id = `${today}_lingo-2025`;
-    const saved = (await adb.doc(`challenges/${id}`).get()).data();
+    const up = (d: AdminUpsertQuestionsInput) => a.call<AdminUpsertQuestionsInput, AdminUpsertQuestionsOutput>("adminUpsertQuestions")(d);
+    const count = async () => (await adb.collection("questions").count().get()).data().count;
     try {
-      const good = { date: today, lingoId: "lingo-2025", type: "speak" as const, phrase: "Ten years together." };
-      const bad = { date: today, lingoId: "lingo-2024", type: "meaning" as const, word: "x", options: ["a", "b", "c"], correctIndex: 5 };
-      const err = await up({ challenges: [good, bad, { ...good, date: "1999-01-01" }] }).catch((e) => e);
+      const good = { id: "t-mean-1", level: "medium" as const, type: "meaning" as const, word: "keen", options: ["eager", "sad", "slow", "late"] as [string, string, string, string], correctIndex: 0 as const, explanation: "eager" };
+      const say = { id: "t-pron-1", level: "hard" as const, type: "pronounce" as const, word: "grandiloquent", explanation: "pompous" };
+      const bad = { ...good, id: "t-mean-2", options: ["a", "a", "b", "c"] as [string, string, string, string] };
+      const err = await up({ questions: [good, bad, { ...good }] }).catch((e) => e);
       expect(err.details.code).toBe("bad-rows");
-      expect(err.details.errors.map((e: { row: number }) => e.row)).toEqual([2, 3]);
-      expect((await adb.doc(`challenges/${id}`).get()).data()).toEqual(saved); // nothing written
+      expect(err.details.errors.map((e: { row: number }) => e.row)).toEqual([2, 3]); // bad options, duplicate id
+      expect(await count()).toBe(456); // nothing written
 
-      await expect(up({ challenges: [good] })).resolves.toEqual({ written: 1 });
-      expect((await adb.doc(`challenges/${id}`).get()).data()).toEqual({ type: "speak", phrase: "Ten years together." });
+      const out = await up({ questions: [good, say] });
+      expect(out).toMatchObject({ written: 2, removed: 456 });
+      expect(out.counts).toMatchObject({ "medium/meaning": 1, "hard/pronounce": 1, "medium/question": 0 });
+      expect(await count()).toBe(2);
+      expect((await adb.doc("questions/t-mean-1").get()).data()).toMatchObject({ word: "keen", correctIndex: 0, level: "medium" });
     } finally {
-      if (saved) await adb.doc(`challenges/${id}`).set(saved);
+      await setQuestionPool(POOL); // other suites and local play use the real pool
     }
   });
 
-  it("stats: users, attempts and wins today, missing challenges", async () => {
+  it("stats: users, attempts and wins today, question counts", async () => {
     const a = await admin();
     const s0 = await a.call<object, AdminStatsOutput>("adminStats")({});
     const p = await newPlayer();
@@ -93,7 +98,14 @@ describe("admin", () => {
     expect(s1.users).toBe(s0.users + 1);
     expect(s1.attemptsToday).toBe(s0.attemptsToday + 1);
     expect(s1.winsToday).toBe(s0.winsToday + 1);
-    expect(s1.missingCount).toBeGreaterThanOrEqual(0);
-    expect(s1.missingChallenges.length).toBeLessThanOrEqual(20);
+    expect(s1.questionTotal).toBe(456);
+    expect(s1.questions).toEqual({
+      "medium/meaning": 100,
+      "medium/question": 100,
+      "medium/pronounce": 30,
+      "hard/meaning": 100,
+      "hard/question": 96,
+      "hard/pronounce": 30,
+    });
   });
 });

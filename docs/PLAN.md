@@ -118,7 +118,8 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 
 ## Day 9 — Freeze (Oct 9)
 - [ ] Only bug fixes; no new features
-- [ ] Remove test users/data from production; re-seed real lingos/config/challenges
+- [ ] Remove test users/data from production; re-seed real lingos/config (`scripts/seed.ts --prod --real-dates --campus …`)
+- [ ] Load the question pool: `npx tsx scripts/loadQuestions.ts --prod --project decade-hunt-66f6e` → expect 456 (medium 100/100/30, hard 100/96/30); /admin Stats shows the same counts
 - [ ] `firebase deploy`; smoke test the live link on 3 phones
 - [ ] Posters up; poster QR → live link
 - [ ] Game starts automatically Oct 10, 00:00 IST (check `startAt`)
@@ -126,7 +127,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 ## Live ops (Oct 10–21)
 | When | Task |
 |---|---|
-| Daily | Check function logs + errors; check tomorrow's challenges exist |
+| Daily | Check function logs + errors; /admin Stats: question pool still 456 |
 | Oct 12, 15, 18 | Run Owl Raids from `/admin` |
 | Oct 13–16 | `redeemPrize` + `/redeem` page (camera QR scan → user → prize → confirm) |
 | Oct 16–19 | `/stage` big screen + `final/state` + `finalControl` (SPEC §10) |

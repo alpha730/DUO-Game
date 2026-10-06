@@ -68,6 +68,11 @@ function Active({
           {lingo && <LingoArt lingo={lingo} mood={checking ? "wow" : "happy"} className="arena-lingo" />}
         </TimerRing>
       </div>
+      {challenge.level === "hard" && (
+        <span className="hard-badge" data-level="hard">
+          🔥 Hard question — your streak is on fire
+        </span>
+      )}
       {isVoiceChallenge(challenge.type) ? (
         <VoiceChallenge challenge={challenge} onTranscript={onTranscript} onSubmit={onVoice} />
       ) : (

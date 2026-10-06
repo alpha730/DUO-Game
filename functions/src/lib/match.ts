@@ -56,14 +56,44 @@ export function normWord(w: string): string {
 }
 
 /**
- * Pronounce match (SPEC §2): pass if the transcript contains the word or one of its `accept`
- * spellings as whole words ("schedule" ≠ "schedules"). Multi-word spellings ("all right") must
+ * Pronounce match (SPEC §2, §9): pass if the transcript contains the word or one of its `accept`
+ * spellings as whole words, or (single words) a near miss — see nearMiss(). Multi-word spellings ("all right") must
  * appear as consecutive words. Normalised like `words()` + `normWord()`.
  */
 export function matchWord(word: string, transcript: string, accept: string[] = []): { passed: boolean } {
-  const heard = ` ${words(transcript).map(normWord).join(" ")} `;
+  const heardWords = words(transcript).map(normWord);
+  const heard = ` ${heardWords.join(" ")} `;
   const targets = [word, ...accept].map((t) => words(t).map(normWord).join(" ")).filter(Boolean);
-  return { passed: targets.some((t) => heard.includes(` ${t} `)) };
+  if (targets.some((t) => heard.includes(` ${t} `))) return { passed: true };
+  // SPEC §9: speech recognition misspells rare words ("perspicacious" → "perspicacius"). A single-word
+  // target also passes when a heard word is within a small edit distance of it.
+  return { passed: targets.some((t) => !t.includes(" ") && heardWords.some((h) => nearMiss(t, h))) };
+}
+
+/** Allowed typos for a word: none under 6 letters, 1 for 6–9, 2 for 10+. */
+export const allowedEdits = (len: number) => (len >= 10 ? 2 : len >= 6 ? 1 : 0);
+
+/** `heard` is within allowedEdits(target) of `target` (Levenshtein; early exit). */
+export function nearMiss(target: string, heard: string): boolean {
+  const max = allowedEdits(target.length);
+  if (max === 0 || Math.abs(target.length - heard.length) > max) return false;
+  return editDistance(target, heard, max) <= max;
+}
+
+/** Levenshtein distance, stopping early once every path exceeds `cap` (returns cap + 1). */
+export function editDistance(a: string, b: string, cap = Infinity): number {
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    let best = i;
+    for (let j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      best = Math.min(best, cur[j]);
+    }
+    if (best > cap) return cap + 1;
+    prev = cur;
+  }
+  return prev[b.length];
 }
 
 /**

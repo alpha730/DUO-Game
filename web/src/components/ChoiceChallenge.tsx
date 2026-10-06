@@ -19,11 +19,14 @@ export default function ChoiceChallenge({
       <div className="bubble">
         {meaning ? (
           <>
-            <p className="bubble-ask">What does this word mean?</p>
+            <p className="bubble-ask">What is the closest meaning of</p>
             <p className="say-word">{challenge.word}</p>
           </>
         ) : (
-          <p className="say-phrase">{challenge.prompt}</p>
+          <>
+            {/_{2,}/.test(challenge.prompt ?? "") && <p className="bubble-ask">Fill in the blank</p>}
+            <p className="say-phrase">{challenge.prompt}</p>
+          </>
         )}
       </div>
       <div className="choices" role="group" aria-label="Answers">

@@ -2,13 +2,14 @@ import { Timestamp } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import {
   COL,
-  challengeId,
   isVoiceChallenge,
   raidChallengeId,
   timerSeconds,
   type AttemptDoc,
+  type CatchDoc,
   type ChallengeDoc,
   type LingoDoc,
+  type QuestionLevel,
   type RaidDoc,
   type RaidPlayerDoc,
   type StartAttemptOutput,
@@ -18,9 +19,11 @@ import { serverNow } from "../lib/clock";
 import { forfeitTx, readOpenAttemptTx } from "../lib/attempts";
 import { publicChallenge } from "../lib/challenge";
 import { istDate } from "../lib/date";
-import { db, userRef } from "../lib/db";
+import { catchRef, db, userRef } from "../lib/db";
 import { campusCheck, isEmulator, isValidLatLng } from "../lib/geo";
 import { requirePlayer } from "../lib/guards";
+import { pinnedQuestion, questionPool } from "../lib/questionPool";
+import { levelFor, pickQuestion, streakDayFor, targetWord } from "../lib/questions";
 import { raidPhase } from "../lib/raids";
 import { attemptsUsedToday, triedToday } from "../lib/state";
 
@@ -51,18 +54,19 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
 
   const attemptRef = db().collection(COL.attempts).doc();
   const raidRef = raidId ? db().collection(COL.raids).doc(raidId as string) : null;
-  // DECISION (Day 8 load test): the challenge is read outside the transaction — every player of a
-  // Lingo reads the same document, and it doesn't change during play.
-  const challengeSnap = await db()
-    .collection(COL.challenges)
-    .doc(raidRef ? raidChallengeId(raidRef.id) : challengeId(today, lingoId))
-    .get();
+  // DECISION (Day 8 load test): shared content is read outside the transaction. A raid has its own
+  // challenge doc; a normal try picks from the question pool, held in memory (SPEC §9 cost rule).
+  // Emulator only: a pinned question keeps browser tests deterministic (lib/questionPool.ts).
+  const raidChallengeSnap = raidRef ? await db().collection(COL.challenges).doc(raidChallengeId(raidRef.id)).get() : null;
+  const pinned = raidRef ? null : await pinnedQuestion(lingoId);
+  const pool = raidRef || pinned ? [] : await questionPool();
   const result = await db().runTransaction(async (tx) => {
     // All reads first (Firestore transactions require it). Only this player's own documents.
-    const [userSnap, raidSnap, playerSnap] = await Promise.all([
+    const [userSnap, raidSnap, playerSnap, catchSnap] = await Promise.all([
       tx.get(userRef(uid)),
       raidRef ? tx.get(raidRef) : null,
       raidRef ? tx.get(raidRef.collection(COL.players).doc(uid)) : null,
+      raidRef ? null : tx.get(catchRef(uid, lingoId)),
     ]);
     const user = userSnap.data() as UserDoc;
     const open = await readOpenAttemptTx(tx, user);
@@ -88,10 +92,37 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
         fail("no-attempts", `You've tried ${rules.attemptsPerDay} Lingos today — come back tomorrow`);
       }
     }
-    if (!challengeSnap.exists) fail("no-challenge", raidRef ? "This raid has no challenge." : "This Lingo has no challenge today.");
-    // No speech recognition in this browser + a voice challenge: refuse BEFORE any write, so no
+    // Which question (SPEC §9): favourite on streak day ≥ 6 → hard, else medium; weighted type; not
+    // seen before by this player; not a word they already had today.
+    let challenge: ChallengeDoc & { explanation?: string };
+    let questionId: string | undefined;
+    let level: QuestionLevel | undefined;
+    let word: string | null = null;
+    if (raidRef) {
+      if (!raidChallengeSnap!.exists) fail("no-challenge", "This raid has no challenge.");
+      challenge = raidChallengeSnap!.data() as ChallengeDoc;
+    } else if (pinned) {
+      challenge = pinned;
+      questionId = `pin-${lingoId}`;
+      level = "medium";
+    } else {
+      const favorite = user.favorites.includes(lingoId);
+      level = levelFor(favorite, streakDayFor(favorite, catchSnap!.data() as CatchDoc | undefined, today));
+      const q = pickQuestion(pool, {
+        level,
+        seen: new Set(user.seenQ ?? []),
+        wordsToday: new Set(user.wordsDate === today ? (user.wordsToday ?? []) : []),
+        // No speech recognition in this browser: pick a tap-to-answer question instead (SPEC §3.8).
+        allowVoice: speech !== false,
+      });
+      if (!q) fail("no-challenge", "There are no questions yet — ask the organisers.");
+      challenge = q!.doc;
+      questionId = q!.id;
+      word = targetWord(q!.doc);
+    }
+    // A raid's (or pinned) voice challenge without speech recognition: refuse BEFORE any write, so no
     // attempt (or raid try) is used and nothing but "it needs your voice" is revealed (SPEC §3.8).
-    if (speech === false && isVoiceChallenge((challengeSnap.data() as ChallengeDoc).type)) {
+    if (speech === false && isVoiceChallenge(challenge!.type)) {
       fail("needs-speech", "Open in Chrome or Safari for this Lingo — it needs your voice.");
     }
 
@@ -99,14 +130,15 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
     // left open in another tab is forfeited (and counted as a loss) here.
     const closed = forfeitTx(tx, uid, open);
 
-    const challenge = challengeSnap.data() as ChallengeDoc;
-    const expiresAt = now + timerSeconds(challenge.type, rules) * 1000;
+    const expiresAt = now + timerSeconds(challenge!.type, rules) * 1000;
     const attempt: AttemptDoc = {
       uid,
       lingoId,
       date: today,
-      type: challenge.type,
+      type: challenge!.type,
       ...(raidRef ? { raidId: raidRef.id } : {}),
+      ...(questionId ? { questionId, level } : {}),
+      question: challenge!, // server-only copy, scored by submitAttempt
       startedAt: Timestamp.fromMillis(now),
       expiresAt: Timestamp.fromMillis(expiresAt),
       status: "open",
@@ -116,12 +148,21 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
     if (raidRef) {
       // The one try is used the moment it starts: won, failed and forfeit all count.
       tx.update(raidRef.collection(COL.players).doc(uid), { attemptId: attemptRef.id });
-      return { challenge, expiresAt, attemptsLeft: Math.max(0, rules.attemptsPerDay - used), closed };
+      return { challenge: challenge!, expiresAt, attemptsLeft: Math.max(0, rules.attemptsPerDay - used), closed, level };
     }
-    // The try is used the moment Start succeeds (a forfeit closes the Lingo too).
-    tx.update(userRef(uid), { attemptsToday: used + 1, attemptsDate: today, triedToday: [...tried, lingoId], triedDate: today });
+    // The try is used the moment Start succeeds (a forfeit closes the Lingo too). The question counts
+    // as seen, and its word as used today, from this moment too.
+    const words = user.wordsDate === today ? (user.wordsToday ?? []) : [];
+    tx.update(userRef(uid), {
+      attemptsToday: used + 1,
+      attemptsDate: today,
+      triedToday: [...tried, lingoId],
+      triedDate: today,
+      ...(questionId ? { seenQ: [...(user.seenQ ?? []).filter((id) => id !== questionId), questionId] } : {}),
+      ...(word ? { wordsToday: [...words, word], wordsDate: today } : {}),
+    });
 
-    return { challenge, expiresAt, attemptsLeft: rules.attemptsPerDay - used - 1, closed };
+    return { challenge: challenge!, expiresAt, attemptsLeft: rules.attemptsPerDay - used - 1, closed, level };
   });
 
   return {
@@ -130,5 +171,6 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
     expiresAt: result.expiresAt,
     serverNow: now,
     attemptsLeft: result.attemptsLeft,
+    ...(result.level ? { level: result.level } : {}),
   };
 });

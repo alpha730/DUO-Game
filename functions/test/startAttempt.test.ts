@@ -86,18 +86,10 @@ describe("startAttempt", () => {
     await expect(start(p, LINGO.meaning)).resolves.toMatchObject({ type: "meaning" });
   });
 
-  it("rejects bad input, unknown Lingos, missing challenges and raids", async () => {
+  it("rejects bad input, unknown Lingos and raids (an empty pool: test/questions.test.ts)", async () => {
     const p = await newPlayer();
     await expect(start(p, "../users/x")).rejects.toMatchObject({ code: "functions/invalid-argument" });
     await expect(start(p, "lingo-1999")).rejects.toMatchObject({ code: "functions/not-found" });
-    const ch = adb.doc(`challenges/${istToday()}_lingo-2025`);
-    const saved = (await ch.get()).data();
-    await ch.delete();
-    try {
-      await expect(start(p, "lingo-2025")).rejects.toMatchObject({ details: { code: "no-challenge" } });
-    } finally {
-      if (saved) await ch.set(saved);
-    }
     await expect(start(p, LINGO.speak, { lat: 999 } as never)).rejects.toMatchObject({ details: { code: "bad-location" } });
     await expect(start(p, LINGO.speak, { raidId: "r1" })).rejects.toMatchObject({ code: "functions/not-found" });
     await expect(start(p, LINGO.speak, { raidId: 5 } as never)).rejects.toMatchObject({ code: "functions/invalid-argument" });

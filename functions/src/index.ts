@@ -15,7 +15,7 @@ export { refreshLeaderboard } from "./fns/refreshLeaderboard";
 export { adminRefreshLeaderboard } from "./fns/adminRefreshLeaderboard";
 export { adminCreateRaid } from "./fns/adminCreateRaid";
 export { adminSetConfig } from "./fns/adminSetConfig";
-export { adminUpsertChallenges } from "./fns/adminUpsertChallenges";
+export { adminUpsertQuestions } from "./fns/adminUpsertQuestions";
 export { adminStats } from "./fns/adminStats";
 export { lockGame } from "./fns/lockGame";
 export { adminSuspicious } from "./fns/adminSuspicious";

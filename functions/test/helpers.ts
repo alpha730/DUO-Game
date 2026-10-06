@@ -55,3 +55,35 @@ export async function patchConfig(patch: Record<string, unknown>) {
   await ref.update(patch);
   return () => ref.set(before);
 }
+
+// ---------- Questions (SPEC §9) ----------
+// Normal tries pick from the question pool. Most suites need a known question per Lingo, so they
+// pin one (emulator-only `_emulator/pins`, like `_emulator/clock`) — the samples the old fixed
+// challenges used. Pins last 30 minutes, then the emulator falls back to the real pool.
+type Pin = Record<string, unknown>;
+export const SAMPLE: Record<"pronounce" | "speak" | "meaning" | "question", Pin> = {
+  pronounce: { type: "pronounce", word: "programme", accept: ["program"] },
+  speak: { type: "speak", phrase: "Practice every day and you will see the difference." },
+  meaning: { type: "meaning", word: "reluctant", options: ["unwilling", "excited", "tired", "careful"], correctIndex: 0 },
+  question: { type: "question", prompt: "She has been working here ___ 2022.", options: ["since", "for", "from", "at"], correctIndex: 0 },
+};
+const ORDER = ["pronounce", "speak", "meaning", "question"] as const;
+/** lingo-2016 pronounce, 2017 speak, 2018 meaning, 2019 question, then repeating. */
+export const DEFAULT_PINS: Record<string, Pin> = Object.fromEntries(
+  Array.from({ length: 10 }, (_, i) => [`lingo-${2016 + i}`, SAMPLE[ORDER[i % 4]]]),
+);
+export const pinQuestions = (byLingo: Record<string, Pin> = DEFAULT_PINS) =>
+  adb.doc("_emulator/pins").set({ until: Date.now() + 30 * 60_000, byLingo });
+export const unpinQuestions = () => adb.doc("_emulator/pins").delete();
+/** Replace the question pool (tests) and make the functions drop their cached copy. */
+export async function setQuestionPool(questions: Array<Record<string, unknown> & { id: string }>) {
+  const old = await adb.collection("questions").select().get();
+  const batch = adb.batch();
+  old.docs.forEach((d) => batch.delete(d.ref));
+  for (const { id, ...doc } of questions) batch.set(adb.doc(`questions/${id}`), doc);
+  batch.set(adb.doc("_emulator/questions"), { version: `${Date.now()}-${Math.random()}` });
+  await batch.commit();
+}
+
+// Every suite starts with the default pins (re-run per test file).
+await pinQuestions();

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { matchPhrase, matchWord, normWord, words } from "./match";
+import { allowedEdits, editDistance, matchPhrase, matchWord, normWord, words } from "./match";
 
 describe("matchWord (pronounce)", () => {
   it("passes when the transcript is the word", () => {
@@ -18,8 +18,24 @@ describe("matchWord (pronounce)", () => {
     expect(matchWord("alright", "all is right", ["all right"]).passed).toBe(false);
   });
   it("matches whole words only", () => {
-    expect(matchWord("schedule", "schedules").passed).toBe(false);
     expect(matchWord("form", "comfortable").passed).toBe(false);
+    expect(matchWord("form", "forms").passed).toBe(false); // under 6 letters: exact only
+  });
+  // SPEC §9: speech recognition misspells rare words — allow a near miss on single words.
+  it("accepts near misses: 1 edit for 6–9 letters, 2 for 10+", () => {
+    expect(matchWord("schedule", "schedules").passed).toBe(true); // 8 letters, 1 edit
+    expect(matchWord("abundant", "abundent").passed).toBe(true);
+    expect(matchWord("abundant", "abandon").passed).toBe(false); // 8 letters, 2+ edits
+    expect(matchWord("perspicacious", "perspicacius").passed).toBe(true); // 13 letters, 1 edit
+    expect(matchWord("perspicacious", "i said perspecacius").passed).toBe(true); // 2 edits
+    expect(matchWord("perspicacious", "perspective").passed).toBe(false);
+    expect(matchWord("grandiloquent", "grandiloquant").passed).toBe(true); // 1 edit
+    expect(matchWord("grandiloquent", "grandilaquant").passed).toBe(true); // 2 edits
+    expect(matchWord("grandiloquent", "grand eloquent").passed).toBe(false);
+    expect(matchWord("grandiloquent", "grindelaquant").passed).toBe(false); // 3 edits
+  });
+  it("near misses only for single-word targets", () => {
+    expect(matchWord("alright", "al rite", ["all right"]).passed).toBe(false);
   });
   it("fails a wrong or empty transcript", () => {
     expect(matchWord("schedule", "shed jewel").passed).toBe(false);
@@ -126,5 +142,19 @@ describe("normalisation: numbers 0–20 and UK/US spellings (both sides)", () =>
     expect(matchWord("theatre", "theater").passed).toBe(true);
     expect(matchWord("twelve", "12").passed).toBe(true);
     expect(matchWord("behaviour", "behavioural").passed).toBe(false); // still whole words only
+  });
+});
+
+describe("editDistance / allowedEdits", () => {
+  it("counts insertions, deletions and substitutions", () => {
+    expect(editDistance("kitten", "sitting")).toBe(3);
+    expect(editDistance("abc", "abc")).toBe(0);
+    expect(editDistance("", "abc")).toBe(3);
+  });
+  it("stops early above the cap", () => {
+    expect(editDistance("perspicacious", "zzzzzzzzzzzzz", 2)).toBe(3);
+  });
+  it("allows 0 / 1 / 2 edits by length", () => {
+    expect([5, 6, 9, 10, 14].map(allowedEdits)).toEqual([0, 1, 1, 2, 2]);
   });
 });

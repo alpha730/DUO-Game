@@ -5,6 +5,8 @@ import {
   COL,
   DEFAULT_RULES,
   DOC,
+  QUESTION_LEVELS,
+  QUESTION_TYPES,
   type AdminPlayerRow,
   type AdminStatsOutput,
   type AdminUploadError,
@@ -12,6 +14,7 @@ import {
   type ChallengeType,
   type GameConfigDoc,
   type GameRules,
+  type QuestionCounts,
 } from "@shared/types";
 import { BRAND, lingoName } from "../config/brand";
 import { api, apiErrorMessage } from "../lib/api";
@@ -85,11 +88,7 @@ function Stats() {
               <span className="small muted">wins today</span>
             </div>
           </div>
-          <p className="small muted" style={{ margin: 0 }} data-missing={stats.missingCount}>
-            {stats.missingCount === 0
-              ? `✓ Every game day × ${BRAND.creatureName} has a challenge.`
-              : `${stats.missingCount} game day × ${BRAND.creatureName} slots have no challenge, e.g. ${stats.missingChallenges.slice(0, 5).join(", ")}`}
-          </p>
+          <QuestionCountsTable counts={stats.questions} total={stats.questionTotal} />
         </>
       )}
       <button className="btn secondary" onClick={load} disabled={busy}>
@@ -202,17 +201,51 @@ function ConfigForm({ config, reload }: { config: GameConfigDoc; reload: () => v
 }
 
 const EXAMPLE = `[
-  { "date": "2026-10-10", "lingoId": "lingo-2016", "type": "pronounce", "word": "colour", "accept": ["color"] },
-  { "date": "2026-10-10", "lingoId": "lingo-2017", "type": "speak", "phrase": "Practice makes progress." },
-  { "date": "2026-10-10", "lingoId": "lingo-2018", "type": "meaning", "word": "keen",
-    "options": ["eager", "tired", "angry", "late"], "correctIndex": 0 },
-  { "date": "2026-10-10", "lingoId": "lingo-2019", "type": "question", "prompt": "She has lived here ___ 2020.",
-    "options": ["since", "for", "from", "at"], "correctIndex": 0 }
+  { "id": "m-mean-001", "level": "medium", "type": "meaning", "word": "abundant",
+    "options": ["exact", "correct", "available in large quantities", "vague"], "correctIndex": 2,
+    "explanation": "available in large quantities" },
+  { "id": "m-fill-001", "level": "medium", "type": "question", "target": "feasible",
+    "prompt": "The project is technically _____ within the budget.",
+    "options": ["feasible", "compel", "distinct", "allocate"], "correctIndex": 0,
+    "explanation": "possible and practical to achieve" },
+  { "id": "m-pron-001", "level": "medium", "type": "pronounce", "word": "abundant",
+    "explanation": "available in large quantities" }
 ]`;
 
-function ChallengeUpload({ onDone }: { onDone: () => void }) {
+/** Questions per level × type (SPEC §9). */
+function QuestionCountsTable({ counts, total }: { counts: QuestionCounts; total: number }) {
+  return (
+    <div className="table-scroll">
+      <table className="admin-table" data-question-total={total}>
+        <thead>
+          <tr>
+            <th>Pool: {total}</th>
+            {QUESTION_TYPES.map((t) => (
+              <th key={t}>{t}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {QUESTION_LEVELS.map((l) => (
+            <tr key={l}>
+              <th>{l}</th>
+              {QUESTION_TYPES.map((t) => (
+                <td key={t} data-count={`${l}/${t}`}>
+                  {counts[`${l}/${t}`]}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function QuestionUpload({ onDone }: { onDone: () => void }) {
   const [text, setText] = useState("");
   const [rowErrors, setRowErrors] = useState<AdminUploadError[]>([]);
+  const [counts, setCounts] = useState<{ counts: QuestionCounts; total: number } | null>(null);
   const { busy, status, run } = useAction();
 
   async function pickFile(file: File | undefined) {
@@ -220,9 +253,10 @@ function ChallengeUpload({ onDone }: { onDone: () => void }) {
   }
   function upload() {
     setRowErrors([]);
-    let challenges: unknown;
+    setCounts(null);
+    let questions: unknown;
     try {
-      challenges = JSON.parse(text);
+      questions = JSON.parse(text);
     } catch {
       run(async () => {
         throw new Error("That isn't valid JSON.");
@@ -230,27 +264,30 @@ function ChallengeUpload({ onDone }: { onDone: () => void }) {
       return;
     }
     run(async () => {
-      const out = await api.adminUpsertChallenges({ challenges: challenges as never });
+      const out = await api.adminUpsertQuestions({ questions: questions as never });
+      setCounts({ counts: out.counts, total: out.written });
       onDone();
-      return `Saved ${out.written} challenge${out.written === 1 ? "" : "s"}.`;
+      return `Saved ${out.written} question${out.written === 1 ? "" : "s"}${out.removed ? ` (removed ${out.removed} old)` : ""}.`;
     }).catch((err) => setRowErrors((err as { details?: { errors?: AdminUploadError[] } }).details?.errors ?? []));
   }
 
   return (
-    <Section title="Upload challenges (JSON)">
+    <Section title="Upload the question pool (JSON)">
       <p className="small muted" style={{ margin: 0 }}>
-        An array of challenges. Each needs a date inside the game, a lingoId and a type; meaning/question need 4 different
-        options and correctIndex 0–3. Nothing is saved if any row is wrong; the same date × Lingo is replaced.
+        The whole pool (scripts/content/question-pool-2026.json): every row needs a unique id, level medium/hard, type
+        meaning/question/pronounce and an explanation; meaning/question need 4 different options and correctIndex 0–3. Nothing
+        is saved if any row is wrong. It replaces the current pool; players get it within 10 minutes.
       </p>
-      <input type="file" accept=".json,application/json" onChange={(e) => void pickFile(e.target.files?.[0])} aria-label="Challenges JSON file" />
+      <input type="file" accept=".json,application/json" onChange={(e) => void pickFile(e.target.files?.[0])} aria-label="Question pool JSON file" />
       <label className="field">
         Or paste JSON
-        <textarea rows={8} value={text} onChange={(e) => setText(e.target.value)} placeholder={EXAMPLE} spellCheck={false} name="challengesJson" />
+        <textarea rows={8} value={text} onChange={(e) => setText(e.target.value)} placeholder={EXAMPLE} spellCheck={false} name="questionsJson" />
       </label>
       <button className="btn" onClick={upload} disabled={busy || !text.trim()}>
         {busy ? "Checking…" : "Validate & upload"}
       </button>
       <StatusLine status={status} />
+      {counts && <QuestionCountsTable counts={counts.counts} total={counts.total} />}
       {rowErrors.length > 0 && (
         <ul className="row-errors small" data-row-errors={rowErrors.length}>
           {rowErrors.map((e) => (
@@ -565,7 +602,7 @@ export default function Admin() {
       <Stats key={statsKey} />
       {config && <GameLock config={config} reload={reload} />}
       {config && <ConfigForm config={config} reload={reload} />}
-      <ChallengeUpload onDone={() => setStatsKey((k) => k + 1)} />
+      <QuestionUpload onDone={() => setStatsKey((k) => k + 1)} />
       {lingos.length > 0 && <CreateRaid lingos={lingos} />}
       <LeaderboardRefresh />
       <Suspicious />

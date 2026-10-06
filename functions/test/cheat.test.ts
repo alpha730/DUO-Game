@@ -82,7 +82,7 @@ describe("cheating with fake data", () => {
 
   it("players can't call admin functions or give themselves a role", async () => {
     const p = await newPlayer();
-    for (const name of ["adminSetConfig", "adminUpsertChallenges", "adminCreateRaid", "adminStats", "lockGame"]) {
+    for (const name of ["adminSetConfig", "adminUpsertQuestions", "adminCreateRaid", "adminStats", "lockGame"]) {
       await expect(p.call(name)({ locked: true, rules: { firstCatchPoints: 1e6 } })).rejects.toMatchObject({ code: "functions/permission-denied" });
     }
     expect((await adb.doc("config/game").get()).data()!.locked).toBe(false);

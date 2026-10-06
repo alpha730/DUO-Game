@@ -1,0 +1,6162 @@
+[
+ {
+  "id": "m-mean-001",
+  "level": "medium",
+  "type": "meaning",
+  "word": "abundant",
+  "options": [
+   "exact and accurate",
+   "correct and free from errors",
+   "available in large quantities",
+   "having more than one possible meaning"
+  ],
+  "correctIndex": 2,
+  "explanation": "available in large quantities"
+ },
+ {
+  "id": "m-mean-002",
+  "level": "medium",
+  "type": "meaning",
+  "word": "allocate",
+  "options": [
+   "certain to happen",
+   "able to be used in many different ways",
+   "to expect or predict something",
+   "to distribute something for a particular purpose"
+  ],
+  "correctIndex": 3,
+  "explanation": "to distribute something for a particular purpose"
+ },
+ {
+  "id": "m-mean-003",
+  "level": "medium",
+  "type": "meaning",
+  "word": "emerge",
+  "options": [
+   "correct and free from errors",
+   "clearly different or separate",
+   "to become known or visible",
+   "to expect or predict something"
+  ],
+  "correctIndex": 2,
+  "explanation": "to become known or visible"
+ },
+ {
+  "id": "m-mean-004",
+  "level": "medium",
+  "type": "meaning",
+  "word": "credible",
+  "options": [
+   "based on what is traditionally done",
+   "worthy of belief or trust",
+   "unwilling or hesitant",
+   "easy to notice or understand"
+  ],
+  "correctIndex": 1,
+  "explanation": "worthy of belief or trust"
+ },
+ {
+  "id": "m-mean-005",
+  "level": "medium",
+  "type": "meaning",
+  "word": "ambiguous",
+  "options": [
+   "to force or strongly persuade",
+   "to get or acquire something",
+   "easily harmed or affected",
+   "having more than one possible meaning"
+  ],
+  "correctIndex": 3,
+  "explanation": "having more than one possible meaning"
+ },
+ {
+  "id": "m-mean-006",
+  "level": "medium",
+  "type": "meaning",
+  "word": "consecutive",
+  "options": [
+   "detailed and carefully developed",
+   "following one after another without interruption",
+   "certain to happen",
+   "easily harmed or affected"
+  ],
+  "correctIndex": 1,
+  "explanation": "following one after another without interruption"
+ },
+ {
+  "id": "m-mean-007",
+  "level": "medium",
+  "type": "meaning",
+  "word": "adequate",
+  "options": [
+   "having more than one possible meaning",
+   "to adjust to new conditions",
+   "sufficient for a particular purpose",
+   "logical and well organized"
+  ],
+  "correctIndex": 2,
+  "explanation": "sufficient for a particular purpose"
+ },
+ {
+  "id": "m-mean-008",
+  "level": "medium",
+  "type": "meaning",
+  "word": "diligent",
+  "options": [
+   "correct and free from errors",
+   "exact and accurate",
+   "a belief, idea, or understanding",
+   "showing careful and persistent effort"
+  ],
+  "correctIndex": 3,
+  "explanation": "showing careful and persistent effort"
+ },
+ {
+  "id": "m-mean-009",
+  "level": "medium",
+  "type": "meaning",
+  "word": "obtain",
+  "options": [
+   "possible and practical to achieve",
+   "to expect or predict something",
+   "following one after another without interruption",
+   "to get or acquire something"
+  ],
+  "correctIndex": 3,
+  "explanation": "to get or acquire something"
+ },
+ {
+  "id": "m-mean-010",
+  "level": "medium",
+  "type": "meaning",
+  "word": "notion",
+  "options": [
+   "correct and free from errors",
+   "able to be used in many different ways",
+   "including all or nearly all details",
+   "a belief, idea, or understanding"
+  ],
+  "correctIndex": 3,
+  "explanation": "a belief, idea, or understanding"
+ },
+ {
+  "id": "m-mean-011",
+  "level": "medium",
+  "type": "meaning",
+  "word": "obtain",
+  "options": [
+   "to get or acquire something",
+   "sufficient for a particular purpose",
+   "correct and free from errors",
+   "continuing despite difficulty"
+  ],
+  "correctIndex": 0,
+  "explanation": "to get or acquire something"
+ },
+ {
+  "id": "m-mean-012",
+  "level": "medium",
+  "type": "meaning",
+  "word": "vulnerable",
+  "options": [
+   "easy to notice or understand",
+   "to adjust to new conditions",
+   "easily harmed or affected",
+   "certain to happen"
+  ],
+  "correctIndex": 2,
+  "explanation": "easily harmed or affected"
+ },
+ {
+  "id": "m-mean-013",
+  "level": "medium",
+  "type": "meaning",
+  "word": "versatile",
+  "options": [
+   "able to be used in many different ways",
+   "exact and accurate",
+   "showing careful and persistent effort",
+   "including all or nearly all details"
+  ],
+  "correctIndex": 0,
+  "explanation": "able to be used in many different ways"
+ },
+ {
+  "id": "m-mean-014",
+  "level": "medium",
+  "type": "meaning",
+  "word": "diligent",
+  "options": [
+   "exact and accurate",
+   "to expect or predict something",
+   "showing careful and persistent effort",
+   "continuing despite difficulty"
+  ],
+  "correctIndex": 2,
+  "explanation": "showing careful and persistent effort"
+ },
+ {
+  "id": "m-mean-015",
+  "level": "medium",
+  "type": "meaning",
+  "word": "credible",
+  "options": [
+   "to expect or predict something",
+   "worthy of belief or trust",
+   "able to be used in many different ways",
+   "including all or nearly all details"
+  ],
+  "correctIndex": 1,
+  "explanation": "worthy of belief or trust"
+ },
+ {
+  "id": "m-mean-016",
+  "level": "medium",
+  "type": "meaning",
+  "word": "anticipate",
+  "options": [
+   "to force or strongly persuade",
+   "to expect or predict something",
+   "having more than one possible meaning",
+   "based on what is traditionally done"
+  ],
+  "correctIndex": 1,
+  "explanation": "to expect or predict something"
+ },
+ {
+  "id": "m-mean-017",
+  "level": "medium",
+  "type": "meaning",
+  "word": "accurate",
+  "options": [
+   "having more than one possible meaning",
+   "to expect or predict something",
+   "able to be used in many different ways",
+   "correct and free from errors"
+  ],
+  "correctIndex": 3,
+  "explanation": "correct and free from errors"
+ },
+ {
+  "id": "m-mean-018",
+  "level": "medium",
+  "type": "meaning",
+  "word": "adapt",
+  "options": [
+   "sufficient for a particular purpose",
+   "available in large quantities",
+   "to adjust to new conditions",
+   "correct and free from errors"
+  ],
+  "correctIndex": 2,
+  "explanation": "to adjust to new conditions"
+ },
+ {
+  "id": "m-mean-019",
+  "level": "medium",
+  "type": "meaning",
+  "word": "anticipate",
+  "options": [
+   "to expect or predict something",
+   "exact and accurate",
+   "to force or strongly persuade",
+   "easy to notice or understand"
+  ],
+  "correctIndex": 0,
+  "explanation": "to expect or predict something"
+ },
+ {
+  "id": "m-mean-020",
+  "level": "medium",
+  "type": "meaning",
+  "word": "apparent",
+  "options": [
+   "to expect or predict something",
+   "easily harmed or affected",
+   "easy to notice or understand",
+   "large in amount or importance"
+  ],
+  "correctIndex": 2,
+  "explanation": "easy to notice or understand"
+ },
+ {
+  "id": "m-mean-021",
+  "level": "medium",
+  "type": "meaning",
+  "word": "adapt",
+  "options": [
+   "to adjust to new conditions",
+   "able to express ideas clearly",
+   "exact and accurate",
+   "unwilling or hesitant"
+  ],
+  "correctIndex": 0,
+  "explanation": "to adjust to new conditions"
+ },
+ {
+  "id": "m-mean-022",
+  "level": "medium",
+  "type": "meaning",
+  "word": "articulate",
+  "options": [
+   "clearly different or separate",
+   "able to be used in many different ways",
+   "able to express ideas clearly",
+   "to get or acquire something"
+  ],
+  "correctIndex": 2,
+  "explanation": "able to express ideas clearly"
+ },
+ {
+  "id": "m-mean-023",
+  "level": "medium",
+  "type": "meaning",
+  "word": "inevitable",
+  "options": [
+   "certain to happen",
+   "to confirm that something is correct or legitimate",
+   "logical and well organized",
+   "based on what is traditionally done"
+  ],
+  "correctIndex": 0,
+  "explanation": "certain to happen"
+ },
+ {
+  "id": "m-mean-024",
+  "level": "medium",
+  "type": "meaning",
+  "word": "validate",
+  "options": [
+   "to confirm that something is correct or legitimate",
+   "certain to happen",
+   "having more than one possible meaning",
+   "easy to notice or understand"
+  ],
+  "correctIndex": 0,
+  "explanation": "to confirm that something is correct or legitimate"
+ },
+ {
+  "id": "m-mean-025",
+  "level": "medium",
+  "type": "meaning",
+  "word": "validate",
+  "options": [
+   "logical and well organized",
+   "to confirm that something is correct or legitimate",
+   "clearly different or separate",
+   "large in amount or importance"
+  ],
+  "correctIndex": 1,
+  "explanation": "to confirm that something is correct or legitimate"
+ },
+ {
+  "id": "m-mean-026",
+  "level": "medium",
+  "type": "meaning",
+  "word": "consecutive",
+  "options": [
+   "sufficient for a particular purpose",
+   "following one after another without interruption",
+   "to become known or visible",
+   "available in large quantities"
+  ],
+  "correctIndex": 1,
+  "explanation": "following one after another without interruption"
+ },
+ {
+  "id": "m-mean-027",
+  "level": "medium",
+  "type": "meaning",
+  "word": "conventional",
+  "options": [
+   "a belief, idea, or understanding",
+   "based on what is traditionally done",
+   "to become known or visible",
+   "easy to notice or understand"
+  ],
+  "correctIndex": 1,
+  "explanation": "based on what is traditionally done"
+ },
+ {
+  "id": "m-mean-028",
+  "level": "medium",
+  "type": "meaning",
+  "word": "coherent",
+  "options": [
+   "detailed and carefully developed",
+   "easily harmed or affected",
+   "easy to notice or understand",
+   "logical and well organized"
+  ],
+  "correctIndex": 3,
+  "explanation": "logical and well organized"
+ },
+ {
+  "id": "m-mean-029",
+  "level": "medium",
+  "type": "meaning",
+  "word": "emerge",
+  "options": [
+   "to confirm that something is correct or legitimate",
+   "correct and free from errors",
+   "to become known or visible",
+   "to distribute something for a particular purpose"
+  ],
+  "correctIndex": 2,
+  "explanation": "to become known or visible"
+ },
+ {
+  "id": "m-mean-030",
+  "level": "medium",
+  "type": "meaning",
+  "word": "ambiguous",
+  "options": [
+   "to force or strongly persuade",
+   "correct and free from errors",
+   "to distribute something for a particular purpose",
+   "having more than one possible meaning"
+  ],
+  "correctIndex": 3,
+  "explanation": "having more than one possible meaning"
+ },
+ {
+  "id": "m-mean-031",
+  "level": "medium",
+  "type": "meaning",
+  "word": "validate",
+  "options": [
+   "able to be used in many different ways",
+   "to confirm that something is correct or legitimate",
+   "to adjust to new conditions",
+   "available in large quantities"
+  ],
+  "correctIndex": 1,
+  "explanation": "to confirm that something is correct or legitimate"
+ },
+ {
+  "id": "m-mean-032",
+  "level": "medium",
+  "type": "meaning",
+  "word": "substantial",
+  "options": [
+   "large in amount or importance",
+   "exact and accurate",
+   "sufficient for a particular purpose",
+   "able to be used in many different ways"
+  ],
+  "correctIndex": 0,
+  "explanation": "large in amount or importance"
+ },
+ {
+  "id": "m-mean-033",
+  "level": "medium",
+  "type": "meaning",
+  "word": "allocate",
+  "options": [
+   "easily harmed or affected",
+   "certain to happen",
+   "worthy of belief or trust",
+   "to distribute something for a particular purpose"
+  ],
+  "correctIndex": 3,
+  "explanation": "to distribute something for a particular purpose"
+ },
+ {
+  "id": "m-mean-034",
+  "level": "medium",
+  "type": "meaning",
+  "word": "compel",
+  "options": [
+   "to get or acquire something",
+   "easy to notice or understand",
+   "large in amount or importance",
+   "to force or strongly persuade"
+  ],
+  "correctIndex": 3,
+  "explanation": "to force or strongly persuade"
+ },
+ {
+  "id": "m-mean-035",
+  "level": "medium",
+  "type": "meaning",
+  "word": "reluctant",
+  "options": [
+   "showing careful and persistent effort",
+   "unwilling or hesitant",
+   "to get or acquire something",
+   "to adjust to new conditions"
+  ],
+  "correctIndex": 1,
+  "explanation": "unwilling or hesitant"
+ },
+ {
+  "id": "m-mean-036",
+  "level": "medium",
+  "type": "meaning",
+  "word": "accurate",
+  "options": [
+   "correct and free from errors",
+   "continuing despite difficulty",
+   "including all or nearly all details",
+   "to force or strongly persuade"
+  ],
+  "correctIndex": 0,
+  "explanation": "correct and free from errors"
+ },
+ {
+  "id": "m-mean-037",
+  "level": "medium",
+  "type": "meaning",
+  "word": "accurate",
+  "options": [
+   "logical and well organized",
+   "including all or nearly all details",
+   "correct and free from errors",
+   "unwilling or hesitant"
+  ],
+  "correctIndex": 2,
+  "explanation": "correct and free from errors"
+ },
+ {
+  "id": "m-mean-038",
+  "level": "medium",
+  "type": "meaning",
+  "word": "persistent",
+  "options": [
+   "following one after another without interruption",
+   "to adjust to new conditions",
+   "to expect or predict something",
+   "continuing despite difficulty"
+  ],
+  "correctIndex": 3,
+  "explanation": "continuing despite difficulty"
+ },
+ {
+  "id": "m-mean-039",
+  "level": "medium",
+  "type": "meaning",
+  "word": "conventional",
+  "options": [
+   "exact and accurate",
+   "logical and well organized",
+   "based on what is traditionally done",
+   "to become known or visible"
+  ],
+  "correctIndex": 2,
+  "explanation": "based on what is traditionally done"
+ },
+ {
+  "id": "m-mean-040",
+  "level": "medium",
+  "type": "meaning",
+  "word": "distinct",
+  "options": [
+   "exact and accurate",
+   "clearly different or separate",
+   "certain to happen",
+   "easily harmed or affected"
+  ],
+  "correctIndex": 1,
+  "explanation": "clearly different or separate"
+ },
+ {
+  "id": "m-mean-041",
+  "level": "medium",
+  "type": "meaning",
+  "word": "adequate",
+  "options": [
+   "able to express ideas clearly",
+   "a belief, idea, or understanding",
+   "sufficient for a particular purpose",
+   "large in amount or importance"
+  ],
+  "correctIndex": 2,
+  "explanation": "sufficient for a particular purpose"
+ },
+ {
+  "id": "m-mean-042",
+  "level": "medium",
+  "type": "meaning",
+  "word": "allocate",
+  "options": [
+   "able to express ideas clearly",
+   "to distribute something for a particular purpose",
+   "clearly different or separate",
+   "to adjust to new conditions"
+  ],
+  "correctIndex": 1,
+  "explanation": "to distribute something for a particular purpose"
+ },
+ {
+  "id": "m-mean-043",
+  "level": "medium",
+  "type": "meaning",
+  "word": "feasible",
+  "options": [
+   "worthy of belief or trust",
+   "possible and practical to achieve",
+   "unwilling or hesitant",
+   "easy to notice or understand"
+  ],
+  "correctIndex": 1,
+  "explanation": "possible and practical to achieve"
+ },
+ {
+  "id": "m-mean-044",
+  "level": "medium",
+  "type": "meaning",
+  "word": "elaborate",
+  "options": [
+   "detailed and carefully developed",
+   "possible and practical to achieve",
+   "able to express ideas clearly",
+   "following one after another without interruption"
+  ],
+  "correctIndex": 0,
+  "explanation": "detailed and carefully developed"
+ },
+ {
+  "id": "m-mean-045",
+  "level": "medium",
+  "type": "meaning",
+  "word": "feasible",
+  "options": [
+   "possible and practical to achieve",
+   "to adjust to new conditions",
+   "logical and well organized",
+   "worthy of belief or trust"
+  ],
+  "correctIndex": 0,
+  "explanation": "possible and practical to achieve"
+ },
+ {
+  "id": "m-mean-046",
+  "level": "medium",
+  "type": "meaning",
+  "word": "consecutive",
+  "options": [
+   "following one after another without interruption",
+   "to confirm that something is correct or legitimate",
+   "easy to notice or understand",
+   "showing careful and persistent effort"
+  ],
+  "correctIndex": 0,
+  "explanation": "following one after another without interruption"
+ },
+ {
+  "id": "m-mean-047",
+  "level": "medium",
+  "type": "meaning",
+  "word": "precise",
+  "options": [
+   "logical and well organized",
+   "correct and free from errors",
+   "exact and accurate",
+   "large in amount or importance"
+  ],
+  "correctIndex": 2,
+  "explanation": "exact and accurate"
+ },
+ {
+  "id": "m-mean-048",
+  "level": "medium",
+  "type": "meaning",
+  "word": "elaborate",
+  "options": [
+   "showing careful and persistent effort",
+   "to expect or predict something",
+   "detailed and carefully developed",
+   "possible and practical to achieve"
+  ],
+  "correctIndex": 2,
+  "explanation": "detailed and carefully developed"
+ },
+ {
+  "id": "m-mean-049",
+  "level": "medium",
+  "type": "meaning",
+  "word": "accurate",
+  "options": [
+   "a belief, idea, or understanding",
+   "easy to notice or understand",
+   "correct and free from errors",
+   "to force or strongly persuade"
+  ],
+  "correctIndex": 2,
+  "explanation": "correct and free from errors"
+ },
+ {
+  "id": "m-mean-050",
+  "level": "medium",
+  "type": "meaning",
+  "word": "precise",
+  "options": [
+   "clearly different or separate",
+   "exact and accurate",
+   "sufficient for a particular purpose",
+   "worthy of belief or trust"
+  ],
+  "correctIndex": 1,
+  "explanation": "exact and accurate"
+ },
+ {
+  "id": "m-mean-051",
+  "level": "medium",
+  "type": "meaning",
+  "word": "diligent",
+  "options": [
+   "to expect or predict something",
+   "easily harmed or affected",
+   "logical and well organized",
+   "showing careful and persistent effort"
+  ],
+  "correctIndex": 3,
+  "explanation": "showing careful and persistent effort"
+ },
+ {
+  "id": "m-mean-052",
+  "level": "medium",
+  "type": "meaning",
+  "word": "versatile",
+  "options": [
+   "able to be used in many different ways",
+   "continuing despite difficulty",
+   "having more than one possible meaning",
+   "exact and accurate"
+  ],
+  "correctIndex": 0,
+  "explanation": "able to be used in many different ways"
+ },
+ {
+  "id": "m-mean-053",
+  "level": "medium",
+  "type": "meaning",
+  "word": "apparent",
+  "options": [
+   "a belief, idea, or understanding",
+   "sufficient for a particular purpose",
+   "available in large quantities",
+   "easy to notice or understand"
+  ],
+  "correctIndex": 3,
+  "explanation": "easy to notice or understand"
+ },
+ {
+  "id": "m-mean-054",
+  "level": "medium",
+  "type": "meaning",
+  "word": "articulate",
+  "options": [
+   "a belief, idea, or understanding",
+   "able to express ideas clearly",
+   "to distribute something for a particular purpose",
+   "correct and free from errors"
+  ],
+  "correctIndex": 1,
+  "explanation": "able to express ideas clearly"
+ },
+ {
+  "id": "m-mean-055",
+  "level": "medium",
+  "type": "meaning",
+  "word": "abundant",
+  "options": [
+   "sufficient for a particular purpose",
+   "to confirm that something is correct or legitimate",
+   "available in large quantities",
+   "to distribute something for a particular purpose"
+  ],
+  "correctIndex": 2,
+  "explanation": "available in large quantities"
+ },
+ {
+  "id": "m-mean-056",
+  "level": "medium",
+  "type": "meaning",
+  "word": "compel",
+  "options": [
+   "to force or strongly persuade",
+   "to expect or predict something",
+   "clearly different or separate",
+   "able to be used in many different ways"
+  ],
+  "correctIndex": 0,
+  "explanation": "to force or strongly persuade"
+ },
+ {
+  "id": "m-mean-057",
+  "level": "medium",
+  "type": "meaning",
+  "word": "apparent",
+  "options": [
+   "easy to notice or understand",
+   "sufficient for a particular purpose",
+   "to adjust to new conditions",
+   "showing careful and persistent effort"
+  ],
+  "correctIndex": 0,
+  "explanation": "easy to notice or understand"
+ },
+ {
+  "id": "m-mean-058",
+  "level": "medium",
+  "type": "meaning",
+  "word": "distinct",
+  "options": [
+   "able to express ideas clearly",
+   "correct and free from errors",
+   "following one after another without interruption",
+   "clearly different or separate"
+  ],
+  "correctIndex": 3,
+  "explanation": "clearly different or separate"
+ },
+ {
+  "id": "m-mean-059",
+  "level": "medium",
+  "type": "meaning",
+  "word": "conventional",
+  "options": [
+   "following one after another without interruption",
+   "based on what is traditionally done",
+   "to expect or predict something",
+   "able to express ideas clearly"
+  ],
+  "correctIndex": 1,
+  "explanation": "based on what is traditionally done"
+ },
+ {
+  "id": "m-mean-060",
+  "level": "medium",
+  "type": "meaning",
+  "word": "persistent",
+  "options": [
+   "to get or acquire something",
+   "possible and practical to achieve",
+   "showing careful and persistent effort",
+   "continuing despite difficulty"
+  ],
+  "correctIndex": 3,
+  "explanation": "continuing despite difficulty"
+ },
+ {
+  "id": "m-mean-061",
+  "level": "medium",
+  "type": "meaning",
+  "word": "anticipate",
+  "options": [
+   "to adjust to new conditions",
+   "clearly different or separate",
+   "logical and well organized",
+   "to expect or predict something"
+  ],
+  "correctIndex": 3,
+  "explanation": "to expect or predict something"
+ },
+ {
+  "id": "m-mean-062",
+  "level": "medium",
+  "type": "meaning",
+  "word": "anticipate",
+  "options": [
+   "to confirm that something is correct or legitimate",
+   "following one after another without interruption",
+   "clearly different or separate",
+   "to expect or predict something"
+  ],
+  "correctIndex": 3,
+  "explanation": "to expect or predict something"
+ },
+ {
+  "id": "m-mean-063",
+  "level": "medium",
+  "type": "meaning",
+  "word": "compel",
+  "options": [
+   "worthy of belief or trust",
+   "to become known or visible",
+   "detailed and carefully developed",
+   "to force or strongly persuade"
+  ],
+  "correctIndex": 3,
+  "explanation": "to force or strongly persuade"
+ },
+ {
+  "id": "m-mean-064",
+  "level": "medium",
+  "type": "meaning",
+  "word": "adapt",
+  "options": [
+   "possible and practical to achieve",
+   "logical and well organized",
+   "correct and free from errors",
+   "to adjust to new conditions"
+  ],
+  "correctIndex": 3,
+  "explanation": "to adjust to new conditions"
+ },
+ {
+  "id": "m-mean-065",
+  "level": "medium",
+  "type": "meaning",
+  "word": "abundant",
+  "options": [
+   "clearly different or separate",
+   "to expect or predict something",
+   "to force or strongly persuade",
+   "available in large quantities"
+  ],
+  "correctIndex": 3,
+  "explanation": "available in large quantities"
+ },
+ {
+  "id": "m-mean-066",
+  "level": "medium",
+  "type": "meaning",
+  "word": "inevitable",
+  "options": [
+   "certain to happen",
+   "easy to notice or understand",
+   "exact and accurate",
+   "to become known or visible"
+  ],
+  "correctIndex": 0,
+  "explanation": "certain to happen"
+ },
+ {
+  "id": "m-mean-067",
+  "level": "medium",
+  "type": "meaning",
+  "word": "apparent",
+  "options": [
+   "certain to happen",
+   "logical and well organized",
+   "easy to notice or understand",
+   "to force or strongly persuade"
+  ],
+  "correctIndex": 2,
+  "explanation": "easy to notice or understand"
+ },
+ {
+  "id": "m-mean-068",
+  "level": "medium",
+  "type": "meaning",
+  "word": "articulate",
+  "options": [
+   "easily harmed or affected",
+   "able to express ideas clearly",
+   "correct and free from errors",
+   "able to be used in many different ways"
+  ],
+  "correctIndex": 1,
+  "explanation": "able to express ideas clearly"
+ },
+ {
+  "id": "m-mean-069",
+  "level": "medium",
+  "type": "meaning",
+  "word": "comprehensive",
+  "options": [
+   "correct and free from errors",
+   "able to be used in many different ways",
+   "including all or nearly all details",
+   "showing careful and persistent effort"
+  ],
+  "correctIndex": 2,
+  "explanation": "including all or nearly all details"
+ },
+ {
+  "id": "m-mean-070",
+  "level": "medium",
+  "type": "meaning",
+  "word": "obtain",
+  "options": [
+   "clearly different or separate",
+   "worthy of belief or trust",
+   "to get or acquire something",
+   "a belief, idea, or understanding"
+  ],
+  "correctIndex": 2,
+  "explanation": "to get or acquire something"
+ },
+ {
+  "id": "m-mean-071",
+  "level": "medium",
+  "type": "meaning",
+  "word": "elaborate",
+  "options": [
+   "detailed and carefully developed",
+   "exact and accurate",
+   "logical and well organized",
+   "worthy of belief or trust"
+  ],
+  "correctIndex": 0,
+  "explanation": "detailed and carefully developed"
+ },
+ {
+  "id": "m-mean-072",
+  "level": "medium",
+  "type": "meaning",
+  "word": "comprehensive",
+  "options": [
+   "worthy of belief or trust",
+   "including all or nearly all details",
+   "to confirm that something is correct or legitimate",
+   "a belief, idea, or understanding"
+  ],
+  "correctIndex": 1,
+  "explanation": "including all or nearly all details"
+ },
+ {
+  "id": "m-mean-073",
+  "level": "medium",
+  "type": "meaning",
+  "word": "abundant",
+  "options": [
+   "unwilling or hesitant",
+   "including all or nearly all details",
+   "available in large quantities",
+   "sufficient for a particular purpose"
+  ],
+  "correctIndex": 2,
+  "explanation": "available in large quantities"
+ },
+ {
+  "id": "m-mean-074",
+  "level": "medium",
+  "type": "meaning",
+  "word": "comprehensive",
+  "options": [
+   "to force or strongly persuade",
+   "to adjust to new conditions",
+   "including all or nearly all details",
+   "to confirm that something is correct or legitimate"
+  ],
+  "correctIndex": 2,
+  "explanation": "including all or nearly all details"
+ },
+ {
+  "id": "m-mean-075",
+  "level": "medium",
+  "type": "meaning",
+  "word": "credible",
+  "options": [
+   "to become known or visible",
+   "able to express ideas clearly",
+   "logical and well organized",
+   "worthy of belief or trust"
+  ],
+  "correctIndex": 3,
+  "explanation": "worthy of belief or trust"
+ },
+ {
+  "id": "m-mean-076",
+  "level": "medium",
+  "type": "meaning",
+  "word": "notion",
+  "options": [
+   "clearly different or separate",
+   "available in large quantities",
+   "a belief, idea, or understanding",
+   "sufficient for a particular purpose"
+  ],
+  "correctIndex": 2,
+  "explanation": "a belief, idea, or understanding"
+ },
+ {
+  "id": "m-mean-077",
+  "level": "medium",
+  "type": "meaning",
+  "word": "substantial",
+  "options": [
+   "large in amount or importance",
+   "exact and accurate",
+   "sufficient for a particular purpose",
+   "following one after another without interruption"
+  ],
+  "correctIndex": 0,
+  "explanation": "large in amount or importance"
+ },
+ {
+  "id": "m-mean-078",
+  "level": "medium",
+  "type": "meaning",
+  "word": "vulnerable",
+  "options": [
+   "continuing despite difficulty",
+   "to force or strongly persuade",
+   "easily harmed or affected",
+   "following one after another without interruption"
+  ],
+  "correctIndex": 2,
+  "explanation": "easily harmed or affected"
+ },
+ {
+  "id": "m-mean-079",
+  "level": "medium",
+  "type": "meaning",
+  "word": "reluctant",
+  "options": [
+   "unwilling or hesitant",
+   "based on what is traditionally done",
+   "to adjust to new conditions",
+   "showing careful and persistent effort"
+  ],
+  "correctIndex": 0,
+  "explanation": "unwilling or hesitant"
+ },
+ {
+  "id": "m-mean-080",
+  "level": "medium",
+  "type": "meaning",
+  "word": "emerge",
+  "options": [
+   "easily harmed or affected",
+   "to distribute something for a particular purpose",
+   "to become known or visible",
+   "to force or strongly persuade"
+  ],
+  "correctIndex": 2,
+  "explanation": "to become known or visible"
+ },
+ {
+  "id": "m-mean-081",
+  "level": "medium",
+  "type": "meaning",
+  "word": "feasible",
+  "options": [
+   "possible and practical to achieve",
+   "detailed and carefully developed",
+   "logical and well organized",
+   "easily harmed or affected"
+  ],
+  "correctIndex": 0,
+  "explanation": "possible and practical to achieve"
+ },
+ {
+  "id": "m-mean-082",
+  "level": "medium",
+  "type": "meaning",
+  "word": "persistent",
+  "options": [
+   "possible and practical to achieve",
+   "to become known or visible",
+   "to adjust to new conditions",
+   "continuing despite difficulty"
+  ],
+  "correctIndex": 3,
+  "explanation": "continuing despite difficulty"
+ },
+ {
+  "id": "m-mean-083",
+  "level": "medium",
+  "type": "meaning",
+  "word": "ambiguous",
+  "options": [
+   "logical and well organized",
+   "having more than one possible meaning",
+   "showing careful and persistent effort",
+   "possible and practical to achieve"
+  ],
+  "correctIndex": 1,
+  "explanation": "having more than one possible meaning"
+ },
+ {
+  "id": "m-mean-084",
+  "level": "medium",
+  "type": "meaning",
+  "word": "inevitable",
+  "options": [
+   "to force or strongly persuade",
+   "easy to notice or understand",
+   "certain to happen",
+   "having more than one possible meaning"
+  ],
+  "correctIndex": 2,
+  "explanation": "certain to happen"
+ },
+ {
+  "id": "m-mean-085",
+  "level": "medium",
+  "type": "meaning",
+  "word": "vulnerable",
+  "options": [
+   "easily harmed or affected",
+   "clearly different or separate",
+   "large in amount or importance",
+   "exact and accurate"
+  ],
+  "correctIndex": 0,
+  "explanation": "easily harmed or affected"
+ },
+ {
+  "id": "m-mean-086",
+  "level": "medium",
+  "type": "meaning",
+  "word": "coherent",
+  "options": [
+   "logical and well organized",
+   "to confirm that something is correct or legitimate",
+   "clearly different or separate",
+   "to become known or visible"
+  ],
+  "correctIndex": 0,
+  "explanation": "logical and well organized"
+ },
+ {
+  "id": "m-mean-087",
+  "level": "medium",
+  "type": "meaning",
+  "word": "adequate",
+  "options": [
+   "clearly different or separate",
+   "to force or strongly persuade",
+   "following one after another without interruption",
+   "sufficient for a particular purpose"
+  ],
+  "correctIndex": 3,
+  "explanation": "sufficient for a particular purpose"
+ },
+ {
+  "id": "m-mean-088",
+  "level": "medium",
+  "type": "meaning",
+  "word": "versatile",
+  "options": [
+   "to force or strongly persuade",
+   "able to be used in many different ways",
+   "showing careful and persistent effort",
+   "sufficient for a particular purpose"
+  ],
+  "correctIndex": 1,
+  "explanation": "able to be used in many different ways"
+ },
+ {
+  "id": "m-mean-089",
+  "level": "medium",
+  "type": "meaning",
+  "word": "articulate",
+  "options": [
+   "able to express ideas clearly",
+   "sufficient for a particular purpose",
+   "to become known or visible",
+   "following one after another without interruption"
+  ],
+  "correctIndex": 0,
+  "explanation": "able to express ideas clearly"
+ },
+ {
+  "id": "m-mean-090",
+  "level": "medium",
+  "type": "meaning",
+  "word": "precise",
+  "options": [
+   "continuing despite difficulty",
+   "exact and accurate",
+   "to expect or predict something",
+   "easily harmed or affected"
+  ],
+  "correctIndex": 1,
+  "explanation": "exact and accurate"
+ },
+ {
+  "id": "m-mean-091",
+  "level": "medium",
+  "type": "meaning",
+  "word": "notion",
+  "options": [
+   "a belief, idea, or understanding",
+   "having more than one possible meaning",
+   "able to express ideas clearly",
+   "logical and well organized"
+  ],
+  "correctIndex": 0,
+  "explanation": "a belief, idea, or understanding"
+ },
+ {
+  "id": "m-mean-092",
+  "level": "medium",
+  "type": "meaning",
+  "word": "adapt",
+  "options": [
+   "to adjust to new conditions",
+   "showing careful and persistent effort",
+   "large in amount or importance",
+   "including all or nearly all details"
+  ],
+  "correctIndex": 0,
+  "explanation": "to adjust to new conditions"
+ },
+ {
+  "id": "m-mean-093",
+  "level": "medium",
+  "type": "meaning",
+  "word": "compel",
+  "options": [
+   "easy to notice or understand",
+   "to force or strongly persuade",
+   "worthy of belief or trust",
+   "clearly different or separate"
+  ],
+  "correctIndex": 1,
+  "explanation": "to force or strongly persuade"
+ },
+ {
+  "id": "m-mean-094",
+  "level": "medium",
+  "type": "meaning",
+  "word": "adequate",
+  "options": [
+   "sufficient for a particular purpose",
+   "to get or acquire something",
+   "exact and accurate",
+   "clearly different or separate"
+  ],
+  "correctIndex": 0,
+  "explanation": "sufficient for a particular purpose"
+ },
+ {
+  "id": "m-mean-095",
+  "level": "medium",
+  "type": "meaning",
+  "word": "distinct",
+  "options": [
+   "detailed and carefully developed",
+   "clearly different or separate",
+   "exact and accurate",
+   "easy to notice or understand"
+  ],
+  "correctIndex": 1,
+  "explanation": "clearly different or separate"
+ },
+ {
+  "id": "m-mean-096",
+  "level": "medium",
+  "type": "meaning",
+  "word": "coherent",
+  "options": [
+   "correct and free from errors",
+   "logical and well organized",
+   "detailed and carefully developed",
+   "having more than one possible meaning"
+  ],
+  "correctIndex": 1,
+  "explanation": "logical and well organized"
+ },
+ {
+  "id": "m-mean-097",
+  "level": "medium",
+  "type": "meaning",
+  "word": "substantial",
+  "options": [
+   "large in amount or importance",
+   "unwilling or hesitant",
+   "including all or nearly all details",
+   "exact and accurate"
+  ],
+  "correctIndex": 0,
+  "explanation": "large in amount or importance"
+ },
+ {
+  "id": "m-mean-098",
+  "level": "medium",
+  "type": "meaning",
+  "word": "ambiguous",
+  "options": [
+   "to get or acquire something",
+   "available in large quantities",
+   "logical and well organized",
+   "having more than one possible meaning"
+  ],
+  "correctIndex": 3,
+  "explanation": "having more than one possible meaning"
+ },
+ {
+  "id": "m-mean-099",
+  "level": "medium",
+  "type": "meaning",
+  "word": "coherent",
+  "options": [
+   "logical and well organized",
+   "showing careful and persistent effort",
+   "a belief, idea, or understanding",
+   "to adjust to new conditions"
+  ],
+  "correctIndex": 0,
+  "explanation": "logical and well organized"
+ },
+ {
+  "id": "m-mean-100",
+  "level": "medium",
+  "type": "meaning",
+  "word": "reluctant",
+  "options": [
+   "worthy of belief or trust",
+   "unwilling or hesitant",
+   "detailed and carefully developed",
+   "to get or acquire something"
+  ],
+  "correctIndex": 1,
+  "explanation": "unwilling or hesitant"
+ },
+ {
+  "id": "m-fill-001",
+  "level": "medium",
+  "type": "question",
+  "target": "feasible",
+  "prompt": "The project is technically _____ within the available budget.",
+  "options": [
+   "feasible",
+   "compel",
+   "distinct",
+   "allocate"
+  ],
+  "correctIndex": 0,
+  "explanation": "possible and practical to achieve"
+ },
+ {
+  "id": "m-fill-002",
+  "level": "medium",
+  "type": "question",
+  "target": "substantial",
+  "prompt": "The results showed a/an _____ improvement over the previous trial.",
+  "options": [
+   "notion",
+   "conventional",
+   "substantial",
+   "accurate"
+  ],
+  "correctIndex": 2,
+  "explanation": "large in amount or importance"
+ },
+ {
+  "id": "m-fill-003",
+  "level": "medium",
+  "type": "question",
+  "target": "distinct",
+  "prompt": "The difference between the two methods was clearly _____.",
+  "options": [
+   "consecutive",
+   "adequate",
+   "persistent",
+   "distinct"
+  ],
+  "correctIndex": 3,
+  "explanation": "clearly different or separate"
+ },
+ {
+  "id": "m-fill-004",
+  "level": "medium",
+  "type": "question",
+  "target": "allocate",
+  "prompt": "The manager decided to _____ more funds to research.",
+  "options": [
+   "articulate",
+   "allocate",
+   "apparent",
+   "persistent"
+  ],
+  "correctIndex": 1,
+  "explanation": "to distribute something for a particular purpose"
+ },
+ {
+  "id": "m-fill-005",
+  "level": "medium",
+  "type": "question",
+  "target": "accurate",
+  "prompt": "The report was carefully checked to ensure the figures were _____.",
+  "options": [
+   "apparent",
+   "notion",
+   "reluctant",
+   "accurate"
+  ],
+  "correctIndex": 3,
+  "explanation": "correct and free from errors"
+ },
+ {
+  "id": "m-fill-006",
+  "level": "medium",
+  "type": "question",
+  "target": "adapt",
+  "prompt": "The team had to _____ its strategy after the market changed.",
+  "options": [
+   "adapt",
+   "obtain",
+   "comprehensive",
+   "precise"
+  ],
+  "correctIndex": 0,
+  "explanation": "to adjust to new conditions"
+ },
+ {
+  "id": "m-fill-007",
+  "level": "medium",
+  "type": "question",
+  "target": "validate",
+  "prompt": "The evidence was strong enough to _____ the claim.",
+  "options": [
+   "validate",
+   "consecutive",
+   "compel",
+   "elaborate"
+  ],
+  "correctIndex": 0,
+  "explanation": "to confirm that something is correct or legitimate"
+ },
+ {
+  "id": "m-fill-008",
+  "level": "medium",
+  "type": "question",
+  "target": "coherent",
+  "prompt": "His explanation was logical and _____ from beginning to end.",
+  "options": [
+   "reluctant",
+   "obtain",
+   "consecutive",
+   "coherent"
+  ],
+  "correctIndex": 3,
+  "explanation": "logical and well organized"
+ },
+ {
+  "id": "m-fill-009",
+  "level": "medium",
+  "type": "question",
+  "target": "comprehensive",
+  "prompt": "The instructions were so _____ that they covered every single step, from start to finish.",
+  "options": [
+   "compel",
+   "comprehensive",
+   "substantial",
+   "abundant"
+  ],
+  "correctIndex": 1,
+  "explanation": "including all or nearly all details"
+ },
+ {
+  "id": "m-fill-010",
+  "level": "medium",
+  "type": "question",
+  "target": "reluctant",
+  "prompt": "She was _____ to accept the offer because of the risks involved.",
+  "options": [
+   "reluctant",
+   "adequate",
+   "credible",
+   "articulate"
+  ],
+  "correctIndex": 0,
+  "explanation": "unwilling or hesitant"
+ },
+ {
+  "id": "m-fill-011",
+  "level": "medium",
+  "type": "question",
+  "target": "abundant",
+  "prompt": "After weeks of rain, water was _____ in the region, and every lake was full.",
+  "options": [
+   "abundant",
+   "credible",
+   "articulate",
+   "accurate"
+  ],
+  "correctIndex": 0,
+  "explanation": "available in large quantities"
+ },
+ {
+  "id": "m-fill-012",
+  "level": "medium",
+  "type": "question",
+  "target": "abundant",
+  "prompt": "The market had a/an _____ supply of mangoes, so prices dropped sharply.",
+  "options": [
+   "versatile",
+   "apparent",
+   "articulate",
+   "abundant"
+  ],
+  "correctIndex": 3,
+  "explanation": "available in large quantities"
+ },
+ {
+  "id": "m-fill-013",
+  "level": "medium",
+  "type": "question",
+  "target": "abundant",
+  "prompt": "Birds are _____ in this forest; you can see hundreds of them every morning.",
+  "options": [
+   "consecutive",
+   "abundant",
+   "conventional",
+   "apparent"
+  ],
+  "correctIndex": 1,
+  "explanation": "available in large quantities"
+ },
+ {
+  "id": "m-fill-014",
+  "level": "medium",
+  "type": "question",
+  "target": "credible",
+  "prompt": "The police believed the witness because her story was _____ and backed by evidence.",
+  "options": [
+   "vulnerable",
+   "persistent",
+   "conventional",
+   "credible"
+  ],
+  "correctIndex": 3,
+  "explanation": "worthy of belief or trust"
+ },
+ {
+  "id": "m-fill-015",
+  "level": "medium",
+  "type": "question",
+  "target": "credible",
+  "prompt": "For your project, use _____ sources such as official reports, not random blogs.",
+  "options": [
+   "credible",
+   "abundant",
+   "comprehensive",
+   "persistent"
+  ],
+  "correctIndex": 0,
+  "explanation": "worthy of belief or trust"
+ },
+ {
+  "id": "m-fill-016",
+  "level": "medium",
+  "type": "question",
+  "target": "credible",
+  "prompt": "Nobody trusted the rumour because it did not come from a/an _____ person.",
+  "options": [
+   "articulate",
+   "credible",
+   "elaborate",
+   "consecutive"
+  ],
+  "correctIndex": 1,
+  "explanation": "worthy of belief or trust"
+ },
+ {
+  "id": "m-fill-017",
+  "level": "medium",
+  "type": "question",
+  "target": "ambiguous",
+  "prompt": "The question was _____, so half the class understood it one way and half another way.",
+  "options": [
+   "ambiguous",
+   "vulnerable",
+   "conventional",
+   "distinct"
+  ],
+  "correctIndex": 0,
+  "explanation": "having more than one possible meaning"
+ },
+ {
+  "id": "m-fill-018",
+  "level": "medium",
+  "type": "question",
+  "target": "ambiguous",
+  "prompt": "His reply was so _____ that we still don't know whether he said yes or no.",
+  "options": [
+   "ambiguous",
+   "apparent",
+   "elaborate",
+   "reluctant"
+  ],
+  "correctIndex": 0,
+  "explanation": "having more than one possible meaning"
+ },
+ {
+  "id": "m-fill-019",
+  "level": "medium",
+  "type": "question",
+  "target": "ambiguous",
+  "prompt": "Please rewrite this _____ sentence; it can be read in two different ways.",
+  "options": [
+   "ambiguous",
+   "vulnerable",
+   "distinct",
+   "versatile"
+  ],
+  "correctIndex": 0,
+  "explanation": "having more than one possible meaning"
+ },
+ {
+  "id": "m-fill-020",
+  "level": "medium",
+  "type": "question",
+  "target": "consecutive",
+  "prompt": "It rained for five _____ days, without a single dry day in between.",
+  "options": [
+   "comprehensive",
+   "credible",
+   "consecutive",
+   "accurate"
+  ],
+  "correctIndex": 2,
+  "explanation": "following one after another without interruption"
+ },
+ {
+  "id": "m-fill-021",
+  "level": "medium",
+  "type": "question",
+  "target": "consecutive",
+  "prompt": "The team won three _____ matches, one after another.",
+  "options": [
+   "consecutive",
+   "conventional",
+   "elaborate",
+   "inevitable"
+  ],
+  "correctIndex": 0,
+  "explanation": "following one after another without interruption"
+ },
+ {
+  "id": "m-fill-022",
+  "level": "medium",
+  "type": "question",
+  "target": "consecutive",
+  "prompt": "She topped her class for two _____ years, 2024 and 2025.",
+  "options": [
+   "coherent",
+   "consecutive",
+   "conventional",
+   "distinct"
+  ],
+  "correctIndex": 1,
+  "explanation": "following one after another without interruption"
+ },
+ {
+  "id": "m-fill-023",
+  "level": "medium",
+  "type": "question",
+  "target": "adequate",
+  "prompt": "The hall has _____ seating for 200 people, which is just enough for the event.",
+  "options": [
+   "vulnerable",
+   "consecutive",
+   "credible",
+   "adequate"
+  ],
+  "correctIndex": 3,
+  "explanation": "sufficient for a particular purpose"
+ },
+ {
+  "id": "m-fill-024",
+  "level": "medium",
+  "type": "question",
+  "target": "adequate",
+  "prompt": "Without _____ sleep, it is hard to concentrate in class.",
+  "options": [
+   "credible",
+   "elaborate",
+   "adequate",
+   "vulnerable"
+  ],
+  "correctIndex": 2,
+  "explanation": "sufficient for a particular purpose"
+ },
+ {
+  "id": "m-fill-025",
+  "level": "medium",
+  "type": "question",
+  "target": "adequate",
+  "prompt": "The food was not special, but the portion was _____ for one person.",
+  "options": [
+   "diligent",
+   "inevitable",
+   "adequate",
+   "elaborate"
+  ],
+  "correctIndex": 2,
+  "explanation": "sufficient for a particular purpose"
+ },
+ {
+  "id": "m-fill-026",
+  "level": "medium",
+  "type": "question",
+  "target": "diligent",
+  "prompt": "A/an _____ student revises every evening, even when there is no test.",
+  "options": [
+   "feasible",
+   "reluctant",
+   "coherent",
+   "diligent"
+  ],
+  "correctIndex": 3,
+  "explanation": "showing careful and persistent effort"
+ },
+ {
+  "id": "m-fill-027",
+  "level": "medium",
+  "type": "question",
+  "target": "diligent",
+  "prompt": "She was so _____ that she checked every page of the report twice.",
+  "options": [
+   "apparent",
+   "comprehensive",
+   "consecutive",
+   "diligent"
+  ],
+  "correctIndex": 3,
+  "explanation": "showing careful and persistent effort"
+ },
+ {
+  "id": "m-fill-028",
+  "level": "medium",
+  "type": "question",
+  "target": "diligent",
+  "prompt": "Thanks to months of _____ work, the team finished the project on time.",
+  "options": [
+   "comprehensive",
+   "apparent",
+   "distinct",
+   "diligent"
+  ],
+  "correctIndex": 3,
+  "explanation": "showing careful and persistent effort"
+ },
+ {
+  "id": "m-fill-029",
+  "level": "medium",
+  "type": "question",
+  "target": "vulnerable",
+  "prompt": "Young plants are _____ to strong winds, so farmers protect them with nets.",
+  "options": [
+   "apparent",
+   "ambiguous",
+   "articulate",
+   "vulnerable"
+  ],
+  "correctIndex": 3,
+  "explanation": "easily harmed or affected"
+ },
+ {
+  "id": "m-fill-030",
+  "level": "medium",
+  "type": "question",
+  "target": "vulnerable",
+  "prompt": "Old computers without updates are _____ to viruses.",
+  "options": [
+   "versatile",
+   "distinct",
+   "vulnerable",
+   "feasible"
+  ],
+  "correctIndex": 2,
+  "explanation": "easily harmed or affected"
+ },
+ {
+  "id": "m-fill-031",
+  "level": "medium",
+  "type": "question",
+  "target": "vulnerable",
+  "prompt": "Children and elderly people are the most _____ during a heatwave.",
+  "options": [
+   "vulnerable",
+   "precise",
+   "ambiguous",
+   "consecutive"
+  ],
+  "correctIndex": 0,
+  "explanation": "easily harmed or affected"
+ },
+ {
+  "id": "m-fill-032",
+  "level": "medium",
+  "type": "question",
+  "target": "versatile",
+  "prompt": "This _____ jacket can be worn in the rain, at college and at a party.",
+  "options": [
+   "versatile",
+   "articulate",
+   "feasible",
+   "elaborate"
+  ],
+  "correctIndex": 0,
+  "explanation": "able to be used in many different ways"
+ },
+ {
+  "id": "m-fill-033",
+  "level": "medium",
+  "type": "question",
+  "target": "versatile",
+  "prompt": "She is a/an _____ cricketer who can bat, bowl and keep wicket.",
+  "options": [
+   "versatile",
+   "articulate",
+   "vulnerable",
+   "persistent"
+  ],
+  "correctIndex": 0,
+  "explanation": "able to be used in many different ways"
+ },
+ {
+  "id": "m-fill-034",
+  "level": "medium",
+  "type": "question",
+  "target": "versatile",
+  "prompt": "A smartphone is a/an _____ tool: it is a camera, a map and a dictionary in one.",
+  "options": [
+   "coherent",
+   "vulnerable",
+   "versatile",
+   "persistent"
+  ],
+  "correctIndex": 2,
+  "explanation": "able to be used in many different ways"
+ },
+ {
+  "id": "m-fill-035",
+  "level": "medium",
+  "type": "question",
+  "target": "accurate",
+  "prompt": "Check the numbers again; the bill must be _____ before we pay it.",
+  "options": [
+   "accurate",
+   "vulnerable",
+   "abundant",
+   "elaborate"
+  ],
+  "correctIndex": 0,
+  "explanation": "correct and free from errors"
+ },
+ {
+  "id": "m-fill-036",
+  "level": "medium",
+  "type": "question",
+  "target": "accurate",
+  "prompt": "The forecast was _____: it rained exactly when they said it would.",
+  "options": [
+   "inevitable",
+   "accurate",
+   "apparent",
+   "substantial"
+  ],
+  "correctIndex": 1,
+  "explanation": "correct and free from errors"
+ },
+ {
+  "id": "m-fill-037",
+  "level": "medium",
+  "type": "question",
+  "target": "accurate",
+  "prompt": "A good reporter gives a/an _____ account of what really happened.",
+  "options": [
+   "ambiguous",
+   "adequate",
+   "diligent",
+   "accurate"
+  ],
+  "correctIndex": 3,
+  "explanation": "correct and free from errors"
+ },
+ {
+  "id": "m-fill-038",
+  "level": "medium",
+  "type": "question",
+  "target": "apparent",
+  "prompt": "From his tired face, it was _____ that he had not slept all night.",
+  "options": [
+   "articulate",
+   "substantial",
+   "apparent",
+   "coherent"
+  ],
+  "correctIndex": 2,
+  "explanation": "easy to notice or understand"
+ },
+ {
+  "id": "m-fill-039",
+  "level": "medium",
+  "type": "question",
+  "target": "apparent",
+  "prompt": "The mistake became _____ only when we compared the two lists side by side.",
+  "options": [
+   "comprehensive",
+   "vulnerable",
+   "diligent",
+   "apparent"
+  ],
+  "correctIndex": 3,
+  "explanation": "easy to notice or understand"
+ },
+ {
+  "id": "m-fill-040",
+  "level": "medium",
+  "type": "question",
+  "target": "apparent",
+  "prompt": "For no _____ reason, all the lights in the hostel suddenly went off.",
+  "options": [
+   "versatile",
+   "vulnerable",
+   "apparent",
+   "reluctant"
+  ],
+  "correctIndex": 2,
+  "explanation": "easy to notice or understand"
+ },
+ {
+  "id": "m-fill-041",
+  "level": "medium",
+  "type": "question",
+  "target": "articulate",
+  "prompt": "She is very _____ and can explain difficult ideas in simple words.",
+  "options": [
+   "articulate",
+   "ambiguous",
+   "abundant",
+   "elaborate"
+  ],
+  "correctIndex": 0,
+  "explanation": "able to express ideas clearly"
+ },
+ {
+  "id": "m-fill-042",
+  "level": "medium",
+  "type": "question",
+  "target": "articulate",
+  "prompt": "A/an _____ speaker keeps the audience's attention with clear, well-chosen words.",
+  "options": [
+   "articulate",
+   "adequate",
+   "abundant",
+   "ambiguous"
+  ],
+  "correctIndex": 0,
+  "explanation": "able to express ideas clearly"
+ },
+ {
+  "id": "m-fill-043",
+  "level": "medium",
+  "type": "question",
+  "target": "articulate",
+  "prompt": "Although he was nervous, his interview answers were calm and _____.",
+  "options": [
+   "elaborate",
+   "substantial",
+   "articulate",
+   "ambiguous"
+  ],
+  "correctIndex": 2,
+  "explanation": "able to express ideas clearly"
+ },
+ {
+  "id": "m-fill-044",
+  "level": "medium",
+  "type": "question",
+  "target": "inevitable",
+  "prompt": "If you never study, failing the exam is almost _____.",
+  "options": [
+   "articulate",
+   "substantial",
+   "comprehensive",
+   "inevitable"
+  ],
+  "correctIndex": 3,
+  "explanation": "certain to happen"
+ },
+ {
+  "id": "m-fill-045",
+  "level": "medium",
+  "type": "question",
+  "target": "inevitable",
+  "prompt": "Change is _____; every city grows and changes over time.",
+  "options": [
+   "inevitable",
+   "comprehensive",
+   "ambiguous",
+   "feasible"
+  ],
+  "correctIndex": 0,
+  "explanation": "certain to happen"
+ },
+ {
+  "id": "m-fill-046",
+  "level": "medium",
+  "type": "question",
+  "target": "inevitable",
+  "prompt": "With dark clouds covering the whole sky, rain seemed _____.",
+  "options": [
+   "feasible",
+   "distinct",
+   "versatile",
+   "inevitable"
+  ],
+  "correctIndex": 3,
+  "explanation": "certain to happen"
+ },
+ {
+  "id": "m-fill-047",
+  "level": "medium",
+  "type": "question",
+  "target": "conventional",
+  "prompt": "Instead of a/an _____ classroom lecture, the teacher took us on a field trip.",
+  "options": [
+   "vulnerable",
+   "ambiguous",
+   "accurate",
+   "conventional"
+  ],
+  "correctIndex": 3,
+  "explanation": "based on what is traditionally done"
+ },
+ {
+  "id": "m-fill-048",
+  "level": "medium",
+  "type": "question",
+  "target": "conventional",
+  "prompt": "She chose a/an _____ career and became a bank officer, just like her parents.",
+  "options": [
+   "ambiguous",
+   "conventional",
+   "coherent",
+   "comprehensive"
+  ],
+  "correctIndex": 1,
+  "explanation": "based on what is traditionally done"
+ },
+ {
+  "id": "m-fill-049",
+  "level": "medium",
+  "type": "question",
+  "target": "conventional",
+  "prompt": "Electric cars are slowly replacing _____ petrol cars in many cities.",
+  "options": [
+   "conventional",
+   "apparent",
+   "feasible",
+   "articulate"
+  ],
+  "correctIndex": 0,
+  "explanation": "based on what is traditionally done"
+ },
+ {
+  "id": "m-fill-050",
+  "level": "medium",
+  "type": "question",
+  "target": "coherent",
+  "prompt": "Your essay needs a/an _____ structure: an introduction, main points and a conclusion.",
+  "options": [
+   "reluctant",
+   "coherent",
+   "apparent",
+   "ambiguous"
+  ],
+  "correctIndex": 1,
+  "explanation": "logical and well organized"
+ },
+ {
+  "id": "m-fill-051",
+  "level": "medium",
+  "type": "question",
+  "target": "coherent",
+  "prompt": "He was so sleepy that he could not give a/an _____ answer to the question.",
+  "options": [
+   "ambiguous",
+   "consecutive",
+   "credible",
+   "coherent"
+  ],
+  "correctIndex": 3,
+  "explanation": "logical and well organized"
+ },
+ {
+  "id": "m-fill-052",
+  "level": "medium",
+  "type": "question",
+  "target": "coherent",
+  "prompt": "The team presented a/an _____ plan in which every step followed logically from the last.",
+  "options": [
+   "accurate",
+   "conventional",
+   "coherent",
+   "persistent"
+  ],
+  "correctIndex": 2,
+  "explanation": "logical and well organized"
+ },
+ {
+  "id": "m-fill-053",
+  "level": "medium",
+  "type": "question",
+  "target": "substantial",
+  "prompt": "The library received a/an _____ donation of ten lakh rupees.",
+  "options": [
+   "inevitable",
+   "substantial",
+   "credible",
+   "precise"
+  ],
+  "correctIndex": 1,
+  "explanation": "large in amount or importance"
+ },
+ {
+  "id": "m-fill-054",
+  "level": "medium",
+  "type": "question",
+  "target": "substantial",
+  "prompt": "There was a/an _____ increase in visitors, from 200 to 2,000 a day.",
+  "options": [
+   "substantial",
+   "diligent",
+   "coherent",
+   "consecutive"
+  ],
+  "correctIndex": 0,
+  "explanation": "large in amount or importance"
+ },
+ {
+  "id": "m-fill-055",
+  "level": "medium",
+  "type": "question",
+  "target": "substantial",
+  "prompt": "She made a/an _____ contribution to the project; most of the code was hers.",
+  "options": [
+   "ambiguous",
+   "distinct",
+   "versatile",
+   "substantial"
+  ],
+  "correctIndex": 3,
+  "explanation": "large in amount or importance"
+ },
+ {
+  "id": "m-fill-056",
+  "level": "medium",
+  "type": "question",
+  "target": "reluctant",
+  "prompt": "He was _____ to speak on stage because he felt shy.",
+  "options": [
+   "reluctant",
+   "adequate",
+   "accurate",
+   "persistent"
+  ],
+  "correctIndex": 0,
+  "explanation": "unwilling or hesitant"
+ },
+ {
+  "id": "m-fill-057",
+  "level": "medium",
+  "type": "question",
+  "target": "reluctant",
+  "prompt": "Many people are _____ to change habits they have had for years.",
+  "options": [
+   "reluctant",
+   "comprehensive",
+   "ambiguous",
+   "distinct"
+  ],
+  "correctIndex": 0,
+  "explanation": "unwilling or hesitant"
+ },
+ {
+  "id": "m-fill-058",
+  "level": "medium",
+  "type": "question",
+  "target": "reluctant",
+  "prompt": "The child was _____ to go to bed while his favourite cartoon was still on.",
+  "options": [
+   "reluctant",
+   "versatile",
+   "adequate",
+   "elaborate"
+  ],
+  "correctIndex": 0,
+  "explanation": "unwilling or hesitant"
+ },
+ {
+  "id": "m-fill-059",
+  "level": "medium",
+  "type": "question",
+  "target": "persistent",
+  "prompt": "Despite many failures, the _____ inventor kept trying until his machine worked.",
+  "options": [
+   "consecutive",
+   "comprehensive",
+   "credible",
+   "persistent"
+  ],
+  "correctIndex": 3,
+  "explanation": "continuing despite difficulty"
+ },
+ {
+  "id": "m-fill-060",
+  "level": "medium",
+  "type": "question",
+  "target": "persistent",
+  "prompt": "The _____ rain continued all day and did not stop even once.",
+  "options": [
+   "adequate",
+   "persistent",
+   "credible",
+   "inevitable"
+  ],
+  "correctIndex": 1,
+  "explanation": "continuing despite difficulty"
+ },
+ {
+  "id": "m-fill-061",
+  "level": "medium",
+  "type": "question",
+  "target": "persistent",
+  "prompt": "Her _____ questions finally got the office to fix the broken fan.",
+  "options": [
+   "persistent",
+   "substantial",
+   "adequate",
+   "coherent"
+  ],
+  "correctIndex": 0,
+  "explanation": "continuing despite difficulty"
+ },
+ {
+  "id": "m-fill-062",
+  "level": "medium",
+  "type": "question",
+  "target": "distinct",
+  "prompt": "The two words sound similar but have _____ meanings.",
+  "options": [
+   "distinct",
+   "consecutive",
+   "adequate",
+   "elaborate"
+  ],
+  "correctIndex": 0,
+  "explanation": "clearly different or separate"
+ },
+ {
+  "id": "m-fill-063",
+  "level": "medium",
+  "type": "question",
+  "target": "distinct",
+  "prompt": "Each Lingo has a/an _____ colour, so they are easy to tell apart.",
+  "options": [
+   "distinct",
+   "credible",
+   "reluctant",
+   "substantial"
+  ],
+  "correctIndex": 0,
+  "explanation": "clearly different or separate"
+ },
+ {
+  "id": "m-fill-064",
+  "level": "medium",
+  "type": "question",
+  "target": "distinct",
+  "prompt": "There is a/an _____ smell of coffee whenever you walk past the canteen.",
+  "options": [
+   "articulate",
+   "conventional",
+   "distinct",
+   "ambiguous"
+  ],
+  "correctIndex": 2,
+  "explanation": "clearly different or separate"
+ },
+ {
+  "id": "m-fill-065",
+  "level": "medium",
+  "type": "question",
+  "target": "feasible",
+  "prompt": "Building a bridge in one week is not _____ with such a small team.",
+  "options": [
+   "feasible",
+   "credible",
+   "conventional",
+   "comprehensive"
+  ],
+  "correctIndex": 0,
+  "explanation": "possible and practical to achieve"
+ },
+ {
+  "id": "m-fill-066",
+  "level": "medium",
+  "type": "question",
+  "target": "feasible",
+  "prompt": "The engineers checked whether the plan was _____ before they started.",
+  "options": [
+   "conventional",
+   "reluctant",
+   "feasible",
+   "substantial"
+  ],
+  "correctIndex": 2,
+  "explanation": "possible and practical to achieve"
+ },
+ {
+  "id": "m-fill-067",
+  "level": "medium",
+  "type": "question",
+  "target": "feasible",
+  "prompt": "Is it _____ to finish this course in three months if I study every day?",
+  "options": [
+   "feasible",
+   "accurate",
+   "conventional",
+   "abundant"
+  ],
+  "correctIndex": 0,
+  "explanation": "possible and practical to achieve"
+ },
+ {
+  "id": "m-fill-068",
+  "level": "medium",
+  "type": "question",
+  "target": "elaborate",
+  "prompt": "The wedding had _____ decorations with thousands of lights and flowers.",
+  "options": [
+   "precise",
+   "persistent",
+   "elaborate",
+   "articulate"
+  ],
+  "correctIndex": 2,
+  "explanation": "detailed and carefully developed"
+ },
+ {
+  "id": "m-fill-069",
+  "level": "medium",
+  "type": "question",
+  "target": "elaborate",
+  "prompt": "She drew a/an _____ map with every street and shop carefully marked.",
+  "options": [
+   "feasible",
+   "apparent",
+   "elaborate",
+   "accurate"
+  ],
+  "correctIndex": 2,
+  "explanation": "detailed and carefully developed"
+ },
+ {
+  "id": "m-fill-070",
+  "level": "medium",
+  "type": "question",
+  "target": "elaborate",
+  "prompt": "The dancers wore _____ costumes covered in beads and mirrors.",
+  "options": [
+   "feasible",
+   "elaborate",
+   "credible",
+   "accurate"
+  ],
+  "correctIndex": 1,
+  "explanation": "detailed and carefully developed"
+ },
+ {
+  "id": "m-fill-071",
+  "level": "medium",
+  "type": "question",
+  "target": "precise",
+  "prompt": "Tell me the _____ time of the meeting, not just 'sometime in the afternoon'.",
+  "options": [
+   "apparent",
+   "consecutive",
+   "elaborate",
+   "precise"
+  ],
+  "correctIndex": 3,
+  "explanation": "exact and accurate"
+ },
+ {
+  "id": "m-fill-072",
+  "level": "medium",
+  "type": "question",
+  "target": "precise",
+  "prompt": "A surgeon's movements must be _____ and steady.",
+  "options": [
+   "coherent",
+   "versatile",
+   "consecutive",
+   "precise"
+  ],
+  "correctIndex": 3,
+  "explanation": "exact and accurate"
+ },
+ {
+  "id": "m-fill-073",
+  "level": "medium",
+  "type": "question",
+  "target": "precise",
+  "prompt": "Baking needs _____ measurements: exactly 200 grams of flour, not 'a cup or so'.",
+  "options": [
+   "persistent",
+   "precise",
+   "distinct",
+   "consecutive"
+  ],
+  "correctIndex": 1,
+  "explanation": "exact and accurate"
+ },
+ {
+  "id": "m-fill-074",
+  "level": "medium",
+  "type": "question",
+  "target": "comprehensive",
+  "prompt": "The guide gives a/an _____ list of all 200 courses offered by the college.",
+  "options": [
+   "reluctant",
+   "comprehensive",
+   "inevitable",
+   "adequate"
+  ],
+  "correctIndex": 1,
+  "explanation": "including all or nearly all details"
+ },
+ {
+  "id": "m-fill-075",
+  "level": "medium",
+  "type": "question",
+  "target": "comprehensive",
+  "prompt": "Before the exam, she made _____ notes covering every single chapter.",
+  "options": [
+   "comprehensive",
+   "conventional",
+   "feasible",
+   "diligent"
+  ],
+  "correctIndex": 0,
+  "explanation": "including all or nearly all details"
+ },
+ {
+  "id": "m-fill-076",
+  "level": "medium",
+  "type": "question",
+  "target": "comprehensive",
+  "prompt": "The insurance plan is _____; it covers fire, theft and floods.",
+  "options": [
+   "comprehensive",
+   "credible",
+   "distinct",
+   "inevitable"
+  ],
+  "correctIndex": 0,
+  "explanation": "including all or nearly all details"
+ },
+ {
+  "id": "m-fill-077",
+  "level": "medium",
+  "type": "question",
+  "target": "allocate",
+  "prompt": "The college will _____ two rooms for the exam, one for each batch.",
+  "options": [
+   "emerge",
+   "allocate",
+   "validate",
+   "compel"
+  ],
+  "correctIndex": 1,
+  "explanation": "to distribute something for a particular purpose"
+ },
+ {
+  "id": "m-fill-078",
+  "level": "medium",
+  "type": "question",
+  "target": "allocate",
+  "prompt": "The government decided to _____ more money to rural schools this year.",
+  "options": [
+   "anticipate",
+   "allocate",
+   "compel",
+   "validate"
+  ],
+  "correctIndex": 1,
+  "explanation": "to distribute something for a particular purpose"
+ },
+ {
+  "id": "m-fill-079",
+  "level": "medium",
+  "type": "question",
+  "target": "allocate",
+  "prompt": "Please _____ ten minutes at the end of the meeting for questions.",
+  "options": [
+   "allocate",
+   "validate",
+   "emerge",
+   "anticipate"
+  ],
+  "correctIndex": 0,
+  "explanation": "to distribute something for a particular purpose"
+ },
+ {
+  "id": "m-fill-080",
+  "level": "medium",
+  "type": "question",
+  "target": "emerge",
+  "prompt": "The sun began to _____ from behind the clouds after the storm.",
+  "options": [
+   "emerge",
+   "anticipate",
+   "validate",
+   "obtain"
+  ],
+  "correctIndex": 0,
+  "explanation": "to become known or visible"
+ },
+ {
+  "id": "m-fill-081",
+  "level": "medium",
+  "type": "question",
+  "target": "emerge",
+  "prompt": "New problems may _____ as the project grows bigger.",
+  "options": [
+   "obtain",
+   "anticipate",
+   "allocate",
+   "emerge"
+  ],
+  "correctIndex": 3,
+  "explanation": "to become known or visible"
+ },
+ {
+  "id": "m-fill-082",
+  "level": "medium",
+  "type": "question",
+  "target": "emerge",
+  "prompt": "The truth will _____ once the investigation is complete.",
+  "options": [
+   "emerge",
+   "compel",
+   "obtain",
+   "validate"
+  ],
+  "correctIndex": 0,
+  "explanation": "to become known or visible"
+ },
+ {
+  "id": "m-fill-083",
+  "level": "medium",
+  "type": "question",
+  "target": "obtain",
+  "prompt": "You must _____ permission from the principal before the trip.",
+  "options": [
+   "emerge",
+   "obtain",
+   "compel",
+   "anticipate"
+  ],
+  "correctIndex": 1,
+  "explanation": "to get or acquire something"
+ },
+ {
+  "id": "m-fill-084",
+  "level": "medium",
+  "type": "question",
+  "target": "obtain",
+  "prompt": "Students can _____ their ID cards from the admin office.",
+  "options": [
+   "emerge",
+   "anticipate",
+   "compel",
+   "obtain"
+  ],
+  "correctIndex": 3,
+  "explanation": "to get or acquire something"
+ },
+ {
+  "id": "m-fill-085",
+  "level": "medium",
+  "type": "question",
+  "target": "obtain",
+  "prompt": "It is very hard to _____ tickets for the final match.",
+  "options": [
+   "anticipate",
+   "emerge",
+   "compel",
+   "obtain"
+  ],
+  "correctIndex": 3,
+  "explanation": "to get or acquire something"
+ },
+ {
+  "id": "m-fill-086",
+  "level": "medium",
+  "type": "question",
+  "target": "anticipate",
+  "prompt": "We _____ a big crowd, so we arranged extra chairs in advance.",
+  "options": [
+   "compel",
+   "validate",
+   "allocate",
+   "anticipate"
+  ],
+  "correctIndex": 3,
+  "explanation": "to expect or predict something"
+ },
+ {
+  "id": "m-fill-087",
+  "level": "medium",
+  "type": "question",
+  "target": "anticipate",
+  "prompt": "Good drivers _____ danger before it happens and slow down early.",
+  "options": [
+   "emerge",
+   "anticipate",
+   "obtain",
+   "validate"
+  ],
+  "correctIndex": 1,
+  "explanation": "to expect or predict something"
+ },
+ {
+  "id": "m-fill-088",
+  "level": "medium",
+  "type": "question",
+  "target": "anticipate",
+  "prompt": "The organisers did not _____ that so many people would come.",
+  "options": [
+   "validate",
+   "allocate",
+   "anticipate",
+   "adapt"
+  ],
+  "correctIndex": 2,
+  "explanation": "to expect or predict something"
+ },
+ {
+  "id": "m-fill-089",
+  "level": "medium",
+  "type": "question",
+  "target": "adapt",
+  "prompt": "Animals must _____ to changes in their environment to survive.",
+  "options": [
+   "adapt",
+   "anticipate",
+   "allocate",
+   "compel"
+  ],
+  "correctIndex": 0,
+  "explanation": "to adjust to new conditions"
+ },
+ {
+  "id": "m-fill-090",
+  "level": "medium",
+  "type": "question",
+  "target": "adapt",
+  "prompt": "It took me a month to _____ to hostel life.",
+  "options": [
+   "compel",
+   "allocate",
+   "anticipate",
+   "adapt"
+  ],
+  "correctIndex": 3,
+  "explanation": "to adjust to new conditions"
+ },
+ {
+  "id": "m-fill-091",
+  "level": "medium",
+  "type": "question",
+  "target": "adapt",
+  "prompt": "Good teachers _____ their lessons for students who learn differently.",
+  "options": [
+   "anticipate",
+   "allocate",
+   "compel",
+   "adapt"
+  ],
+  "correctIndex": 3,
+  "explanation": "to adjust to new conditions"
+ },
+ {
+  "id": "m-fill-092",
+  "level": "medium",
+  "type": "question",
+  "target": "validate",
+  "prompt": "The lab ran more tests to _____ the results of the first experiment.",
+  "options": [
+   "compel",
+   "validate",
+   "allocate",
+   "anticipate"
+  ],
+  "correctIndex": 1,
+  "explanation": "to confirm that something is correct or legitimate"
+ },
+ {
+  "id": "m-fill-093",
+  "level": "medium",
+  "type": "question",
+  "target": "validate",
+  "prompt": "Please _____ your email address by clicking the link we sent you.",
+  "options": [
+   "compel",
+   "validate",
+   "emerge",
+   "anticipate"
+  ],
+  "correctIndex": 1,
+  "explanation": "to confirm that something is correct or legitimate"
+ },
+ {
+  "id": "m-fill-094",
+  "level": "medium",
+  "type": "question",
+  "target": "validate",
+  "prompt": "The ticket machine will _____ your pass before the gate opens.",
+  "options": [
+   "allocate",
+   "anticipate",
+   "emerge",
+   "validate"
+  ],
+  "correctIndex": 3,
+  "explanation": "to confirm that something is correct or legitimate"
+ },
+ {
+  "id": "m-fill-095",
+  "level": "medium",
+  "type": "question",
+  "target": "compel",
+  "prompt": "Heavy rain may _____ us to cancel the outdoor event.",
+  "options": [
+   "validate",
+   "obtain",
+   "emerge",
+   "compel"
+  ],
+  "correctIndex": 3,
+  "explanation": "to force or strongly persuade"
+ },
+ {
+  "id": "m-fill-096",
+  "level": "medium",
+  "type": "question",
+  "target": "compel",
+  "prompt": "No one can _____ you to share your password.",
+  "options": [
+   "emerge",
+   "anticipate",
+   "compel",
+   "allocate"
+  ],
+  "correctIndex": 2,
+  "explanation": "to force or strongly persuade"
+ },
+ {
+  "id": "m-fill-097",
+  "level": "medium",
+  "type": "question",
+  "target": "compel",
+  "prompt": "Strong new evidence could _____ the court to reopen the case.",
+  "options": [
+   "anticipate",
+   "allocate",
+   "validate",
+   "compel"
+  ],
+  "correctIndex": 3,
+  "explanation": "to force or strongly persuade"
+ },
+ {
+  "id": "m-fill-098",
+  "level": "medium",
+  "type": "question",
+  "target": "notion",
+  "prompt": "The _____ that the Earth is flat was rejected centuries ago.",
+  "options": [
+   "harvest",
+   "ladder",
+   "notion",
+   "receipt"
+  ],
+  "correctIndex": 2,
+  "explanation": "a belief, idea, or understanding"
+ },
+ {
+  "id": "m-fill-099",
+  "level": "medium",
+  "type": "question",
+  "target": "notion",
+  "prompt": "I have no _____ of what this homework is about; can you explain it?",
+  "options": [
+   "receipt",
+   "harvest",
+   "notion",
+   "ladder"
+  ],
+  "correctIndex": 2,
+  "explanation": "a belief, idea, or understanding"
+ },
+ {
+  "id": "m-fill-100",
+  "level": "medium",
+  "type": "question",
+  "target": "notion",
+  "prompt": "She had a romantic _____ of city life before she actually moved there.",
+  "options": [
+   "notion",
+   "ladder",
+   "harvest",
+   "receipt"
+  ],
+  "correctIndex": 0,
+  "explanation": "a belief, idea, or understanding"
+ },
+ {
+  "id": "m-pron-001",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "abundant",
+  "explanation": "available in large quantities"
+ },
+ {
+  "id": "m-pron-002",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "accurate",
+  "explanation": "correct and free from errors"
+ },
+ {
+  "id": "m-pron-003",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "adapt",
+  "explanation": "to adjust to new conditions"
+ },
+ {
+  "id": "m-pron-004",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "adequate",
+  "explanation": "sufficient for a particular purpose"
+ },
+ {
+  "id": "m-pron-005",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "allocate",
+  "explanation": "to distribute something for a particular purpose"
+ },
+ {
+  "id": "m-pron-006",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "ambiguous",
+  "explanation": "having more than one possible meaning"
+ },
+ {
+  "id": "m-pron-007",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "anticipate",
+  "explanation": "to expect or predict something"
+ },
+ {
+  "id": "m-pron-008",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "apparent",
+  "explanation": "easy to notice or understand"
+ },
+ {
+  "id": "m-pron-009",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "articulate",
+  "explanation": "able to express ideas clearly"
+ },
+ {
+  "id": "m-pron-010",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "coherent",
+  "explanation": "logical and well organized"
+ },
+ {
+  "id": "m-pron-011",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "compel",
+  "explanation": "to force or strongly persuade"
+ },
+ {
+  "id": "m-pron-012",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "comprehensive",
+  "explanation": "including all or nearly all details"
+ },
+ {
+  "id": "m-pron-013",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "consecutive",
+  "explanation": "following one after another without interruption"
+ },
+ {
+  "id": "m-pron-014",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "conventional",
+  "explanation": "based on what is traditionally done"
+ },
+ {
+  "id": "m-pron-015",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "credible",
+  "explanation": "worthy of belief or trust"
+ },
+ {
+  "id": "m-pron-016",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "diligent",
+  "explanation": "showing careful and persistent effort"
+ },
+ {
+  "id": "m-pron-017",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "distinct",
+  "explanation": "clearly different or separate"
+ },
+ {
+  "id": "m-pron-018",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "elaborate",
+  "explanation": "detailed and carefully developed"
+ },
+ {
+  "id": "m-pron-019",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "emerge",
+  "explanation": "to become known or visible"
+ },
+ {
+  "id": "m-pron-020",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "feasible",
+  "explanation": "possible and practical to achieve"
+ },
+ {
+  "id": "m-pron-021",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "inevitable",
+  "explanation": "certain to happen"
+ },
+ {
+  "id": "m-pron-022",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "notion",
+  "explanation": "a belief, idea, or understanding"
+ },
+ {
+  "id": "m-pron-023",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "obtain",
+  "explanation": "to get or acquire something"
+ },
+ {
+  "id": "m-pron-024",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "persistent",
+  "explanation": "continuing despite difficulty"
+ },
+ {
+  "id": "m-pron-025",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "precise",
+  "explanation": "exact and accurate"
+ },
+ {
+  "id": "m-pron-026",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "reluctant",
+  "explanation": "unwilling or hesitant"
+ },
+ {
+  "id": "m-pron-027",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "substantial",
+  "explanation": "large in amount or importance"
+ },
+ {
+  "id": "m-pron-028",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "validate",
+  "explanation": "to confirm that something is correct or legitimate"
+ },
+ {
+  "id": "m-pron-029",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "versatile",
+  "explanation": "able to be used in many different ways"
+ },
+ {
+  "id": "m-pron-030",
+  "level": "medium",
+  "type": "pronounce",
+  "word": "vulnerable",
+  "explanation": "easily harmed or affected"
+ },
+ {
+  "id": "h-mean-001",
+  "level": "hard",
+  "type": "meaning",
+  "word": "magnanimous",
+  "options": [
+   "essentially different or unrelated",
+   "given to sudden and unpredictable changes",
+   "open to more than one interpretation; ambiguous",
+   "generous or forgiving, especially toward a rival"
+  ],
+  "correctIndex": 3,
+  "explanation": "generous or forgiving, especially toward a rival"
+ },
+ {
+  "id": "h-mean-002",
+  "level": "hard",
+  "type": "meaning",
+  "word": "anachronistic",
+  "options": [
+   "only recently begun and not fully formed",
+   "peculiar or distinctive to an individual",
+   "using language that is pompous or overly elaborate",
+   "belonging to a period different from the one in which it exists"
+  ],
+  "correctIndex": 3,
+  "explanation": "belonging to a period different from the one in which it exists"
+ },
+ {
+  "id": "h-mean-003",
+  "level": "hard",
+  "type": "meaning",
+  "word": "circumspect",
+  "options": [
+   "careful to consider all circumstances before acting",
+   "representing the most typical or perfect example",
+   "to place things close together for comparison",
+   "open to more than one interpretation; ambiguous"
+  ],
+  "correctIndex": 0,
+  "explanation": "careful to consider all circumstances before acting"
+ },
+ {
+  "id": "h-mean-004",
+  "level": "hard",
+  "type": "meaning",
+  "word": "vociferous",
+  "options": [
+   "expressing opinions loudly and forcefully",
+   "to make something unclear or difficult to understand",
+   "a confusing and difficult problem",
+   "reserved or saying very little"
+  ],
+  "correctIndex": 0,
+  "explanation": "expressing opinions loudly and forcefully"
+ },
+ {
+  "id": "h-mean-005",
+  "level": "hard",
+  "type": "meaning",
+  "word": "fastidious",
+  "options": [
+   "very attentive to detail and accuracy",
+   "only recently begun and not fully formed",
+   "reserved or saying very little",
+   "hostile and aggressive"
+  ],
+  "correctIndex": 0,
+  "explanation": "very attentive to detail and accuracy"
+ },
+ {
+  "id": "h-mean-006",
+  "level": "hard",
+  "type": "meaning",
+  "word": "perspicacious",
+  "options": [
+   "having a ready insight into things",
+   "generous or forgiving, especially toward a rival",
+   "reserved or saying very little",
+   "using language that is pompous or overly elaborate"
+  ],
+  "correctIndex": 0,
+  "explanation": "having a ready insight into things"
+ },
+ {
+  "id": "h-mean-007",
+  "level": "hard",
+  "type": "meaning",
+  "word": "grandiloquent",
+  "options": [
+   "to drain someone of energy or vitality",
+   "having good judgment and practical wisdom",
+   "reserved or saying very little",
+   "using language that is pompous or overly elaborate"
+  ],
+  "correctIndex": 3,
+  "explanation": "using language that is pompous or overly elaborate"
+ },
+ {
+  "id": "h-mean-008",
+  "level": "hard",
+  "type": "meaning",
+  "word": "perspicacious",
+  "options": [
+   "unwilling to change one's views or compromise",
+   "kept secret, especially because it would not be approved",
+   "stubbornly resistant to authority or control",
+   "having a ready insight into things"
+  ],
+  "correctIndex": 3,
+  "explanation": "having a ready insight into things"
+ },
+ {
+  "id": "h-mean-009",
+  "level": "hard",
+  "type": "meaning",
+  "word": "laconic",
+  "options": [
+   "having a ready insight into things",
+   "essentially different or unrelated",
+   "expressing opinions loudly and forcefully",
+   "using very few words"
+  ],
+  "correctIndex": 3,
+  "explanation": "using very few words"
+ },
+ {
+  "id": "h-mean-010",
+  "level": "hard",
+  "type": "meaning",
+  "word": "sagacious",
+  "options": [
+   "having a ready insight into things",
+   "having good judgment and practical wisdom",
+   "very attentive to detail and accuracy",
+   "cheerful, energetic, and enthusiastic"
+  ],
+  "correctIndex": 1,
+  "explanation": "having good judgment and practical wisdom"
+ },
+ {
+  "id": "h-mean-011",
+  "level": "hard",
+  "type": "meaning",
+  "word": "intransigent",
+  "options": [
+   "unwilling to change one's views or compromise",
+   "generous or forgiving, especially toward a rival",
+   "reserved or saying very little",
+   "expressing opinions loudly and forcefully"
+  ],
+  "correctIndex": 0,
+  "explanation": "unwilling to change one's views or compromise"
+ },
+ {
+  "id": "h-mean-012",
+  "level": "hard",
+  "type": "meaning",
+  "word": "magnanimous",
+  "options": [
+   "generous or forgiving, especially toward a rival",
+   "causing harm or damage",
+   "having good judgment and practical wisdom",
+   "unwilling to change one's views or compromise"
+  ],
+  "correctIndex": 0,
+  "explanation": "generous or forgiving, especially toward a rival"
+ },
+ {
+  "id": "h-mean-013",
+  "level": "hard",
+  "type": "meaning",
+  "word": "ameliorate",
+  "options": [
+   "difficult to understand, especially because of complexity",
+   "to make a difficult situation better",
+   "stubbornly resistant to authority or control",
+   "given to sudden and unpredictable changes"
+  ],
+  "correctIndex": 1,
+  "explanation": "to make a difficult situation better"
+ },
+ {
+  "id": "h-mean-014",
+  "level": "hard",
+  "type": "meaning",
+  "word": "capricious",
+  "options": [
+   "given to sudden and unpredictable changes",
+   "using very few words",
+   "generous or forgiving, especially toward a rival",
+   "a confusing and difficult problem"
+  ],
+  "correctIndex": 0,
+  "explanation": "given to sudden and unpredictable changes"
+ },
+ {
+  "id": "h-mean-015",
+  "level": "hard",
+  "type": "meaning",
+  "word": "obfuscate",
+  "options": [
+   "expressing opinions loudly and forcefully",
+   "to make something unclear or difficult to understand",
+   "kept secret, especially because it would not be approved",
+   "using very few words"
+  ],
+  "correctIndex": 1,
+  "explanation": "to make something unclear or difficult to understand"
+ },
+ {
+  "id": "h-mean-016",
+  "level": "hard",
+  "type": "meaning",
+  "word": "conundrum",
+  "options": [
+   "done with little care, interest, or effort",
+   "generous or forgiving, especially toward a rival",
+   "a confusing and difficult problem",
+   "to place things close together for comparison"
+  ],
+  "correctIndex": 2,
+  "explanation": "a confusing and difficult problem"
+ },
+ {
+  "id": "h-mean-017",
+  "level": "hard",
+  "type": "meaning",
+  "word": "recalcitrant",
+  "options": [
+   "given to sudden and unpredictable changes",
+   "stubbornly resistant to authority or control",
+   "kept secret, especially because it would not be approved",
+   "open to more than one interpretation; ambiguous"
+  ],
+  "correctIndex": 1,
+  "explanation": "stubbornly resistant to authority or control"
+ },
+ {
+  "id": "h-mean-018",
+  "level": "hard",
+  "type": "meaning",
+  "word": "quintessential",
+  "options": [
+   "very attentive to detail and accuracy",
+   "to place things close together for comparison",
+   "stubbornly resistant to authority or control",
+   "representing the most typical or perfect example"
+  ],
+  "correctIndex": 3,
+  "explanation": "representing the most typical or perfect example"
+ },
+ {
+  "id": "h-mean-019",
+  "level": "hard",
+  "type": "meaning",
+  "word": "abstruse",
+  "options": [
+   "peculiar or distinctive to an individual",
+   "very attentive to detail and accuracy",
+   "difficult to understand, especially because of complexity",
+   "having good judgment and practical wisdom"
+  ],
+  "correctIndex": 2,
+  "explanation": "difficult to understand, especially because of complexity"
+ },
+ {
+  "id": "h-mean-020",
+  "level": "hard",
+  "type": "meaning",
+  "word": "idiosyncratic",
+  "options": [
+   "using very few words",
+   "having a ready insight into things",
+   "peculiar or distinctive to an individual",
+   "causing harm or damage"
+  ],
+  "correctIndex": 2,
+  "explanation": "peculiar or distinctive to an individual"
+ },
+ {
+  "id": "h-mean-021",
+  "level": "hard",
+  "type": "meaning",
+  "word": "ubiquitous",
+  "options": [
+   "to place things close together for comparison",
+   "present or found everywhere",
+   "to make something unclear or difficult to understand",
+   "difficult to understand, especially because of complexity"
+  ],
+  "correctIndex": 1,
+  "explanation": "present or found everywhere"
+ },
+ {
+  "id": "h-mean-022",
+  "level": "hard",
+  "type": "meaning",
+  "word": "ubiquitous",
+  "options": [
+   "belonging to a period different from the one in which it exists",
+   "cheerful, energetic, and enthusiastic",
+   "reserved or saying very little",
+   "present or found everywhere"
+  ],
+  "correctIndex": 3,
+  "explanation": "present or found everywhere"
+ },
+ {
+  "id": "h-mean-023",
+  "level": "hard",
+  "type": "meaning",
+  "word": "intransigent",
+  "options": [
+   "given to sudden and unpredictable changes",
+   "causing harm or damage",
+   "unwilling to change one's views or compromise",
+   "to make something unclear or difficult to understand"
+  ],
+  "correctIndex": 2,
+  "explanation": "unwilling to change one's views or compromise"
+ },
+ {
+  "id": "h-mean-024",
+  "level": "hard",
+  "type": "meaning",
+  "word": "ameliorate",
+  "options": [
+   "to make a difficult situation better",
+   "hostile and aggressive",
+   "causing harm or damage",
+   "a confusing and difficult problem"
+  ],
+  "correctIndex": 0,
+  "explanation": "to make a difficult situation better"
+ },
+ {
+  "id": "h-mean-025",
+  "level": "hard",
+  "type": "meaning",
+  "word": "juxtapose",
+  "options": [
+   "to place things close together for comparison",
+   "present or found everywhere",
+   "belonging to a period different from the one in which it exists",
+   "a confusing and difficult problem"
+  ],
+  "correctIndex": 0,
+  "explanation": "to place things close together for comparison"
+ },
+ {
+  "id": "h-mean-026",
+  "level": "hard",
+  "type": "meaning",
+  "word": "perspicacious",
+  "options": [
+   "done with little care, interest, or effort",
+   "having a ready insight into things",
+   "given to sudden and unpredictable changes",
+   "belonging to a period different from the one in which it exists"
+  ],
+  "correctIndex": 1,
+  "explanation": "having a ready insight into things"
+ },
+ {
+  "id": "h-mean-027",
+  "level": "hard",
+  "type": "meaning",
+  "word": "quintessential",
+  "options": [
+   "essentially different or unrelated",
+   "done with little care, interest, or effort",
+   "difficult to understand, especially because of complexity",
+   "representing the most typical or perfect example"
+  ],
+  "correctIndex": 3,
+  "explanation": "representing the most typical or perfect example"
+ },
+ {
+  "id": "h-mean-028",
+  "level": "hard",
+  "type": "meaning",
+  "word": "deleterious",
+  "options": [
+   "reserved or saying very little",
+   "causing harm or damage",
+   "belonging to a period different from the one in which it exists",
+   "open to more than one interpretation; ambiguous"
+  ],
+  "correctIndex": 1,
+  "explanation": "causing harm or damage"
+ },
+ {
+  "id": "h-mean-029",
+  "level": "hard",
+  "type": "meaning",
+  "word": "fastidious",
+  "options": [
+   "difficult to understand, especially because of complexity",
+   "very attentive to detail and accuracy",
+   "peculiar or distinctive to an individual",
+   "using language that is pompous or overly elaborate"
+  ],
+  "correctIndex": 1,
+  "explanation": "very attentive to detail and accuracy"
+ },
+ {
+  "id": "h-mean-030",
+  "level": "hard",
+  "type": "meaning",
+  "word": "belligerent",
+  "options": [
+   "hostile and aggressive",
+   "present or found everywhere",
+   "careful to consider all circumstances before acting",
+   "unwilling to change one's views or compromise"
+  ],
+  "correctIndex": 0,
+  "explanation": "hostile and aggressive"
+ },
+ {
+  "id": "h-mean-031",
+  "level": "hard",
+  "type": "meaning",
+  "word": "disparate",
+  "options": [
+   "to make something unclear or difficult to understand",
+   "given to sudden and unpredictable changes",
+   "essentially different or unrelated",
+   "expressing opinions loudly and forcefully"
+  ],
+  "correctIndex": 2,
+  "explanation": "essentially different or unrelated"
+ },
+ {
+  "id": "h-mean-032",
+  "level": "hard",
+  "type": "meaning",
+  "word": "anachronistic",
+  "options": [
+   "belonging to a period different from the one in which it exists",
+   "only recently begun and not fully formed",
+   "having a ready insight into things",
+   "open to more than one interpretation; ambiguous"
+  ],
+  "correctIndex": 0,
+  "explanation": "belonging to a period different from the one in which it exists"
+ },
+ {
+  "id": "h-mean-033",
+  "level": "hard",
+  "type": "meaning",
+  "word": "belligerent",
+  "options": [
+   "hostile and aggressive",
+   "cheerful, energetic, and enthusiastic",
+   "difficult to understand, especially because of complexity",
+   "essentially different or unrelated"
+  ],
+  "correctIndex": 0,
+  "explanation": "hostile and aggressive"
+ },
+ {
+  "id": "h-mean-034",
+  "level": "hard",
+  "type": "meaning",
+  "word": "deleterious",
+  "options": [
+   "hostile and aggressive",
+   "causing harm or damage",
+   "stubbornly resistant to authority or control",
+   "belonging to a period different from the one in which it exists"
+  ],
+  "correctIndex": 1,
+  "explanation": "causing harm or damage"
+ },
+ {
+  "id": "h-mean-035",
+  "level": "hard",
+  "type": "meaning",
+  "word": "taciturn",
+  "options": [
+   "reserved or saying very little",
+   "representing the most typical or perfect example",
+   "to make a difficult situation better",
+   "expressing opinions loudly and forcefully"
+  ],
+  "correctIndex": 0,
+  "explanation": "reserved or saying very little"
+ },
+ {
+  "id": "h-mean-036",
+  "level": "hard",
+  "type": "meaning",
+  "word": "capricious",
+  "options": [
+   "given to sudden and unpredictable changes",
+   "using very few words",
+   "using language that is pompous or overly elaborate",
+   "done with little care, interest, or effort"
+  ],
+  "correctIndex": 0,
+  "explanation": "given to sudden and unpredictable changes"
+ },
+ {
+  "id": "h-mean-037",
+  "level": "hard",
+  "type": "meaning",
+  "word": "ebullient",
+  "options": [
+   "belonging to a period different from the one in which it exists",
+   "cheerful, energetic, and enthusiastic",
+   "using very few words",
+   "peculiar or distinctive to an individual"
+  ],
+  "correctIndex": 1,
+  "explanation": "cheerful, energetic, and enthusiastic"
+ },
+ {
+  "id": "h-mean-038",
+  "level": "hard",
+  "type": "meaning",
+  "word": "disparate",
+  "options": [
+   "essentially different or unrelated",
+   "careful to consider all circumstances before acting",
+   "using very few words",
+   "only recently begun and not fully formed"
+  ],
+  "correctIndex": 0,
+  "explanation": "essentially different or unrelated"
+ },
+ {
+  "id": "h-mean-039",
+  "level": "hard",
+  "type": "meaning",
+  "word": "idiosyncratic",
+  "options": [
+   "peculiar or distinctive to an individual",
+   "to place things close together for comparison",
+   "given to sudden and unpredictable changes",
+   "unwilling to change one's views or compromise"
+  ],
+  "correctIndex": 0,
+  "explanation": "peculiar or distinctive to an individual"
+ },
+ {
+  "id": "h-mean-040",
+  "level": "hard",
+  "type": "meaning",
+  "word": "circumspect",
+  "options": [
+   "careful to consider all circumstances before acting",
+   "cheerful, energetic, and enthusiastic",
+   "to make something unclear or difficult to understand",
+   "expressing opinions loudly and forcefully"
+  ],
+  "correctIndex": 0,
+  "explanation": "careful to consider all circumstances before acting"
+ },
+ {
+  "id": "h-mean-041",
+  "level": "hard",
+  "type": "meaning",
+  "word": "enervate",
+  "options": [
+   "difficult to understand, especially because of complexity",
+   "done with little care, interest, or effort",
+   "to drain someone of energy or vitality",
+   "expressing opinions loudly and forcefully"
+  ],
+  "correctIndex": 2,
+  "explanation": "to drain someone of energy or vitality"
+ },
+ {
+  "id": "h-mean-042",
+  "level": "hard",
+  "type": "meaning",
+  "word": "belligerent",
+  "options": [
+   "hostile and aggressive",
+   "generous or forgiving, especially toward a rival",
+   "belonging to a period different from the one in which it exists",
+   "given to sudden and unpredictable changes"
+  ],
+  "correctIndex": 0,
+  "explanation": "hostile and aggressive"
+ },
+ {
+  "id": "h-mean-043",
+  "level": "hard",
+  "type": "meaning",
+  "word": "perfunctory",
+  "options": [
+   "to make a difficult situation better",
+   "done with little care, interest, or effort",
+   "using language that is pompous or overly elaborate",
+   "expressing opinions loudly and forcefully"
+  ],
+  "correctIndex": 1,
+  "explanation": "done with little care, interest, or effort"
+ },
+ {
+  "id": "h-mean-044",
+  "level": "hard",
+  "type": "meaning",
+  "word": "ameliorate",
+  "options": [
+   "to make a difficult situation better",
+   "a confusing and difficult problem",
+   "using language that is pompous or overly elaborate",
+   "stubbornly resistant to authority or control"
+  ],
+  "correctIndex": 0,
+  "explanation": "to make a difficult situation better"
+ },
+ {
+  "id": "h-mean-045",
+  "level": "hard",
+  "type": "meaning",
+  "word": "enervate",
+  "options": [
+   "using language that is pompous or overly elaborate",
+   "essentially different or unrelated",
+   "open to more than one interpretation; ambiguous",
+   "to drain someone of energy or vitality"
+  ],
+  "correctIndex": 3,
+  "explanation": "to drain someone of energy or vitality"
+ },
+ {
+  "id": "h-mean-046",
+  "level": "hard",
+  "type": "meaning",
+  "word": "sagacious",
+  "options": [
+   "cheerful, energetic, and enthusiastic",
+   "using language that is pompous or overly elaborate",
+   "generous or forgiving, especially toward a rival",
+   "having good judgment and practical wisdom"
+  ],
+  "correctIndex": 3,
+  "explanation": "having good judgment and practical wisdom"
+ },
+ {
+  "id": "h-mean-047",
+  "level": "hard",
+  "type": "meaning",
+  "word": "belligerent",
+  "options": [
+   "expressing opinions loudly and forcefully",
+   "a confusing and difficult problem",
+   "hostile and aggressive",
+   "difficult to understand, especially because of complexity"
+  ],
+  "correctIndex": 2,
+  "explanation": "hostile and aggressive"
+ },
+ {
+  "id": "h-mean-048",
+  "level": "hard",
+  "type": "meaning",
+  "word": "equivocal",
+  "options": [
+   "open to more than one interpretation; ambiguous",
+   "stubbornly resistant to authority or control",
+   "essentially different or unrelated",
+   "representing the most typical or perfect example"
+  ],
+  "correctIndex": 0,
+  "explanation": "open to more than one interpretation; ambiguous"
+ },
+ {
+  "id": "h-mean-049",
+  "level": "hard",
+  "type": "meaning",
+  "word": "circumspect",
+  "options": [
+   "careful to consider all circumstances before acting",
+   "generous or forgiving, especially toward a rival",
+   "stubbornly resistant to authority or control",
+   "belonging to a period different from the one in which it exists"
+  ],
+  "correctIndex": 0,
+  "explanation": "careful to consider all circumstances before acting"
+ },
+ {
+  "id": "h-mean-050",
+  "level": "hard",
+  "type": "meaning",
+  "word": "ebullient",
+  "options": [
+   "to place things close together for comparison",
+   "unwilling to change one's views or compromise",
+   "difficult to understand, especially because of complexity",
+   "cheerful, energetic, and enthusiastic"
+  ],
+  "correctIndex": 3,
+  "explanation": "cheerful, energetic, and enthusiastic"
+ },
+ {
+  "id": "h-mean-051",
+  "level": "hard",
+  "type": "meaning",
+  "word": "obfuscate",
+  "options": [
+   "to make something unclear or difficult to understand",
+   "done with little care, interest, or effort",
+   "to drain someone of energy or vitality",
+   "representing the most typical or perfect example"
+  ],
+  "correctIndex": 0,
+  "explanation": "to make something unclear or difficult to understand"
+ },
+ {
+  "id": "h-mean-052",
+  "level": "hard",
+  "type": "meaning",
+  "word": "laconic",
+  "options": [
+   "using very few words",
+   "having good judgment and practical wisdom",
+   "having a ready insight into things",
+   "a confusing and difficult problem"
+  ],
+  "correctIndex": 0,
+  "explanation": "using very few words"
+ },
+ {
+  "id": "h-mean-053",
+  "level": "hard",
+  "type": "meaning",
+  "word": "vociferous",
+  "options": [
+   "causing harm or damage",
+   "expressing opinions loudly and forcefully",
+   "kept secret, especially because it would not be approved",
+   "unwilling to change one's views or compromise"
+  ],
+  "correctIndex": 1,
+  "explanation": "expressing opinions loudly and forcefully"
+ },
+ {
+  "id": "h-mean-054",
+  "level": "hard",
+  "type": "meaning",
+  "word": "quintessential",
+  "options": [
+   "representing the most typical or perfect example",
+   "having good judgment and practical wisdom",
+   "causing harm or damage",
+   "only recently begun and not fully formed"
+  ],
+  "correctIndex": 0,
+  "explanation": "representing the most typical or perfect example"
+ },
+ {
+  "id": "h-mean-055",
+  "level": "hard",
+  "type": "meaning",
+  "word": "taciturn",
+  "options": [
+   "kept secret, especially because it would not be approved",
+   "having good judgment and practical wisdom",
+   "reserved or saying very little",
+   "to place things close together for comparison"
+  ],
+  "correctIndex": 2,
+  "explanation": "reserved or saying very little"
+ },
+ {
+  "id": "h-mean-056",
+  "level": "hard",
+  "type": "meaning",
+  "word": "obfuscate",
+  "options": [
+   "careful to consider all circumstances before acting",
+   "having good judgment and practical wisdom",
+   "hostile and aggressive",
+   "to make something unclear or difficult to understand"
+  ],
+  "correctIndex": 3,
+  "explanation": "to make something unclear or difficult to understand"
+ },
+ {
+  "id": "h-mean-057",
+  "level": "hard",
+  "type": "meaning",
+  "word": "conundrum",
+  "options": [
+   "very attentive to detail and accuracy",
+   "present or found everywhere",
+   "a confusing and difficult problem",
+   "representing the most typical or perfect example"
+  ],
+  "correctIndex": 2,
+  "explanation": "a confusing and difficult problem"
+ },
+ {
+  "id": "h-mean-058",
+  "level": "hard",
+  "type": "meaning",
+  "word": "inchoate",
+  "options": [
+   "to make something unclear or difficult to understand",
+   "reserved or saying very little",
+   "only recently begun and not fully formed",
+   "using very few words"
+  ],
+  "correctIndex": 2,
+  "explanation": "only recently begun and not fully formed"
+ },
+ {
+  "id": "h-mean-059",
+  "level": "hard",
+  "type": "meaning",
+  "word": "idiosyncratic",
+  "options": [
+   "cheerful, energetic, and enthusiastic",
+   "expressing opinions loudly and forcefully",
+   "to drain someone of energy or vitality",
+   "peculiar or distinctive to an individual"
+  ],
+  "correctIndex": 3,
+  "explanation": "peculiar or distinctive to an individual"
+ },
+ {
+  "id": "h-mean-060",
+  "level": "hard",
+  "type": "meaning",
+  "word": "recalcitrant",
+  "options": [
+   "stubbornly resistant to authority or control",
+   "cheerful, energetic, and enthusiastic",
+   "expressing opinions loudly and forcefully",
+   "to drain someone of energy or vitality"
+  ],
+  "correctIndex": 0,
+  "explanation": "stubbornly resistant to authority or control"
+ },
+ {
+  "id": "h-mean-061",
+  "level": "hard",
+  "type": "meaning",
+  "word": "capricious",
+  "options": [
+   "to place things close together for comparison",
+   "given to sudden and unpredictable changes",
+   "to make something unclear or difficult to understand",
+   "done with little care, interest, or effort"
+  ],
+  "correctIndex": 1,
+  "explanation": "given to sudden and unpredictable changes"
+ },
+ {
+  "id": "h-mean-062",
+  "level": "hard",
+  "type": "meaning",
+  "word": "deleterious",
+  "options": [
+   "using language that is pompous or overly elaborate",
+   "causing harm or damage",
+   "belonging to a period different from the one in which it exists",
+   "to make something unclear or difficult to understand"
+  ],
+  "correctIndex": 1,
+  "explanation": "causing harm or damage"
+ },
+ {
+  "id": "h-mean-063",
+  "level": "hard",
+  "type": "meaning",
+  "word": "equivocal",
+  "options": [
+   "open to more than one interpretation; ambiguous",
+   "having a ready insight into things",
+   "unwilling to change one's views or compromise",
+   "to place things close together for comparison"
+  ],
+  "correctIndex": 0,
+  "explanation": "open to more than one interpretation; ambiguous"
+ },
+ {
+  "id": "h-mean-064",
+  "level": "hard",
+  "type": "meaning",
+  "word": "intransigent",
+  "options": [
+   "difficult to understand, especially because of complexity",
+   "unwilling to change one's views or compromise",
+   "a confusing and difficult problem",
+   "essentially different or unrelated"
+  ],
+  "correctIndex": 1,
+  "explanation": "unwilling to change one's views or compromise"
+ },
+ {
+  "id": "h-mean-065",
+  "level": "hard",
+  "type": "meaning",
+  "word": "ameliorate",
+  "options": [
+   "essentially different or unrelated",
+   "peculiar or distinctive to an individual",
+   "to make a difficult situation better",
+   "only recently begun and not fully formed"
+  ],
+  "correctIndex": 2,
+  "explanation": "to make a difficult situation better"
+ },
+ {
+  "id": "h-mean-066",
+  "level": "hard",
+  "type": "meaning",
+  "word": "vociferous",
+  "options": [
+   "a confusing and difficult problem",
+   "to place things close together for comparison",
+   "expressing opinions loudly and forcefully",
+   "very attentive to detail and accuracy"
+  ],
+  "correctIndex": 2,
+  "explanation": "expressing opinions loudly and forcefully"
+ },
+ {
+  "id": "h-mean-067",
+  "level": "hard",
+  "type": "meaning",
+  "word": "disparate",
+  "options": [
+   "essentially different or unrelated",
+   "belonging to a period different from the one in which it exists",
+   "using very few words",
+   "careful to consider all circumstances before acting"
+  ],
+  "correctIndex": 0,
+  "explanation": "essentially different or unrelated"
+ },
+ {
+  "id": "h-mean-068",
+  "level": "hard",
+  "type": "meaning",
+  "word": "laconic",
+  "options": [
+   "kept secret, especially because it would not be approved",
+   "generous or forgiving, especially toward a rival",
+   "using very few words",
+   "representing the most typical or perfect example"
+  ],
+  "correctIndex": 2,
+  "explanation": "using very few words"
+ },
+ {
+  "id": "h-mean-069",
+  "level": "hard",
+  "type": "meaning",
+  "word": "fastidious",
+  "options": [
+   "very attentive to detail and accuracy",
+   "hostile and aggressive",
+   "to place things close together for comparison",
+   "done with little care, interest, or effort"
+  ],
+  "correctIndex": 0,
+  "explanation": "very attentive to detail and accuracy"
+ },
+ {
+  "id": "h-mean-070",
+  "level": "hard",
+  "type": "meaning",
+  "word": "ebullient",
+  "options": [
+   "cheerful, energetic, and enthusiastic",
+   "causing harm or damage",
+   "using very few words",
+   "using language that is pompous or overly elaborate"
+  ],
+  "correctIndex": 0,
+  "explanation": "cheerful, energetic, and enthusiastic"
+ },
+ {
+  "id": "h-mean-071",
+  "level": "hard",
+  "type": "meaning",
+  "word": "juxtapose",
+  "options": [
+   "generous or forgiving, especially toward a rival",
+   "to drain someone of energy or vitality",
+   "to place things close together for comparison",
+   "cheerful, energetic, and enthusiastic"
+  ],
+  "correctIndex": 2,
+  "explanation": "to place things close together for comparison"
+ },
+ {
+  "id": "h-mean-072",
+  "level": "hard",
+  "type": "meaning",
+  "word": "enervate",
+  "options": [
+   "to drain someone of energy or vitality",
+   "generous or forgiving, especially toward a rival",
+   "essentially different or unrelated",
+   "stubbornly resistant to authority or control"
+  ],
+  "correctIndex": 0,
+  "explanation": "to drain someone of energy or vitality"
+ },
+ {
+  "id": "h-mean-073",
+  "level": "hard",
+  "type": "meaning",
+  "word": "abstruse",
+  "options": [
+   "generous or forgiving, especially toward a rival",
+   "difficult to understand, especially because of complexity",
+   "kept secret, especially because it would not be approved",
+   "to make something unclear or difficult to understand"
+  ],
+  "correctIndex": 1,
+  "explanation": "difficult to understand, especially because of complexity"
+ },
+ {
+  "id": "h-mean-074",
+  "level": "hard",
+  "type": "meaning",
+  "word": "equivocal",
+  "options": [
+   "kept secret, especially because it would not be approved",
+   "open to more than one interpretation; ambiguous",
+   "using very few words",
+   "having a ready insight into things"
+  ],
+  "correctIndex": 1,
+  "explanation": "open to more than one interpretation; ambiguous"
+ },
+ {
+  "id": "h-mean-075",
+  "level": "hard",
+  "type": "meaning",
+  "word": "inchoate",
+  "options": [
+   "cheerful, energetic, and enthusiastic",
+   "only recently begun and not fully formed",
+   "expressing opinions loudly and forcefully",
+   "very attentive to detail and accuracy"
+  ],
+  "correctIndex": 1,
+  "explanation": "only recently begun and not fully formed"
+ },
+ {
+  "id": "h-mean-076",
+  "level": "hard",
+  "type": "meaning",
+  "word": "circumspect",
+  "options": [
+   "to make something unclear or difficult to understand",
+   "having a ready insight into things",
+   "careful to consider all circumstances before acting",
+   "using language that is pompous or overly elaborate"
+  ],
+  "correctIndex": 2,
+  "explanation": "careful to consider all circumstances before acting"
+ },
+ {
+  "id": "h-mean-077",
+  "level": "hard",
+  "type": "meaning",
+  "word": "grandiloquent",
+  "options": [
+   "careful to consider all circumstances before acting",
+   "using language that is pompous or overly elaborate",
+   "causing harm or damage",
+   "representing the most typical or perfect example"
+  ],
+  "correctIndex": 1,
+  "explanation": "using language that is pompous or overly elaborate"
+ },
+ {
+  "id": "h-mean-078",
+  "level": "hard",
+  "type": "meaning",
+  "word": "ubiquitous",
+  "options": [
+   "present or found everywhere",
+   "having good judgment and practical wisdom",
+   "unwilling to change one's views or compromise",
+   "kept secret, especially because it would not be approved"
+  ],
+  "correctIndex": 0,
+  "explanation": "present or found everywhere"
+ },
+ {
+  "id": "h-mean-079",
+  "level": "hard",
+  "type": "meaning",
+  "word": "fastidious",
+  "options": [
+   "essentially different or unrelated",
+   "very attentive to detail and accuracy",
+   "peculiar or distinctive to an individual",
+   "cheerful, energetic, and enthusiastic"
+  ],
+  "correctIndex": 1,
+  "explanation": "very attentive to detail and accuracy"
+ },
+ {
+  "id": "h-mean-080",
+  "level": "hard",
+  "type": "meaning",
+  "word": "surreptitious",
+  "options": [
+   "to place things close together for comparison",
+   "open to more than one interpretation; ambiguous",
+   "very attentive to detail and accuracy",
+   "kept secret, especially because it would not be approved"
+  ],
+  "correctIndex": 3,
+  "explanation": "kept secret, especially because it would not be approved"
+ },
+ {
+  "id": "h-mean-081",
+  "level": "hard",
+  "type": "meaning",
+  "word": "disparate",
+  "options": [
+   "belonging to a period different from the one in which it exists",
+   "having a ready insight into things",
+   "representing the most typical or perfect example",
+   "essentially different or unrelated"
+  ],
+  "correctIndex": 3,
+  "explanation": "essentially different or unrelated"
+ },
+ {
+  "id": "h-mean-082",
+  "level": "hard",
+  "type": "meaning",
+  "word": "ebullient",
+  "options": [
+   "difficult to understand, especially because of complexity",
+   "reserved or saying very little",
+   "cheerful, energetic, and enthusiastic",
+   "careful to consider all circumstances before acting"
+  ],
+  "correctIndex": 2,
+  "explanation": "cheerful, energetic, and enthusiastic"
+ },
+ {
+  "id": "h-mean-083",
+  "level": "hard",
+  "type": "meaning",
+  "word": "surreptitious",
+  "options": [
+   "kept secret, especially because it would not be approved",
+   "difficult to understand, especially because of complexity",
+   "cheerful, energetic, and enthusiastic",
+   "using very few words"
+  ],
+  "correctIndex": 0,
+  "explanation": "kept secret, especially because it would not be approved"
+ },
+ {
+  "id": "h-mean-084",
+  "level": "hard",
+  "type": "meaning",
+  "word": "sagacious",
+  "options": [
+   "representing the most typical or perfect example",
+   "generous or forgiving, especially toward a rival",
+   "having good judgment and practical wisdom",
+   "causing harm or damage"
+  ],
+  "correctIndex": 2,
+  "explanation": "having good judgment and practical wisdom"
+ },
+ {
+  "id": "h-mean-085",
+  "level": "hard",
+  "type": "meaning",
+  "word": "surreptitious",
+  "options": [
+   "belonging to a period different from the one in which it exists",
+   "representing the most typical or perfect example",
+   "present or found everywhere",
+   "kept secret, especially because it would not be approved"
+  ],
+  "correctIndex": 3,
+  "explanation": "kept secret, especially because it would not be approved"
+ },
+ {
+  "id": "h-mean-086",
+  "level": "hard",
+  "type": "meaning",
+  "word": "conundrum",
+  "options": [
+   "expressing opinions loudly and forcefully",
+   "to place things close together for comparison",
+   "a confusing and difficult problem",
+   "to make a difficult situation better"
+  ],
+  "correctIndex": 2,
+  "explanation": "a confusing and difficult problem"
+ },
+ {
+  "id": "h-mean-087",
+  "level": "hard",
+  "type": "meaning",
+  "word": "equivocal",
+  "options": [
+   "very attentive to detail and accuracy",
+   "open to more than one interpretation; ambiguous",
+   "to make a difficult situation better",
+   "representing the most typical or perfect example"
+  ],
+  "correctIndex": 1,
+  "explanation": "open to more than one interpretation; ambiguous"
+ },
+ {
+  "id": "h-mean-088",
+  "level": "hard",
+  "type": "meaning",
+  "word": "abstruse",
+  "options": [
+   "only recently begun and not fully formed",
+   "difficult to understand, especially because of complexity",
+   "very attentive to detail and accuracy",
+   "cheerful, energetic, and enthusiastic"
+  ],
+  "correctIndex": 1,
+  "explanation": "difficult to understand, especially because of complexity"
+ },
+ {
+  "id": "h-mean-089",
+  "level": "hard",
+  "type": "meaning",
+  "word": "inchoate",
+  "options": [
+   "done with little care, interest, or effort",
+   "present or found everywhere",
+   "only recently begun and not fully formed",
+   "hostile and aggressive"
+  ],
+  "correctIndex": 2,
+  "explanation": "only recently begun and not fully formed"
+ },
+ {
+  "id": "h-mean-090",
+  "level": "hard",
+  "type": "meaning",
+  "word": "anachronistic",
+  "options": [
+   "to make something unclear or difficult to understand",
+   "present or found everywhere",
+   "stubbornly resistant to authority or control",
+   "belonging to a period different from the one in which it exists"
+  ],
+  "correctIndex": 3,
+  "explanation": "belonging to a period different from the one in which it exists"
+ },
+ {
+  "id": "h-mean-091",
+  "level": "hard",
+  "type": "meaning",
+  "word": "magnanimous",
+  "options": [
+   "having good judgment and practical wisdom",
+   "difficult to understand, especially because of complexity",
+   "having a ready insight into things",
+   "generous or forgiving, especially toward a rival"
+  ],
+  "correctIndex": 3,
+  "explanation": "generous or forgiving, especially toward a rival"
+ },
+ {
+  "id": "h-mean-092",
+  "level": "hard",
+  "type": "meaning",
+  "word": "perfunctory",
+  "options": [
+   "to make a difficult situation better",
+   "done with little care, interest, or effort",
+   "generous or forgiving, especially toward a rival",
+   "to drain someone of energy or vitality"
+  ],
+  "correctIndex": 1,
+  "explanation": "done with little care, interest, or effort"
+ },
+ {
+  "id": "h-mean-093",
+  "level": "hard",
+  "type": "meaning",
+  "word": "grandiloquent",
+  "options": [
+   "kept secret, especially because it would not be approved",
+   "using language that is pompous or overly elaborate",
+   "hostile and aggressive",
+   "difficult to understand, especially because of complexity"
+  ],
+  "correctIndex": 1,
+  "explanation": "using language that is pompous or overly elaborate"
+ },
+ {
+  "id": "h-mean-094",
+  "level": "hard",
+  "type": "meaning",
+  "word": "juxtapose",
+  "options": [
+   "having good judgment and practical wisdom",
+   "stubbornly resistant to authority or control",
+   "very attentive to detail and accuracy",
+   "to place things close together for comparison"
+  ],
+  "correctIndex": 3,
+  "explanation": "to place things close together for comparison"
+ },
+ {
+  "id": "h-mean-095",
+  "level": "hard",
+  "type": "meaning",
+  "word": "recalcitrant",
+  "options": [
+   "hostile and aggressive",
+   "unwilling to change one's views or compromise",
+   "reserved or saying very little",
+   "stubbornly resistant to authority or control"
+  ],
+  "correctIndex": 3,
+  "explanation": "stubbornly resistant to authority or control"
+ },
+ {
+  "id": "h-mean-096",
+  "level": "hard",
+  "type": "meaning",
+  "word": "perfunctory",
+  "options": [
+   "expressing opinions loudly and forcefully",
+   "done with little care, interest, or effort",
+   "cheerful, energetic, and enthusiastic",
+   "belonging to a period different from the one in which it exists"
+  ],
+  "correctIndex": 1,
+  "explanation": "done with little care, interest, or effort"
+ },
+ {
+  "id": "h-mean-097",
+  "level": "hard",
+  "type": "meaning",
+  "word": "anachronistic",
+  "options": [
+   "causing harm or damage",
+   "difficult to understand, especially because of complexity",
+   "belonging to a period different from the one in which it exists",
+   "given to sudden and unpredictable changes"
+  ],
+  "correctIndex": 2,
+  "explanation": "belonging to a period different from the one in which it exists"
+ },
+ {
+  "id": "h-mean-098",
+  "level": "hard",
+  "type": "meaning",
+  "word": "taciturn",
+  "options": [
+   "using language that is pompous or overly elaborate",
+   "reserved or saying very little",
+   "to place things close together for comparison",
+   "using very few words"
+  ],
+  "correctIndex": 1,
+  "explanation": "reserved or saying very little"
+ },
+ {
+  "id": "h-mean-099",
+  "level": "hard",
+  "type": "meaning",
+  "word": "deleterious",
+  "options": [
+   "done with little care, interest, or effort",
+   "causing harm or damage",
+   "unwilling to change one's views or compromise",
+   "having a ready insight into things"
+  ],
+  "correctIndex": 1,
+  "explanation": "causing harm or damage"
+ },
+ {
+  "id": "h-mean-100",
+  "level": "hard",
+  "type": "meaning",
+  "word": "conundrum",
+  "options": [
+   "a confusing and difficult problem",
+   "kept secret, especially because it would not be approved",
+   "generous or forgiving, especially toward a rival",
+   "representing the most typical or perfect example"
+  ],
+  "correctIndex": 0,
+  "explanation": "a confusing and difficult problem"
+ },
+ {
+  "id": "h-fill-001",
+  "level": "hard",
+  "type": "question",
+  "target": "abstruse",
+  "prompt": "The professor's explanation was so _____ that several students struggled to follow it.",
+  "options": [
+   "deleterious",
+   "inchoate",
+   "abstruse",
+   "laconic"
+  ],
+  "correctIndex": 2,
+  "explanation": "difficult to understand, especially because of complexity"
+ },
+ {
+  "id": "h-fill-002",
+  "level": "hard",
+  "type": "question",
+  "target": "quintessential",
+  "prompt": "The critic praised the novel as the _____ example of the genre.",
+  "options": [
+   "idiosyncratic",
+   "belligerent",
+   "quintessential",
+   "surreptitious"
+  ],
+  "correctIndex": 2,
+  "explanation": "representing the most typical or perfect example"
+ },
+ {
+  "id": "h-fill-003",
+  "level": "hard",
+  "type": "question",
+  "target": "fastidious",
+  "prompt": "His _____ attention to detail made even minor errors unlikely.",
+  "options": [
+   "grandiloquent",
+   "fastidious",
+   "vociferous",
+   "surreptitious"
+  ],
+  "correctIndex": 1,
+  "explanation": "very attentive to detail and accuracy"
+ },
+ {
+  "id": "h-fill-004",
+  "level": "hard",
+  "type": "question",
+  "target": "ubiquitous",
+  "prompt": "The new technology has become _____ in modern workplaces.",
+  "options": [
+   "circumspect",
+   "ubiquitous",
+   "ameliorate",
+   "taciturn"
+  ],
+  "correctIndex": 1,
+  "explanation": "present or found everywhere"
+ },
+ {
+  "id": "h-fill-005",
+  "level": "hard",
+  "type": "question",
+  "target": "perspicacious",
+  "prompt": "The committee was impressed by her _____ judgment.",
+  "options": [
+   "conundrum",
+   "quintessential",
+   "perspicacious",
+   "ebullient"
+  ],
+  "correctIndex": 2,
+  "explanation": "having a ready insight into things"
+ },
+ {
+  "id": "h-fill-006",
+  "level": "hard",
+  "type": "question",
+  "target": "obfuscate",
+  "prompt": "The journalist tried not to _____ the facts with unnecessary technical language.",
+  "options": [
+   "conundrum",
+   "disparate",
+   "obfuscate",
+   "ubiquitous"
+  ],
+  "correctIndex": 2,
+  "explanation": "to make something unclear or difficult to understand"
+ },
+ {
+  "id": "h-fill-007",
+  "level": "hard",
+  "type": "question",
+  "target": "ameliorate",
+  "prompt": "The policy was designed to _____ the effects of the economic downturn.",
+  "options": [
+   "idiosyncratic",
+   "ameliorate",
+   "grandiloquent",
+   "enervate"
+  ],
+  "correctIndex": 1,
+  "explanation": "to make a difficult situation better"
+ },
+ {
+  "id": "h-fill-008",
+  "level": "hard",
+  "type": "question",
+  "target": "anachronistic",
+  "prompt": "The historian considered the terminology _____ because it belonged to another era.",
+  "options": [
+   "recalcitrant",
+   "anachronistic",
+   "obfuscate",
+   "inchoate"
+  ],
+  "correctIndex": 1,
+  "explanation": "belonging to a period different from the one in which it exists"
+ },
+ {
+  "id": "h-fill-009",
+  "level": "hard",
+  "type": "question",
+  "target": "equivocal",
+  "prompt": "The witness gave a/an _____ answer that could be interpreted in two ways.",
+  "options": [
+   "perspicacious",
+   "surreptitious",
+   "equivocal",
+   "taciturn"
+  ],
+  "correctIndex": 2,
+  "explanation": "open to more than one interpretation; ambiguous"
+ },
+ {
+  "id": "h-fill-010",
+  "level": "hard",
+  "type": "question",
+  "target": "intransigent",
+  "prompt": "The negotiator remained _____ and refused every compromise.",
+  "options": [
+   "anachronistic",
+   "circumspect",
+   "intransigent",
+   "surreptitious"
+  ],
+  "correctIndex": 2,
+  "explanation": "unwilling to change one's views or compromise"
+ },
+ {
+  "id": "h-fill-011",
+  "level": "hard",
+  "type": "question",
+  "target": "magnanimous",
+  "prompt": "In a/an _____ gesture, the winner praised and hugged his defeated rival.",
+  "options": [
+   "circumspect",
+   "intransigent",
+   "magnanimous",
+   "idiosyncratic"
+  ],
+  "correctIndex": 2,
+  "explanation": "generous or forgiving, especially toward a rival"
+ },
+ {
+  "id": "h-fill-012",
+  "level": "hard",
+  "type": "question",
+  "target": "magnanimous",
+  "prompt": "She was _____ enough to forgive the friend who had insulted her in public.",
+  "options": [
+   "magnanimous",
+   "anachronistic",
+   "inchoate",
+   "surreptitious"
+  ],
+  "correctIndex": 0,
+  "explanation": "generous or forgiving, especially toward a rival"
+ },
+ {
+  "id": "h-fill-013",
+  "level": "hard",
+  "type": "question",
+  "target": "magnanimous",
+  "prompt": "The _____ captain shared his award with the opposing team's best player.",
+  "options": [
+   "magnanimous",
+   "belligerent",
+   "equivocal",
+   "laconic"
+  ],
+  "correctIndex": 0,
+  "explanation": "generous or forgiving, especially toward a rival"
+ },
+ {
+  "id": "h-fill-014",
+  "level": "hard",
+  "type": "question",
+  "target": "anachronistic",
+  "prompt": "A smartphone in a film set in 1850 would be _____.",
+  "options": [
+   "anachronistic",
+   "belligerent",
+   "circumspect",
+   "recalcitrant"
+  ],
+  "correctIndex": 0,
+  "explanation": "belonging to a period different from the one in which it exists"
+ },
+ {
+  "id": "h-fill-015",
+  "level": "hard",
+  "type": "question",
+  "target": "anachronistic",
+  "prompt": "Some people think handwritten letters are _____ in the age of email.",
+  "options": [
+   "anachronistic",
+   "belligerent",
+   "recalcitrant",
+   "intransigent"
+  ],
+  "correctIndex": 0,
+  "explanation": "belonging to a period different from the one in which it exists"
+ },
+ {
+  "id": "h-fill-016",
+  "level": "hard",
+  "type": "question",
+  "target": "anachronistic",
+  "prompt": "The modern glass door looked _____ next to the fort's 400-year-old walls.",
+  "options": [
+   "anachronistic",
+   "laconic",
+   "deleterious",
+   "grandiloquent"
+  ],
+  "correctIndex": 0,
+  "explanation": "belonging to a period different from the one in which it exists"
+ },
+ {
+  "id": "h-fill-017",
+  "level": "hard",
+  "type": "question",
+  "target": "circumspect",
+  "prompt": "Be _____ when sharing personal details online; think carefully before you post.",
+  "options": [
+   "capricious",
+   "ubiquitous",
+   "circumspect",
+   "disparate"
+  ],
+  "correctIndex": 2,
+  "explanation": "careful to consider all circumstances before acting"
+ },
+ {
+  "id": "h-fill-018",
+  "level": "hard",
+  "type": "question",
+  "target": "circumspect",
+  "prompt": "The _____ investor studied every risk before putting in any money.",
+  "options": [
+   "ubiquitous",
+   "anachronistic",
+   "circumspect",
+   "belligerent"
+  ],
+  "correctIndex": 2,
+  "explanation": "careful to consider all circumstances before acting"
+ },
+ {
+  "id": "h-fill-019",
+  "level": "hard",
+  "type": "question",
+  "target": "circumspect",
+  "prompt": "Diplomats must be _____, weighing every word before they speak.",
+  "options": [
+   "circumspect",
+   "intransigent",
+   "quintessential",
+   "ubiquitous"
+  ],
+  "correctIndex": 0,
+  "explanation": "careful to consider all circumstances before acting"
+ },
+ {
+  "id": "h-fill-020",
+  "level": "hard",
+  "type": "question",
+  "target": "vociferous",
+  "prompt": "The _____ fans shouted and chanted for the full ninety minutes.",
+  "options": [
+   "disparate",
+   "equivocal",
+   "vociferous",
+   "capricious"
+  ],
+  "correctIndex": 2,
+  "explanation": "expressing opinions loudly and forcefully"
+ },
+ {
+  "id": "h-fill-021",
+  "level": "hard",
+  "type": "question",
+  "target": "vociferous",
+  "prompt": "There was _____ opposition to the fee increase, with students protesting loudly outside.",
+  "options": [
+   "idiosyncratic",
+   "perfunctory",
+   "vociferous",
+   "inchoate"
+  ],
+  "correctIndex": 2,
+  "explanation": "expressing opinions loudly and forcefully"
+ },
+ {
+  "id": "h-fill-022",
+  "level": "hard",
+  "type": "question",
+  "target": "vociferous",
+  "prompt": "He was a/an _____ critic who loudly attacked every new rule.",
+  "options": [
+   "deleterious",
+   "disparate",
+   "inchoate",
+   "vociferous"
+  ],
+  "correctIndex": 3,
+  "explanation": "expressing opinions loudly and forcefully"
+ },
+ {
+  "id": "h-fill-023",
+  "level": "hard",
+  "type": "question",
+  "target": "fastidious",
+  "prompt": "She is so _____ that she irons even her socks.",
+  "options": [
+   "vociferous",
+   "fastidious",
+   "belligerent",
+   "sagacious"
+  ],
+  "correctIndex": 1,
+  "explanation": "very attentive to detail and accuracy"
+ },
+ {
+  "id": "h-fill-024",
+  "level": "hard",
+  "type": "question",
+  "target": "fastidious",
+  "prompt": "The _____ editor found every missing comma in the 300-page book.",
+  "options": [
+   "quintessential",
+   "surreptitious",
+   "taciturn",
+   "fastidious"
+  ],
+  "correctIndex": 3,
+  "explanation": "very attentive to detail and accuracy"
+ },
+ {
+  "id": "h-fill-025",
+  "level": "hard",
+  "type": "question",
+  "target": "fastidious",
+  "prompt": "Being _____ about hygiene, the chef washed his hands after every single task.",
+  "options": [
+   "vociferous",
+   "quintessential",
+   "fastidious",
+   "grandiloquent"
+  ],
+  "correctIndex": 2,
+  "explanation": "very attentive to detail and accuracy"
+ },
+ {
+  "id": "h-fill-026",
+  "level": "hard",
+  "type": "question",
+  "target": "perspicacious",
+  "prompt": "The _____ detective noticed the tiny clue that everyone else had missed.",
+  "options": [
+   "vociferous",
+   "taciturn",
+   "perspicacious",
+   "perfunctory"
+  ],
+  "correctIndex": 2,
+  "explanation": "having a ready insight into things"
+ },
+ {
+  "id": "h-fill-027",
+  "level": "hard",
+  "type": "question",
+  "target": "perspicacious",
+  "prompt": "A/an _____ investor saw the company's potential years before anyone else did.",
+  "options": [
+   "abstruse",
+   "perspicacious",
+   "intransigent",
+   "perfunctory"
+  ],
+  "correctIndex": 1,
+  "explanation": "having a ready insight into things"
+ },
+ {
+  "id": "h-fill-028",
+  "level": "hard",
+  "type": "question",
+  "target": "perspicacious",
+  "prompt": "Her _____ comments showed she understood the problem better than the experts.",
+  "options": [
+   "anachronistic",
+   "perspicacious",
+   "quintessential",
+   "ebullient"
+  ],
+  "correctIndex": 1,
+  "explanation": "having a ready insight into things"
+ },
+ {
+  "id": "h-fill-029",
+  "level": "hard",
+  "type": "question",
+  "target": "grandiloquent",
+  "prompt": "His _____ speech was full of long, showy words but said very little.",
+  "options": [
+   "intransigent",
+   "belligerent",
+   "grandiloquent",
+   "perfunctory"
+  ],
+  "correctIndex": 2,
+  "explanation": "using language that is pompous or overly elaborate"
+ },
+ {
+  "id": "h-fill-030",
+  "level": "hard",
+  "type": "question",
+  "target": "grandiloquent",
+  "prompt": "The politician's _____ promises sounded impressive but meant nothing.",
+  "options": [
+   "quintessential",
+   "equivocal",
+   "circumspect",
+   "grandiloquent"
+  ],
+  "correctIndex": 3,
+  "explanation": "using language that is pompous or overly elaborate"
+ },
+ {
+  "id": "h-fill-031",
+  "level": "hard",
+  "type": "question",
+  "target": "grandiloquent",
+  "prompt": "Avoid _____ language in emails; plain words are clearer.",
+  "options": [
+   "laconic",
+   "inchoate",
+   "ubiquitous",
+   "grandiloquent"
+  ],
+  "correctIndex": 3,
+  "explanation": "using language that is pompous or overly elaborate"
+ },
+ {
+  "id": "h-fill-032",
+  "level": "hard",
+  "type": "question",
+  "target": "laconic",
+  "prompt": "When asked about the match, the _____ captain just said, 'We won.'",
+  "options": [
+   "laconic",
+   "belligerent",
+   "circumspect",
+   "deleterious"
+  ],
+  "correctIndex": 0,
+  "explanation": "using very few words"
+ },
+ {
+  "id": "h-fill-033",
+  "level": "hard",
+  "type": "question",
+  "target": "laconic",
+  "prompt": "Her _____ reply of 'Fine.' ended the conversation immediately.",
+  "options": [
+   "abstruse",
+   "recalcitrant",
+   "laconic",
+   "perfunctory"
+  ],
+  "correctIndex": 2,
+  "explanation": "using very few words"
+ },
+ {
+  "id": "h-fill-034",
+  "level": "hard",
+  "type": "question",
+  "target": "laconic",
+  "prompt": "He is known for his _____ style, never using ten words when two will do.",
+  "options": [
+   "abstruse",
+   "circumspect",
+   "laconic",
+   "intransigent"
+  ],
+  "correctIndex": 2,
+  "explanation": "using very few words"
+ },
+ {
+  "id": "h-fill-035",
+  "level": "hard",
+  "type": "question",
+  "target": "sagacious",
+  "prompt": "Grandmother's _____ advice solved a problem the whole family had struggled with.",
+  "options": [
+   "deleterious",
+   "recalcitrant",
+   "anachronistic",
+   "sagacious"
+  ],
+  "correctIndex": 3,
+  "explanation": "having good judgment and practical wisdom"
+ },
+ {
+  "id": "h-fill-036",
+  "level": "hard",
+  "type": "question",
+  "target": "sagacious",
+  "prompt": "A/an _____ leader makes wise decisions even in a crisis.",
+  "options": [
+   "sagacious",
+   "ubiquitous",
+   "vociferous",
+   "intransigent"
+  ],
+  "correctIndex": 0,
+  "explanation": "having good judgment and practical wisdom"
+ },
+ {
+  "id": "h-fill-037",
+  "level": "hard",
+  "type": "question",
+  "target": "sagacious",
+  "prompt": "The _____ old teacher always knew which students needed extra help.",
+  "options": [
+   "belligerent",
+   "anachronistic",
+   "sagacious",
+   "ebullient"
+  ],
+  "correctIndex": 2,
+  "explanation": "having good judgment and practical wisdom"
+ },
+ {
+  "id": "h-fill-038",
+  "level": "hard",
+  "type": "question",
+  "target": "intransigent",
+  "prompt": "The _____ landlord refused every request to lower the rent.",
+  "options": [
+   "idiosyncratic",
+   "taciturn",
+   "intransigent",
+   "circumspect"
+  ],
+  "correctIndex": 2,
+  "explanation": "unwilling to change one's views or compromise"
+ },
+ {
+  "id": "h-fill-039",
+  "level": "hard",
+  "type": "question",
+  "target": "intransigent",
+  "prompt": "Talks failed because both sides were _____ and would not compromise at all.",
+  "options": [
+   "sagacious",
+   "intransigent",
+   "deleterious",
+   "surreptitious"
+  ],
+  "correctIndex": 1,
+  "explanation": "unwilling to change one's views or compromise"
+ },
+ {
+  "id": "h-fill-040",
+  "level": "hard",
+  "type": "question",
+  "target": "intransigent",
+  "prompt": "Even when proven wrong, he remained _____ and never changed his position.",
+  "options": [
+   "taciturn",
+   "ebullient",
+   "capricious",
+   "intransigent"
+  ],
+  "correctIndex": 3,
+  "explanation": "unwilling to change one's views or compromise"
+ },
+ {
+  "id": "h-fill-041",
+  "level": "hard",
+  "type": "question",
+  "target": "capricious",
+  "prompt": "The _____ weather changed from bright sunshine to a hailstorm within an hour.",
+  "options": [
+   "perspicacious",
+   "surreptitious",
+   "capricious",
+   "intransigent"
+  ],
+  "correctIndex": 2,
+  "explanation": "given to sudden and unpredictable changes"
+ },
+ {
+  "id": "h-fill-042",
+  "level": "hard",
+  "type": "question",
+  "target": "capricious",
+  "prompt": "The _____ manager changed the deadline three times in one day.",
+  "options": [
+   "perspicacious",
+   "grandiloquent",
+   "capricious",
+   "perfunctory"
+  ],
+  "correctIndex": 2,
+  "explanation": "given to sudden and unpredictable changes"
+ },
+ {
+  "id": "h-fill-043",
+  "level": "hard",
+  "type": "question",
+  "target": "capricious",
+  "prompt": "Small children can be _____, loving a toy one minute and ignoring it the next.",
+  "options": [
+   "capricious",
+   "inchoate",
+   "perspicacious",
+   "fastidious"
+  ],
+  "correctIndex": 0,
+  "explanation": "given to sudden and unpredictable changes"
+ },
+ {
+  "id": "h-fill-044",
+  "level": "hard",
+  "type": "question",
+  "target": "recalcitrant",
+  "prompt": "The _____ student refused to follow any of the teacher's instructions.",
+  "options": [
+   "recalcitrant",
+   "ebullient",
+   "inchoate",
+   "quintessential"
+  ],
+  "correctIndex": 0,
+  "explanation": "stubbornly resistant to authority or control"
+ },
+ {
+  "id": "h-fill-045",
+  "level": "hard",
+  "type": "question",
+  "target": "recalcitrant",
+  "prompt": "Even after many warnings, the _____ shopkeeper kept blocking the road.",
+  "options": [
+   "recalcitrant",
+   "grandiloquent",
+   "ubiquitous",
+   "quintessential"
+  ],
+  "correctIndex": 0,
+  "explanation": "stubbornly resistant to authority or control"
+ },
+ {
+  "id": "h-fill-046",
+  "level": "hard",
+  "type": "question",
+  "target": "recalcitrant",
+  "prompt": "The _____ mule would not move, no matter how hard they pulled.",
+  "options": [
+   "recalcitrant",
+   "inchoate",
+   "quintessential",
+   "disparate"
+  ],
+  "correctIndex": 0,
+  "explanation": "stubbornly resistant to authority or control"
+ },
+ {
+  "id": "h-fill-047",
+  "level": "hard",
+  "type": "question",
+  "target": "quintessential",
+  "prompt": "Chai and samosas on a rainy day are the _____ Indian evening snack.",
+  "options": [
+   "sagacious",
+   "quintessential",
+   "surreptitious",
+   "ebullient"
+  ],
+  "correctIndex": 1,
+  "explanation": "representing the most typical or perfect example"
+ },
+ {
+  "id": "h-fill-048",
+  "level": "hard",
+  "type": "question",
+  "target": "quintessential",
+  "prompt": "With its pink buildings and grand forts, Jaipur is the _____ heritage city.",
+  "options": [
+   "perfunctory",
+   "ebullient",
+   "disparate",
+   "quintessential"
+  ],
+  "correctIndex": 3,
+  "explanation": "representing the most typical or perfect example"
+ },
+ {
+  "id": "h-fill-049",
+  "level": "hard",
+  "type": "question",
+  "target": "abstruse",
+  "prompt": "The lecture on quantum physics was so _____ that few students could follow it.",
+  "options": [
+   "abstruse",
+   "grandiloquent",
+   "anachronistic",
+   "perspicacious"
+  ],
+  "correctIndex": 0,
+  "explanation": "difficult to understand, especially because of complexity"
+ },
+ {
+  "id": "h-fill-050",
+  "level": "hard",
+  "type": "question",
+  "target": "abstruse",
+  "prompt": "The contract was written in _____ legal language that nobody could understand.",
+  "options": [
+   "abstruse",
+   "capricious",
+   "perfunctory",
+   "intransigent"
+  ],
+  "correctIndex": 0,
+  "explanation": "difficult to understand, especially because of complexity"
+ },
+ {
+  "id": "h-fill-051",
+  "level": "hard",
+  "type": "question",
+  "target": "idiosyncratic",
+  "prompt": "His _____ habit of wearing one red sock and one blue sock made him easy to recognise.",
+  "options": [
+   "intransigent",
+   "quintessential",
+   "idiosyncratic",
+   "equivocal"
+  ],
+  "correctIndex": 2,
+  "explanation": "peculiar or distinctive to an individual"
+ },
+ {
+  "id": "h-fill-052",
+  "level": "hard",
+  "type": "question",
+  "target": "idiosyncratic",
+  "prompt": "The painter has a/an _____ style that is entirely her own.",
+  "options": [
+   "ubiquitous",
+   "idiosyncratic",
+   "laconic",
+   "quintessential"
+  ],
+  "correctIndex": 1,
+  "explanation": "peculiar or distinctive to an individual"
+ },
+ {
+  "id": "h-fill-053",
+  "level": "hard",
+  "type": "question",
+  "target": "idiosyncratic",
+  "prompt": "Every family has _____ traditions that seem strange to outsiders.",
+  "options": [
+   "magnanimous",
+   "quintessential",
+   "idiosyncratic",
+   "equivocal"
+  ],
+  "correctIndex": 2,
+  "explanation": "peculiar or distinctive to an individual"
+ },
+ {
+  "id": "h-fill-054",
+  "level": "hard",
+  "type": "question",
+  "target": "ubiquitous",
+  "prompt": "Mobile phones are now _____; almost everyone carries one everywhere.",
+  "options": [
+   "inchoate",
+   "belligerent",
+   "laconic",
+   "ubiquitous"
+  ],
+  "correctIndex": 3,
+  "explanation": "present or found everywhere"
+ },
+ {
+  "id": "h-fill-055",
+  "level": "hard",
+  "type": "question",
+  "target": "ubiquitous",
+  "prompt": "After the festival, plastic cups were _____, lying in every corner of the ground.",
+  "options": [
+   "deleterious",
+   "ubiquitous",
+   "abstruse",
+   "circumspect"
+  ],
+  "correctIndex": 1,
+  "explanation": "present or found everywhere"
+ },
+ {
+  "id": "h-fill-056",
+  "level": "hard",
+  "type": "question",
+  "target": "deleterious",
+  "prompt": "Smoking has a/an _____ effect on the lungs.",
+  "options": [
+   "surreptitious",
+   "circumspect",
+   "sagacious",
+   "deleterious"
+  ],
+  "correctIndex": 3,
+  "explanation": "causing harm or damage"
+ },
+ {
+  "id": "h-fill-057",
+  "level": "hard",
+  "type": "question",
+  "target": "deleterious",
+  "prompt": "Too much screen time at night can be _____ to sleep.",
+  "options": [
+   "quintessential",
+   "deleterious",
+   "abstruse",
+   "circumspect"
+  ],
+  "correctIndex": 1,
+  "explanation": "causing harm or damage"
+ },
+ {
+  "id": "h-fill-058",
+  "level": "hard",
+  "type": "question",
+  "target": "deleterious",
+  "prompt": "The factory's waste had _____ effects on the fish in the river.",
+  "options": [
+   "vociferous",
+   "circumspect",
+   "perspicacious",
+   "deleterious"
+  ],
+  "correctIndex": 3,
+  "explanation": "causing harm or damage"
+ },
+ {
+  "id": "h-fill-059",
+  "level": "hard",
+  "type": "question",
+  "target": "belligerent",
+  "prompt": "The _____ customer shouted at the staff and threatened to start a fight.",
+  "options": [
+   "fastidious",
+   "abstruse",
+   "belligerent",
+   "ebullient"
+  ],
+  "correctIndex": 2,
+  "explanation": "hostile and aggressive"
+ },
+ {
+  "id": "h-fill-060",
+  "level": "hard",
+  "type": "question",
+  "target": "belligerent",
+  "prompt": "His _____ tone turned a small disagreement into a big argument.",
+  "options": [
+   "idiosyncratic",
+   "fastidious",
+   "surreptitious",
+   "belligerent"
+  ],
+  "correctIndex": 3,
+  "explanation": "hostile and aggressive"
+ },
+ {
+  "id": "h-fill-061",
+  "level": "hard",
+  "type": "question",
+  "target": "belligerent",
+  "prompt": "The _____ nation kept threatening its neighbours with war.",
+  "options": [
+   "perfunctory",
+   "inchoate",
+   "surreptitious",
+   "belligerent"
+  ],
+  "correctIndex": 3,
+  "explanation": "hostile and aggressive"
+ },
+ {
+  "id": "h-fill-062",
+  "level": "hard",
+  "type": "question",
+  "target": "disparate",
+  "prompt": "The two cities are so _____ that they have almost nothing in common.",
+  "options": [
+   "quintessential",
+   "disparate",
+   "circumspect",
+   "recalcitrant"
+  ],
+  "correctIndex": 1,
+  "explanation": "essentially different or unrelated"
+ },
+ {
+  "id": "h-fill-063",
+  "level": "hard",
+  "type": "question",
+  "target": "disparate",
+  "prompt": "Our team members come from _____ fields: law, music and engineering.",
+  "options": [
+   "circumspect",
+   "disparate",
+   "surreptitious",
+   "abstruse"
+  ],
+  "correctIndex": 1,
+  "explanation": "essentially different or unrelated"
+ },
+ {
+  "id": "h-fill-064",
+  "level": "hard",
+  "type": "question",
+  "target": "disparate",
+  "prompt": "The book brings together _____ ideas from science, art and history.",
+  "options": [
+   "disparate",
+   "recalcitrant",
+   "capricious",
+   "surreptitious"
+  ],
+  "correctIndex": 0,
+  "explanation": "essentially different or unrelated"
+ },
+ {
+  "id": "h-fill-065",
+  "level": "hard",
+  "type": "question",
+  "target": "taciturn",
+  "prompt": "The _____ new student hardly said a word during his first week.",
+  "options": [
+   "anachronistic",
+   "taciturn",
+   "capricious",
+   "recalcitrant"
+  ],
+  "correctIndex": 1,
+  "explanation": "reserved or saying very little"
+ },
+ {
+  "id": "h-fill-066",
+  "level": "hard",
+  "type": "question",
+  "target": "taciturn",
+  "prompt": "Her _____ grandfather rarely talked, but he always listened carefully.",
+  "options": [
+   "capricious",
+   "anachronistic",
+   "quintessential",
+   "taciturn"
+  ],
+  "correctIndex": 3,
+  "explanation": "reserved or saying very little"
+ },
+ {
+  "id": "h-fill-067",
+  "level": "hard",
+  "type": "question",
+  "target": "taciturn",
+  "prompt": "Being _____, he answered most questions with just a nod.",
+  "options": [
+   "belligerent",
+   "taciturn",
+   "idiosyncratic",
+   "perfunctory"
+  ],
+  "correctIndex": 1,
+  "explanation": "reserved or saying very little"
+ },
+ {
+  "id": "h-fill-068",
+  "level": "hard",
+  "type": "question",
+  "target": "ebullient",
+  "prompt": "The _____ host welcomed every guest with a huge smile and a loud cheer.",
+  "options": [
+   "quintessential",
+   "perfunctory",
+   "recalcitrant",
+   "ebullient"
+  ],
+  "correctIndex": 3,
+  "explanation": "cheerful, energetic, and enthusiastic"
+ },
+ {
+  "id": "h-fill-069",
+  "level": "hard",
+  "type": "question",
+  "target": "ebullient",
+  "prompt": "After winning the trophy, the team was _____, singing and dancing all the way home.",
+  "options": [
+   "fastidious",
+   "vociferous",
+   "ebullient",
+   "quintessential"
+  ],
+  "correctIndex": 2,
+  "explanation": "cheerful, energetic, and enthusiastic"
+ },
+ {
+  "id": "h-fill-070",
+  "level": "hard",
+  "type": "question",
+  "target": "ebullient",
+  "prompt": "Her _____ personality filled the whole room with energy.",
+  "options": [
+   "intransigent",
+   "laconic",
+   "capricious",
+   "ebullient"
+  ],
+  "correctIndex": 3,
+  "explanation": "cheerful, energetic, and enthusiastic"
+ },
+ {
+  "id": "h-fill-071",
+  "level": "hard",
+  "type": "question",
+  "target": "perfunctory",
+  "prompt": "He gave my essay a/an _____ glance and handed it back without really reading it.",
+  "options": [
+   "intransigent",
+   "ebullient",
+   "perfunctory",
+   "taciturn"
+  ],
+  "correctIndex": 2,
+  "explanation": "done with little care, interest, or effort"
+ },
+ {
+  "id": "h-fill-072",
+  "level": "hard",
+  "type": "question",
+  "target": "perfunctory",
+  "prompt": "The guard made a/an _____ check of our bags, barely looking inside.",
+  "options": [
+   "perfunctory",
+   "circumspect",
+   "capricious",
+   "ubiquitous"
+  ],
+  "correctIndex": 0,
+  "explanation": "done with little care, interest, or effort"
+ },
+ {
+  "id": "h-fill-073",
+  "level": "hard",
+  "type": "question",
+  "target": "perfunctory",
+  "prompt": "Her _____ 'sorry' showed she did not really mean it.",
+  "options": [
+   "perfunctory",
+   "ebullient",
+   "laconic",
+   "circumspect"
+  ],
+  "correctIndex": 0,
+  "explanation": "done with little care, interest, or effort"
+ },
+ {
+  "id": "h-fill-074",
+  "level": "hard",
+  "type": "question",
+  "target": "equivocal",
+  "prompt": "The minister gave a/an _____ answer that was neither yes nor no.",
+  "options": [
+   "ebullient",
+   "equivocal",
+   "grandiloquent",
+   "vociferous"
+  ],
+  "correctIndex": 1,
+  "explanation": "open to more than one interpretation; ambiguous"
+ },
+ {
+  "id": "h-fill-075",
+  "level": "hard",
+  "type": "question",
+  "target": "equivocal",
+  "prompt": "The first test results were _____, so the lab ordered a second test.",
+  "options": [
+   "intransigent",
+   "magnanimous",
+   "recalcitrant",
+   "equivocal"
+  ],
+  "correctIndex": 3,
+  "explanation": "open to more than one interpretation; ambiguous"
+ },
+ {
+  "id": "h-fill-076",
+  "level": "hard",
+  "type": "question",
+  "target": "inchoate",
+  "prompt": "The idea was still _____, just a rough thought without any real plan.",
+  "options": [
+   "inchoate",
+   "belligerent",
+   "grandiloquent",
+   "vociferous"
+  ],
+  "correctIndex": 0,
+  "explanation": "only recently begun and not fully formed"
+ },
+ {
+  "id": "h-fill-077",
+  "level": "hard",
+  "type": "question",
+  "target": "inchoate",
+  "prompt": "Her _____ business plan needed months of work before investors would see it.",
+  "options": [
+   "inchoate",
+   "ubiquitous",
+   "magnanimous",
+   "quintessential"
+  ],
+  "correctIndex": 0,
+  "explanation": "only recently begun and not fully formed"
+ },
+ {
+  "id": "h-fill-078",
+  "level": "hard",
+  "type": "question",
+  "target": "inchoate",
+  "prompt": "The project was at a/an _____ stage; only the very first steps had been taken.",
+  "options": [
+   "sagacious",
+   "fastidious",
+   "inchoate",
+   "perspicacious"
+  ],
+  "correctIndex": 2,
+  "explanation": "only recently begun and not fully formed"
+ },
+ {
+  "id": "h-fill-079",
+  "level": "hard",
+  "type": "question",
+  "target": "surreptitious",
+  "prompt": "He took a/an _____ look at his phone under the desk during the exam.",
+  "options": [
+   "belligerent",
+   "surreptitious",
+   "capricious",
+   "equivocal"
+  ],
+  "correctIndex": 1,
+  "explanation": "kept secret, especially because it would not be approved"
+ },
+ {
+  "id": "h-fill-080",
+  "level": "hard",
+  "type": "question",
+  "target": "surreptitious",
+  "prompt": "The _____ recording was made without anyone in the room knowing.",
+  "options": [
+   "surreptitious",
+   "equivocal",
+   "circumspect",
+   "intransigent"
+  ],
+  "correctIndex": 0,
+  "explanation": "kept secret, especially because it would not be approved"
+ },
+ {
+  "id": "h-fill-081",
+  "level": "hard",
+  "type": "question",
+  "target": "surreptitious",
+  "prompt": "She made a/an _____ exit from the party while no one was watching.",
+  "options": [
+   "perspicacious",
+   "perfunctory",
+   "quintessential",
+   "surreptitious"
+  ],
+  "correctIndex": 3,
+  "explanation": "kept secret, especially because it would not be approved"
+ },
+ {
+  "id": "h-fill-082",
+  "level": "hard",
+  "type": "question",
+  "target": "ameliorate",
+  "prompt": "The new flyover should _____ the traffic problems in the city centre.",
+  "options": [
+   "obfuscate",
+   "enervate",
+   "ameliorate",
+   "juxtapose"
+  ],
+  "correctIndex": 2,
+  "explanation": "to make a difficult situation better"
+ },
+ {
+  "id": "h-fill-083",
+  "level": "hard",
+  "type": "question",
+  "target": "ameliorate",
+  "prompt": "Volunteers worked hard to _____ living conditions in the flood camp.",
+  "options": [
+   "enervate",
+   "ameliorate",
+   "juxtapose",
+   "obfuscate"
+  ],
+  "correctIndex": 1,
+  "explanation": "to make a difficult situation better"
+ },
+ {
+  "id": "h-fill-084",
+  "level": "hard",
+  "type": "question",
+  "target": "ameliorate",
+  "prompt": "Planting more trees can help _____ the effects of extreme heat.",
+  "options": [
+   "obfuscate",
+   "juxtapose",
+   "enervate",
+   "ameliorate"
+  ],
+  "correctIndex": 3,
+  "explanation": "to make a difficult situation better"
+ },
+ {
+  "id": "h-fill-085",
+  "level": "hard",
+  "type": "question",
+  "target": "obfuscate",
+  "prompt": "Don't _____ your main point with too many technical terms.",
+  "options": [
+   "obfuscate",
+   "ameliorate",
+   "juxtapose",
+   "enervate"
+  ],
+  "correctIndex": 0,
+  "explanation": "to make something unclear or difficult to understand"
+ },
+ {
+  "id": "h-fill-086",
+  "level": "hard",
+  "type": "question",
+  "target": "obfuscate",
+  "prompt": "The company tried to _____ its losses with confusing reports.",
+  "options": [
+   "juxtapose",
+   "enervate",
+   "obfuscate",
+   "ameliorate"
+  ],
+  "correctIndex": 2,
+  "explanation": "to make something unclear or difficult to understand"
+ },
+ {
+  "id": "h-fill-087",
+  "level": "hard",
+  "type": "question",
+  "target": "obfuscate",
+  "prompt": "Lawyers sometimes _____ simple facts to confuse the other side.",
+  "options": [
+   "obfuscate",
+   "enervate",
+   "juxtapose",
+   "ameliorate"
+  ],
+  "correctIndex": 0,
+  "explanation": "to make something unclear or difficult to understand"
+ },
+ {
+  "id": "h-fill-088",
+  "level": "hard",
+  "type": "question",
+  "target": "juxtapose",
+  "prompt": "The exhibition will _____ old photos with new ones to show how the city has changed.",
+  "options": [
+   "obfuscate",
+   "juxtapose",
+   "enervate",
+   "ameliorate"
+  ],
+  "correctIndex": 1,
+  "explanation": "to place things close together for comparison"
+ },
+ {
+  "id": "h-fill-089",
+  "level": "hard",
+  "type": "question",
+  "target": "juxtapose",
+  "prompt": "The film likes to _____ rich and poor families in the same scene.",
+  "options": [
+   "enervate",
+   "ameliorate",
+   "juxtapose",
+   "obfuscate"
+  ],
+  "correctIndex": 2,
+  "explanation": "to place things close together for comparison"
+ },
+ {
+  "id": "h-fill-090",
+  "level": "hard",
+  "type": "question",
+  "target": "juxtapose",
+  "prompt": "Poets often _____ light and dark images for a stronger effect.",
+  "options": [
+   "obfuscate",
+   "enervate",
+   "ameliorate",
+   "juxtapose"
+  ],
+  "correctIndex": 3,
+  "explanation": "to place things close together for comparison"
+ },
+ {
+  "id": "h-fill-091",
+  "level": "hard",
+  "type": "question",
+  "target": "enervate",
+  "prompt": "The extreme heat seemed to _____ everyone; nobody had the energy to move.",
+  "options": [
+   "ameliorate",
+   "enervate",
+   "obfuscate",
+   "juxtapose"
+  ],
+  "correctIndex": 1,
+  "explanation": "to drain someone of energy or vitality"
+ },
+ {
+  "id": "h-fill-092",
+  "level": "hard",
+  "type": "question",
+  "target": "enervate",
+  "prompt": "Long night shifts can _____ even the strongest workers.",
+  "options": [
+   "enervate",
+   "ameliorate",
+   "juxtapose",
+   "obfuscate"
+  ],
+  "correctIndex": 0,
+  "explanation": "to drain someone of energy or vitality"
+ },
+ {
+  "id": "h-fill-093",
+  "level": "hard",
+  "type": "question",
+  "target": "enervate",
+  "prompt": "Weeks of exams and little sleep began to _____ the students.",
+  "options": [
+   "enervate",
+   "ameliorate",
+   "obfuscate",
+   "juxtapose"
+  ],
+  "correctIndex": 0,
+  "explanation": "to drain someone of energy or vitality"
+ },
+ {
+  "id": "h-fill-094",
+  "level": "hard",
+  "type": "question",
+  "target": "conundrum",
+  "prompt": "Choosing between two great job offers was a real _____.",
+  "options": [
+   "souvenir",
+   "pedestal",
+   "lantern",
+   "conundrum"
+  ],
+  "correctIndex": 3,
+  "explanation": "a confusing and difficult problem"
+ },
+ {
+  "id": "h-fill-095",
+  "level": "hard",
+  "type": "question",
+  "target": "conundrum",
+  "prompt": "How to fit 50 people into a 30-seat bus was a/an _____ for the organisers.",
+  "options": [
+   "souvenir",
+   "conundrum",
+   "lantern",
+   "pedestal"
+  ],
+  "correctIndex": 1,
+  "explanation": "a confusing and difficult problem"
+ },
+ {
+  "id": "h-fill-096",
+  "level": "hard",
+  "type": "question",
+  "target": "conundrum",
+  "prompt": "The missing keys remained a/an _____ until they turned up in the fridge.",
+  "options": [
+   "lantern",
+   "conundrum",
+   "pedestal",
+   "souvenir"
+  ],
+  "correctIndex": 1,
+  "explanation": "a confusing and difficult problem"
+ },
+ {
+  "id": "h-pron-001",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "abstruse",
+  "explanation": "difficult to understand, especially because of complexity"
+ },
+ {
+  "id": "h-pron-002",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "ameliorate",
+  "explanation": "to make a difficult situation better"
+ },
+ {
+  "id": "h-pron-003",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "anachronistic",
+  "explanation": "belonging to a period different from the one in which it exists"
+ },
+ {
+  "id": "h-pron-004",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "belligerent",
+  "explanation": "hostile and aggressive"
+ },
+ {
+  "id": "h-pron-005",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "capricious",
+  "explanation": "given to sudden and unpredictable changes"
+ },
+ {
+  "id": "h-pron-006",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "circumspect",
+  "explanation": "careful to consider all circumstances before acting"
+ },
+ {
+  "id": "h-pron-007",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "conundrum",
+  "explanation": "a confusing and difficult problem"
+ },
+ {
+  "id": "h-pron-008",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "deleterious",
+  "explanation": "causing harm or damage"
+ },
+ {
+  "id": "h-pron-009",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "disparate",
+  "explanation": "essentially different or unrelated"
+ },
+ {
+  "id": "h-pron-010",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "ebullient",
+  "explanation": "cheerful, energetic, and enthusiastic"
+ },
+ {
+  "id": "h-pron-011",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "enervate",
+  "explanation": "to drain someone of energy or vitality"
+ },
+ {
+  "id": "h-pron-012",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "equivocal",
+  "explanation": "open to more than one interpretation; ambiguous"
+ },
+ {
+  "id": "h-pron-013",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "fastidious",
+  "explanation": "very attentive to detail and accuracy"
+ },
+ {
+  "id": "h-pron-014",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "grandiloquent",
+  "explanation": "using language that is pompous or overly elaborate"
+ },
+ {
+  "id": "h-pron-015",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "idiosyncratic",
+  "explanation": "peculiar or distinctive to an individual"
+ },
+ {
+  "id": "h-pron-016",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "inchoate",
+  "explanation": "only recently begun and not fully formed"
+ },
+ {
+  "id": "h-pron-017",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "intransigent",
+  "explanation": "unwilling to change one's views or compromise"
+ },
+ {
+  "id": "h-pron-018",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "juxtapose",
+  "explanation": "to place things close together for comparison"
+ },
+ {
+  "id": "h-pron-019",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "laconic",
+  "explanation": "using very few words"
+ },
+ {
+  "id": "h-pron-020",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "magnanimous",
+  "explanation": "generous or forgiving, especially toward a rival"
+ },
+ {
+  "id": "h-pron-021",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "obfuscate",
+  "explanation": "to make something unclear or difficult to understand"
+ },
+ {
+  "id": "h-pron-022",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "perfunctory",
+  "explanation": "done with little care, interest, or effort"
+ },
+ {
+  "id": "h-pron-023",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "perspicacious",
+  "explanation": "having a ready insight into things"
+ },
+ {
+  "id": "h-pron-024",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "quintessential",
+  "explanation": "representing the most typical or perfect example"
+ },
+ {
+  "id": "h-pron-025",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "recalcitrant",
+  "explanation": "stubbornly resistant to authority or control"
+ },
+ {
+  "id": "h-pron-026",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "sagacious",
+  "explanation": "having good judgment and practical wisdom"
+ },
+ {
+  "id": "h-pron-027",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "surreptitious",
+  "explanation": "kept secret, especially because it would not be approved"
+ },
+ {
+  "id": "h-pron-028",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "taciturn",
+  "explanation": "reserved or saying very little"
+ },
+ {
+  "id": "h-pron-029",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "ubiquitous",
+  "explanation": "present or found everywhere"
+ },
+ {
+  "id": "h-pron-030",
+  "level": "hard",
+  "type": "pronounce",
+  "word": "vociferous",
+  "explanation": "expressing opinions loudly and forcefully"
+ }
+]

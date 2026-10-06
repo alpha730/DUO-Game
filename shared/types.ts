@@ -37,7 +37,8 @@ export const COL = {
   catches: "catches", // subcollection of users/{uid}
   lingos: "lingos",
   config: "config",
-  challenges: "challenges",
+  challenges: "challenges", // Owl Raid challenges (raid_{id}); the old date × Lingo ones are an archive
+  questions: "questions", // the question pool (SPEC §9), server-only
   attempts: "attempts",
   pointsLog: "pointsLog",
   leaderboard: "leaderboard",
@@ -78,6 +79,11 @@ export interface UserDoc {
    */
   triedToday?: string[];
   triedDate?: IstDate | null;
+  /** Pool question ids this player has been asked (never repeated across days while others are left). */
+  seenQ?: string[];
+  /** Target words asked on `wordsDate` (the same word is not asked twice in a day). */
+  wordsToday?: string[];
+  wordsDate?: IstDate | null;
   /** Non-raid attempts used on `attemptsDate`; treat as 0 when attemptsDate ≠ today. */
   attemptsToday: number;
   attemptsDate: IstDate | null;
@@ -231,6 +237,27 @@ export interface QuestionChallengeDoc {
 }
 export type ChallengeDoc = PronounceChallengeDoc | SpeakChallengeDoc | MeaningChallengeDoc | QuestionChallengeDoc;
 
+// ---------- Question pool (SPEC §9) ----------
+
+export type QuestionLevel = "medium" | "hard";
+export const QUESTION_LEVELS = ["medium", "hard"] as const;
+/** Types in the pool (speak is only used by Owl Raids). */
+export type QuestionType = "meaning" | "question" | "pronounce";
+export const QUESTION_TYPES = ["meaning", "question", "pronounce"] as const;
+
+/**
+ * questions/{id} — never client-readable; `correctIndex` / `accept` never sent before answering.
+ * meaning: "What is the closest meaning of “word”?" + 4 options; question: fill-in-the-blank `prompt`
+ * + 4 options (`target` = the answer word); pronounce: the player says `word`.
+ */
+export type QuestionDoc = (PronounceChallengeDoc | MeaningChallengeDoc | (QuestionChallengeDoc & { target: string })) & {
+  level: QuestionLevel;
+  /** Shown on the result screen after answering (meaning/question): what the word means. */
+  explanation: string;
+};
+/** One row of scripts/content/question-pool-*.json / the /admin upload. */
+export type QuestionUpload = QuestionDoc & { id: string };
+
 /** attempts/{id} — never client-readable */
 export interface AttemptDoc {
   uid: string;
@@ -252,6 +279,14 @@ export interface AttemptDoc {
   /** Cheat signal (flag only): answered faster than a human could (functions/src/lib/cheat.ts). */
   flagged?: boolean;
   flagReason?: string;
+  /** Pool question asked (normal tries); raids use challenges/raid_{raidId}. */
+  questionId?: string;
+  level?: QuestionLevel;
+  /**
+   * DECISION: a server-only copy of the question asked (attempts are never client-readable), so
+   * submitAttempt scores against exactly what was shown without reading the pool again.
+   */
+  question?: ChallengeDoc & { explanation?: string };
 }
 
 export type PointsReason =
@@ -404,6 +439,8 @@ export interface StartAttemptOutput {
   serverNow: number;
   /** Daily attempts left after this one (unchanged for raid attempts). */
   attemptsLeft: number;
+  /** Pool difficulty (normal tries): hard from a favourite's 6th streak day. */
+  level?: QuestionLevel;
 }
 
 export interface SubmitAttemptInput {
@@ -435,6 +472,8 @@ export interface SubmitAttemptOutput {
   needsFavorites: boolean;
   /** An Owl Raid attempt (base = raidCatchPoints instead of the normal catch points). */
   raid?: boolean;
+  /** meaning / question, after answering only: the right option and what it means (for learning). */
+  answer?: { text: string; explanation?: string };
 }
 
 export interface SetFavoritesInput {
@@ -483,16 +522,16 @@ export interface AdminSetConfigInput {
   rules?: Partial<GameRules>;
 }
 
-export type ChallengeUpload =
-  | { date: IstDate; lingoId: string; type: "pronounce"; word: string; accept?: string[] }
-  | { date: IstDate; lingoId: string; type: "speak"; phrase: string }
-  | { date: IstDate; lingoId: string; type: "meaning"; word: string; options: string[]; correctIndex: number }
-  | { date: IstDate; lingoId: string; type: "question"; prompt: string; options: string[]; correctIndex: number };
-export interface AdminUpsertChallengesInput {
-  challenges: ChallengeUpload[];
+/** "medium/meaning" → count */
+export type QuestionCounts = Record<`${QuestionLevel}/${QuestionType}`, number>;
+export interface AdminUpsertQuestionsInput {
+  /** The whole pool: replaces questions/* (ids not in the upload are removed). */
+  questions: QuestionUpload[];
 }
-export interface AdminUpsertChallengesOutput {
+export interface AdminUpsertQuestionsOutput {
   written: number;
+  removed: number;
+  counts: QuestionCounts;
 }
 
 /** A challenge without its date/Lingo key (same shape as challenges/*). */
@@ -554,9 +593,9 @@ export interface AdminStatsOutput {
   users: number;
   attemptsToday: number;
   winsToday: number;
-  /** Game days × Lingos with no challenge (ids like 2026-10-12_lingo-2018); first 20 + count. */
-  missingChallenges: string[];
-  missingCount: number;
+  /** Questions in the pool per level × type. */
+  questions: QuestionCounts;
+  questionTotal: number;
 }
 
 export type FinalControlInput =

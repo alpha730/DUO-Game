@@ -3,7 +3,7 @@
 // resets it (level kept), and a real 10-day streak reaches MAX + 1000 once.
 import { afterAll, afterEach, describe, expect, it } from "vitest";
 import type { GetMyStateOutput, SetFavoritesInput, StartAttemptOutput, SubmitAttemptOutput } from "../src/shared/types";
-import { adb, CAMPUS, cleanupApps, istToday, newPlayer } from "./helpers";
+import { adb, CAMPUS, cleanupApps, DEFAULT_PINS, istToday, newPlayer, pinQuestions } from "./helpers";
 
 type Player = Awaited<ReturnType<typeof newPlayer>>;
 const DAY = 86_400_000;
@@ -17,23 +17,14 @@ const addDays = (date: string, n: number) => new Date(Date.parse(`${date}T00:00:
 const setClock = (ms: number) => clock.set({ offsetMs: ms - Date.now() });
 
 const N = istToday();
-const days = Array.from({ length: 12 }, (_, i) => addDays(N, i));
-// Our own challenge for the two favourites on every test day (answer: option 0); restored afterwards.
-const saved = new Map<string, FirebaseFirestore.DocumentData | undefined>();
-async function useTestChallenges() {
-  for (const d of days) {
-    for (const l of FAV) {
-      const ref = adb.doc(`challenges/${d}_${l}`);
-      if (!saved.has(ref.path)) saved.set(ref.path, (await ref.get()).data());
-      await ref.set({ type: "meaning", word: "keen", options: ["eager", "sad", "slow", "late"], correctIndex: 0 });
-    }
-  }
-}
+// Our own question for the two favourites (answer: option 0), pinned for every day of the test.
+const KEEN = { type: "meaning", word: "keen", options: ["eager", "sad", "slow", "late"], correctIndex: 0 };
+const useTestChallenges = () => pinQuestions({ ...DEFAULT_PINS, ...Object.fromEntries(FAV.map((l) => [l, KEEN])) });
 
 afterEach(() => clock.delete());
 afterAll(async () => {
   await clock.delete();
-  for (const [path, data] of saved) await (data ? adb.doc(path).set(data) : adb.doc(path).delete());
+  await pinQuestions();
   await cleanupApps();
 });
 

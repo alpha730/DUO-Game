@@ -1,23 +1,22 @@
-// Seeds lingos, config/game, today's challenges and prizes.
+// Seeds lingos, config/game and prizes; on the emulator also the question pool (SPEC §9).
 //   Emulator (default):  npx tsx scripts/seed.ts
 //   Real launch dates:   npx tsx scripts/seed.ts --real-dates
 //   Production:          GOOGLE_APPLICATION_CREDENTIALS=key.json npx tsx scripts/seed.ts --prod --project <id> --real-dates --campus <lat>,<lng>,<radiusM>
-//                        then: npx tsx scripts/loadChallenges.ts --prod --project <id>
-// --real-dates writes no sample challenges (the real ones come from scripts/loadChallenges.ts, and a
-// re-seed must never overwrite them).
+//                        then: npx tsx scripts/loadQuestions.ts --prod --project <id>
+// Production never gets questions from the seed (scripts/loadQuestions.ts loads them, and a re-seed
+// must never touch them).
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import {
   COL,
   DEFAULT_RULES,
   DOC,
-  challengeId,
-  type ChallengeDoc,
   type GameConfigDoc,
   type LingoDoc,
   type PrizeDoc,
 } from "../shared/types";
 import { LINGOS, lingoId } from "./lingos";
+import { writeQuestionPool } from "./questionPool";
 
 const args = process.argv.slice(2);
 const prod = args.includes("--prod");
@@ -72,42 +71,6 @@ async function main() {
   };
   batch.set(db.collection(COL.config).doc(DOC.gameConfig), config);
 
-  // One sample of each type for today (medium, CEFR B1–B2 — SPEC §9).
-  const challenges: Array<[string, ChallengeDoc]> = [
-    [lingoId("2016"), { type: "pronounce", word: "programme", accept: ["program"] }],
-    [lingoId("2017"), { type: "speak", phrase: "Practice every day and you will see the difference." }],
-    [
-      lingoId("2018"),
-      {
-        type: "meaning",
-        word: "reluctant",
-        options: ["unwilling", "excited", "tired", "careful"],
-        correctIndex: 0,
-      },
-    ],
-    [
-      lingoId("2019"),
-      {
-        type: "question",
-        prompt: "She has been working here ___ 2022.",
-        options: ["since", "for", "from", "at"],
-        correctIndex: 0,
-      },
-    ],
-  ];
-  // DECISION: every Lingo gets a challenge for the next 7 days (the 4 samples rotate), so the full
-  // flow can be played on the emulators from any poster, on any day. Today, Lingos 2016–2019 keep
-  // exactly the samples above (the tests rely on that).
-  const samples = challenges.map(([, ch]) => ch);
-  let written = 0;
-  for (let day = 0; day < (realDates ? 0 : 7); day++) {
-    const date = istDate(Date.now() + day * 86_400_000);
-    LINGOS.forEach(([, year], i) => {
-      batch.set(db.collection(COL.challenges).doc(challengeId(date, lingoId(year))), samples[(i + day) % samples.length]);
-      written++;
-    });
-  }
-
   const prizes: Array<[string, PrizeDoc]> = [
     ["sticker-pack", { name: "Sticker pack", cost: 200, stock: 200 }],
     ["tshirt", { name: "T-shirt", cost: 1000, stock: 30 }],
@@ -115,9 +78,11 @@ async function main() {
   for (const [id, prize] of prizes) batch.set(db.collection(COL.prizes).doc(id), prize);
 
   await batch.commit();
+  const pool = prod ? null : await writeQuestionPool(db);
   console.log(
     `Seeded ${prod ? "PROD" : "emulator"} (${projectId}): ${LINGOS.length} lingos, config/game ` +
-      `(start ${startAt}, lock ${lockAt}), ${written} sample challenges${realDates ? " (real ones: scripts/loadChallenges.ts)" : ` (10 Lingos × 7 days from ${today})`}, ${prizes.length} prizes.`,
+      `(start ${startAt}, lock ${lockAt}), ${prizes.length} prizes, ` +
+      (pool ? `question pool: ${pool.written} questions.` : "no questions (run scripts/loadQuestions.ts --prod)."),
   );
 }
 

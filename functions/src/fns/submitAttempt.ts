@@ -2,7 +2,6 @@ import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import {
   COL,
-  challengeId,
   raidChallengeId,
   timerSeconds,
   type AttemptDoc,
@@ -52,12 +51,9 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
       throw new HttpsError("failed-precondition", "This chance is already over.", { code: "not-open", status: attempt.status });
     }
 
+    // The question asked is stored on the attempt (startAttempt); only older raid attempts lack it.
     const [challengeSnap, userSnap, catchSnap] = await Promise.all([
-      tx.get(
-        db()
-          .collection(COL.challenges)
-          .doc(attempt.raidId ? raidChallengeId(attempt.raidId) : challengeId(attempt.date, attempt.lingoId)),
-      ),
+      attempt.question || !attempt.raidId ? null : tx.get(db().collection(COL.challenges).doc(raidChallengeId(attempt.raidId))),
       tx.get(userRef(uid)),
       tx.get(catchRef(uid, attempt.lingoId)),
     ]);
@@ -72,8 +68,18 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
       return { late: true as const };
     }
 
-    const challenge = challengeSnap.data() as ChallengeDoc | undefined;
+    const challenge = attempt.question ?? (challengeSnap?.data() as ChallengeDoc | undefined);
     if (!challenge) throw new HttpsError("internal", "Challenge missing.");
+    // After answering only (CLAUDE.md rule 4): the right option and what it means, for learning.
+    const answer =
+      challenge.type === "meaning" || challenge.type === "question"
+        ? {
+            answer: {
+              text: challenge.options[challenge.correctIndex],
+              ...(attempt.question?.explanation ? { explanation: attempt.question.explanation } : {}),
+            },
+          }
+        : {};
     const result = scoreAnswer(challenge, { transcript, choice }, rules);
     const answerMs = now - attempt.startedAt.toMillis();
     const bonus = result.won ? speedBonus(expiresAt, now, timerSeconds(attempt.type, rules), rules.speedBonusPerSecond) : 0;
@@ -112,6 +118,7 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
         needsFavorites: false,
         ...(attempt.raidId ? { raid: true } : {}),
         ...missed,
+        ...answer,
       };
       return { late: false as const, response };
     }
@@ -159,6 +166,7 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
         needsFavorites: r.needsFavorites,
         raid: true,
         ...missed,
+        ...answer,
       };
       return { late: false as const, response };
     }
@@ -185,6 +193,7 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
       newTotal: user.points + o.pointsAdded,
       needsFavorites: o.needsFavorites,
       ...missed,
+      ...answer,
     };
     return { late: false as const, response };
   });

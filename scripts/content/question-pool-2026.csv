@@ -1,0 +1,457 @@
+id,level,type,word,prompt,optionA,optionB,optionC,optionD,correct,explanation
+m-mean-001,medium,meaning,abundant,,exact and accurate,correct and free from errors,available in large quantities,having more than one possible meaning,C,available in large quantities
+m-mean-002,medium,meaning,allocate,,certain to happen,able to be used in many different ways,to expect or predict something,to distribute something for a particular purpose,D,to distribute something for a particular purpose
+m-mean-003,medium,meaning,emerge,,correct and free from errors,clearly different or separate,to become known or visible,to expect or predict something,C,to become known or visible
+m-mean-004,medium,meaning,credible,,based on what is traditionally done,worthy of belief or trust,unwilling or hesitant,easy to notice or understand,B,worthy of belief or trust
+m-mean-005,medium,meaning,ambiguous,,to force or strongly persuade,to get or acquire something,easily harmed or affected,having more than one possible meaning,D,having more than one possible meaning
+m-mean-006,medium,meaning,consecutive,,detailed and carefully developed,following one after another without interruption,certain to happen,easily harmed or affected,B,following one after another without interruption
+m-mean-007,medium,meaning,adequate,,having more than one possible meaning,to adjust to new conditions,sufficient for a particular purpose,logical and well organized,C,sufficient for a particular purpose
+m-mean-008,medium,meaning,diligent,,correct and free from errors,exact and accurate,"a belief, idea, or understanding",showing careful and persistent effort,D,showing careful and persistent effort
+m-mean-009,medium,meaning,obtain,,possible and practical to achieve,to expect or predict something,following one after another without interruption,to get or acquire something,D,to get or acquire something
+m-mean-010,medium,meaning,notion,,correct and free from errors,able to be used in many different ways,including all or nearly all details,"a belief, idea, or understanding",D,"a belief, idea, or understanding"
+m-mean-011,medium,meaning,obtain,,to get or acquire something,sufficient for a particular purpose,correct and free from errors,continuing despite difficulty,A,to get or acquire something
+m-mean-012,medium,meaning,vulnerable,,easy to notice or understand,to adjust to new conditions,easily harmed or affected,certain to happen,C,easily harmed or affected
+m-mean-013,medium,meaning,versatile,,able to be used in many different ways,exact and accurate,showing careful and persistent effort,including all or nearly all details,A,able to be used in many different ways
+m-mean-014,medium,meaning,diligent,,exact and accurate,to expect or predict something,showing careful and persistent effort,continuing despite difficulty,C,showing careful and persistent effort
+m-mean-015,medium,meaning,credible,,to expect or predict something,worthy of belief or trust,able to be used in many different ways,including all or nearly all details,B,worthy of belief or trust
+m-mean-016,medium,meaning,anticipate,,to force or strongly persuade,to expect or predict something,having more than one possible meaning,based on what is traditionally done,B,to expect or predict something
+m-mean-017,medium,meaning,accurate,,having more than one possible meaning,to expect or predict something,able to be used in many different ways,correct and free from errors,D,correct and free from errors
+m-mean-018,medium,meaning,adapt,,sufficient for a particular purpose,available in large quantities,to adjust to new conditions,correct and free from errors,C,to adjust to new conditions
+m-mean-019,medium,meaning,anticipate,,to expect or predict something,exact and accurate,to force or strongly persuade,easy to notice or understand,A,to expect or predict something
+m-mean-020,medium,meaning,apparent,,to expect or predict something,easily harmed or affected,easy to notice or understand,large in amount or importance,C,easy to notice or understand
+m-mean-021,medium,meaning,adapt,,to adjust to new conditions,able to express ideas clearly,exact and accurate,unwilling or hesitant,A,to adjust to new conditions
+m-mean-022,medium,meaning,articulate,,clearly different or separate,able to be used in many different ways,able to express ideas clearly,to get or acquire something,C,able to express ideas clearly
+m-mean-023,medium,meaning,inevitable,,certain to happen,to confirm that something is correct or legitimate,logical and well organized,based on what is traditionally done,A,certain to happen
+m-mean-024,medium,meaning,validate,,to confirm that something is correct or legitimate,certain to happen,having more than one possible meaning,easy to notice or understand,A,to confirm that something is correct or legitimate
+m-mean-025,medium,meaning,validate,,logical and well organized,to confirm that something is correct or legitimate,clearly different or separate,large in amount or importance,B,to confirm that something is correct or legitimate
+m-mean-026,medium,meaning,consecutive,,sufficient for a particular purpose,following one after another without interruption,to become known or visible,available in large quantities,B,following one after another without interruption
+m-mean-027,medium,meaning,conventional,,"a belief, idea, or understanding",based on what is traditionally done,to become known or visible,easy to notice or understand,B,based on what is traditionally done
+m-mean-028,medium,meaning,coherent,,detailed and carefully developed,easily harmed or affected,easy to notice or understand,logical and well organized,D,logical and well organized
+m-mean-029,medium,meaning,emerge,,to confirm that something is correct or legitimate,correct and free from errors,to become known or visible,to distribute something for a particular purpose,C,to become known or visible
+m-mean-030,medium,meaning,ambiguous,,to force or strongly persuade,correct and free from errors,to distribute something for a particular purpose,having more than one possible meaning,D,having more than one possible meaning
+m-mean-031,medium,meaning,validate,,able to be used in many different ways,to confirm that something is correct or legitimate,to adjust to new conditions,available in large quantities,B,to confirm that something is correct or legitimate
+m-mean-032,medium,meaning,substantial,,large in amount or importance,exact and accurate,sufficient for a particular purpose,able to be used in many different ways,A,large in amount or importance
+m-mean-033,medium,meaning,allocate,,easily harmed or affected,certain to happen,worthy of belief or trust,to distribute something for a particular purpose,D,to distribute something for a particular purpose
+m-mean-034,medium,meaning,compel,,to get or acquire something,easy to notice or understand,large in amount or importance,to force or strongly persuade,D,to force or strongly persuade
+m-mean-035,medium,meaning,reluctant,,showing careful and persistent effort,unwilling or hesitant,to get or acquire something,to adjust to new conditions,B,unwilling or hesitant
+m-mean-036,medium,meaning,accurate,,correct and free from errors,continuing despite difficulty,including all or nearly all details,to force or strongly persuade,A,correct and free from errors
+m-mean-037,medium,meaning,accurate,,logical and well organized,including all or nearly all details,correct and free from errors,unwilling or hesitant,C,correct and free from errors
+m-mean-038,medium,meaning,persistent,,following one after another without interruption,to adjust to new conditions,to expect or predict something,continuing despite difficulty,D,continuing despite difficulty
+m-mean-039,medium,meaning,conventional,,exact and accurate,logical and well organized,based on what is traditionally done,to become known or visible,C,based on what is traditionally done
+m-mean-040,medium,meaning,distinct,,exact and accurate,clearly different or separate,certain to happen,easily harmed or affected,B,clearly different or separate
+m-mean-041,medium,meaning,adequate,,able to express ideas clearly,"a belief, idea, or understanding",sufficient for a particular purpose,large in amount or importance,C,sufficient for a particular purpose
+m-mean-042,medium,meaning,allocate,,able to express ideas clearly,to distribute something for a particular purpose,clearly different or separate,to adjust to new conditions,B,to distribute something for a particular purpose
+m-mean-043,medium,meaning,feasible,,worthy of belief or trust,possible and practical to achieve,unwilling or hesitant,easy to notice or understand,B,possible and practical to achieve
+m-mean-044,medium,meaning,elaborate,,detailed and carefully developed,possible and practical to achieve,able to express ideas clearly,following one after another without interruption,A,detailed and carefully developed
+m-mean-045,medium,meaning,feasible,,possible and practical to achieve,to adjust to new conditions,logical and well organized,worthy of belief or trust,A,possible and practical to achieve
+m-mean-046,medium,meaning,consecutive,,following one after another without interruption,to confirm that something is correct or legitimate,easy to notice or understand,showing careful and persistent effort,A,following one after another without interruption
+m-mean-047,medium,meaning,precise,,logical and well organized,correct and free from errors,exact and accurate,large in amount or importance,C,exact and accurate
+m-mean-048,medium,meaning,elaborate,,showing careful and persistent effort,to expect or predict something,detailed and carefully developed,possible and practical to achieve,C,detailed and carefully developed
+m-mean-049,medium,meaning,accurate,,"a belief, idea, or understanding",easy to notice or understand,correct and free from errors,to force or strongly persuade,C,correct and free from errors
+m-mean-050,medium,meaning,precise,,clearly different or separate,exact and accurate,sufficient for a particular purpose,worthy of belief or trust,B,exact and accurate
+m-mean-051,medium,meaning,diligent,,to expect or predict something,easily harmed or affected,logical and well organized,showing careful and persistent effort,D,showing careful and persistent effort
+m-mean-052,medium,meaning,versatile,,able to be used in many different ways,continuing despite difficulty,having more than one possible meaning,exact and accurate,A,able to be used in many different ways
+m-mean-053,medium,meaning,apparent,,"a belief, idea, or understanding",sufficient for a particular purpose,available in large quantities,easy to notice or understand,D,easy to notice or understand
+m-mean-054,medium,meaning,articulate,,"a belief, idea, or understanding",able to express ideas clearly,to distribute something for a particular purpose,correct and free from errors,B,able to express ideas clearly
+m-mean-055,medium,meaning,abundant,,sufficient for a particular purpose,to confirm that something is correct or legitimate,available in large quantities,to distribute something for a particular purpose,C,available in large quantities
+m-mean-056,medium,meaning,compel,,to force or strongly persuade,to expect or predict something,clearly different or separate,able to be used in many different ways,A,to force or strongly persuade
+m-mean-057,medium,meaning,apparent,,easy to notice or understand,sufficient for a particular purpose,to adjust to new conditions,showing careful and persistent effort,A,easy to notice or understand
+m-mean-058,medium,meaning,distinct,,able to express ideas clearly,correct and free from errors,following one after another without interruption,clearly different or separate,D,clearly different or separate
+m-mean-059,medium,meaning,conventional,,following one after another without interruption,based on what is traditionally done,to expect or predict something,able to express ideas clearly,B,based on what is traditionally done
+m-mean-060,medium,meaning,persistent,,to get or acquire something,possible and practical to achieve,showing careful and persistent effort,continuing despite difficulty,D,continuing despite difficulty
+m-mean-061,medium,meaning,anticipate,,to adjust to new conditions,clearly different or separate,logical and well organized,to expect or predict something,D,to expect or predict something
+m-mean-062,medium,meaning,anticipate,,to confirm that something is correct or legitimate,following one after another without interruption,clearly different or separate,to expect or predict something,D,to expect or predict something
+m-mean-063,medium,meaning,compel,,worthy of belief or trust,to become known or visible,detailed and carefully developed,to force or strongly persuade,D,to force or strongly persuade
+m-mean-064,medium,meaning,adapt,,possible and practical to achieve,logical and well organized,correct and free from errors,to adjust to new conditions,D,to adjust to new conditions
+m-mean-065,medium,meaning,abundant,,clearly different or separate,to expect or predict something,to force or strongly persuade,available in large quantities,D,available in large quantities
+m-mean-066,medium,meaning,inevitable,,certain to happen,easy to notice or understand,exact and accurate,to become known or visible,A,certain to happen
+m-mean-067,medium,meaning,apparent,,certain to happen,logical and well organized,easy to notice or understand,to force or strongly persuade,C,easy to notice or understand
+m-mean-068,medium,meaning,articulate,,easily harmed or affected,able to express ideas clearly,correct and free from errors,able to be used in many different ways,B,able to express ideas clearly
+m-mean-069,medium,meaning,comprehensive,,correct and free from errors,able to be used in many different ways,including all or nearly all details,showing careful and persistent effort,C,including all or nearly all details
+m-mean-070,medium,meaning,obtain,,clearly different or separate,worthy of belief or trust,to get or acquire something,"a belief, idea, or understanding",C,to get or acquire something
+m-mean-071,medium,meaning,elaborate,,detailed and carefully developed,exact and accurate,logical and well organized,worthy of belief or trust,A,detailed and carefully developed
+m-mean-072,medium,meaning,comprehensive,,worthy of belief or trust,including all or nearly all details,to confirm that something is correct or legitimate,"a belief, idea, or understanding",B,including all or nearly all details
+m-mean-073,medium,meaning,abundant,,unwilling or hesitant,including all or nearly all details,available in large quantities,sufficient for a particular purpose,C,available in large quantities
+m-mean-074,medium,meaning,comprehensive,,to force or strongly persuade,to adjust to new conditions,including all or nearly all details,to confirm that something is correct or legitimate,C,including all or nearly all details
+m-mean-075,medium,meaning,credible,,to become known or visible,able to express ideas clearly,logical and well organized,worthy of belief or trust,D,worthy of belief or trust
+m-mean-076,medium,meaning,notion,,clearly different or separate,available in large quantities,"a belief, idea, or understanding",sufficient for a particular purpose,C,"a belief, idea, or understanding"
+m-mean-077,medium,meaning,substantial,,large in amount or importance,exact and accurate,sufficient for a particular purpose,following one after another without interruption,A,large in amount or importance
+m-mean-078,medium,meaning,vulnerable,,continuing despite difficulty,to force or strongly persuade,easily harmed or affected,following one after another without interruption,C,easily harmed or affected
+m-mean-079,medium,meaning,reluctant,,unwilling or hesitant,based on what is traditionally done,to adjust to new conditions,showing careful and persistent effort,A,unwilling or hesitant
+m-mean-080,medium,meaning,emerge,,easily harmed or affected,to distribute something for a particular purpose,to become known or visible,to force or strongly persuade,C,to become known or visible
+m-mean-081,medium,meaning,feasible,,possible and practical to achieve,detailed and carefully developed,logical and well organized,easily harmed or affected,A,possible and practical to achieve
+m-mean-082,medium,meaning,persistent,,possible and practical to achieve,to become known or visible,to adjust to new conditions,continuing despite difficulty,D,continuing despite difficulty
+m-mean-083,medium,meaning,ambiguous,,logical and well organized,having more than one possible meaning,showing careful and persistent effort,possible and practical to achieve,B,having more than one possible meaning
+m-mean-084,medium,meaning,inevitable,,to force or strongly persuade,easy to notice or understand,certain to happen,having more than one possible meaning,C,certain to happen
+m-mean-085,medium,meaning,vulnerable,,easily harmed or affected,clearly different or separate,large in amount or importance,exact and accurate,A,easily harmed or affected
+m-mean-086,medium,meaning,coherent,,logical and well organized,to confirm that something is correct or legitimate,clearly different or separate,to become known or visible,A,logical and well organized
+m-mean-087,medium,meaning,adequate,,clearly different or separate,to force or strongly persuade,following one after another without interruption,sufficient for a particular purpose,D,sufficient for a particular purpose
+m-mean-088,medium,meaning,versatile,,to force or strongly persuade,able to be used in many different ways,showing careful and persistent effort,sufficient for a particular purpose,B,able to be used in many different ways
+m-mean-089,medium,meaning,articulate,,able to express ideas clearly,sufficient for a particular purpose,to become known or visible,following one after another without interruption,A,able to express ideas clearly
+m-mean-090,medium,meaning,precise,,continuing despite difficulty,exact and accurate,to expect or predict something,easily harmed or affected,B,exact and accurate
+m-mean-091,medium,meaning,notion,,"a belief, idea, or understanding",having more than one possible meaning,able to express ideas clearly,logical and well organized,A,"a belief, idea, or understanding"
+m-mean-092,medium,meaning,adapt,,to adjust to new conditions,showing careful and persistent effort,large in amount or importance,including all or nearly all details,A,to adjust to new conditions
+m-mean-093,medium,meaning,compel,,easy to notice or understand,to force or strongly persuade,worthy of belief or trust,clearly different or separate,B,to force or strongly persuade
+m-mean-094,medium,meaning,adequate,,sufficient for a particular purpose,to get or acquire something,exact and accurate,clearly different or separate,A,sufficient for a particular purpose
+m-mean-095,medium,meaning,distinct,,detailed and carefully developed,clearly different or separate,exact and accurate,easy to notice or understand,B,clearly different or separate
+m-mean-096,medium,meaning,coherent,,correct and free from errors,logical and well organized,detailed and carefully developed,having more than one possible meaning,B,logical and well organized
+m-mean-097,medium,meaning,substantial,,large in amount or importance,unwilling or hesitant,including all or nearly all details,exact and accurate,A,large in amount or importance
+m-mean-098,medium,meaning,ambiguous,,to get or acquire something,available in large quantities,logical and well organized,having more than one possible meaning,D,having more than one possible meaning
+m-mean-099,medium,meaning,coherent,,logical and well organized,showing careful and persistent effort,"a belief, idea, or understanding",to adjust to new conditions,A,logical and well organized
+m-mean-100,medium,meaning,reluctant,,worthy of belief or trust,unwilling or hesitant,detailed and carefully developed,to get or acquire something,B,unwilling or hesitant
+m-fill-001,medium,question,feasible,The project is technically _____ within the available budget.,feasible,compel,distinct,allocate,A,possible and practical to achieve
+m-fill-002,medium,question,substantial,The results showed a/an _____ improvement over the previous trial.,notion,conventional,substantial,accurate,C,large in amount or importance
+m-fill-003,medium,question,distinct,The difference between the two methods was clearly _____.,consecutive,adequate,persistent,distinct,D,clearly different or separate
+m-fill-004,medium,question,allocate,The manager decided to _____ more funds to research.,articulate,allocate,apparent,persistent,B,to distribute something for a particular purpose
+m-fill-005,medium,question,accurate,The report was carefully checked to ensure the figures were _____.,apparent,notion,reluctant,accurate,D,correct and free from errors
+m-fill-006,medium,question,adapt,The team had to _____ its strategy after the market changed.,adapt,obtain,comprehensive,precise,A,to adjust to new conditions
+m-fill-007,medium,question,validate,The evidence was strong enough to _____ the claim.,validate,consecutive,compel,elaborate,A,to confirm that something is correct or legitimate
+m-fill-008,medium,question,coherent,His explanation was logical and _____ from beginning to end.,reluctant,obtain,consecutive,coherent,D,logical and well organized
+m-fill-009,medium,question,comprehensive,"The instructions were so _____ that they covered every single step, from start to finish.",compel,comprehensive,substantial,abundant,B,including all or nearly all details
+m-fill-010,medium,question,reluctant,She was _____ to accept the offer because of the risks involved.,reluctant,adequate,credible,articulate,A,unwilling or hesitant
+m-fill-011,medium,question,abundant,"After weeks of rain, water was _____ in the region, and every lake was full.",abundant,credible,articulate,accurate,A,available in large quantities
+m-fill-012,medium,question,abundant,"The market had a/an _____ supply of mangoes, so prices dropped sharply.",versatile,apparent,articulate,abundant,D,available in large quantities
+m-fill-013,medium,question,abundant,Birds are _____ in this forest; you can see hundreds of them every morning.,consecutive,abundant,conventional,apparent,B,available in large quantities
+m-fill-014,medium,question,credible,The police believed the witness because her story was _____ and backed by evidence.,vulnerable,persistent,conventional,credible,D,worthy of belief or trust
+m-fill-015,medium,question,credible,"For your project, use _____ sources such as official reports, not random blogs.",credible,abundant,comprehensive,persistent,A,worthy of belief or trust
+m-fill-016,medium,question,credible,Nobody trusted the rumour because it did not come from a/an _____ person.,articulate,credible,elaborate,consecutive,B,worthy of belief or trust
+m-fill-017,medium,question,ambiguous,"The question was _____, so half the class understood it one way and half another way.",ambiguous,vulnerable,conventional,distinct,A,having more than one possible meaning
+m-fill-018,medium,question,ambiguous,His reply was so _____ that we still don't know whether he said yes or no.,ambiguous,apparent,elaborate,reluctant,A,having more than one possible meaning
+m-fill-019,medium,question,ambiguous,Please rewrite this _____ sentence; it can be read in two different ways.,ambiguous,vulnerable,distinct,versatile,A,having more than one possible meaning
+m-fill-020,medium,question,consecutive,"It rained for five _____ days, without a single dry day in between.",comprehensive,credible,consecutive,accurate,C,following one after another without interruption
+m-fill-021,medium,question,consecutive,"The team won three _____ matches, one after another.",consecutive,conventional,elaborate,inevitable,A,following one after another without interruption
+m-fill-022,medium,question,consecutive,"She topped her class for two _____ years, 2024 and 2025.",coherent,consecutive,conventional,distinct,B,following one after another without interruption
+m-fill-023,medium,question,adequate,"The hall has _____ seating for 200 people, which is just enough for the event.",vulnerable,consecutive,credible,adequate,D,sufficient for a particular purpose
+m-fill-024,medium,question,adequate,"Without _____ sleep, it is hard to concentrate in class.",credible,elaborate,adequate,vulnerable,C,sufficient for a particular purpose
+m-fill-025,medium,question,adequate,"The food was not special, but the portion was _____ for one person.",diligent,inevitable,adequate,elaborate,C,sufficient for a particular purpose
+m-fill-026,medium,question,diligent,"A/an _____ student revises every evening, even when there is no test.",feasible,reluctant,coherent,diligent,D,showing careful and persistent effort
+m-fill-027,medium,question,diligent,She was so _____ that she checked every page of the report twice.,apparent,comprehensive,consecutive,diligent,D,showing careful and persistent effort
+m-fill-028,medium,question,diligent,"Thanks to months of _____ work, the team finished the project on time.",comprehensive,apparent,distinct,diligent,D,showing careful and persistent effort
+m-fill-029,medium,question,vulnerable,"Young plants are _____ to strong winds, so farmers protect them with nets.",apparent,ambiguous,articulate,vulnerable,D,easily harmed or affected
+m-fill-030,medium,question,vulnerable,Old computers without updates are _____ to viruses.,versatile,distinct,vulnerable,feasible,C,easily harmed or affected
+m-fill-031,medium,question,vulnerable,Children and elderly people are the most _____ during a heatwave.,vulnerable,precise,ambiguous,consecutive,A,easily harmed or affected
+m-fill-032,medium,question,versatile,"This _____ jacket can be worn in the rain, at college and at a party.",versatile,articulate,feasible,elaborate,A,able to be used in many different ways
+m-fill-033,medium,question,versatile,"She is a/an _____ cricketer who can bat, bowl and keep wicket.",versatile,articulate,vulnerable,persistent,A,able to be used in many different ways
+m-fill-034,medium,question,versatile,"A smartphone is a/an _____ tool: it is a camera, a map and a dictionary in one.",coherent,vulnerable,versatile,persistent,C,able to be used in many different ways
+m-fill-035,medium,question,accurate,Check the numbers again; the bill must be _____ before we pay it.,accurate,vulnerable,abundant,elaborate,A,correct and free from errors
+m-fill-036,medium,question,accurate,The forecast was _____: it rained exactly when they said it would.,inevitable,accurate,apparent,substantial,B,correct and free from errors
+m-fill-037,medium,question,accurate,A good reporter gives a/an _____ account of what really happened.,ambiguous,adequate,diligent,accurate,D,correct and free from errors
+m-fill-038,medium,question,apparent,"From his tired face, it was _____ that he had not slept all night.",articulate,substantial,apparent,coherent,C,easy to notice or understand
+m-fill-039,medium,question,apparent,The mistake became _____ only when we compared the two lists side by side.,comprehensive,vulnerable,diligent,apparent,D,easy to notice or understand
+m-fill-040,medium,question,apparent,"For no _____ reason, all the lights in the hostel suddenly went off.",versatile,vulnerable,apparent,reluctant,C,easy to notice or understand
+m-fill-041,medium,question,articulate,She is very _____ and can explain difficult ideas in simple words.,articulate,ambiguous,abundant,elaborate,A,able to express ideas clearly
+m-fill-042,medium,question,articulate,"A/an _____ speaker keeps the audience's attention with clear, well-chosen words.",articulate,adequate,abundant,ambiguous,A,able to express ideas clearly
+m-fill-043,medium,question,articulate,"Although he was nervous, his interview answers were calm and _____.",elaborate,substantial,articulate,ambiguous,C,able to express ideas clearly
+m-fill-044,medium,question,inevitable,"If you never study, failing the exam is almost _____.",articulate,substantial,comprehensive,inevitable,D,certain to happen
+m-fill-045,medium,question,inevitable,Change is _____; every city grows and changes over time.,inevitable,comprehensive,ambiguous,feasible,A,certain to happen
+m-fill-046,medium,question,inevitable,"With dark clouds covering the whole sky, rain seemed _____.",feasible,distinct,versatile,inevitable,D,certain to happen
+m-fill-047,medium,question,conventional,"Instead of a/an _____ classroom lecture, the teacher took us on a field trip.",vulnerable,ambiguous,accurate,conventional,D,based on what is traditionally done
+m-fill-048,medium,question,conventional,"She chose a/an _____ career and became a bank officer, just like her parents.",ambiguous,conventional,coherent,comprehensive,B,based on what is traditionally done
+m-fill-049,medium,question,conventional,Electric cars are slowly replacing _____ petrol cars in many cities.,conventional,apparent,feasible,articulate,A,based on what is traditionally done
+m-fill-050,medium,question,coherent,"Your essay needs a/an _____ structure: an introduction, main points and a conclusion.",reluctant,coherent,apparent,ambiguous,B,logical and well organized
+m-fill-051,medium,question,coherent,He was so sleepy that he could not give a/an _____ answer to the question.,ambiguous,consecutive,credible,coherent,D,logical and well organized
+m-fill-052,medium,question,coherent,The team presented a/an _____ plan in which every step followed logically from the last.,accurate,conventional,coherent,persistent,C,logical and well organized
+m-fill-053,medium,question,substantial,The library received a/an _____ donation of ten lakh rupees.,inevitable,substantial,credible,precise,B,large in amount or importance
+m-fill-054,medium,question,substantial,"There was a/an _____ increase in visitors, from 200 to 2,000 a day.",substantial,diligent,coherent,consecutive,A,large in amount or importance
+m-fill-055,medium,question,substantial,She made a/an _____ contribution to the project; most of the code was hers.,ambiguous,distinct,versatile,substantial,D,large in amount or importance
+m-fill-056,medium,question,reluctant,He was _____ to speak on stage because he felt shy.,reluctant,adequate,accurate,persistent,A,unwilling or hesitant
+m-fill-057,medium,question,reluctant,Many people are _____ to change habits they have had for years.,reluctant,comprehensive,ambiguous,distinct,A,unwilling or hesitant
+m-fill-058,medium,question,reluctant,The child was _____ to go to bed while his favourite cartoon was still on.,reluctant,versatile,adequate,elaborate,A,unwilling or hesitant
+m-fill-059,medium,question,persistent,"Despite many failures, the _____ inventor kept trying until his machine worked.",consecutive,comprehensive,credible,persistent,D,continuing despite difficulty
+m-fill-060,medium,question,persistent,The _____ rain continued all day and did not stop even once.,adequate,persistent,credible,inevitable,B,continuing despite difficulty
+m-fill-061,medium,question,persistent,Her _____ questions finally got the office to fix the broken fan.,persistent,substantial,adequate,coherent,A,continuing despite difficulty
+m-fill-062,medium,question,distinct,The two words sound similar but have _____ meanings.,distinct,consecutive,adequate,elaborate,A,clearly different or separate
+m-fill-063,medium,question,distinct,"Each Lingo has a/an _____ colour, so they are easy to tell apart.",distinct,credible,reluctant,substantial,A,clearly different or separate
+m-fill-064,medium,question,distinct,There is a/an _____ smell of coffee whenever you walk past the canteen.,articulate,conventional,distinct,ambiguous,C,clearly different or separate
+m-fill-065,medium,question,feasible,Building a bridge in one week is not _____ with such a small team.,feasible,credible,conventional,comprehensive,A,possible and practical to achieve
+m-fill-066,medium,question,feasible,The engineers checked whether the plan was _____ before they started.,conventional,reluctant,feasible,substantial,C,possible and practical to achieve
+m-fill-067,medium,question,feasible,Is it _____ to finish this course in three months if I study every day?,feasible,accurate,conventional,abundant,A,possible and practical to achieve
+m-fill-068,medium,question,elaborate,The wedding had _____ decorations with thousands of lights and flowers.,precise,persistent,elaborate,articulate,C,detailed and carefully developed
+m-fill-069,medium,question,elaborate,She drew a/an _____ map with every street and shop carefully marked.,feasible,apparent,elaborate,accurate,C,detailed and carefully developed
+m-fill-070,medium,question,elaborate,The dancers wore _____ costumes covered in beads and mirrors.,feasible,elaborate,credible,accurate,B,detailed and carefully developed
+m-fill-071,medium,question,precise,"Tell me the _____ time of the meeting, not just 'sometime in the afternoon'.",apparent,consecutive,elaborate,precise,D,exact and accurate
+m-fill-072,medium,question,precise,A surgeon's movements must be _____ and steady.,coherent,versatile,consecutive,precise,D,exact and accurate
+m-fill-073,medium,question,precise,"Baking needs _____ measurements: exactly 200 grams of flour, not 'a cup or so'.",persistent,precise,distinct,consecutive,B,exact and accurate
+m-fill-074,medium,question,comprehensive,The guide gives a/an _____ list of all 200 courses offered by the college.,reluctant,comprehensive,inevitable,adequate,B,including all or nearly all details
+m-fill-075,medium,question,comprehensive,"Before the exam, she made _____ notes covering every single chapter.",comprehensive,conventional,feasible,diligent,A,including all or nearly all details
+m-fill-076,medium,question,comprehensive,"The insurance plan is _____; it covers fire, theft and floods.",comprehensive,credible,distinct,inevitable,A,including all or nearly all details
+m-fill-077,medium,question,allocate,"The college will _____ two rooms for the exam, one for each batch.",emerge,allocate,validate,compel,B,to distribute something for a particular purpose
+m-fill-078,medium,question,allocate,The government decided to _____ more money to rural schools this year.,anticipate,allocate,compel,validate,B,to distribute something for a particular purpose
+m-fill-079,medium,question,allocate,Please _____ ten minutes at the end of the meeting for questions.,allocate,validate,emerge,anticipate,A,to distribute something for a particular purpose
+m-fill-080,medium,question,emerge,The sun began to _____ from behind the clouds after the storm.,emerge,anticipate,validate,obtain,A,to become known or visible
+m-fill-081,medium,question,emerge,New problems may _____ as the project grows bigger.,obtain,anticipate,allocate,emerge,D,to become known or visible
+m-fill-082,medium,question,emerge,The truth will _____ once the investigation is complete.,emerge,compel,obtain,validate,A,to become known or visible
+m-fill-083,medium,question,obtain,You must _____ permission from the principal before the trip.,emerge,obtain,compel,anticipate,B,to get or acquire something
+m-fill-084,medium,question,obtain,Students can _____ their ID cards from the admin office.,emerge,anticipate,compel,obtain,D,to get or acquire something
+m-fill-085,medium,question,obtain,It is very hard to _____ tickets for the final match.,anticipate,emerge,compel,obtain,D,to get or acquire something
+m-fill-086,medium,question,anticipate,"We _____ a big crowd, so we arranged extra chairs in advance.",compel,validate,allocate,anticipate,D,to expect or predict something
+m-fill-087,medium,question,anticipate,Good drivers _____ danger before it happens and slow down early.,emerge,anticipate,obtain,validate,B,to expect or predict something
+m-fill-088,medium,question,anticipate,The organisers did not _____ that so many people would come.,validate,allocate,anticipate,adapt,C,to expect or predict something
+m-fill-089,medium,question,adapt,Animals must _____ to changes in their environment to survive.,adapt,anticipate,allocate,compel,A,to adjust to new conditions
+m-fill-090,medium,question,adapt,It took me a month to _____ to hostel life.,compel,allocate,anticipate,adapt,D,to adjust to new conditions
+m-fill-091,medium,question,adapt,Good teachers _____ their lessons for students who learn differently.,anticipate,allocate,compel,adapt,D,to adjust to new conditions
+m-fill-092,medium,question,validate,The lab ran more tests to _____ the results of the first experiment.,compel,validate,allocate,anticipate,B,to confirm that something is correct or legitimate
+m-fill-093,medium,question,validate,Please _____ your email address by clicking the link we sent you.,compel,validate,emerge,anticipate,B,to confirm that something is correct or legitimate
+m-fill-094,medium,question,validate,The ticket machine will _____ your pass before the gate opens.,allocate,anticipate,emerge,validate,D,to confirm that something is correct or legitimate
+m-fill-095,medium,question,compel,Heavy rain may _____ us to cancel the outdoor event.,validate,obtain,emerge,compel,D,to force or strongly persuade
+m-fill-096,medium,question,compel,No one can _____ you to share your password.,emerge,anticipate,compel,allocate,C,to force or strongly persuade
+m-fill-097,medium,question,compel,Strong new evidence could _____ the court to reopen the case.,anticipate,allocate,validate,compel,D,to force or strongly persuade
+m-fill-098,medium,question,notion,The _____ that the Earth is flat was rejected centuries ago.,harvest,ladder,notion,receipt,C,"a belief, idea, or understanding"
+m-fill-099,medium,question,notion,I have no _____ of what this homework is about; can you explain it?,receipt,harvest,notion,ladder,C,"a belief, idea, or understanding"
+m-fill-100,medium,question,notion,She had a romantic _____ of city life before she actually moved there.,notion,ladder,harvest,receipt,A,"a belief, idea, or understanding"
+m-pron-001,medium,pronounce,abundant,,,,,,,available in large quantities
+m-pron-002,medium,pronounce,accurate,,,,,,,correct and free from errors
+m-pron-003,medium,pronounce,adapt,,,,,,,to adjust to new conditions
+m-pron-004,medium,pronounce,adequate,,,,,,,sufficient for a particular purpose
+m-pron-005,medium,pronounce,allocate,,,,,,,to distribute something for a particular purpose
+m-pron-006,medium,pronounce,ambiguous,,,,,,,having more than one possible meaning
+m-pron-007,medium,pronounce,anticipate,,,,,,,to expect or predict something
+m-pron-008,medium,pronounce,apparent,,,,,,,easy to notice or understand
+m-pron-009,medium,pronounce,articulate,,,,,,,able to express ideas clearly
+m-pron-010,medium,pronounce,coherent,,,,,,,logical and well organized
+m-pron-011,medium,pronounce,compel,,,,,,,to force or strongly persuade
+m-pron-012,medium,pronounce,comprehensive,,,,,,,including all or nearly all details
+m-pron-013,medium,pronounce,consecutive,,,,,,,following one after another without interruption
+m-pron-014,medium,pronounce,conventional,,,,,,,based on what is traditionally done
+m-pron-015,medium,pronounce,credible,,,,,,,worthy of belief or trust
+m-pron-016,medium,pronounce,diligent,,,,,,,showing careful and persistent effort
+m-pron-017,medium,pronounce,distinct,,,,,,,clearly different or separate
+m-pron-018,medium,pronounce,elaborate,,,,,,,detailed and carefully developed
+m-pron-019,medium,pronounce,emerge,,,,,,,to become known or visible
+m-pron-020,medium,pronounce,feasible,,,,,,,possible and practical to achieve
+m-pron-021,medium,pronounce,inevitable,,,,,,,certain to happen
+m-pron-022,medium,pronounce,notion,,,,,,,"a belief, idea, or understanding"
+m-pron-023,medium,pronounce,obtain,,,,,,,to get or acquire something
+m-pron-024,medium,pronounce,persistent,,,,,,,continuing despite difficulty
+m-pron-025,medium,pronounce,precise,,,,,,,exact and accurate
+m-pron-026,medium,pronounce,reluctant,,,,,,,unwilling or hesitant
+m-pron-027,medium,pronounce,substantial,,,,,,,large in amount or importance
+m-pron-028,medium,pronounce,validate,,,,,,,to confirm that something is correct or legitimate
+m-pron-029,medium,pronounce,versatile,,,,,,,able to be used in many different ways
+m-pron-030,medium,pronounce,vulnerable,,,,,,,easily harmed or affected
+h-mean-001,hard,meaning,magnanimous,,essentially different or unrelated,given to sudden and unpredictable changes,open to more than one interpretation; ambiguous,"generous or forgiving, especially toward a rival",D,"generous or forgiving, especially toward a rival"
+h-mean-002,hard,meaning,anachronistic,,only recently begun and not fully formed,peculiar or distinctive to an individual,using language that is pompous or overly elaborate,belonging to a period different from the one in which it exists,D,belonging to a period different from the one in which it exists
+h-mean-003,hard,meaning,circumspect,,careful to consider all circumstances before acting,representing the most typical or perfect example,to place things close together for comparison,open to more than one interpretation; ambiguous,A,careful to consider all circumstances before acting
+h-mean-004,hard,meaning,vociferous,,expressing opinions loudly and forcefully,to make something unclear or difficult to understand,a confusing and difficult problem,reserved or saying very little,A,expressing opinions loudly and forcefully
+h-mean-005,hard,meaning,fastidious,,very attentive to detail and accuracy,only recently begun and not fully formed,reserved or saying very little,hostile and aggressive,A,very attentive to detail and accuracy
+h-mean-006,hard,meaning,perspicacious,,having a ready insight into things,"generous or forgiving, especially toward a rival",reserved or saying very little,using language that is pompous or overly elaborate,A,having a ready insight into things
+h-mean-007,hard,meaning,grandiloquent,,to drain someone of energy or vitality,having good judgment and practical wisdom,reserved or saying very little,using language that is pompous or overly elaborate,D,using language that is pompous or overly elaborate
+h-mean-008,hard,meaning,perspicacious,,unwilling to change one's views or compromise,"kept secret, especially because it would not be approved",stubbornly resistant to authority or control,having a ready insight into things,D,having a ready insight into things
+h-mean-009,hard,meaning,laconic,,having a ready insight into things,essentially different or unrelated,expressing opinions loudly and forcefully,using very few words,D,using very few words
+h-mean-010,hard,meaning,sagacious,,having a ready insight into things,having good judgment and practical wisdom,very attentive to detail and accuracy,"cheerful, energetic, and enthusiastic",B,having good judgment and practical wisdom
+h-mean-011,hard,meaning,intransigent,,unwilling to change one's views or compromise,"generous or forgiving, especially toward a rival",reserved or saying very little,expressing opinions loudly and forcefully,A,unwilling to change one's views or compromise
+h-mean-012,hard,meaning,magnanimous,,"generous or forgiving, especially toward a rival",causing harm or damage,having good judgment and practical wisdom,unwilling to change one's views or compromise,A,"generous or forgiving, especially toward a rival"
+h-mean-013,hard,meaning,ameliorate,,"difficult to understand, especially because of complexity",to make a difficult situation better,stubbornly resistant to authority or control,given to sudden and unpredictable changes,B,to make a difficult situation better
+h-mean-014,hard,meaning,capricious,,given to sudden and unpredictable changes,using very few words,"generous or forgiving, especially toward a rival",a confusing and difficult problem,A,given to sudden and unpredictable changes
+h-mean-015,hard,meaning,obfuscate,,expressing opinions loudly and forcefully,to make something unclear or difficult to understand,"kept secret, especially because it would not be approved",using very few words,B,to make something unclear or difficult to understand
+h-mean-016,hard,meaning,conundrum,,"done with little care, interest, or effort","generous or forgiving, especially toward a rival",a confusing and difficult problem,to place things close together for comparison,C,a confusing and difficult problem
+h-mean-017,hard,meaning,recalcitrant,,given to sudden and unpredictable changes,stubbornly resistant to authority or control,"kept secret, especially because it would not be approved",open to more than one interpretation; ambiguous,B,stubbornly resistant to authority or control
+h-mean-018,hard,meaning,quintessential,,very attentive to detail and accuracy,to place things close together for comparison,stubbornly resistant to authority or control,representing the most typical or perfect example,D,representing the most typical or perfect example
+h-mean-019,hard,meaning,abstruse,,peculiar or distinctive to an individual,very attentive to detail and accuracy,"difficult to understand, especially because of complexity",having good judgment and practical wisdom,C,"difficult to understand, especially because of complexity"
+h-mean-020,hard,meaning,idiosyncratic,,using very few words,having a ready insight into things,peculiar or distinctive to an individual,causing harm or damage,C,peculiar or distinctive to an individual
+h-mean-021,hard,meaning,ubiquitous,,to place things close together for comparison,present or found everywhere,to make something unclear or difficult to understand,"difficult to understand, especially because of complexity",B,present or found everywhere
+h-mean-022,hard,meaning,ubiquitous,,belonging to a period different from the one in which it exists,"cheerful, energetic, and enthusiastic",reserved or saying very little,present or found everywhere,D,present or found everywhere
+h-mean-023,hard,meaning,intransigent,,given to sudden and unpredictable changes,causing harm or damage,unwilling to change one's views or compromise,to make something unclear or difficult to understand,C,unwilling to change one's views or compromise
+h-mean-024,hard,meaning,ameliorate,,to make a difficult situation better,hostile and aggressive,causing harm or damage,a confusing and difficult problem,A,to make a difficult situation better
+h-mean-025,hard,meaning,juxtapose,,to place things close together for comparison,present or found everywhere,belonging to a period different from the one in which it exists,a confusing and difficult problem,A,to place things close together for comparison
+h-mean-026,hard,meaning,perspicacious,,"done with little care, interest, or effort",having a ready insight into things,given to sudden and unpredictable changes,belonging to a period different from the one in which it exists,B,having a ready insight into things
+h-mean-027,hard,meaning,quintessential,,essentially different or unrelated,"done with little care, interest, or effort","difficult to understand, especially because of complexity",representing the most typical or perfect example,D,representing the most typical or perfect example
+h-mean-028,hard,meaning,deleterious,,reserved or saying very little,causing harm or damage,belonging to a period different from the one in which it exists,open to more than one interpretation; ambiguous,B,causing harm or damage
+h-mean-029,hard,meaning,fastidious,,"difficult to understand, especially because of complexity",very attentive to detail and accuracy,peculiar or distinctive to an individual,using language that is pompous or overly elaborate,B,very attentive to detail and accuracy
+h-mean-030,hard,meaning,belligerent,,hostile and aggressive,present or found everywhere,careful to consider all circumstances before acting,unwilling to change one's views or compromise,A,hostile and aggressive
+h-mean-031,hard,meaning,disparate,,to make something unclear or difficult to understand,given to sudden and unpredictable changes,essentially different or unrelated,expressing opinions loudly and forcefully,C,essentially different or unrelated
+h-mean-032,hard,meaning,anachronistic,,belonging to a period different from the one in which it exists,only recently begun and not fully formed,having a ready insight into things,open to more than one interpretation; ambiguous,A,belonging to a period different from the one in which it exists
+h-mean-033,hard,meaning,belligerent,,hostile and aggressive,"cheerful, energetic, and enthusiastic","difficult to understand, especially because of complexity",essentially different or unrelated,A,hostile and aggressive
+h-mean-034,hard,meaning,deleterious,,hostile and aggressive,causing harm or damage,stubbornly resistant to authority or control,belonging to a period different from the one in which it exists,B,causing harm or damage
+h-mean-035,hard,meaning,taciturn,,reserved or saying very little,representing the most typical or perfect example,to make a difficult situation better,expressing opinions loudly and forcefully,A,reserved or saying very little
+h-mean-036,hard,meaning,capricious,,given to sudden and unpredictable changes,using very few words,using language that is pompous or overly elaborate,"done with little care, interest, or effort",A,given to sudden and unpredictable changes
+h-mean-037,hard,meaning,ebullient,,belonging to a period different from the one in which it exists,"cheerful, energetic, and enthusiastic",using very few words,peculiar or distinctive to an individual,B,"cheerful, energetic, and enthusiastic"
+h-mean-038,hard,meaning,disparate,,essentially different or unrelated,careful to consider all circumstances before acting,using very few words,only recently begun and not fully formed,A,essentially different or unrelated
+h-mean-039,hard,meaning,idiosyncratic,,peculiar or distinctive to an individual,to place things close together for comparison,given to sudden and unpredictable changes,unwilling to change one's views or compromise,A,peculiar or distinctive to an individual
+h-mean-040,hard,meaning,circumspect,,careful to consider all circumstances before acting,"cheerful, energetic, and enthusiastic",to make something unclear or difficult to understand,expressing opinions loudly and forcefully,A,careful to consider all circumstances before acting
+h-mean-041,hard,meaning,enervate,,"difficult to understand, especially because of complexity","done with little care, interest, or effort",to drain someone of energy or vitality,expressing opinions loudly and forcefully,C,to drain someone of energy or vitality
+h-mean-042,hard,meaning,belligerent,,hostile and aggressive,"generous or forgiving, especially toward a rival",belonging to a period different from the one in which it exists,given to sudden and unpredictable changes,A,hostile and aggressive
+h-mean-043,hard,meaning,perfunctory,,to make a difficult situation better,"done with little care, interest, or effort",using language that is pompous or overly elaborate,expressing opinions loudly and forcefully,B,"done with little care, interest, or effort"
+h-mean-044,hard,meaning,ameliorate,,to make a difficult situation better,a confusing and difficult problem,using language that is pompous or overly elaborate,stubbornly resistant to authority or control,A,to make a difficult situation better
+h-mean-045,hard,meaning,enervate,,using language that is pompous or overly elaborate,essentially different or unrelated,open to more than one interpretation; ambiguous,to drain someone of energy or vitality,D,to drain someone of energy or vitality
+h-mean-046,hard,meaning,sagacious,,"cheerful, energetic, and enthusiastic",using language that is pompous or overly elaborate,"generous or forgiving, especially toward a rival",having good judgment and practical wisdom,D,having good judgment and practical wisdom
+h-mean-047,hard,meaning,belligerent,,expressing opinions loudly and forcefully,a confusing and difficult problem,hostile and aggressive,"difficult to understand, especially because of complexity",C,hostile and aggressive
+h-mean-048,hard,meaning,equivocal,,open to more than one interpretation; ambiguous,stubbornly resistant to authority or control,essentially different or unrelated,representing the most typical or perfect example,A,open to more than one interpretation; ambiguous
+h-mean-049,hard,meaning,circumspect,,careful to consider all circumstances before acting,"generous or forgiving, especially toward a rival",stubbornly resistant to authority or control,belonging to a period different from the one in which it exists,A,careful to consider all circumstances before acting
+h-mean-050,hard,meaning,ebullient,,to place things close together for comparison,unwilling to change one's views or compromise,"difficult to understand, especially because of complexity","cheerful, energetic, and enthusiastic",D,"cheerful, energetic, and enthusiastic"
+h-mean-051,hard,meaning,obfuscate,,to make something unclear or difficult to understand,"done with little care, interest, or effort",to drain someone of energy or vitality,representing the most typical or perfect example,A,to make something unclear or difficult to understand
+h-mean-052,hard,meaning,laconic,,using very few words,having good judgment and practical wisdom,having a ready insight into things,a confusing and difficult problem,A,using very few words
+h-mean-053,hard,meaning,vociferous,,causing harm or damage,expressing opinions loudly and forcefully,"kept secret, especially because it would not be approved",unwilling to change one's views or compromise,B,expressing opinions loudly and forcefully
+h-mean-054,hard,meaning,quintessential,,representing the most typical or perfect example,having good judgment and practical wisdom,causing harm or damage,only recently begun and not fully formed,A,representing the most typical or perfect example
+h-mean-055,hard,meaning,taciturn,,"kept secret, especially because it would not be approved",having good judgment and practical wisdom,reserved or saying very little,to place things close together for comparison,C,reserved or saying very little
+h-mean-056,hard,meaning,obfuscate,,careful to consider all circumstances before acting,having good judgment and practical wisdom,hostile and aggressive,to make something unclear or difficult to understand,D,to make something unclear or difficult to understand
+h-mean-057,hard,meaning,conundrum,,very attentive to detail and accuracy,present or found everywhere,a confusing and difficult problem,representing the most typical or perfect example,C,a confusing and difficult problem
+h-mean-058,hard,meaning,inchoate,,to make something unclear or difficult to understand,reserved or saying very little,only recently begun and not fully formed,using very few words,C,only recently begun and not fully formed
+h-mean-059,hard,meaning,idiosyncratic,,"cheerful, energetic, and enthusiastic",expressing opinions loudly and forcefully,to drain someone of energy or vitality,peculiar or distinctive to an individual,D,peculiar or distinctive to an individual
+h-mean-060,hard,meaning,recalcitrant,,stubbornly resistant to authority or control,"cheerful, energetic, and enthusiastic",expressing opinions loudly and forcefully,to drain someone of energy or vitality,A,stubbornly resistant to authority or control
+h-mean-061,hard,meaning,capricious,,to place things close together for comparison,given to sudden and unpredictable changes,to make something unclear or difficult to understand,"done with little care, interest, or effort",B,given to sudden and unpredictable changes
+h-mean-062,hard,meaning,deleterious,,using language that is pompous or overly elaborate,causing harm or damage,belonging to a period different from the one in which it exists,to make something unclear or difficult to understand,B,causing harm or damage
+h-mean-063,hard,meaning,equivocal,,open to more than one interpretation; ambiguous,having a ready insight into things,unwilling to change one's views or compromise,to place things close together for comparison,A,open to more than one interpretation; ambiguous
+h-mean-064,hard,meaning,intransigent,,"difficult to understand, especially because of complexity",unwilling to change one's views or compromise,a confusing and difficult problem,essentially different or unrelated,B,unwilling to change one's views or compromise
+h-mean-065,hard,meaning,ameliorate,,essentially different or unrelated,peculiar or distinctive to an individual,to make a difficult situation better,only recently begun and not fully formed,C,to make a difficult situation better
+h-mean-066,hard,meaning,vociferous,,a confusing and difficult problem,to place things close together for comparison,expressing opinions loudly and forcefully,very attentive to detail and accuracy,C,expressing opinions loudly and forcefully
+h-mean-067,hard,meaning,disparate,,essentially different or unrelated,belonging to a period different from the one in which it exists,using very few words,careful to consider all circumstances before acting,A,essentially different or unrelated
+h-mean-068,hard,meaning,laconic,,"kept secret, especially because it would not be approved","generous or forgiving, especially toward a rival",using very few words,representing the most typical or perfect example,C,using very few words
+h-mean-069,hard,meaning,fastidious,,very attentive to detail and accuracy,hostile and aggressive,to place things close together for comparison,"done with little care, interest, or effort",A,very attentive to detail and accuracy
+h-mean-070,hard,meaning,ebullient,,"cheerful, energetic, and enthusiastic",causing harm or damage,using very few words,using language that is pompous or overly elaborate,A,"cheerful, energetic, and enthusiastic"
+h-mean-071,hard,meaning,juxtapose,,"generous or forgiving, especially toward a rival",to drain someone of energy or vitality,to place things close together for comparison,"cheerful, energetic, and enthusiastic",C,to place things close together for comparison
+h-mean-072,hard,meaning,enervate,,to drain someone of energy or vitality,"generous or forgiving, especially toward a rival",essentially different or unrelated,stubbornly resistant to authority or control,A,to drain someone of energy or vitality
+h-mean-073,hard,meaning,abstruse,,"generous or forgiving, especially toward a rival","difficult to understand, especially because of complexity","kept secret, especially because it would not be approved",to make something unclear or difficult to understand,B,"difficult to understand, especially because of complexity"
+h-mean-074,hard,meaning,equivocal,,"kept secret, especially because it would not be approved",open to more than one interpretation; ambiguous,using very few words,having a ready insight into things,B,open to more than one interpretation; ambiguous
+h-mean-075,hard,meaning,inchoate,,"cheerful, energetic, and enthusiastic",only recently begun and not fully formed,expressing opinions loudly and forcefully,very attentive to detail and accuracy,B,only recently begun and not fully formed
+h-mean-076,hard,meaning,circumspect,,to make something unclear or difficult to understand,having a ready insight into things,careful to consider all circumstances before acting,using language that is pompous or overly elaborate,C,careful to consider all circumstances before acting
+h-mean-077,hard,meaning,grandiloquent,,careful to consider all circumstances before acting,using language that is pompous or overly elaborate,causing harm or damage,representing the most typical or perfect example,B,using language that is pompous or overly elaborate
+h-mean-078,hard,meaning,ubiquitous,,present or found everywhere,having good judgment and practical wisdom,unwilling to change one's views or compromise,"kept secret, especially because it would not be approved",A,present or found everywhere
+h-mean-079,hard,meaning,fastidious,,essentially different or unrelated,very attentive to detail and accuracy,peculiar or distinctive to an individual,"cheerful, energetic, and enthusiastic",B,very attentive to detail and accuracy
+h-mean-080,hard,meaning,surreptitious,,to place things close together for comparison,open to more than one interpretation; ambiguous,very attentive to detail and accuracy,"kept secret, especially because it would not be approved",D,"kept secret, especially because it would not be approved"
+h-mean-081,hard,meaning,disparate,,belonging to a period different from the one in which it exists,having a ready insight into things,representing the most typical or perfect example,essentially different or unrelated,D,essentially different or unrelated
+h-mean-082,hard,meaning,ebullient,,"difficult to understand, especially because of complexity",reserved or saying very little,"cheerful, energetic, and enthusiastic",careful to consider all circumstances before acting,C,"cheerful, energetic, and enthusiastic"
+h-mean-083,hard,meaning,surreptitious,,"kept secret, especially because it would not be approved","difficult to understand, especially because of complexity","cheerful, energetic, and enthusiastic",using very few words,A,"kept secret, especially because it would not be approved"
+h-mean-084,hard,meaning,sagacious,,representing the most typical or perfect example,"generous or forgiving, especially toward a rival",having good judgment and practical wisdom,causing harm or damage,C,having good judgment and practical wisdom
+h-mean-085,hard,meaning,surreptitious,,belonging to a period different from the one in which it exists,representing the most typical or perfect example,present or found everywhere,"kept secret, especially because it would not be approved",D,"kept secret, especially because it would not be approved"
+h-mean-086,hard,meaning,conundrum,,expressing opinions loudly and forcefully,to place things close together for comparison,a confusing and difficult problem,to make a difficult situation better,C,a confusing and difficult problem
+h-mean-087,hard,meaning,equivocal,,very attentive to detail and accuracy,open to more than one interpretation; ambiguous,to make a difficult situation better,representing the most typical or perfect example,B,open to more than one interpretation; ambiguous
+h-mean-088,hard,meaning,abstruse,,only recently begun and not fully formed,"difficult to understand, especially because of complexity",very attentive to detail and accuracy,"cheerful, energetic, and enthusiastic",B,"difficult to understand, especially because of complexity"
+h-mean-089,hard,meaning,inchoate,,"done with little care, interest, or effort",present or found everywhere,only recently begun and not fully formed,hostile and aggressive,C,only recently begun and not fully formed
+h-mean-090,hard,meaning,anachronistic,,to make something unclear or difficult to understand,present or found everywhere,stubbornly resistant to authority or control,belonging to a period different from the one in which it exists,D,belonging to a period different from the one in which it exists
+h-mean-091,hard,meaning,magnanimous,,having good judgment and practical wisdom,"difficult to understand, especially because of complexity",having a ready insight into things,"generous or forgiving, especially toward a rival",D,"generous or forgiving, especially toward a rival"
+h-mean-092,hard,meaning,perfunctory,,to make a difficult situation better,"done with little care, interest, or effort","generous or forgiving, especially toward a rival",to drain someone of energy or vitality,B,"done with little care, interest, or effort"
+h-mean-093,hard,meaning,grandiloquent,,"kept secret, especially because it would not be approved",using language that is pompous or overly elaborate,hostile and aggressive,"difficult to understand, especially because of complexity",B,using language that is pompous or overly elaborate
+h-mean-094,hard,meaning,juxtapose,,having good judgment and practical wisdom,stubbornly resistant to authority or control,very attentive to detail and accuracy,to place things close together for comparison,D,to place things close together for comparison
+h-mean-095,hard,meaning,recalcitrant,,hostile and aggressive,unwilling to change one's views or compromise,reserved or saying very little,stubbornly resistant to authority or control,D,stubbornly resistant to authority or control
+h-mean-096,hard,meaning,perfunctory,,expressing opinions loudly and forcefully,"done with little care, interest, or effort","cheerful, energetic, and enthusiastic",belonging to a period different from the one in which it exists,B,"done with little care, interest, or effort"
+h-mean-097,hard,meaning,anachronistic,,causing harm or damage,"difficult to understand, especially because of complexity",belonging to a period different from the one in which it exists,given to sudden and unpredictable changes,C,belonging to a period different from the one in which it exists
+h-mean-098,hard,meaning,taciturn,,using language that is pompous or overly elaborate,reserved or saying very little,to place things close together for comparison,using very few words,B,reserved or saying very little
+h-mean-099,hard,meaning,deleterious,,"done with little care, interest, or effort",causing harm or damage,unwilling to change one's views or compromise,having a ready insight into things,B,causing harm or damage
+h-mean-100,hard,meaning,conundrum,,a confusing and difficult problem,"kept secret, especially because it would not be approved","generous or forgiving, especially toward a rival",representing the most typical or perfect example,A,a confusing and difficult problem
+h-fill-001,hard,question,abstruse,The professor's explanation was so _____ that several students struggled to follow it.,deleterious,inchoate,abstruse,laconic,C,"difficult to understand, especially because of complexity"
+h-fill-002,hard,question,quintessential,The critic praised the novel as the _____ example of the genre.,idiosyncratic,belligerent,quintessential,surreptitious,C,representing the most typical or perfect example
+h-fill-003,hard,question,fastidious,His _____ attention to detail made even minor errors unlikely.,grandiloquent,fastidious,vociferous,surreptitious,B,very attentive to detail and accuracy
+h-fill-004,hard,question,ubiquitous,The new technology has become _____ in modern workplaces.,circumspect,ubiquitous,ameliorate,taciturn,B,present or found everywhere
+h-fill-005,hard,question,perspicacious,The committee was impressed by her _____ judgment.,conundrum,quintessential,perspicacious,ebullient,C,having a ready insight into things
+h-fill-006,hard,question,obfuscate,The journalist tried not to _____ the facts with unnecessary technical language.,conundrum,disparate,obfuscate,ubiquitous,C,to make something unclear or difficult to understand
+h-fill-007,hard,question,ameliorate,The policy was designed to _____ the effects of the economic downturn.,idiosyncratic,ameliorate,grandiloquent,enervate,B,to make a difficult situation better
+h-fill-008,hard,question,anachronistic,The historian considered the terminology _____ because it belonged to another era.,recalcitrant,anachronistic,obfuscate,inchoate,B,belonging to a period different from the one in which it exists
+h-fill-009,hard,question,equivocal,The witness gave a/an _____ answer that could be interpreted in two ways.,perspicacious,surreptitious,equivocal,taciturn,C,open to more than one interpretation; ambiguous
+h-fill-010,hard,question,intransigent,The negotiator remained _____ and refused every compromise.,anachronistic,circumspect,intransigent,surreptitious,C,unwilling to change one's views or compromise
+h-fill-011,hard,question,magnanimous,"In a/an _____ gesture, the winner praised and hugged his defeated rival.",circumspect,intransigent,magnanimous,idiosyncratic,C,"generous or forgiving, especially toward a rival"
+h-fill-012,hard,question,magnanimous,She was _____ enough to forgive the friend who had insulted her in public.,magnanimous,anachronistic,inchoate,surreptitious,A,"generous or forgiving, especially toward a rival"
+h-fill-013,hard,question,magnanimous,The _____ captain shared his award with the opposing team's best player.,magnanimous,belligerent,equivocal,laconic,A,"generous or forgiving, especially toward a rival"
+h-fill-014,hard,question,anachronistic,A smartphone in a film set in 1850 would be _____.,anachronistic,belligerent,circumspect,recalcitrant,A,belonging to a period different from the one in which it exists
+h-fill-015,hard,question,anachronistic,Some people think handwritten letters are _____ in the age of email.,anachronistic,belligerent,recalcitrant,intransigent,A,belonging to a period different from the one in which it exists
+h-fill-016,hard,question,anachronistic,The modern glass door looked _____ next to the fort's 400-year-old walls.,anachronistic,laconic,deleterious,grandiloquent,A,belonging to a period different from the one in which it exists
+h-fill-017,hard,question,circumspect,Be _____ when sharing personal details online; think carefully before you post.,capricious,ubiquitous,circumspect,disparate,C,careful to consider all circumstances before acting
+h-fill-018,hard,question,circumspect,The _____ investor studied every risk before putting in any money.,ubiquitous,anachronistic,circumspect,belligerent,C,careful to consider all circumstances before acting
+h-fill-019,hard,question,circumspect,"Diplomats must be _____, weighing every word before they speak.",circumspect,intransigent,quintessential,ubiquitous,A,careful to consider all circumstances before acting
+h-fill-020,hard,question,vociferous,The _____ fans shouted and chanted for the full ninety minutes.,disparate,equivocal,vociferous,capricious,C,expressing opinions loudly and forcefully
+h-fill-021,hard,question,vociferous,"There was _____ opposition to the fee increase, with students protesting loudly outside.",idiosyncratic,perfunctory,vociferous,inchoate,C,expressing opinions loudly and forcefully
+h-fill-022,hard,question,vociferous,He was a/an _____ critic who loudly attacked every new rule.,deleterious,disparate,inchoate,vociferous,D,expressing opinions loudly and forcefully
+h-fill-023,hard,question,fastidious,She is so _____ that she irons even her socks.,vociferous,fastidious,belligerent,sagacious,B,very attentive to detail and accuracy
+h-fill-024,hard,question,fastidious,The _____ editor found every missing comma in the 300-page book.,quintessential,surreptitious,taciturn,fastidious,D,very attentive to detail and accuracy
+h-fill-025,hard,question,fastidious,"Being _____ about hygiene, the chef washed his hands after every single task.",vociferous,quintessential,fastidious,grandiloquent,C,very attentive to detail and accuracy
+h-fill-026,hard,question,perspicacious,The _____ detective noticed the tiny clue that everyone else had missed.,vociferous,taciturn,perspicacious,perfunctory,C,having a ready insight into things
+h-fill-027,hard,question,perspicacious,A/an _____ investor saw the company's potential years before anyone else did.,abstruse,perspicacious,intransigent,perfunctory,B,having a ready insight into things
+h-fill-028,hard,question,perspicacious,Her _____ comments showed she understood the problem better than the experts.,anachronistic,perspicacious,quintessential,ebullient,B,having a ready insight into things
+h-fill-029,hard,question,grandiloquent,"His _____ speech was full of long, showy words but said very little.",intransigent,belligerent,grandiloquent,perfunctory,C,using language that is pompous or overly elaborate
+h-fill-030,hard,question,grandiloquent,The politician's _____ promises sounded impressive but meant nothing.,quintessential,equivocal,circumspect,grandiloquent,D,using language that is pompous or overly elaborate
+h-fill-031,hard,question,grandiloquent,Avoid _____ language in emails; plain words are clearer.,laconic,inchoate,ubiquitous,grandiloquent,D,using language that is pompous or overly elaborate
+h-fill-032,hard,question,laconic,"When asked about the match, the _____ captain just said, 'We won.'",laconic,belligerent,circumspect,deleterious,A,using very few words
+h-fill-033,hard,question,laconic,Her _____ reply of 'Fine.' ended the conversation immediately.,abstruse,recalcitrant,laconic,perfunctory,C,using very few words
+h-fill-034,hard,question,laconic,"He is known for his _____ style, never using ten words when two will do.",abstruse,circumspect,laconic,intransigent,C,using very few words
+h-fill-035,hard,question,sagacious,Grandmother's _____ advice solved a problem the whole family had struggled with.,deleterious,recalcitrant,anachronistic,sagacious,D,having good judgment and practical wisdom
+h-fill-036,hard,question,sagacious,A/an _____ leader makes wise decisions even in a crisis.,sagacious,ubiquitous,vociferous,intransigent,A,having good judgment and practical wisdom
+h-fill-037,hard,question,sagacious,The _____ old teacher always knew which students needed extra help.,belligerent,anachronistic,sagacious,ebullient,C,having good judgment and practical wisdom
+h-fill-038,hard,question,intransigent,The _____ landlord refused every request to lower the rent.,idiosyncratic,taciturn,intransigent,circumspect,C,unwilling to change one's views or compromise
+h-fill-039,hard,question,intransigent,Talks failed because both sides were _____ and would not compromise at all.,sagacious,intransigent,deleterious,surreptitious,B,unwilling to change one's views or compromise
+h-fill-040,hard,question,intransigent,"Even when proven wrong, he remained _____ and never changed his position.",taciturn,ebullient,capricious,intransigent,D,unwilling to change one's views or compromise
+h-fill-041,hard,question,capricious,The _____ weather changed from bright sunshine to a hailstorm within an hour.,perspicacious,surreptitious,capricious,intransigent,C,given to sudden and unpredictable changes
+h-fill-042,hard,question,capricious,The _____ manager changed the deadline three times in one day.,perspicacious,grandiloquent,capricious,perfunctory,C,given to sudden and unpredictable changes
+h-fill-043,hard,question,capricious,"Small children can be _____, loving a toy one minute and ignoring it the next.",capricious,inchoate,perspicacious,fastidious,A,given to sudden and unpredictable changes
+h-fill-044,hard,question,recalcitrant,The _____ student refused to follow any of the teacher's instructions.,recalcitrant,ebullient,inchoate,quintessential,A,stubbornly resistant to authority or control
+h-fill-045,hard,question,recalcitrant,"Even after many warnings, the _____ shopkeeper kept blocking the road.",recalcitrant,grandiloquent,ubiquitous,quintessential,A,stubbornly resistant to authority or control
+h-fill-046,hard,question,recalcitrant,"The _____ mule would not move, no matter how hard they pulled.",recalcitrant,inchoate,quintessential,disparate,A,stubbornly resistant to authority or control
+h-fill-047,hard,question,quintessential,Chai and samosas on a rainy day are the _____ Indian evening snack.,sagacious,quintessential,surreptitious,ebullient,B,representing the most typical or perfect example
+h-fill-048,hard,question,quintessential,"With its pink buildings and grand forts, Jaipur is the _____ heritage city.",perfunctory,ebullient,disparate,quintessential,D,representing the most typical or perfect example
+h-fill-049,hard,question,abstruse,The lecture on quantum physics was so _____ that few students could follow it.,abstruse,grandiloquent,anachronistic,perspicacious,A,"difficult to understand, especially because of complexity"
+h-fill-050,hard,question,abstruse,The contract was written in _____ legal language that nobody could understand.,abstruse,capricious,perfunctory,intransigent,A,"difficult to understand, especially because of complexity"
+h-fill-051,hard,question,idiosyncratic,His _____ habit of wearing one red sock and one blue sock made him easy to recognise.,intransigent,quintessential,idiosyncratic,equivocal,C,peculiar or distinctive to an individual
+h-fill-052,hard,question,idiosyncratic,The painter has a/an _____ style that is entirely her own.,ubiquitous,idiosyncratic,laconic,quintessential,B,peculiar or distinctive to an individual
+h-fill-053,hard,question,idiosyncratic,Every family has _____ traditions that seem strange to outsiders.,magnanimous,quintessential,idiosyncratic,equivocal,C,peculiar or distinctive to an individual
+h-fill-054,hard,question,ubiquitous,Mobile phones are now _____; almost everyone carries one everywhere.,inchoate,belligerent,laconic,ubiquitous,D,present or found everywhere
+h-fill-055,hard,question,ubiquitous,"After the festival, plastic cups were _____, lying in every corner of the ground.",deleterious,ubiquitous,abstruse,circumspect,B,present or found everywhere
+h-fill-056,hard,question,deleterious,Smoking has a/an _____ effect on the lungs.,surreptitious,circumspect,sagacious,deleterious,D,causing harm or damage
+h-fill-057,hard,question,deleterious,Too much screen time at night can be _____ to sleep.,quintessential,deleterious,abstruse,circumspect,B,causing harm or damage
+h-fill-058,hard,question,deleterious,The factory's waste had _____ effects on the fish in the river.,vociferous,circumspect,perspicacious,deleterious,D,causing harm or damage
+h-fill-059,hard,question,belligerent,The _____ customer shouted at the staff and threatened to start a fight.,fastidious,abstruse,belligerent,ebullient,C,hostile and aggressive
+h-fill-060,hard,question,belligerent,His _____ tone turned a small disagreement into a big argument.,idiosyncratic,fastidious,surreptitious,belligerent,D,hostile and aggressive
+h-fill-061,hard,question,belligerent,The _____ nation kept threatening its neighbours with war.,perfunctory,inchoate,surreptitious,belligerent,D,hostile and aggressive
+h-fill-062,hard,question,disparate,The two cities are so _____ that they have almost nothing in common.,quintessential,disparate,circumspect,recalcitrant,B,essentially different or unrelated
+h-fill-063,hard,question,disparate,"Our team members come from _____ fields: law, music and engineering.",circumspect,disparate,surreptitious,abstruse,B,essentially different or unrelated
+h-fill-064,hard,question,disparate,"The book brings together _____ ideas from science, art and history.",disparate,recalcitrant,capricious,surreptitious,A,essentially different or unrelated
+h-fill-065,hard,question,taciturn,The _____ new student hardly said a word during his first week.,anachronistic,taciturn,capricious,recalcitrant,B,reserved or saying very little
+h-fill-066,hard,question,taciturn,"Her _____ grandfather rarely talked, but he always listened carefully.",capricious,anachronistic,quintessential,taciturn,D,reserved or saying very little
+h-fill-067,hard,question,taciturn,"Being _____, he answered most questions with just a nod.",belligerent,taciturn,idiosyncratic,perfunctory,B,reserved or saying very little
+h-fill-068,hard,question,ebullient,The _____ host welcomed every guest with a huge smile and a loud cheer.,quintessential,perfunctory,recalcitrant,ebullient,D,"cheerful, energetic, and enthusiastic"
+h-fill-069,hard,question,ebullient,"After winning the trophy, the team was _____, singing and dancing all the way home.",fastidious,vociferous,ebullient,quintessential,C,"cheerful, energetic, and enthusiastic"
+h-fill-070,hard,question,ebullient,Her _____ personality filled the whole room with energy.,intransigent,laconic,capricious,ebullient,D,"cheerful, energetic, and enthusiastic"
+h-fill-071,hard,question,perfunctory,He gave my essay a/an _____ glance and handed it back without really reading it.,intransigent,ebullient,perfunctory,taciturn,C,"done with little care, interest, or effort"
+h-fill-072,hard,question,perfunctory,"The guard made a/an _____ check of our bags, barely looking inside.",perfunctory,circumspect,capricious,ubiquitous,A,"done with little care, interest, or effort"
+h-fill-073,hard,question,perfunctory,Her _____ 'sorry' showed she did not really mean it.,perfunctory,ebullient,laconic,circumspect,A,"done with little care, interest, or effort"
+h-fill-074,hard,question,equivocal,The minister gave a/an _____ answer that was neither yes nor no.,ebullient,equivocal,grandiloquent,vociferous,B,open to more than one interpretation; ambiguous
+h-fill-075,hard,question,equivocal,"The first test results were _____, so the lab ordered a second test.",intransigent,magnanimous,recalcitrant,equivocal,D,open to more than one interpretation; ambiguous
+h-fill-076,hard,question,inchoate,"The idea was still _____, just a rough thought without any real plan.",inchoate,belligerent,grandiloquent,vociferous,A,only recently begun and not fully formed
+h-fill-077,hard,question,inchoate,Her _____ business plan needed months of work before investors would see it.,inchoate,ubiquitous,magnanimous,quintessential,A,only recently begun and not fully formed
+h-fill-078,hard,question,inchoate,The project was at a/an _____ stage; only the very first steps had been taken.,sagacious,fastidious,inchoate,perspicacious,C,only recently begun and not fully formed
+h-fill-079,hard,question,surreptitious,He took a/an _____ look at his phone under the desk during the exam.,belligerent,surreptitious,capricious,equivocal,B,"kept secret, especially because it would not be approved"
+h-fill-080,hard,question,surreptitious,The _____ recording was made without anyone in the room knowing.,surreptitious,equivocal,circumspect,intransigent,A,"kept secret, especially because it would not be approved"
+h-fill-081,hard,question,surreptitious,She made a/an _____ exit from the party while no one was watching.,perspicacious,perfunctory,quintessential,surreptitious,D,"kept secret, especially because it would not be approved"
+h-fill-082,hard,question,ameliorate,The new flyover should _____ the traffic problems in the city centre.,obfuscate,enervate,ameliorate,juxtapose,C,to make a difficult situation better
+h-fill-083,hard,question,ameliorate,Volunteers worked hard to _____ living conditions in the flood camp.,enervate,ameliorate,juxtapose,obfuscate,B,to make a difficult situation better
+h-fill-084,hard,question,ameliorate,Planting more trees can help _____ the effects of extreme heat.,obfuscate,juxtapose,enervate,ameliorate,D,to make a difficult situation better
+h-fill-085,hard,question,obfuscate,Don't _____ your main point with too many technical terms.,obfuscate,ameliorate,juxtapose,enervate,A,to make something unclear or difficult to understand
+h-fill-086,hard,question,obfuscate,The company tried to _____ its losses with confusing reports.,juxtapose,enervate,obfuscate,ameliorate,C,to make something unclear or difficult to understand
+h-fill-087,hard,question,obfuscate,Lawyers sometimes _____ simple facts to confuse the other side.,obfuscate,enervate,juxtapose,ameliorate,A,to make something unclear or difficult to understand
+h-fill-088,hard,question,juxtapose,The exhibition will _____ old photos with new ones to show how the city has changed.,obfuscate,juxtapose,enervate,ameliorate,B,to place things close together for comparison
+h-fill-089,hard,question,juxtapose,The film likes to _____ rich and poor families in the same scene.,enervate,ameliorate,juxtapose,obfuscate,C,to place things close together for comparison
+h-fill-090,hard,question,juxtapose,Poets often _____ light and dark images for a stronger effect.,obfuscate,enervate,ameliorate,juxtapose,D,to place things close together for comparison
+h-fill-091,hard,question,enervate,The extreme heat seemed to _____ everyone; nobody had the energy to move.,ameliorate,enervate,obfuscate,juxtapose,B,to drain someone of energy or vitality
+h-fill-092,hard,question,enervate,Long night shifts can _____ even the strongest workers.,enervate,ameliorate,juxtapose,obfuscate,A,to drain someone of energy or vitality
+h-fill-093,hard,question,enervate,Weeks of exams and little sleep began to _____ the students.,enervate,ameliorate,obfuscate,juxtapose,A,to drain someone of energy or vitality
+h-fill-094,hard,question,conundrum,Choosing between two great job offers was a real _____.,souvenir,pedestal,lantern,conundrum,D,a confusing and difficult problem
+h-fill-095,hard,question,conundrum,How to fit 50 people into a 30-seat bus was a/an _____ for the organisers.,souvenir,conundrum,lantern,pedestal,B,a confusing and difficult problem
+h-fill-096,hard,question,conundrum,The missing keys remained a/an _____ until they turned up in the fridge.,lantern,conundrum,pedestal,souvenir,B,a confusing and difficult problem
+h-pron-001,hard,pronounce,abstruse,,,,,,,"difficult to understand, especially because of complexity"
+h-pron-002,hard,pronounce,ameliorate,,,,,,,to make a difficult situation better
+h-pron-003,hard,pronounce,anachronistic,,,,,,,belonging to a period different from the one in which it exists
+h-pron-004,hard,pronounce,belligerent,,,,,,,hostile and aggressive
+h-pron-005,hard,pronounce,capricious,,,,,,,given to sudden and unpredictable changes
+h-pron-006,hard,pronounce,circumspect,,,,,,,careful to consider all circumstances before acting
+h-pron-007,hard,pronounce,conundrum,,,,,,,a confusing and difficult problem
+h-pron-008,hard,pronounce,deleterious,,,,,,,causing harm or damage
+h-pron-009,hard,pronounce,disparate,,,,,,,essentially different or unrelated
+h-pron-010,hard,pronounce,ebullient,,,,,,,"cheerful, energetic, and enthusiastic"
+h-pron-011,hard,pronounce,enervate,,,,,,,to drain someone of energy or vitality
+h-pron-012,hard,pronounce,equivocal,,,,,,,open to more than one interpretation; ambiguous
+h-pron-013,hard,pronounce,fastidious,,,,,,,very attentive to detail and accuracy
+h-pron-014,hard,pronounce,grandiloquent,,,,,,,using language that is pompous or overly elaborate
+h-pron-015,hard,pronounce,idiosyncratic,,,,,,,peculiar or distinctive to an individual
+h-pron-016,hard,pronounce,inchoate,,,,,,,only recently begun and not fully formed
+h-pron-017,hard,pronounce,intransigent,,,,,,,unwilling to change one's views or compromise
+h-pron-018,hard,pronounce,juxtapose,,,,,,,to place things close together for comparison
+h-pron-019,hard,pronounce,laconic,,,,,,,using very few words
+h-pron-020,hard,pronounce,magnanimous,,,,,,,"generous or forgiving, especially toward a rival"
+h-pron-021,hard,pronounce,obfuscate,,,,,,,to make something unclear or difficult to understand
+h-pron-022,hard,pronounce,perfunctory,,,,,,,"done with little care, interest, or effort"
+h-pron-023,hard,pronounce,perspicacious,,,,,,,having a ready insight into things
+h-pron-024,hard,pronounce,quintessential,,,,,,,representing the most typical or perfect example
+h-pron-025,hard,pronounce,recalcitrant,,,,,,,stubbornly resistant to authority or control
+h-pron-026,hard,pronounce,sagacious,,,,,,,having good judgment and practical wisdom
+h-pron-027,hard,pronounce,surreptitious,,,,,,,"kept secret, especially because it would not be approved"
+h-pron-028,hard,pronounce,taciturn,,,,,,,reserved or saying very little
+h-pron-029,hard,pronounce,ubiquitous,,,,,,,present or found everywhere
+h-pron-030,hard,pronounce,vociferous,,,,,,,expressing opinions loudly and forcefully

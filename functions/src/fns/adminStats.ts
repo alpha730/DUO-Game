@@ -1,14 +1,15 @@
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { COL, type AdminStatsOutput } from "../shared/types";
 import { serverNow } from "../lib/clock";
-import { missingChallenges } from "../lib/admin";
+import { questionPool } from "../lib/questionPool";
+import { countQuestions } from "../lib/questions";
 import { istDate } from "../lib/date";
 import { db, loadConfig } from "../lib/db";
 import { requireRole } from "../lib/guards";
 
 /**
- * Admin stats (PLAN 7.2): users, attempts today, wins today, and which game days × Lingos still
- * lack a challenge.
+ * Admin stats (PLAN 7.2): users, attempts today, wins today, and the question pool per level × type
+ * (counted from the in-memory pool — no extra reads).
  *
  * DECISION (cost rules): totals use count() aggregations — they read no user documents (billed
  * 1 read per 1000 index entries, ~20 reads for 20k users). Only on the admin's click, never live.
@@ -19,24 +20,18 @@ export const adminStats = onCall<unknown, Promise<AdminStatsOutput>>(async (req)
   if (!config) throw new HttpsError("failed-precondition", "Game is not configured — run the seed first.");
   const today = istDate(await serverNow());
   const attempts = db().collection(COL.attempts).where("date", "==", today);
-  const [users, attemptsToday, winsToday, lingos, challenges] = await Promise.all([
+  const [users, attemptsToday, winsToday, pool] = await Promise.all([
     db().collection(COL.users).count().get(),
     attempts.count().get(),
     attempts.where("status", "==", "won").count().get(),
-    db().collection(COL.lingos).select().get(),
-    db().collection(COL.challenges).select().get(),
+    questionPool(),
   ]);
-  const missing = missingChallenges(
-    { startAt: config.startAt.toMillis(), lockAt: config.lockAt.toMillis() },
-    lingos.docs.map((d) => d.id).sort(),
-    new Set(challenges.docs.map((d) => d.id)),
-  );
   return {
     today,
     users: users.data().count,
     attemptsToday: attemptsToday.data().count,
     winsToday: winsToday.data().count,
-    missingChallenges: missing.slice(0, 20),
-    missingCount: missing.length,
+    questions: countQuestions(pool),
+    questionTotal: pool.length,
   };
 });

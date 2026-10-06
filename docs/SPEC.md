@@ -43,7 +43,7 @@
 | **Speed bonus** (every correct answer, incl. raids) | +1 per full second left on the server timer: `floor((expiresAt − receivedAt)/1000)`, clamped 0…timer length |
 | Wrong / failed / forfeited try | 0 points (and that Lingo is used for the day — 1 of the 4) |
 | Logging in, opening the app, days played | 0 points |
-| Location check | must be within `radiusM` of **any** campus centre in `config.campuses` (both JECRC campuses, 500 m each to start; editable in /admin) (on the **emulators only** an off-campus player is let through with a logged warning, for testing from home; never skipped in production) |
+| Location check | must be within `radiusM` of **any** campus centre in `config.campuses` (both JECRC campuses: Foundation 500 m, University 1000 m; editable in /admin) (on the **emulators only** an off-campus player is let through with a logged warning, for testing from home; never skipped in production) |
 
 **Favourite streak:** +1 when the favourite is caught on the IST day right after its last catch. A missed day resets the streak to 0, but **levels never go down**. MAX is permanent once reached.
 **Choosing favourites:** after a user's first 2 catches, the app asks them to pick 2 favourites from Lingos they have caught. Until then no streaks count. Last day a 10-day streak can still be completed: start by Oct 12.

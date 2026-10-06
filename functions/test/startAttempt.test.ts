@@ -100,13 +100,8 @@ describe("startAttempt", () => {
   // Production refuses off-campus players (src/lib/geo.test.ts); the emulator only warns so the game
   // can be played from home.
   it("lets an off-campus player through on the emulator", async () => {
-    const restore = await patchConfig({ campusRadiusM: 500 });
-    try {
-      const p = await newPlayer();
-      await expect(start(p, LINGO.speak, { lat: 26.9124, lng: 75.7873 })).resolves.toMatchObject({ type: "speak" }); // city centre
-    } finally {
-      await restore();
-    }
+    const p = await newPlayer(); // seeded campuses are real (500 m each); the city centre is ~15 km away
+    await expect(start(p, LINGO.speak, { lat: 26.9124, lng: 75.7873 })).resolves.toMatchObject({ type: "speak" });
   });
 
   it("speech: false refuses voice challenges without using an attempt or revealing them (PLAN 3.10)", async () => {

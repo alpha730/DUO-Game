@@ -2860,9 +2860,21 @@ a {
   margin: 0;
   min-width: 0;
 }
+.campus-list {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  margin: 0;
+  min-width: 0;
+}
+.campus-list legend,
 .raid-challenge legend {
   font-weight: 600;
   padding: 0 6px;
+}
+.campus-row + .campus-row {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
 }
 .option-row {
   gap: 10px;

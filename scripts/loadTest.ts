@@ -9,7 +9,7 @@ export {};
 const PROJECT = "demo-decade-hunt";
 const AUTH = "http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1";
 const FN = `http://127.0.0.1:5001/${PROJECT}/asia-south1`;
-const CAMPUS = { lat: 26.7838, lng: 75.8225 };
+const CAMPUS = { lat: 26.7838, lng: 75.8301 }; // JECRC Foundation (scripts/campuses.ts)
 
 const players = Number(process.argv[2] ?? 500);
 const spreadMs = Number(process.argv[3] ?? 0) * 1000;

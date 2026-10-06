@@ -1,6 +1,6 @@
 # Real-phone checklist (Day 8)
 
-**Before (laptop, once):** Blaze billing on → `npx tsx scripts/seed.ts --prod --project decade-hunt-66f6e --campus <lat>,<lng>,500`
+**Before (laptop, once):** Blaze billing on → `npx tsx scripts/seed.ts --prod --project decade-hunt-66f6e` (both campuses from `scripts/campuses.ts`)
 (test mode: game open from today) → `cd web && npm run build && cd .. && firebase deploy -P prod` → sign in once on a phone →
 `npx tsx scripts/setRole.ts <you> admin --prod --project decade-hunt-66f6e`.
 Then load the questions: `npx tsx scripts/loadQuestions.ts --prod --project decade-hunt-66f6e` (prints 456 + counts per level/type).
@@ -18,8 +18,9 @@ Then load the questions: `npx tsx scripts/loadQuestions.ts --prod --project deca
 8. **Instagram:** DM yourself the link, open it inside Instagram → "Open in your browser" card (Android: **Open in Chrome** button; iPhone: ••• → Open in Safari) → the game opens in the real browser.
 9. **Me** → QR code visible → **Share my card** → share sheet with the image → Instagram story shows the card.
 10. **Leaderboard** → your row appears (≤ 10 min, or /admin → Refresh now).
-11. Off campus (e.g. at home): Catch → "You need to be on campus to catch Lingos"; Lingos left unchanged.
-12. Turn the phone sideways → "Please turn your phone upright".
+11. Do 3–4 at **both** campuses (JECRC Foundation and JECRC University): Catch works at each — if a poster spot says off campus, widen that campus's radius in /admin → Config.
+12. Off campus (e.g. at home): Catch → "You need to be on campus to catch Lingos"; Lingos left unchanged.
+13. Turn the phone sideways → "Please turn your phone upright".
 
 ## Testing on Wi-Fi before the deploy (laptop + phone)
 - Run the emulators and `cd web && npm run dev`; open the "Network" address it prints (e.g. `http://192.168.0.144:5173`) on a phone on the same Wi-Fi. If it doesn't load, allow Node.js / Java through Windows Firewall (private networks).

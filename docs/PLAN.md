@@ -118,7 +118,7 @@ Human: 10 poster images final (high contrast, lots of detail), `targets.mind` co
 
 ## Day 9 — Freeze (Oct 9)
 - [ ] Only bug fixes; no new features
-- [ ] Remove test users/data from production; re-seed real lingos/config (`scripts/seed.ts --prod --real-dates --campus …`)
+- [ ] Remove test users/data from production; re-seed real lingos/config (`scripts/seed.ts --prod --real-dates`; both campuses come from `scripts/campuses.ts`)
 - [ ] Load the question pool: `npx tsx scripts/loadQuestions.ts --prod --project decade-hunt-66f6e` → expect 456 (medium 100/100/30, hard 100/96/30); /admin Stats shows the same counts
 - [ ] `firebase deploy`; smoke test the live link on 3 phones
 - [ ] Posters up; poster QR → live link

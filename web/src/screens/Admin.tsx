@@ -1,10 +1,11 @@
 import { db, doc, getDoc } from "../lib/firestore";
-import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import {
   COL,
   DEFAULT_RULES,
   DOC,
+  MAX_CAMPUSES,
   QUESTION_LEVELS,
   QUESTION_TYPES,
   type AdminPlayerRow,
@@ -123,12 +124,14 @@ function GameLock({ config, reload }: { config: GameConfigDoc; reload: () => voi
   );
 }
 
+type CampusRow = { name: string; lat: string; lng: string; radiusM: string };
+
 function ConfigForm({ config, reload }: { config: GameConfigDoc; reload: () => void }) {
   const [startAt, setStartAt] = useState(toIstInput(config.startAt.toMillis()));
   const [lockAt, setLockAt] = useState(toIstInput(config.lockAt.toMillis()));
-  const [lat, setLat] = useState(String(config.campusLat));
-  const [lng, setLng] = useState(String(config.campusLng));
-  const [radius, setRadius] = useState(String(config.campusRadiusM));
+  const [campuses, setCampuses] = useState<CampusRow[]>(
+    (config.campuses ?? []).map((c) => ({ name: c.name, lat: String(c.lat), lng: String(c.lng), radiusM: String(c.radiusM) })),
+  );
   const rulesNow = { ...DEFAULT_RULES, ...config.rules };
   const [rules, setRules] = useState<Record<string, string>>(
     Object.fromEntries(Object.entries(rulesNow).map(([k, v]) => [k, String(v)])),
@@ -145,9 +148,7 @@ function ConfigForm({ config, reload }: { config: GameConfigDoc; reload: () => v
       await api.adminSetConfig({
         startAt: fromIstInput(startAt),
         lockAt: fromIstInput(lockAt),
-        campusLat: Number(lat),
-        campusLng: Number(lng),
-        campusRadiusM: Number(radius),
+        campuses: campuses.map((c) => ({ name: c.name.trim(), lat: Number(c.lat), lng: Number(c.lng), radiusM: Number(c.radiusM) })),
         ...(Object.keys(changedRules).length ? { rules: changedRules } : {}),
       });
       reload();
@@ -166,20 +167,51 @@ function ConfigForm({ config, reload }: { config: GameConfigDoc; reload: () => v
           Play locks (IST)
           <input type="datetime-local" value={lockAt} onChange={(e) => setLockAt(e.target.value)} required name="lockAt" />
         </label>
-        <div className="row admin-pair">
-          <label className="field">
-            Campus lat
-            <input inputMode="decimal" value={lat} onChange={(e) => setLat(e.target.value)} required name="campusLat" />
-          </label>
-          <label className="field">
-            Campus lng
-            <input inputMode="decimal" value={lng} onChange={(e) => setLng(e.target.value)} required name="campusLng" />
-          </label>
-        </div>
-        <label className="field">
-          Campus radius (m)
-          <input inputMode="numeric" value={radius} onChange={(e) => setRadius(e.target.value)} required name="campusRadiusM" />
-        </label>
+        <fieldset className="stack campus-list">
+          <legend>Campuses (on campus = inside any of them)</legend>
+          {campuses.map((c, i) => {
+            const set = (k: keyof CampusRow) => (e: ChangeEvent<HTMLInputElement>) =>
+              setCampuses((list) => list.map((x, j) => (j === i ? { ...x, [k]: e.target.value } : x)));
+            return (
+              <div className="stack campus-row" key={i} data-campus={i}>
+                <div className="row admin-pair">
+                  <label className="field">
+                    Name
+                    <input value={c.name} onChange={set("name")} required name={`campus-${i}-name`} />
+                  </label>
+                  <label className="field">
+                    Radius (m)
+                    <input inputMode="numeric" value={c.radiusM} onChange={set("radiusM")} required name={`campus-${i}-radiusM`} />
+                  </label>
+                </div>
+                <div className="row admin-pair">
+                  <label className="field">
+                    Lat
+                    <input inputMode="decimal" value={c.lat} onChange={set("lat")} required name={`campus-${i}-lat`} />
+                  </label>
+                  <label className="field">
+                    Lng
+                    <input inputMode="decimal" value={c.lng} onChange={set("lng")} required name={`campus-${i}-lng`} />
+                  </label>
+                </div>
+                {campuses.length > 1 && (
+                  <button type="button" className="btn secondary" onClick={() => setCampuses((list) => list.filter((_, j) => j !== i))}>
+                    Remove {c.name || `campus ${i + 1}`}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+          {campuses.length < MAX_CAMPUSES && (
+            <button
+              type="button"
+              className="btn secondary"
+              onClick={() => setCampuses((list) => [...list, { name: "", lat: "", lng: "", radiusM: "500" }])}
+            >
+              Add campus
+            </button>
+          )}
+        </fieldset>
         <details>
           <summary>Game rules (SPEC §2)</summary>
           <div className="rules-grid">

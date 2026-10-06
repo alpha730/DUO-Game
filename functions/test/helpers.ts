@@ -16,8 +16,8 @@ export const adb = adminFirestore(admin);
 export const adminAuth = getAdminAuth(admin);
 
 export const istToday = () => new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().slice(0, 10);
-/** Inside the seeded (huge) campus radius. */
-export const CAMPUS = { lat: 26.7838, lng: 75.8225 };
+/** At the seeded JECRC Foundation campus (scripts/campuses.ts). */
+export const CAMPUS = { lat: 26.7838, lng: 75.8301 };
 
 const apps: FirebaseApp[] = [];
 let n = 0;

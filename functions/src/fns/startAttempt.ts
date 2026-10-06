@@ -43,7 +43,7 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
     throw new HttpsError("invalid-argument", "Unknown raid.");
   }
   if (!isValidLatLng(lat, lng)) throw new HttpsError("invalid-argument", "We need your location.", { code: "bad-location" });
-  if (campusCheck(lat as number, lng as number, config, isEmulator()) === "off-campus") {
+  if (campusCheck(lat as number, lng as number, config.campuses ?? [], isEmulator()) === "off-campus") {
     fail("off-campus", "You need to be on campus to catch Lingos.");
   }
 

@@ -254,7 +254,7 @@ const DARK: BrandColors = {
 /** The look before official branding (kept for a one-line revert). */
 export const PLACEHOLDER: BrandSet = {
   appName: "Decade Hunt",
-  campaignName: "10 years · 10 Lingos · 1 campus",
+  campaignName: "10 years · 10 Lingos · 2 campuses",
   tagline: "Ten posters are hiding Lingos. Find them, catch them, top the board!",
   partnerName: "the English Test",
   creatureName: "Lingo",

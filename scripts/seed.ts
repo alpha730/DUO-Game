@@ -1,7 +1,7 @@
 // Seeds lingos, config/game and prizes; on the emulator also the question pool (SPEC §9).
 //   Emulator (default):  npx tsx scripts/seed.ts
 //   Real launch dates:   npx tsx scripts/seed.ts --real-dates
-//   Production:          GOOGLE_APPLICATION_CREDENTIALS=key.json npx tsx scripts/seed.ts --prod --project <id> --real-dates --campus <lat>,<lng>,<radiusM>
+//   Production:          GOOGLE_APPLICATION_CREDENTIALS=key.json npx tsx scripts/seed.ts --prod --project <id> --real-dates
 //                        then: npx tsx scripts/loadQuestions.ts --prod --project <id>
 // Production never gets questions from the seed (scripts/loadQuestions.ts loads them, and a re-seed
 // must never touch them).
@@ -15,6 +15,7 @@ import {
   type LingoDoc,
   type PrizeDoc,
 } from "../shared/types";
+import { CAMPUSES } from "./campuses";
 import { LINGOS, lingoId } from "./lingos";
 import { writeQuestionPool } from "./questionPool";
 
@@ -23,12 +24,6 @@ const prod = args.includes("--prod");
 const realDates = args.includes("--real-dates");
 const projectArg = args.indexOf("--project");
 const projectId = projectArg >= 0 ? args[projectArg + 1] : "demo-decade-hunt";
-const campusArg = args.indexOf("--campus");
-const campus = campusArg >= 0 ? args[campusArg + 1].split(",").map(Number) : null;
-if (campus && (campus.length !== 3 || campus.some((n) => !Number.isFinite(n)) || campus[2] < 50)) {
-  throw new Error("--campus needs <lat>,<lng>,<radiusM>, e.g. --campus 26.7838,75.8225,600");
-}
-if (prod && !campus) throw new Error("--prod needs the real campus: --campus <lat>,<lng>,<radiusM>");
 
 if (!prod) process.env.FIRESTORE_EMULATOR_HOST ??= "127.0.0.1:8085";
 if (prod && projectId.startsWith("demo-")) throw new Error("--prod needs --project <real project id>");
@@ -55,18 +50,16 @@ async function main() {
     batch.set(db.collection(COL.lingos).doc(lingoId(year)), lingo);
   });
 
-  // DECISION: the emulator seed opens the game from today 00:00 IST and uses a huge campus radius
-  // so everything is testable off-campus right now. --real-dates uses launch dates (SPEC/CLAUDE.md).
+  // DECISION: the emulator seed opens the game from today 00:00 IST (the emulator also lets
+  // off-campus players through, see functions/src/lib/geo.ts) so everything is testable now.
+  // --real-dates uses launch dates (SPEC/CLAUDE.md).
   const startAt = realDates ? `2026-10-10T00:00:00${IST}` : `${today}T00:00:00${IST}`;
   const lockAt = `2026-10-22T12:00:00${IST}`;
   const config: GameConfigDoc = {
     startAt: Timestamp.fromDate(new Date(startAt)),
     lockAt: Timestamp.fromDate(new Date(lockAt)),
     locked: false,
-    // Emulator default: around JECRC, Sitapura, Jaipur with a huge radius (playable from anywhere).
-    campusLat: campus?.[0] ?? 26.7838,
-    campusLng: campus?.[1] ?? 75.8225,
-    campusRadiusM: campus?.[2] ?? 20_000_000,
+    campuses: CAMPUSES, // both JECRC campuses (scripts/campuses.ts); editable in /admin
     rules: DEFAULT_RULES, // exactly SPEC §2 (see shared/types.ts)
   };
   batch.set(db.collection(COL.config).doc(DOC.gameConfig), config);

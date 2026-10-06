@@ -39,15 +39,20 @@ describe("admin", () => {
     const a = await admin();
     await keepingConfig(async () => {
       const before = await config();
-      await setConfig(a, { campusRadiusM: 750, rules: { attemptsPerDay: 5 } });
+      const campuses = [
+        { name: "JECRC Foundation", lat: 26.7838, lng: 75.8301, radiusM: 750 },
+        { name: "JECRC University", lat: 26.7759236, lng: 75.8745013, radiusM: 600 },
+      ];
+      await setConfig(a, { campuses, rules: { attemptsPerDay: 5 } });
       const after = await config();
-      expect(after.campusRadiusM).toBe(750);
+      expect(after.campuses).toEqual(campuses);
       expect(after.rules).toEqual({ ...before.rules, attemptsPerDay: 5 }); // other rules untouched
       const lockAt = before.lockAt.toMillis() + 3_600_000;
       await setConfig(a, { lockAt });
       expect((await config()).lockAt.toMillis()).toBe(lockAt);
       await expect(setConfig(a, { startAt: lockAt + 1 })).rejects.toMatchObject({ details: { code: "bad-config" } });
       await expect(setConfig(a, { rules: { nope: 1 } as never })).rejects.toMatchObject({ details: { code: "bad-config" } });
+      await expect(setConfig(a, { campuses: [] })).rejects.toMatchObject({ details: { code: "bad-config" } });
     });
   });
 

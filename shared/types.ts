@@ -188,14 +188,23 @@ export const DEFAULT_RULES: GameRules = {
   raidCatchPoints: 150,
 };
 
+/** One campus: players count as "on campus" within radiusM metres of its centre. */
+export interface Campus {
+  name: string;
+  lat: number;
+  lng: number;
+  radiusM: number;
+}
+/** DECISION: a few campuses at most (JECRC has two); every one has all 10 posters. */
+export const MAX_CAMPUSES = 4;
+
 /** config/game — signed-in read */
 export interface GameConfigDoc {
   startAt: FireTimestamp;
   lockAt: FireTimestamp;
   locked: boolean;
-  campusLat: number;
-  campusLng: number;
-  campusRadiusM: number;
+  /** On campus = inside any of these (1–MAX_CAMPUSES). */
+  campuses: Campus[];
   rules: GameRules;
 }
 
@@ -516,9 +525,8 @@ export interface AdminSetConfigInput {
   startAt?: number;
   lockAt?: number;
   locked?: boolean;
-  campusLat?: number;
-  campusLng?: number;
-  campusRadiusM?: number;
+  /** Replaces the whole list. */
+  campuses?: Campus[];
   rules?: Partial<GameRules>;
 }
 

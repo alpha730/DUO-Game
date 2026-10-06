@@ -1,7 +1,7 @@
 # Decade Hunt — Spec
 
 ## 1. The game in short
-- 10 posters on campus, one per DET year (2016–2025). Each poster = one Lingo.
+- 10 posters on **each of the two JECRC campuses** (JECRC Foundation, JECRC University — the same 10 at both), one per DET year (2016–2025). Each poster = one Lingo.
 - Scan a poster → its Lingo appears on the camera → tap **Catch it** → one timed challenge.
 - Each try asks one question from a shared **question pool** (§9), picked by the server:
   - **meaning** — "What is the closest meaning of “word”?", 4 options (15 s) — 40 % of picks
@@ -43,7 +43,7 @@
 | **Speed bonus** (every correct answer, incl. raids) | +1 per full second left on the server timer: `floor((expiresAt − receivedAt)/1000)`, clamped 0…timer length |
 | Wrong / failed / forfeited try | 0 points (and that Lingo is used for the day — 1 of the 4) |
 | Logging in, opening the app, days played | 0 points |
-| Location check | must be within `campusRadiusM` of campus centre (on the **emulators only** an off-campus player is let through with a logged warning, for testing from home; never skipped in production) |
+| Location check | must be within `radiusM` of **any** campus centre in `config.campuses` (both JECRC campuses, 500 m each to start; editable in /admin) (on the **emulators only** an off-campus player is let through with a logged warning, for testing from home; never skipped in production) |
 
 **Favourite streak:** +1 when the favourite is caught on the IST day right after its last catch. A missed day resets the streak to 0, but **levels never go down**. MAX is permanent once reached.
 **Choosing favourites:** after a user's first 2 catches, the app asks them to pick 2 favourites from Lingos they have caught. Until then no streaks count. Last day a 10-day streak can still be completed: start by Oct 12.
@@ -88,7 +88,7 @@ The same order picks the top 20 for the final round. The live final round on Oct
 | `users/{uid}` | name, email, points, triedToday (lingoId[]) + triedDate (one try per Lingo per day), seenQ (question ids asked, never repeated), wordsToday + wordsDate (words asked today), openAttemptId? (the one open attempt; no queries on `attempts` in transactions), flags? (too-fast answers), suspect? (≥ 10 wins, ≥ 95 % accuracy, avg < 3 s), attemptsToday, attemptsDate, dayStreak, lastPlayDate, lingosCaught (number), allTenBonus (bool), favorites (lingoId[] max 2), favoriteChangesLeft (1), wins, losses, totalAnswerMs, pointsReachedAt, profileDone, createdAt | owner only |
 | `users/{uid}/catches/{lingoId}` | firstCaughtAt, timesCaught, lastCaughtDate, level (1\|2\|3\|'MAX'), favStreak, maxBonusGiven (bool) | owner only |
 | `lingos/{lingoId}` | name, detYear, posterIndex (0–9), modelUrl, rarity, color | signed-in |
-| `config/game` | startAt, lockAt, locked, campusLat, campusLng, campusRadiusM, rules (table above) | signed-in |
+| `config/game` | startAt, lockAt, locked, campuses ({name, lat, lng, radiusM}[], 1–4; seeded from `scripts/campuses.ts`), rules (table above) | signed-in |
 | `questions/{id}` | the pool (§9): level ('medium'\|'hard'), type ('meaning'\|'question'\|'pronounce'), word? (meaning/pronounce), prompt? + target? (question), options? (4), correctIndex?, accept? (pronounce), explanation | **never** |
 | `challenges/raid_{raidId}` | an Owl Raid's own challenge: type ('pronounce'\|'speak'\|'meaning'\|'question'), word?, accept?, phrase?, prompt?, options? (4), correctIndex? (the old `challenges/{date}_{lingoId}` docs are no longer used) | **never** |
 | `attempts/{id}` | uid, lingoId, date, type, raidId?, questionId? + level? (pool question), question (server-only copy of what was asked, scored by submitAttempt), startedAt, expiresAt, status ('open'\|'won'\|'failed'\|'forfeit'), score?, receivedAt?, answerMs?, speedBonus?, flagged?, flagReason? | **never** |

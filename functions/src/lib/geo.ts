@@ -1,3 +1,5 @@
+import type { Campus } from "../shared/types";
+
 const EARTH_RADIUS_M = 6_371_000;
 const rad = (deg: number) => (deg * Math.PI) / 180;
 
@@ -24,28 +26,25 @@ export function isValidLatLng(lat: unknown, lng: unknown): boolean {
 export const isEmulator = () => process.env.FUNCTIONS_EMULATOR === "true";
 
 /**
- * Campus location check (SPEC §2). DECISION (user request): on the emulators an off-campus player
- * is let through with a warning so the game can be played from home; in production it's refused.
+ * Campus location check (SPEC §2): on campus = inside any campus's radius. DECISION (user request):
+ * on the emulators an off-campus player is let through with a warning so the game can be played
+ * from home; in production it's refused.
  */
 export function campusCheck(
   lat: number,
   lng: number,
-  campus: { campusLat: number; campusLng: number; campusRadiusM: number },
+  campuses: Campus[],
   emulator: boolean,
 ): "on-campus" | "skipped" | "off-campus" {
-  if (isOnCampus(lat, lng, campus)) return "on-campus";
+  if (isOnCampus(lat, lng, campuses)) return "on-campus";
   if (emulator) {
-    const m = Math.round(distanceM(lat, lng, campus.campusLat, campus.campusLng));
-    console.warn(`[emulator] off campus by ${m} m (radius ${campus.campusRadiusM} m) — check skipped; enforced in production`);
+    const away = campuses.map((c) => `${c.name} ${Math.round(distanceM(lat, lng, c.lat, c.lng))} m (radius ${c.radiusM} m)`);
+    console.warn(`[emulator] off campus: ${away.join(", ") || "no campuses set"} — check skipped; enforced in production`);
     return "skipped";
   }
   return "off-campus";
 }
 
-export function isOnCampus(
-  lat: number,
-  lng: number,
-  campus: { campusLat: number; campusLng: number; campusRadiusM: number },
-): boolean {
-  return distanceM(lat, lng, campus.campusLat, campus.campusLng) <= campus.campusRadiusM;
+export function isOnCampus(lat: number, lng: number, campuses: Campus[]): boolean {
+  return campuses.some((c) => distanceM(lat, lng, c.lat, c.lng) <= c.radiusM);
 }

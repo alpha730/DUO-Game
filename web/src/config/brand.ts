@@ -122,6 +122,8 @@ export interface BrandSet {
   creatureName: string;
   raidName: string;
   campusName: string;
+  /** Scan screen hint while looking for a poster (aim at the art, not the shared header/footer). */
+  scanHint: string;
   themes: { light: BrandColors; dark: BrandColors };
   /** CSS font-family stack for body text. */
   fontFamily: string;
@@ -260,6 +262,7 @@ export const PLACEHOLDER: BrandSet = {
   creatureName: "Lingo",
   raidName: "Owl Raid",
   campusName: "JECRC",
+  scanHint: "Point at the Lingo in the middle of the poster",
   themes: { light: LIGHT, dark: DARK },
   fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
   // Nunito (SIL Open Font License, web/public/fonts/OFL-Nunito.txt) — not a brand font.
@@ -316,6 +319,7 @@ export const OFFICIAL: BrandSet = {
   appName: PLACEHOLDER.appName, // the game's own name — not a Duolingo mark
   campaignName: pending("campaign name", PLACEHOLDER.campaignName),
   partnerName: "Duolingo English Test", // approved (rule 8)
+  scanHint: "Point at Duo in the middle of the poster", // every final poster shows Duo
   themes: pending("colours", PLACEHOLDER.themes),
   fontFamily: officialFonts.length ? `BrandFont, ${PLACEHOLDER.fontFamily}` : PLACEHOLDER.fontFamily,
   displayFontFamily: officialFonts.length ? `BrandFont, ${PLACEHOLDER.displayFontFamily}` : PLACEHOLDER.displayFontFamily,

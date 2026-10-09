@@ -155,7 +155,8 @@ Roles = custom claims `{role:'admin'|'volunteer'}` set by `scripts/setRole.ts`.
 Bottom nav: Home · Dex · [raised round Scan button] · Ranks (leaderboard) · Me; Scan itself is full screen. Large tap targets (≥ 48 px). Works in portrait only. Light and dark theme follow the phone; all colours come from `web/src/config/brand.ts`. Haptics (where supported) and short sounds (mute on Me).
 
 ## 8. AR details
-- Build `targets.mind` from the 10 poster images with the MindAR compiler; target index = `posterIndex`.
+- Build `targets.mind` from the 10 final posters (`assets/posters/final/poster-01…10.png` = posterIndex 0–9) with `web/compile-targets.html` (MindAR compiler, 1000 px wide); target index = `posterIndex`. Print versions are higher-res copies of the same design — no recompile needed.
+- Every poster shares the "DECADE HUNT" header and the quote-box frame, so the compiler paints the top 24 % and bottom 20 % flat first: only the middle (Duo + background) is matched, and a header or footer alone never counts as a poster. Scan hint: "Point at Duo in the middle of the poster" (`brand.ts` `scanHint`).
 - On `targetFound(i)` → load `lingos` where posterIndex == i → show its `.glb` with a gentle idle bob; show "Catch it".
 - If the user already tried this Lingo today → "Tried today ✓" (caught) or "Tried today ✗ — back tomorrow" (failed/forfeit); if 4 Lingos tried today → "You've tried 4 Lingos today — come back tomorrow". Otherwise "Catch it" (favourites also show their streak, e.g. "🔥 Day 4 — keep it going").
 - Stop camera + dispose three.js scene when leaving `/scan`.

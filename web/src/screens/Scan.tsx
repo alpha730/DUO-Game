@@ -248,7 +248,7 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
               </div>
             )}
             {status === "scanning" && !lingo && bareposter === null && (
-              <p className="ar-hint">Point at a {BRAND.appName} poster</p>
+              <p className="ar-hint">{BRAND.scanHint}</p>
             )}
             {status === "scanning" && bareposter !== null && (
               <section className="scan-card" role="status" data-kind="noGameData">

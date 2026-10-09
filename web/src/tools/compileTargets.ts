@@ -10,10 +10,17 @@ let images: HTMLImageElement[] = [];
 
 // Posters are scaled down to this width before compiling: full-size renders give a huge targets.mind.
 // Override with ?width=<px> (0 = no resize).
-// DECISION: 600 px — tested 400/600/800 at 1–3 m, angled, blurred and dim: all tracked equally well, and
-// 600 is the smallest of the two shortlisted widths (7.0 MB raw, 2.4 MB with brotli for 10 posters).
-const DEFAULT_WIDTH = 600;
-const WIDTH = Number(new URLSearchParams(location.search).get("width") ?? DEFAULT_WIDTH);
+// Final posters (assets/posters/final, 1131×1600): compiled at 1000 px wide (user, Oct 9).
+const DEFAULT_WIDTH = 1000;
+const params = new URLSearchParams(location.search);
+const WIDTH = Number(params.get("width") ?? DEFAULT_WIDTH);
+
+// Every final poster has the same "DECADE HUNT" header and the same quote-box frame at the bottom.
+// Those bands are painted flat (no features) before compiling, so only the middle (Duo + background,
+// different on every poster) is ever matched — a header or footer alone can't be taken for the wrong
+// poster — and targets.mind is ~35 % smaller. Top % and bottom %; ?mask=0,0 turns it off.
+// DECISION: 24 % / 20 % — checked on the final posters (header ends at ~24 %, quote box starts at ~80 %).
+const [MASK_TOP, MASK_BOTTOM] = (params.get("mask") ?? "24,20").split(",").map((n) => Number(n) / 100);
 
 function loadImage(file: File) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -26,11 +33,16 @@ function loadImage(file: File) {
 
 async function shrink(img: HTMLImageElement): Promise<HTMLImageElement> {
   const scale = WIDTH > 0 ? Math.min(1, WIDTH / img.naturalWidth) : 1;
-  if (scale === 1) return img;
+  if (scale === 1 && !MASK_TOP && !MASK_BOTTOM) return img;
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(img.naturalWidth * scale);
   canvas.height = Math.round(img.naturalHeight * scale);
-  canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#808080";
+  ctx.fillRect(0, 0, canvas.width, Math.round(canvas.height * MASK_TOP));
+  const bottom = Math.round(canvas.height * MASK_BOTTOM);
+  ctx.fillRect(0, canvas.height - bottom, canvas.width, bottom);
   const out = new Image();
   out.src = canvas.toDataURL("image/png");
   await out.decode();
@@ -49,7 +61,8 @@ input.addEventListener("change", async () => {
   button.disabled = images.length === 0;
   status.textContent =
     `${images.length} image(s) → posterIndex 0–${images.length - 1}, ` +
-    `compiled at ${images[0]?.naturalWidth}×${images[0]?.naturalHeight}`;
+    `compiled at ${images[0]?.naturalWidth}×${images[0]?.naturalHeight}, ` +
+    `header/footer masked ${Math.round(MASK_TOP * 100)} %/${Math.round(MASK_BOTTOM * 100)} %`;
 });
 
 button.addEventListener("click", async () => {

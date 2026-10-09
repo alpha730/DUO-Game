@@ -203,8 +203,7 @@ export default function Catch() {
       setNeedsSpeech(code === "needs-speech");
       setErrorCode(code ?? (err as { code?: string }).code ?? "");
       setClosed(["raid-tried", "raid-ended", "not-joined", "already-tried", "no-attempts"].includes(code ?? ""));
-      // The server names the Lingo by its id-level name; show the brand's display name instead.
-      setError(code === "already-tried" ? `You've already tried ${name} today — come back tomorrow` : apiErrorMessage(err));
+      setError(apiErrorMessage(err)); // names the Lingo by its stored name (= the brand's display name)
       setPhase("ready");
     }
   }

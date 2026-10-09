@@ -10,7 +10,7 @@ Then load the questions: `npx tsx scripts/loadQuestions.ts --prod --project deca
 
 1. Open **https://decade-hunt-66f6e.web.app** → logo + "Decade Hunt" shows within ~1 s, then the sign-in screen.
 2. **Continue with Google** (or Create an account → tap the link in the email → "I've verified") → type your name → **Start hunting** → Home shows "Lingos left today: 4/4" and 10 empty slots. *Time it: under 5 s on mobile data.*
-3. **Scan** → Allow camera → hold the phone ~1 m from poster 3 → within ~2 s Zari appears on the poster with a name chip. *First scan on mobile data: note the seconds.*
+3. **Scan** → Allow camera → hold the phone ~1 m from poster 3 → within ~2 s Winking Duo appears on the poster with a name chip. *First scan on mobile data: note the seconds.*
 4. Tap **Catch** → Allow microphone + location → **Start** → a question from the pool ("What is the closest meaning of…", a fill-in-the-blank, or a word to say) → answer → "+1xx" with confetti; after a meaning/fill-in question the result shows **the right answer + what it means**. Home: 1 caught, "Lingos left today: 3/4".
 5. Keep catching until you get a *say this word* question → say it → result within ~2 s; a slightly wrong recognition of a long word still counts. *(iPhone: Settings › Safari › Microphone = Allow.)* Over the 4 tries no question and no word repeats.
 6. **Start** another Lingo, then press Home / switch app / lock the screen mid-challenge → come back → "Chance lost", Lingos left went down by 1; scanning that poster again says "Tried today ✗ — back tomorrow".

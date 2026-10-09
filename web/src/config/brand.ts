@@ -333,18 +333,19 @@ export const OFFICIAL: BrandSet = {
     celebrate: supplied("mascot: celebrate", "mascots/celebrate.png", PLACEHOLDER.mascots.celebrate),
     oops: supplied("mascot: oops (error states)", "mascots/oops.png", PLACEHOLDER.mascots.oops),
   },
-  // The characters on the official posters (assets/posters/official), posterIndex 0–9 = 2016–2025.
+  // Duo's moods on the final posters (assets/posters/final), posterIndex 0–9 = 2016–2025. Same names
+  // as the lingos collection (scripts/lingos.ts), so server messages match what the app shows.
   lingoNames: {
-    "lingo-2016": "Duo",
-    "lingo-2017": "Lily",
-    "lingo-2018": "Zari",
-    "lingo-2019": "Bea",
-    "lingo-2020": "Vikram",
-    "lingo-2021": "Junior",
-    "lingo-2022": "Oscar",
-    "lingo-2023": "Eddy",
-    "lingo-2024": "Lin",
-    "lingo-2025": "Lucy",
+    "lingo-2016": "Rookie Duo",
+    "lingo-2017": "Curious Duo",
+    "lingo-2018": "Winking Duo",
+    "lingo-2019": "Thumbs-Up Duo",
+    "lingo-2020": "Fierce Duo",
+    "lingo-2021": "Lovestruck Duo",
+    "lingo-2022": "Joyful Duo",
+    "lingo-2023": "Bookworm Duo",
+    "lingo-2024": "Cool Duo",
+    "lingo-2025": "Champion Duo",
   },
   // Character art per Lingo (assets/brand/mascots/lingo-<year>.png), only where supplied.
   lingoArt: Object.fromEntries(

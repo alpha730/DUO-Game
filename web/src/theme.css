@@ -985,19 +985,19 @@ a {
 }
 
 .scan-card-kicker {
-  font-size: 0.78rem;
+  font-size: clamp(0.7rem, 3.4vw, 0.78rem);
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
   color: var(--primary-text);
 }
 
+/* Long names ("Thumbs-Up Duo", "Lovestruck Duo") wrap to a second line instead of being cut off. */
 .scan-card h2 {
   margin: 0;
-  font-size: 1.6rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: clamp(1.3rem, 6.5vw, 1.6rem);
+  line-height: 1.1;
 }
 
 .scan-card-meta {
@@ -1812,6 +1812,7 @@ a {
 
 .fav-card-name {
   display: flex;
+  flex-wrap: wrap; /* a long name takes the line; the level badge drops below it */
   align-items: center;
   justify-content: space-between;
   gap: 6px;
@@ -1819,11 +1820,10 @@ a {
 }
 
 .fav-card-name strong {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  line-height: 1.15;
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: clamp(0.92rem, 4.4vw, 1.05rem);
 }
 
 .fav-streak {
@@ -1900,14 +1900,18 @@ a {
   height: 52px;
 }
 
+/* Two lines ("Lovestruck / Duo"); min-height keeps every tile the same height. */
 .slot-name {
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-height: 2.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.1;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 0.8rem;
+  font-size: 0.74rem;
 }
 
 .lingo-slot[data-caught="false"] .slot-name {
@@ -3060,12 +3064,11 @@ a {
 
 .dex-card-name {
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  text-align: center;
+  line-height: 1.1;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 1.1rem;
+  font-size: clamp(0.95rem, 4.6vw, 1.1rem);
 }
 
 .dex-card[data-caught="false"] .dex-card-name {
@@ -3088,7 +3091,7 @@ a {
 .dex-times {
   position: absolute;
   right: 10px;
-  bottom: 50px;
+  top: 82px; /* bottom-right of the art, clear of a two-line name */
   padding: 0 7px;
   border-radius: 999px;
   background: var(--surface);

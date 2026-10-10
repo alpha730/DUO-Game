@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { LINGO_COUNT, type CatchView, type GetMyStateOutput } from "@shared/types";
+import CoBrand from "../components/CoBrand";
 import EmptyState from "../components/EmptyState";
 import Hud from "../components/Hud";
 import { ScanIcon } from "../components/Icons";
 import LevelBadge from "../components/LevelBadge";
 import LingoArt from "../components/LingoArt";
 import LingoPips from "../components/LingoPips";
+import Mascot from "../components/Mascot";
 import RaidBanner from "../components/RaidBanner";
 import { BRAND, lingoName } from "../config/brand";
 import { useAuth } from "../lib/auth";
@@ -79,23 +81,25 @@ export default function Home() {
 
   return (
     <main className="screen with-nav stack home">
+      <header className="topbar">
+        <CoBrand />
+      </header>
       <Hud state={me} />
 
-      <section className="scan-hero" aria-label="Scan">
-        <p className="home-greet">
-          Hi {firstName} <span aria-hidden="true">👋</span>
-        </p>
-        <Link to="/scan" className="scan-hero-btn" aria-label="Scan a poster">
-          <span className="radar" aria-hidden="true" />
-          <span className="radar r2" aria-hidden="true" />
-          <span className="radar r3" aria-hidden="true" />
-          <span className="scan-hero-core">
-            <ScanIcon size={46} />
-            <span className="scan-hero-label">
-              Scan a<br />
-              poster
-            </span>
-          </span>
+      {/* DET-style hero: one clear heading, one clear action. */}
+      <section className="home-hero card" aria-label="Scan">
+        <div className="home-hero-top">
+          <div className="home-hero-text">
+            <p className="eyebrow">
+              Hi {firstName} <span aria-hidden="true">👋</span>
+            </p>
+            <h1>Ready to show your English?</h1>
+            <p className="muted">Scan a poster on campus to meet a {BRAND.creatureName}.</p>
+          </div>
+          <Mascot slot="hero" mood="happy" className="home-hero-art" />
+        </div>
+        <Link to="/scan" className="btn big scan-hero-btn" aria-label="Scan a poster">
+          <ScanIcon size={24} /> Scan a poster
         </Link>
         {me && <LingoPips left={me.attemptsLeft} total={me.attemptsPerDay} />}
       </section>

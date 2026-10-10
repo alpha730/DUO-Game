@@ -1627,110 +1627,63 @@ a {
   gap: 18px;
 }
 
-.scan-hero {
-  position: relative;
+.home-hero {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin: 0 -16px;
-  padding: 4px 16px 6px;
-  overflow: hidden;
-  background: radial-gradient(circle at 50% 52%, var(--bg-alt) 0, transparent 62%);
+  align-items: stretch;
+  gap: 14px;
+  padding: 18px 16px 16px;
 }
 
-.home-greet {
+.home-hero-top {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.home-hero-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.home-hero h1 {
+  margin: 0 0 6px;
+  font-size: clamp(1.45rem, 7vw, 1.75rem);
+  line-height: 1.12;
+}
+
+.home-hero-text p.muted {
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 1.15rem;
-  color: var(--muted);
 }
 
-.scan-hero-btn {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: min(58vw, 216px);
-  aspect-ratio: 1;
-  margin: 26px auto 30px;
-  border-radius: 50%;
-  text-decoration: none;
-  color: var(--on-primary);
+.home-hero .home-hero-art {
+  flex: none;
+  width: 84px;
 }
 
-.scan-hero-core {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: var(--primary);
-  border: 6px solid color-mix(in srgb, var(--on-primary) 12%, var(--primary));
-  box-shadow:
-    inset 0 -12px 0 rgb(0 0 0 / 0.12),
-    inset 0 12px 24px rgb(255 255 255 / 0.3),
-    0 8px 0 var(--primary-dark),
-    0 18px 44px var(--primary-glow);
-  animation: hero-pulse 2.2s ease-in-out infinite;
-  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+.home-hero .attempts-pill {
+  align-self: center;
 }
 
-.scan-hero-btn:active .scan-hero-core {
-  animation: none;
-  transform: translateY(8px);
-  box-shadow:
-    inset 0 -6px 0 rgb(0 0 0 / 0.12),
-    inset 0 12px 24px rgb(255 255 255 / 0.3),
-    0 0 0 var(--primary-dark),
-    0 8px 20px var(--primary-glow);
-}
-
-.scan-hero-label {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 1.45rem;
-  line-height: 1.05;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.radar {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 3px solid var(--primary);
-  opacity: 0;
-  animation: radar 2.7s ease-out infinite;
-}
-
-.radar.r2 {
-  animation-delay: 0.9s;
-}
-
-.radar.r3 {
-  animation-delay: 1.8s;
-}
-
-@keyframes radar {
-  0% {
-    transform: scale(0.96);
-    opacity: 0.7;
+@media (max-width: 350px) {
+  .home-hero .home-hero-art {
+    display: none;
   }
-  100% {
-    transform: scale(1.55);
-    opacity: 0;
-  }
-}
 
-@keyframes hero-pulse {
-  50% {
-    transform: scale(1.035);
+  .home-hero .attempts-pill {
+    gap: 7px;
+    padding: 7px 12px;
+    font-size: 0.86rem;
+    white-space: nowrap;
+  }
+
+  .home-hero .pips {
+    gap: 4px;
+  }
+
+  .home-hero .pips i {
+    width: 12px;
+    height: 12px;
   }
 }
 
@@ -1773,7 +1726,6 @@ a {
 .pips i[data-on="true"] {
   background: var(--primary);
   border-color: var(--primary-dark);
-  box-shadow: 0 0 8px var(--primary-glow);
 }
 
 /* Favourite cards */

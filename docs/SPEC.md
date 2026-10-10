@@ -147,7 +147,7 @@ Roles = custom claims `{role:'admin'|'volunteer'}` set by `scripts/setRole.ts`.
 | `/scan` | AR | full-screen camera + MindAR (`/assets/targets.mind`, 10 targets), small top HUD + close X; target found → ring snaps to the poster, that Lingo's model pops in, bottom sheet with "Catch it" |
 | `/catch/:lingoId` | Challenge | pre-flight (mic + location) → Start → the Lingo in a circular timer ring, question in its speech bubble → pronounce / speak (giant mic + live transcript) or meaning / question (4 big buttons) → result (win: count-up + breakdown, big moments on a full-screen card) |
 | `/leaderboard` | Rankings | Students only: podium for the top 3, then rank / name / points; own rank pinned at bottom |
-| `/rules` | Game rules | public (no sign-in): every rule + number in tables (daily limits, questions + timers, points, favourites + levels, raids, fair play, leaderboard + final), from the live `config/game` rules when signed in; linked from Login, Home and Me |
+| `/rules` | Game rules | public (no sign-in): every rule + number in tables (daily limits, questions + timers, points, favourites + levels, raids, fair play), from the live `config/game` rules when signed in; linked from Login, Home and Me |
 | `/me` | Profile | profile card (level, streak, points, accuracy, avg time), QR of uid (for prizes), share card button, sound on/off, logout |
 | `/admin` | Admin | config, upload the question pool (JSON) + counts per level/type, create raid, stats, lock game, suspicious players (on click), top-20 CSV export with flags (role admin) |
 | `/redeem` | Volunteer | scan QR → user + balance → pick prize → confirm (role volunteer/admin) |

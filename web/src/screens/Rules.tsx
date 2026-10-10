@@ -142,17 +142,6 @@ export default function Rules() {
         ]}
       />
 
-      <Table
-        id="leaderboard"
-        title="Leaderboard and final"
-        rows={[
-          ["Ranking", "Points, then accuracy, then average answer time, then who got there first"],
-          ["Updates", "Every 10 minutes"],
-          ["Play ends", <><strong>Oct 22, 12:00 IST</strong></>],
-          ["Final round", <>The <strong>top 20</strong> meet on stage on Oct 22 afternoon</>],
-        ]}
-      />
-
       <button className="btn big" onClick={back} data-rules-back>
         Got it
       </button>

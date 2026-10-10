@@ -3052,11 +3052,6 @@ body:has(.catch[data-phase="submitting"]) {
   padding-left: 20px;
   color: var(--danger-text);
 }
-.btn.danger {
-  background: var(--danger);
-  color: var(--on-primary);
-  box-shadow: none;
-}
 
 /* ---------- Share card on Me (PLAN 7.5) ---------- */
 .share-card {

@@ -81,7 +81,7 @@ export async function drawShareCard(canvas: HTMLCanvasElement, s: ShareStats): P
 
   text(`${fmt(s.points)} pts`, 1480, 120, c.gold, 900);
   text(s.name, 1600, 52, c.text, 600);
-  text(`${BRAND.campusName} · ${BRAND.partnerName}`, 1800, 36, c.text, 600);
+  text(BRAND.coBrandShort, 1800, 40, c.primaryText, 800); // "DET × JECRC · 10 Years"
 }
 
 export function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {

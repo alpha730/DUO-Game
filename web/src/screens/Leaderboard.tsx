@@ -5,6 +5,7 @@ import { api, apiErrorMessage } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { usingEmulators } from "../lib/firebase";
 import Hud from "../components/Hud";
+import { BRAND } from "../config/brand";
 import { useMyState } from "../lib/myState";
 import { initial } from "../lib/trainer";
 
@@ -62,9 +63,14 @@ export default function Leaderboard() {
   return (
     <main className="screen with-nav stack board-screen">
       <Hud state={me} />
-      <header className="section-title">
-        <h1 style={{ margin: 0 }}>Leaderboard</h1>
-        {board?.updatedAt && <span className="small muted">Updated {ago(board.updatedAt)}</span>}
+      <header className="board-head">
+        <p className="eyebrow" data-cobrand>
+          {BRAND.coBrandShort}
+        </p>
+        <div className="section-title">
+          <h1 style={{ margin: 0 }}>Leaderboard</h1>
+          {board?.updatedAt && <span className="small muted">Updated {ago(board.updatedAt)}</span>}
+        </div>
       </header>
       <div className="board-tabs" role="tablist" aria-label="Leaderboard">
         <span role="tab" aria-selected="true" className="board-tab">

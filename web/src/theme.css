@@ -2320,14 +2320,22 @@ body:has(.catch[data-phase="submitting"]) {
   gap: 8px;
 }
 
+/* DET tab: light-blue tile with a blue border when selected. */
 .board-tab {
   padding: 8px 16px;
-  border-radius: 999px;
-  background: var(--primary);
-  color: var(--on-primary);
-  box-shadow: 0 3px 0 var(--primary-dark);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--accent-border);
+  background: var(--accent-soft);
+  color: var(--link);
   font-family: var(--font-display);
   font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.board-head .eyebrow {
+  margin: 0 0 2px;
 }
 
 .board {

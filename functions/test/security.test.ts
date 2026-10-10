@@ -152,6 +152,20 @@ describe("C. replays and races", () => {
     }
   });
 
+  it("a late getMyState (from a page just left) never auto-forfeits an attempt started after it arrived", async () => {
+    const p = await newPlayer();
+    const a = await start(p, MEANING);
+    // Same as the request arriving before the Start: the attempt's start lies after the request time.
+    const ref = adb.doc(`attempts/${a.attemptId}`);
+    await ref.update({ startedAt: Timestamp.fromMillis(Date.now() + 10_000) });
+    await state(p);
+    expect((await ref.get()).data()!.status).toBe("open");
+    // An attempt that started before the request (a tab left behind) is still closed.
+    await ref.update({ startedAt: Timestamp.fromMillis(Date.now() - 10_000) });
+    await state(p);
+    expect((await ref.get()).data()!.status).toBe("forfeit");
+  });
+
   it("someone else's attempt, an old attempt, and after expiry + grace are all rejected", async () => {
     const [owner, thief] = [await newPlayer(), await newPlayer()];
     const a = await start(owner, MEANING);

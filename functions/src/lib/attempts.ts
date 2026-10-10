@@ -26,13 +26,18 @@ export function forfeitTx(tx: Transaction, uid: string, snap: DocumentSnapshot |
 /**
  * Auto-forfeit (getMyState): closes the user's open attempt, if any. Costs one user read when there
  * is none (the common case), and only then runs a transaction.
+ * Only an attempt that started BEFORE this request arrived (`requestAt`, server time) is closed: a
+ * getMyState from a page the player just left can reach the server after their next Start, and must
+ * never kill that new attempt (QA: seen as a wrong answer reported "Chance lost").
  */
-export async function forfeitOpenAttempt(uid: string, user: Pick<UserDoc, "openAttemptId"> | undefined): Promise<number> {
+export async function forfeitOpenAttempt(uid: string, user: Pick<UserDoc, "openAttemptId"> | undefined, requestAt = Infinity): Promise<number> {
   if (!user?.openAttemptId) return 0;
   return db().runTransaction(async (tx) => {
     const fresh = (await tx.get(userRef(uid))).data() as UserDoc | undefined;
     const snap = await readOpenAttemptTx(tx, fresh);
     if (!fresh?.openAttemptId) return 0;
+    const startedAt = (snap?.data() as AttemptDoc | undefined)?.startedAt?.toMillis() ?? 0;
+    if (startedAt >= requestAt) return 0; // started after this request: not ours to close
     const closed = forfeitTx(tx, uid, snap);
     tx.update(userRef(uid), { openAttemptId: null });
     return closed;

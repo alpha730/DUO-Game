@@ -22,7 +22,7 @@ export const getMyState = onCall<unknown, Promise<GetMyStateOutput>>(async (req)
   ]);
   // Auto-forfeit (SPEC §3.5): only when the user doc points at an open attempt; then re-read the user
   // (losses changed).
-  if (await forfeitOpenAttempt(uid, userSnap.data() as UserDoc | undefined)) userSnap = await userRef(uid).get();
+  if (await forfeitOpenAttempt(uid, userSnap.data() as UserDoc | undefined, now)) userSnap = await userRef(uid).get();
   const rules = config?.rules ?? DEFAULT_RULES;
   const user = userSnap.exists ? (userSnap.data() as UserDoc) : null;
 

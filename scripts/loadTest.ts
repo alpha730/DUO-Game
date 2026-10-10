@@ -10,6 +10,9 @@ const PROJECT = "demo-decade-hunt";
 const AUTH = "http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1";
 const FN = `http://127.0.0.1:5001/${PROJECT}/asia-south1`;
 const CAMPUS = { lat: 26.7838, lng: 75.8301 }; // JECRC Foundation (scripts/campuses.ts)
+// App Check is enforced on the emulator too (unsigned debug token, as in web/src/lib/firebase.ts).
+const b64 = (o: object) => Buffer.from(JSON.stringify(o)).toString("base64url");
+const APP_CHECK_TOKEN = `${b64({ alg: "none", typ: "JWT" })}.${b64({ sub: "demo-app", iss: "emulator", exp: 4102444800 })}.emulator`;
 
 const players = Number(process.argv[2] ?? 500);
 const spreadMs = Number(process.argv[3] ?? 0) * 1000;
@@ -20,7 +23,7 @@ const run = `load${Date.now().toString(36)}`;
 async function post(url: string, body: unknown, token?: string) {
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    headers: { "Content-Type": "application/json", "X-Firebase-AppCheck": APP_CHECK_TOKEN, ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     body: JSON.stringify(body),
   }).catch((e: Error & { cause?: { code?: string } }) => {
     throw new Error(`network ${e.cause?.code ?? e.message}`);

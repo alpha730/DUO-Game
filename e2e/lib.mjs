@@ -22,6 +22,9 @@ export const FUNCTIONS = `http://127.0.0.1:5001/${PROJECT}/asia-south1`;
 export const FOUNDATION = { lat: 26.7838, lng: 75.8301 };
 export const UNIVERSITY = { lat: 26.7759236, lng: 75.8745013 };
 export const FAR_AWAY = { lat: 28.6139, lng: 77.209 }; // Delhi
+// App Check is enforced on the emulator too (unsigned debug token, see web/src/lib/firebase.ts).
+const b64 = (o) => Buffer.from(JSON.stringify(o)).toString("base64url");
+export const APP_CHECK_TOKEN = `${b64({ alg: "none", typ: "JWT" })}.${b64({ sub: "demo-app", iss: "emulator", exp: 4102444800 })}.emulator`;
 
 let failures = 0;
 export const ok = (c, m) => {
@@ -170,6 +173,7 @@ export async function uidOf(email) {
 /** Sign up through the UI (email + password), verify via the emulator link, finish the profile. */
 export async function signUp(page, { tag = "p", name = "E2E Player" } = {}) {
   const email = uniqueEmail(tag);
+  await clearRateLimits();
   await signOut(page);
   await page.getByRole("button", { name: /Create an account/ }).click();
   await page.getByLabel("Email").fill(email);
@@ -230,7 +234,7 @@ export async function idTokenFor(email, password = "test1234") {
 export async function callFn(name, data, idToken, headers = {}) {
   const res = await fetch(`${FUNCTIONS}/${name}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}), ...headers },
+    headers: { "Content-Type": "application/json", "X-Firebase-AppCheck": APP_CHECK_TOKEN, ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}), ...headers },
     body: JSON.stringify({ data }),
   });
   const body = await res.json().catch(() => ({}));
@@ -240,6 +244,7 @@ export async function callFn(name, data, idToken, headers = {}) {
 // ---------- Game steps ----------
 /** Open /scan and fire "poster found" for poster i; returns the scan card. */
 export async function posterFound(page, posterIndex) {
+  await clearRateLimits();
   if (!new URL(page.url()).pathname.startsWith("/scan")) await page.goto(BASE + "/scan");
   await page.waitForFunction(() => typeof window.__posterFound === "function", null, { timeout: 30000 });
   await page.evaluate((i) => window.__posterFound(i), posterIndex);
@@ -249,8 +254,19 @@ export async function posterFound(page, posterIndex) {
   return card;
 }
 
+/**
+ * E2E plays far faster than a person (a dozen questions a minute), so before each step the per-user
+ * rate-limit counters (limits/*) are cleared. The limits themselves are tested in
+ * functions/test/security.test.ts ("E. rate limits").
+ */
+export async function clearRateLimits() {
+  const snap = await adb.collection("limits").get();
+  await Promise.all(snap.docs.map((d) => d.ref.delete()));
+}
+
 /** /catch/<lingo> → wait for Start → Start → question on screen. */
 export async function startCatch(page, lingoId, { goto = true } = {}) {
+  await clearRateLimits();
   if (goto) await page.goto(BASE + `/catch/${lingoId}`);
   await page.getByRole("button", { name: "Start" }).click({ timeout: 25000 });
   await page.locator("[data-phase=active]").waitFor({ timeout: 20000 });
@@ -258,6 +274,7 @@ export async function startCatch(page, lingoId, { goto = true } = {}) {
 
 /** Choice question: tap the option with this text, then SUBMIT; returns the result card's outcome. */
 export async function answerChoice(page, text) {
+  await clearRateLimits();
   await page.getByRole("radio", { name: new RegExp(`${text}$`) }).click();
   await page.getByRole("button", { name: "Submit" }).click();
   return resultOutcome(page);

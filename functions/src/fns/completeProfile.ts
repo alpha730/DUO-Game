@@ -3,6 +3,8 @@ import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { DEFAULT_RULES, NAME_MAX, NAME_MIN, type CompleteProfileInput, type CompleteProfileOutput } from "../shared/types";
 import { db, loadConfig, userRef } from "../lib/db";
 import { requireAuth } from "../lib/guards";
+import { rateLimit } from "../lib/rateLimit";
+import { serverNow } from "../lib/clock";
 
 /** Name only (SPEC §4): trimmed, inner spaces collapsed, 2–40 characters. */
 export function parseProfile(data: unknown): CompleteProfileInput {
@@ -16,6 +18,7 @@ export function parseProfile(data: unknown): CompleteProfileInput {
 
 export const completeProfile = onCall<unknown, Promise<CompleteProfileOutput>>(async (req) => {
   const uid = requireAuth(req);
+  await rateLimit(uid, "call", await serverNow());
   // Fake-account guard (SPEC §4): Google accounts arrive verified; email/password users must click
   // the verification link first (the client refreshes its token afterwards).
   const token = req.auth!.token;

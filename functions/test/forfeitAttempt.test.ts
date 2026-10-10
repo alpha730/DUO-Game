@@ -1,7 +1,7 @@
 // forfeitAttempt (HTTP) against the emulators (PLAN 3.3).
 import { afterAll, describe, expect, it } from "vitest";
 import type { StartAttemptOutput } from "../src/shared/types";
-import { adb, CAMPUS, cleanupApps, FUNCTIONS_ORIGIN, newPlayer } from "./helpers";
+import { adb, CAMPUS, cleanupApps, FUNCTIONS_ORIGIN, newPlayer, APP_CHECK_TOKEN } from "./helpers";
 
 afterAll(cleanupApps);
 
@@ -11,7 +11,7 @@ const start = (p: Player) => p.call<object, StartAttemptOutput>("startAttempt")(
 const forfeit = (token: string | null, body: unknown, init: RequestInit = {}) =>
   fetch(URL_, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    headers: { "Content-Type": "application/json", "X-Firebase-AppCheck": APP_CHECK_TOKEN, ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     body: typeof body === "string" ? body : JSON.stringify(body),
     ...init,
   });
@@ -34,7 +34,7 @@ describe("forfeitAttempt", () => {
     const p = await newPlayer();
     const a = await start(p);
     const res = await forfeit(await p.idToken(), JSON.stringify({ attemptId: a.attemptId }), {
-      headers: { "Content-Type": "text/plain;charset=UTF-8", Authorization: `Bearer ${await p.idToken()}` },
+      headers: { "Content-Type": "text/plain;charset=UTF-8", "X-Firebase-AppCheck": APP_CHECK_TOKEN, Authorization: `Bearer ${await p.idToken()}` },
     });
     expect(res.status).toBe(204);
     expect(await status(a.attemptId)).toBe("forfeit");
@@ -71,7 +71,7 @@ describe("forfeitAttempt", () => {
     const a = await start(p);
     const res = await fetch("http://localhost:5173/api/forfeit", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${await p.idToken()}` },
+      headers: { "Content-Type": "application/json", "X-Firebase-AppCheck": APP_CHECK_TOKEN, Authorization: `Bearer ${await p.idToken()}` },
       body: JSON.stringify({ attemptId: a.attemptId }),
     });
     expect(res.status).toBe(204);

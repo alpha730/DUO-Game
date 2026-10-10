@@ -1,6 +1,7 @@
 import { HttpsError, type CallableRequest } from "firebase-functions/v2/https";
 import type { GameConfigDoc, Role, UserDoc } from "../shared/types";
 import { loadConfig, userRef } from "./db";
+import { rateLimit } from "./rateLimit";
 
 /** Signed in → returns uid. */
 export function requireAuth(req: Pick<CallableRequest, "auth">): string {
@@ -14,6 +15,11 @@ export async function requireProfile(uid: string): Promise<UserDoc> {
   const snap = await userRef(uid).get();
   const user = snap.data() as UserDoc | undefined;
   if (!user?.profileDone) throw new HttpsError("failed-precondition", "Finish your profile first.", { code: "no-profile" });
+  if (user.disabled) {
+    throw new HttpsError("permission-denied", "This account has been paused by the organisers. Please talk to them at the help desk.", {
+      code: "disabled",
+    });
+  }
   return user;
 }
 
@@ -48,9 +54,21 @@ export function requireRole(req: Pick<CallableRequest, "auth">, roles: Role[]): 
   return uid;
 }
 
-/** All of CLAUDE.md rule 6 in one call, for player-facing callables. */
-export async function requirePlayer(req: Pick<CallableRequest, "auth">, now = Date.now()) {
+/** Only verified emails play (anti-cheat F): Google accounts are verified; email/password must click the link. */
+export function requireVerified(req: Pick<CallableRequest, "auth">): void {
+  if (req.auth?.token?.email_verified !== true) {
+    throw new HttpsError("failed-precondition", "Verify your email first.", { code: "unverified" });
+  }
+}
+
+/**
+ * All of CLAUDE.md rule 6 in one call, for player-facing callables: signed in, verified email,
+ * within the rate limit (startAttempt counts as a start too), profile done and not disabled, game open.
+ */
+export async function requirePlayer(req: Pick<CallableRequest, "auth">, now = Date.now(), kind: "call" | "start" = "call") {
   const uid = requireAuth(req);
+  requireVerified(req);
+  await rateLimit(uid, kind, now);
   const [user, config] = await Promise.all([requireProfile(uid), requireGameOpen(now)]);
   return { uid, user, config };
 }

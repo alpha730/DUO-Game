@@ -101,6 +101,8 @@ export const api = {
   adminCreateRaid: call<AdminCreateRaidInput, AdminCreateRaidOutput>("adminCreateRaid"),
   lockGame: call<LockGameInput, LockGameOutput>("lockGame"),
   adminSuspicious: call<Record<string, never>, AdminPlayersOutput>("adminSuspicious"),
+  adminDuplicates: call<Record<string, never>, AdminPlayersOutput>("adminDuplicates", 60_000),
+  adminSetDisabled: call<{ uid: string; disabled: boolean }, { uid: string; disabled: boolean }>("adminSetDisabled"),
   adminTop20: call<Record<string, never>, AdminPlayersOutput>("adminTop20", 60_000),
 };
 

@@ -3,7 +3,7 @@
 // 4 (a second try doesn't). Raids stay outside.
 import { afterAll, afterEach, describe, expect, it } from "vitest";
 import type { AdminCreateRaidOutput, GetMyStateOutput, StartAttemptOutput, SubmitAttemptOutput } from "../src/shared/types";
-import { adb, adminAuth, CAMPUS, cleanupApps, FUNCTIONS_ORIGIN, istToday, newPlayer } from "./helpers";
+import { adb, adminAuth, CAMPUS, cleanupApps, FUNCTIONS_ORIGIN, istToday, newPlayer, APP_CHECK_TOKEN } from "./helpers";
 
 afterEach(() => adb.doc("_emulator/clock").delete());
 afterAll(cleanupApps);
@@ -56,7 +56,7 @@ describe("2 tries per Lingo per day, 4 different Lingos", () => {
     const a = await start(p, L(3));
     const res = await fetch(`${FUNCTIONS_ORIGIN}/forfeitAttempt`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${await p.idToken()}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${await p.idToken()}`, "Content-Type": "application/json", "X-Firebase-AppCheck": APP_CHECK_TOKEN },
       body: JSON.stringify({ attemptId: a.attemptId }),
     });
     expect(res.status).toBe(204);

@@ -15,5 +15,9 @@ export function playerRow(uid: string, u: UserDoc, rank?: number): AdminPlayerRo
     avgAnswerMs: wins ? Math.round((u.totalAnswerMs ?? 0) / wins) : 0,
     flags: u.flags ?? 0,
     suspect: u.suspect ?? false,
+    voiceSuspect: u.voiceSuspect ?? false,
+    locationJumps: u.locationJumps ?? 0,
+    disabled: u.disabled ?? false,
+    createdAt: u.createdAt ? u.createdAt.toMillis() : undefined,
   };
 }

@@ -1,21 +1,40 @@
+import { randomInt } from "node:crypto";
 import type { ChallengeDoc, StartAttemptOutput } from "../shared/types";
 
 export type PublicChallenge = Pick<StartAttemptOutput, "type" | "word" | "phrase" | "prompt" | "options">;
 
+/** A random order of n options (Fisher–Yates, crypto RNG): shown[i] = options[order[i]]. */
+export function shuffledOrder(n = 4, rand: (max: number) => number = randomInt): number[] {
+  const order = Array.from({ length: n }, (_, i) => i);
+  for (let i = n - 1; i > 0; i--) {
+    const j = rand(i + 1);
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return order;
+}
+
+/** The option the player picked, as an index into the stored options (undefined stays undefined). */
+export function originalChoice(choice: number | undefined, order: number[] | undefined): number | undefined {
+  if (choice === undefined || !order) return choice;
+  return order[choice];
+}
+
 /**
  * The part of a challenge the player may see before answering. Builds a new object field by field
- * (no spreading), so `accept` and `correctIndex` can never leak (CLAUDE.md rule 4).
+ * (no spreading), so `accept` and `correctIndex` can never leak (CLAUDE.md rule 4). Choice options
+ * come in this attempt's own `order` (anti-cheat B).
  */
-export function publicChallenge(ch: ChallengeDoc): PublicChallenge {
+export function publicChallenge(ch: ChallengeDoc, order?: number[]): PublicChallenge {
+  const opts = (options: readonly string[]) => (order ? order.map((i) => options[i]) : [...options]);
   switch (ch.type) {
     case "pronounce":
       return { type: "pronounce", word: ch.word };
     case "speak":
       return { type: "speak", phrase: ch.phrase };
     case "meaning":
-      return { type: "meaning", word: ch.word, options: [...ch.options] };
+      return { type: "meaning", word: ch.word, options: opts(ch.options) };
     case "question":
-      return { type: "question", prompt: ch.prompt, options: [...ch.options] };
+      return { type: "question", prompt: ch.prompt, options: opts(ch.options) };
   }
 }
 

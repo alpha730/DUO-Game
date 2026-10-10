@@ -28,9 +28,16 @@ await shot(page, "01-home");
 const g = await launch();
 await g.page.goto(BASE);
 const [popup] = await Promise.all([g.page.waitForEvent("popup"), g.page.getByRole("button", { name: /Continue with Google/ }).click()]);
-await popup.getByText(/Add new account/i).click({ timeout: 15000 });
-await popup.locator("#email-input").fill(`google${Date.now()}@gmail.com`).catch(() => {});
-await popup.getByText(/Auto-generate user information/i).click().catch(() => {});
+// The emulator's popup lists earlier test accounts first (if any): add a new one.
+await popup.waitForLoadState();
+const autoGen = popup.getByRole("button", { name: /Auto-generate user information/i });
+const addNew = popup.getByText(/Add new account/i);
+await Promise.race([autoGen.waitFor({ timeout: 20000 }), addNew.waitFor({ timeout: 20000 })]);
+if (!(await autoGen.isVisible())) {
+  await addNew.click();
+  await autoGen.waitFor({ timeout: 15000 });
+}
+await autoGen.click();
 await popup.getByRole("button", { name: /Sign in with Google\.com/i }).click({ timeout: 10000 });
 await g.page.waitForURL("**/setup", { timeout: 20000 });
 const nameField = g.page.getByLabel("Full name");

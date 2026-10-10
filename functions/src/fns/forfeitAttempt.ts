@@ -5,6 +5,9 @@ import { onRequest } from "firebase-functions/v2/https";
 import { COL, type AttemptDoc } from "../shared/types";
 import { db, userRef } from "../lib/db";
 import { allowedOrigins } from "../lib/origins";
+import { APP_CHECK_ENFORCED, appCheckTokenOk } from "../lib/appCheck";
+import { rateLimit } from "../lib/rateLimit";
+import { serverNow } from "../lib/clock";
 
 // Hosting domains; the app itself calls same-origin /api/forfeit (firebase.json rewrite), so CORS
 // only matters for direct calls to the function URL. (The emulator allows every origin regardless.)
@@ -12,7 +15,7 @@ const ORIGINS = allowedOrigins(process.env.GCLOUD_PROJECT ?? "", process.env.FUN
 
 /**
  * One-chance rule (SPEC §3.4): the client fires this with fetch(keepalive) when the page is hidden.
- * POST, header `Authorization: Bearer <idToken>`, body `{attemptId}` → 204.
+ * POST, headers `Authorization: Bearer <idToken>` + `X-Firebase-AppCheck: <token>`, body `{attemptId}` → 204.
  * Idempotent: an attempt that's already closed is left alone (still 204).
  */
 export const forfeitAttempt = onRequest({ cors: ORIGINS }, async (req, res) => {
@@ -25,11 +28,22 @@ export const forfeitAttempt = onRequest({ cors: ORIGINS }, async (req, res) => {
     res.status(401).send("Missing token");
     return;
   }
+  // Anti-cheat D: like the callables, only the real app (a valid App Check token).
+  if (APP_CHECK_ENFORCED && !(await appCheckTokenOk(req.get("x-firebase-appcheck") ?? undefined))) {
+    res.status(401).send("Missing or invalid App Check token");
+    return;
+  }
   let uid: string;
   try {
     uid = (await getAuth().verifyIdToken(token)).uid;
   } catch {
     res.status(401).send("Bad token");
+    return;
+  }
+  try {
+    await rateLimit(uid, "call", await serverNow());
+  } catch {
+    res.status(429).send("Slow down");
     return;
   }
 

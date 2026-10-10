@@ -28,3 +28,34 @@ export function isSuspect(u: Pick<UserDoc, "wins" | "losses" | "totalAnswerMs">)
   if (wins < SUSPECT_MIN_WINS || played === 0) return false;
   return wins / played >= SUSPECT_MIN_ACCURACY && (u.totalAnswerMs ?? 0) / wins < SUSPECT_MAX_AVG_MS;
 }
+
+/** Location jump (anti-cheat H): this far apart (the two JECRC campuses are ~4.5 km apart)… */
+export const JUMP_M = 3000;
+/** …within this time is faster than anyone gets from one campus to the other. */
+export const JUMP_MS = 5 * 60_000;
+
+/** Flag only: did the player's location jump ≥ 3 km in under 5 minutes since the last Start? Pure. */
+export function locationJump(
+  prev: { lat: number; lng: number; at: number } | null,
+  next: { lat: number; lng: number; at: number },
+  distance: (lat1: number, lng1: number, lat2: number, lng2: number) => number,
+): boolean {
+  if (!prev) return false;
+  return next.at - prev.at < JUMP_MS && distance(prev.lat, prev.lng, next.lat, next.lng) >= JUMP_M;
+}
+
+export const VOICE_MIN_WINS = 5;
+export const VOICE_FAST_MS = 2000;
+
+/**
+ * Read Aloud (anti-cheat G): "perfect transcript every time + always under 2 s" — a recording or
+ * text injected into the speech API rather than a person. Flag only. Pure.
+ */
+export function voiceSignals(
+  u: Pick<UserDoc, "voiceWins" | "voicePerfectFast">,
+  win: { perfect: boolean; answerMs: number },
+): { voiceWins: number; voicePerfectFast: number; voiceSuspect: boolean } {
+  const voiceWins = (u.voiceWins ?? 0) + 1;
+  const voicePerfectFast = (u.voicePerfectFast ?? 0) + (win.perfect && win.answerMs < VOICE_FAST_MS ? 1 : 0);
+  return { voiceWins, voicePerfectFast, voiceSuspect: voiceWins >= VOICE_MIN_WINS && voicePerfectFast === voiceWins };
+}

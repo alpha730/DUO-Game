@@ -23,7 +23,7 @@ import VoiceChallenge from "../components/VoiceChallenge";
 import { api, apiErrorMessage } from "../lib/api";
 import { haptic, play } from "../lib/feedback";
 import { triesLeft, triesUsed } from "../lib/catchStatus";
-import { auth } from "../lib/firebase";
+import { appCheckToken, auth } from "../lib/firebase";
 import { loadLingos, type Lingo } from "../lib/lingos";
 import { recordAnswer } from "../lib/skills";
 
@@ -154,6 +154,7 @@ export default function Catch() {
   const [lingoTriesLeft, setLingoTriesLeft] = useState<number | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(reloaded ? { kind: "forfeit" } : null);
   const token = useRef<string | null>(null);
+  const appCheckTok = useRef<string | null>(null); // cached with the ID token for the forfeit request
   const submitted = useRef(false);
   const lastAnswer = useRef<Answer>({});
 
@@ -172,7 +173,7 @@ export default function Catch() {
     const lose = () => {
       if (submitted.current) return; // answer already on its way
       submitted.current = true;
-      sendForfeit(token.current, challenge.attemptId);
+      sendForfeit(token.current, challenge.attemptId, appCheckTok.current);
       setOutcome({ kind: "forfeit" });
       setPhase("done");
     };
@@ -194,7 +195,7 @@ export default function Catch() {
     () => () => {
       if (running.current && !submitted.current) {
         submitted.current = true;
-        sendForfeit(token.current, running.current);
+        sendForfeit(token.current, running.current, appCheckTok.current);
       }
       activeAttempt.clear();
     },
@@ -228,7 +229,7 @@ export default function Catch() {
     setError("");
     try {
       // Cache the ID token now so the one-chance forfeit needs no async work later (SPEC §3.4).
-      token.current = (await auth.currentUser?.getIdToken()) ?? null;
+      [token.current, appCheckTok.current] = await Promise.all([auth.currentUser?.getIdToken() ?? null, appCheckToken()]);
       // No SpeechRecognition here → the server refuses voice challenges up front (no attempt used).
       const out = await api.startAttempt({ lingoId, lat: position.lat, lng: position.lng, speech: speechSupported(), ...(raidId ? { raidId } : {}) });
       submitted.current = false;
@@ -240,7 +241,7 @@ export default function Catch() {
       const code = (err as { details?: { code?: string } }).details?.code;
       setNeedsSpeech(code === "needs-speech");
       setErrorCode(code ?? (err as { code?: string }).code ?? "");
-      setClosed(["raid-tried", "raid-ended", "not-joined", "already-caught", "already-tried", "no-attempts"].includes(code ?? ""));
+      setClosed(["raid-tried", "raid-ended", "not-joined", "already-caught", "already-tried", "no-attempts", "disabled", "unverified"].includes(code ?? ""));
       setError(apiErrorMessage(err)); // names the Lingo by its stored name (= the brand's display name)
       setPhase("ready");
     }

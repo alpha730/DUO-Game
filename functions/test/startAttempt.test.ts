@@ -25,7 +25,13 @@ describe("startAttempt", () => {
       expect(raw).not.toContain('"program"'); // the pronounce accept[] spelling
       if (type === "pronounce") expect(out).toMatchObject({ word: "programme" });
       if (type === "speak") expect(out.phrase).toMatch(/^Practice every day/);
-      if (type === "meaning") expect(out).toMatchObject({ word: "reluctant", options: ["unwilling", "excited", "tired", "careful"] });
+      if (type === "meaning") {
+        // Shuffled for this attempt (anti-cheat B): the same 4 options, in the stored order's permutation.
+        const stored = ["unwilling", "excited", "tired", "careful"];
+        const order = (await adb.doc(`attempts/${out.attemptId}`).get()).data()!.order as number[];
+        expect(out).toMatchObject({ word: "reluctant", options: order.map((i) => stored[i]) });
+        expect([...out.options!].sort()).toEqual([...stored].sort());
+      }
       if (type === "question") expect(out.prompt).toContain("___");
       const timer = { pronounce: 15, speak: 20, meaning: 15, question: 20 }[type]!;
       expect(out.expiresAt - out.serverNow).toBe(timer * 1000);

@@ -11,6 +11,10 @@ process.env.FIREBASE_AUTH_EMULATOR_HOST ??= "127.0.0.1:9099";
 const AUTH = "http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1";
 const FUNCTIONS = `http://127.0.0.1:5001/${PROJECT}/asia-south1`;
 const PASSWORD = "test1234";
+// App Check (anti-cheat D) is enforced on the emulator too; it decodes tokens without a signature,
+// so local tools send this unsigned debug token (same as web/src/lib/firebase.ts on the emulators).
+const b64 = (o: object) => Buffer.from(JSON.stringify(o)).toString("base64url");
+export const APP_CHECK_TOKEN = `${b64({ alg: "none", typ: "JWT" })}.${b64({ sub: "demo-app", iss: "emulator", exp: 4102444800 })}.emulator`;
 
 export const TEST_USERS: Array<{ email: string; name: string; role?: Role }> = [
   { email: "admin@qa.test", name: "QA Admin", role: "admin" },
@@ -39,7 +43,7 @@ for (const u of TEST_USERS) {
   await auth.setCustomUserClaims(user.uid, u.role ? { role: u.role } : null);
   const res = await fetch(`${FUNCTIONS}/completeProfile`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${await signIn(u.email)}` },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${await signIn(u.email)}`, "X-Firebase-AppCheck": APP_CHECK_TOKEN },
     body: JSON.stringify({ data: { name: u.name } }),
   });
   const ok = res.ok || (await res.text()).includes("already");

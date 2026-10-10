@@ -94,6 +94,11 @@ export default function Home() {
       </header>
       <Hud state={me} />
       <GameClock phase={phase} me={me} now={now} />
+      {me?.user?.disabled && (
+        <EmptyState badge="⏸" title="Your account is paused" role="alert" data-empty="disabled">
+          <p className="muted">The organisers have paused this account. Please talk to them at the help desk.</p>
+        </EmptyState>
+      )}
 
       {/* DET-style hero: one clear heading, one clear action. */}
       <section className="home-hero card" aria-label="Scan">

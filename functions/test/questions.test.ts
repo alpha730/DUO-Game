@@ -169,7 +169,7 @@ describe("question pool (SPEC §9)", () => {
       await setQuestionPool([q("m1", "medium", "meaning", "abundant")]);
       const p = await newPlayer();
       const a1 = await start(p, "lingo-2018");
-      expect(a1.options).toEqual(["abundant-right", "b", "c", "d"]);
+      expect([...a1.options!].sort()).toEqual(["abundant-right", "b", "c", "d"]); // shuffled per attempt
       const lost = await p.call<object, SubmitAttemptOutput>("submitAttempt")({ attemptId: a1.attemptId, choice: 2 });
       expect(lost).toMatchObject({ result: "failed", answer: { text: "abundant-right", explanation: "abundant explained" } });
       // The pool changing after Start doesn't change the answer of a running try.

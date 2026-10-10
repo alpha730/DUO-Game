@@ -232,16 +232,18 @@ function ConfigForm({ config, reload }: { config: GameConfigDoc; reload: () => v
   );
 }
 
+// Placeholder rows only — never real pool questions: this chunk is a public file, and a real row
+// here would hand out its answer (QA: the old example shipped two pool answers).
 const EXAMPLE = `[
-  { "id": "m-mean-001", "level": "medium", "type": "meaning", "word": "abundant",
-    "options": ["exact", "correct", "available in large quantities", "vague"], "correctIndex": 2,
-    "explanation": "available in large quantities" },
-  { "id": "m-fill-001", "level": "medium", "type": "question", "target": "feasible",
-    "prompt": "The project is technically _____ within the budget.",
-    "options": ["feasible", "compel", "distinct", "allocate"], "correctIndex": 0,
-    "explanation": "possible and practical to achieve" },
-  { "id": "m-pron-001", "level": "medium", "type": "pronounce", "word": "abundant",
-    "explanation": "available in large quantities" }
+  { "id": "example-meaning", "level": "medium", "type": "meaning", "word": "WORD",
+    "options": ["option A", "option B", "option C", "option D"], "correctIndex": 2,
+    "explanation": "why option C is right" },
+  { "id": "example-blank", "level": "medium", "type": "question", "target": "WORD",
+    "prompt": "A sentence with a _____ to fill.",
+    "options": ["option A", "option B", "option C", "option D"], "correctIndex": 0,
+    "explanation": "why option A is right" },
+  { "id": "example-read-aloud", "level": "medium", "type": "pronounce", "word": "WORD",
+    "explanation": "what the word means" }
 ]`;
 
 /** Questions per level × type (SPEC §9). */
@@ -501,7 +503,29 @@ function LeaderboardRefresh() {
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 const secs = (ms: number) => (ms ? `${(ms / 1000).toFixed(1)} s` : "—");
 
-function PlayersTable({ rows, showRank }: { rows: AdminPlayerRow[]; showRank?: boolean }) {
+/** Disable / re-enable a player (anti-cheat F): every function refuses, off the leaderboard. */
+function DisableButton({ row }: { row: AdminPlayerRow }) {
+  const [disabled, setDisabled] = useState(row.disabled);
+  const [busy, setBusy] = useState(false);
+  async function toggle() {
+    if (!disabled && !confirm(`Disable ${row.name} (${row.email})? They can't play and leave the leaderboard at the next refresh.`)) return;
+    setBusy(true);
+    try {
+      setDisabled((await api.adminSetDisabled({ uid: row.uid, disabled: !disabled })).disabled);
+    } catch (err) {
+      alert(apiErrorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <button className={`btn small ${disabled ? "secondary" : "danger"}`} disabled={busy} onClick={toggle} data-disable={row.uid} data-disabled={disabled}>
+      {busy ? "…" : disabled ? "Enable" : "Disable"}
+    </button>
+  );
+}
+
+function PlayersTable({ rows, showRank, showReason }: { rows: AdminPlayerRow[]; showRank?: boolean; showReason?: boolean }) {
   if (!rows.length) return <p className="small muted" style={{ margin: 0 }}>Nobody.</p>;
   return (
     <div className="table-scroll">
@@ -509,18 +533,22 @@ function PlayersTable({ rows, showRank }: { rows: AdminPlayerRow[]; showRank?: b
         <thead>
           <tr>
             {showRank && <th>#</th>}
+            {showReason && <th>Group</th>}
             <th>Name</th>
             <th>Email</th>
             <th>Points</th>
             <th>Accuracy</th>
             <th>Avg time</th>
             <th>Flags</th>
+            {showReason && <th>Why</th>}
+            <th>Player</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.uid} data-uid={r.uid} className={r.flags > 0 || r.suspect ? "flagged" : undefined}>
+            <tr key={r.uid} data-uid={r.uid} className={r.flags > 0 || r.suspect || r.voiceSuspect || r.locationJumps > 0 ? "flagged" : undefined}>
               {showRank && <td>{r.rank}</td>}
+              {showReason && <td>{r.group}</td>}
               <td>{r.name}</td>
               <td>{r.email}</td>
               <td>{r.points.toLocaleString("en-IN")}</td>
@@ -529,6 +557,12 @@ function PlayersTable({ rows, showRank }: { rows: AdminPlayerRow[]; showRank?: b
               <td>
                 {r.flags}
                 {r.suspect ? " ⚠" : ""}
+                {r.voiceSuspect ? " 🎤" : ""}
+                {r.locationJumps > 0 ? ` 📍${r.locationJumps}` : ""}
+              </td>
+              {showReason && <td className="small">{r.reason}</td>}
+              <td>
+                <DisableButton row={r} />
               </td>
             </tr>
           ))}
@@ -545,7 +579,8 @@ function Suspicious() {
     <Section title="Suspicious players">
       <p className="small muted" style={{ margin: 0 }}>
         Flags = answers faster than a human could (voice &lt; 1.5 s, tap &lt; 0.8 s). ⚠ = ≥ 10 wins, ≥ 95 % accuracy and
-        &lt; 3 s average. Signals only — nobody is blocked; check before handing out prizes.
+        &lt; 3 s average. 🎤 = every Read Aloud perfect and under 2 s. 📍 = jumped between the campuses in under 5
+        minutes. Signals only — nobody is blocked automatically; check, then Disable if needed.
       </p>
       <button
         className="btn secondary"
@@ -560,12 +595,38 @@ function Suspicious() {
   );
 }
 
+function Duplicates() {
+  const [rows, setRows] = useState<AdminPlayerRow[] | null>(null);
+  const { busy, status, run } = useAction();
+  return (
+    <Section title="Possible duplicate accounts">
+      <p className="small muted" style={{ margin: 0 }}>
+        Same or nearly the same name, similar email, made minutes apart. Two students can share a name — this only
+        groups them for you to check; nobody is blocked automatically. Reads every player, so load it only when needed.
+      </p>
+      <button
+        className="btn secondary"
+        disabled={busy}
+        onClick={() =>
+          run(async () => ((r) => (setRows(r.rows), `${new Set(r.rows.map((x) => x.group)).size} group(s), ${r.rows.length} accounts.`))(await api.adminDuplicates({}))).catch(() => {})
+        }
+        data-load-duplicates
+      >
+        {busy ? "Loading…" : rows ? "Reload" : "Load possible duplicates"}
+      </button>
+      <StatusLine status={status} />
+      {rows && <PlayersTable rows={rows} showReason />}
+    </Section>
+  );
+}
+
 /** CSV (Excel-friendly) of the top 20 for the final, flags column included. */
 function toCsv(rows: AdminPlayerRow[]): string {
   const q = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`;
-  const head = ["rank", "name", "email", "points", "accuracy_pct", "avg_answer_s", "wins", "flags", "suspect"];
+  const head = ["rank", "name", "email", "points", "accuracy_pct", "avg_answer_s", "wins", "flags", "suspect", "voice_flag", "location_jumps", "disabled"];
+  const yes = (b: boolean) => (b ? "yes" : "no");
   const body = rows.map((r) =>
-    [r.rank ?? "", r.name, r.email, r.points, Math.round(r.accuracy * 100), (r.avgAnswerMs / 1000).toFixed(2), r.wins, r.flags, r.suspect ? "yes" : "no"]
+    [r.rank ?? "", r.name, r.email, r.points, Math.round(r.accuracy * 100), (r.avgAnswerMs / 1000).toFixed(2), r.wins, r.flags, yes(r.suspect), yes(r.voiceSuspect), r.locationJumps, yes(r.disabled)]
       .map(q)
       .join(","),
   );
@@ -638,6 +699,7 @@ export default function Admin() {
       {lingos.length > 0 && <CreateRaid lingos={lingos} />}
       <LeaderboardRefresh />
       <Suspicious />
+      <Duplicates />
       <Top20 />
     </main>
   );

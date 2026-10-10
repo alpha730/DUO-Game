@@ -48,6 +48,7 @@ export const COL = {
   prizes: "prizes",
   redemptions: "redemptions",
   final: "final",
+  limits: "limits", // per-user rate-limit counters (server-only)
 } as const;
 
 export const DOC = {
@@ -71,6 +72,18 @@ export interface UserDoc {
   /** Admin-only cheat signals: count of too-fast answers, and "too good to be true" (lib/cheat.ts). */
   flags?: number;
   suspect?: boolean;
+  /** Read Aloud wins, and how many of them were a perfect transcript in under 2 s (lib/cheat.ts). */
+  voiceWins?: number;
+  voicePerfectFast?: number;
+  /** Flag only: every Read Aloud win perfect and under 2 s (≥ 5 wins). */
+  voiceSuspect?: boolean;
+  /** Last location sent with Start, and how often it jumped between campuses faster than possible. */
+  lastFix?: { lat: number; lng: number; at: FireTimestamp };
+  locationJumps?: number;
+  /** Disabled by an admin: every function refuses; left off the leaderboard. getMyState still answers. */
+  disabled?: boolean;
+  /** Points spent at the prize desk; balance = points − spent (leaderboard points stay). */
+  spent?: number;
   /** The user's one open attempt (set by startAttempt, cleared when it ends); avoids querying attempts. */
   openAttemptId?: string | null;
   /**
@@ -298,6 +311,12 @@ export interface AttemptDoc {
    * submitAttempt scores against exactly what was shown without reading the pool again.
    */
   question?: ChallengeDoc & { explanation?: string };
+  /**
+   * Choice questions: the option order shown to this player (shown[i] = options[order[i]]). Shuffled
+   * per attempt, so "the answer is C" means nothing to anyone else; the client sends the position it
+   * saw and the server maps it back.
+   */
+  order?: number[];
 }
 
 export type PointsReason =
@@ -527,6 +546,12 @@ export interface RedeemPrizeInput {
 }
 export interface RedeemPrizeOutput {
   newBalance: number;
+  redemptionId: string;
+}
+
+export interface AdminSetDisabledInput {
+  uid: string;
+  disabled: boolean;
 }
 
 // Admin functions
@@ -599,6 +624,14 @@ export interface AdminPlayerRow {
   avgAnswerMs: number;
   flags: number;
   suspect: boolean;
+  voiceSuspect: boolean;
+  locationJumps: number;
+  disabled: boolean;
+  /** Possible duplicates: why this row is in a group (e.g. "same name", "similar email"). */
+  reason?: string;
+  /** Duplicate group number (rows with the same group belong together). */
+  group?: number;
+  createdAt?: number;
 }
 export interface AdminPlayersOutput {
   rows: AdminPlayerRow[];

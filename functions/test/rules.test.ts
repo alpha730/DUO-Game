@@ -19,6 +19,8 @@ const NEVER_READABLE = [
   "pointsLog/p1",
   "redemptions/r1",
   "raids/raid1/players/alice",
+  "limits/alice", // rate-limit counters (anti-cheat E)
+  "_emulator/clock", // test switches: never readable, and production never reads them
 ];
 const SIGNED_IN_READABLE = [
   "lingos/lingo1",
@@ -91,19 +93,46 @@ describe("users", () => {
     await assertFails(getDoc(doc(bob(), "users/alice/catches/lingo1")));
     await assertFails(getDoc(doc(anon(), "users/alice")));
     await assertFails(getDocs(collection(alice(), "users")));
+    await assertFails(getDocs(collection(anon(), "users")));
+    await assertFails(getDocs(collection(admin(), "users"))); // even an admin claim can't list players from the phone
+    await assertFails(getDocs(collection(alice(), "pointsLog")));
+    await assertFails(getDocs(collection(alice(), "redemptions")));
+    await assertFails(getDocs(collection(alice(), "raids/raid1/players")));
   });
+});
+
+// Anti-cheat I: every collection × every kind of client (owner, another player, signed out, admin
+// claim) — read where allowed, and never any write: points, levels, favourites, raid counts, the
+// leaderboard, roles, prizes all change only through the Cloud Functions (admin SDK).
+const WHO = { owner: () => alice(), other: () => bob(), anon: () => anon(), admin: () => admin() };
+describe("read matrix", () => {
+  for (const path of ALL) {
+    const own = path.startsWith("users/alice");
+    const open = SIGNED_IN_READABLE.includes(path);
+    for (const [who, ctx] of Object.entries(WHO)) {
+      const allowed = own ? who === "owner" : open ? who !== "anon" : false;
+      it(`${path}: ${who} ${allowed ? "can" : "cannot"} read`, async () => {
+        await (allowed ? assertSucceeds : assertFails)(getDoc(doc(ctx(), path)));
+      });
+    }
+  }
 });
 
 describe("no client writes anywhere", () => {
   for (const path of ALL) {
-    it(`${path}: create/update/delete denied`, async () => {
-      // Owner + admin claim is the most privileged client there is.
-      const ctx = path.startsWith("users/alice") ? alice() : admin();
-      await assertFails(setDoc(doc(ctx, path), { points: 999999 }));
-      await assertFails(updateDoc(doc(ctx, path), { points: 999999 }));
-      await assertFails(deleteDoc(doc(ctx, path)));
+    it(`${path}: create/update/delete denied for owner, other, anon and admin claim`, async () => {
+      for (const ctx of Object.values(WHO)) {
+        await assertFails(setDoc(doc(ctx(), path), { points: 999999, level: "MAX", role: "admin", favorites: ["x", "y"], count: 999, top: [] }));
+        await assertFails(updateDoc(doc(ctx(), path), { points: 999999 }));
+        await assertFails(deleteDoc(doc(ctx(), path)));
+      }
     });
   }
+  it("cannot create new docs in any collection (incl. users/catches/raid shards)", async () => {
+    for (const path of ["users/mallory", "users/alice/catches/new", "raids/raid1/shards/9", "leaderboard/fake", "pointsLog/new", "limits/bob", "prizes/free"]) {
+      await assertFails(setDoc(doc(alice(), path), { points: 1 }));
+    }
+  });
   it("cannot create a brand new user doc for self", async () => {
     await assertFails(setDoc(doc(bob(), "users/bob"), { points: 100, profileDone: true }));
   });

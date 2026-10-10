@@ -5,12 +5,14 @@ import { forfeitOpenAttempt } from "../lib/attempts";
 import { istDate } from "../lib/date";
 import { loadConfig, userRef } from "../lib/db";
 import { requireAuth } from "../lib/guards";
+import { rateLimit } from "../lib/rateLimit";
 import { attemptsLeft, catchView, userView } from "../lib/state";
 
 // SPEC §5: no profile / game-open check — Home and Scan call this before the game starts too.
 export const getMyState = onCall<unknown, Promise<GetMyStateOutput>>(async (req) => {
   const uid = requireAuth(req);
   const now = await serverNow();
+  await rateLimit(uid, "call", now);
   const today = istDate(now);
 
   let [userSnap, catchesSnap, config] = await Promise.all([

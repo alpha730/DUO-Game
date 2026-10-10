@@ -15,7 +15,8 @@ export const topUsersQuery = () =>
 export async function refreshStudentsBoard(now = Date.now()): Promise<number> {
   const snap = await topUsersQuery().get();
   const top = rankStudents(
-    snap.docs.map((d) => {
+    // Disabled players (anti-cheat F) are left off the board.
+    snap.docs.filter((d) => !(d.data() as UserDoc).disabled).map((d) => {
       const u = d.data() as UserDoc;
       return {
         uid: d.id,

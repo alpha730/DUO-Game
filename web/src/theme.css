@@ -3723,3 +3723,12 @@ body:has(.catch[data-phase="submitting"]) {
   font-size: 1.6rem;
   font-variant-numeric: tabular-nums;
 }
+
+/* Admin tables: compact Disable / Enable buttons. */
+.admin-table .btn {
+  width: auto;
+  min-height: 34px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}

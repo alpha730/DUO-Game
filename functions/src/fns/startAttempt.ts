@@ -1,4 +1,4 @@
-import { Timestamp } from "firebase-admin/firestore";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import {
   COL,
@@ -17,16 +17,20 @@ import {
 } from "../shared/types";
 import { serverNow } from "../lib/clock";
 import { forfeitTx, readOpenAttemptTx } from "../lib/attempts";
-import { publicChallenge } from "../lib/challenge";
+import { publicChallenge, shuffledOrder } from "../lib/challenge";
 import { istDate } from "../lib/date";
 import { catchRef, db, userRef } from "../lib/db";
 import { lenientCampus } from "../lib/emulator";
-import { campusCheck, isValidLatLng } from "../lib/geo";
+import { campusCheck, distanceM, isValidLatLng } from "../lib/geo";
+import { locationJump } from "../lib/cheat";
 import { requirePlayer } from "../lib/guards";
 import { pinnedQuestion, questionPool } from "../lib/questionPool";
 import { levelFor, pickQuestion, streakDayFor, targetWord } from "../lib/questions";
 import { raidPhase } from "../lib/raids";
 import { attemptsUsedToday, triedToday, triesToday } from "../lib/state";
+
+/** Two Starts within this window (two tabs/devices at the same moment): the second is refused. */
+const RACE_MS = 5000;
 
 const fail = (code: string, message: string): never => {
   throw new HttpsError("failed-precondition", message, { code });
@@ -34,7 +38,7 @@ const fail = (code: string, message: string): never => {
 
 export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (req) => {
   const now = await serverNow();
-  const { uid, config } = await requirePlayer(req, now);
+  const { uid, config } = await requirePlayer(req, now, "start");
   const { lingoId, lat, lng, raidId, speech } = (req.data ?? {}) as Record<string, unknown>;
 
   if (typeof lingoId !== "string" || !/^[\w-]{1,40}$/.test(lingoId)) {
@@ -71,6 +75,13 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
     ]);
     const user = userSnap.data() as UserDoc;
     const open = await readOpenAttemptTx(tx, user);
+    // Anti-cheat C: Start from two tabs/devices at the same moment → only the first one runs (and
+    // uses a try); the second is refused without writing anything. An older open attempt (a tab
+    // left behind) is still closed as a miss below (SPEC §3.7).
+    const openDoc = open?.data() as AttemptDoc | undefined;
+    if (openDoc?.status === "open" && now - openDoc.startedAt.toMillis() < RACE_MS) {
+      fail("busy", "You already have a question open — answer that one first.");
+    }
     const used = attemptsUsedToday(user, today);
     const tried = triedToday(user, today);
     const tries = triesToday(user, today);
@@ -140,6 +151,11 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
     const closed = forfeitTx(tx, uid, open);
 
     const expiresAt = now + timerSeconds(challenge!.type, rules) * 1000;
+    // Anti-cheat B: choice options in a new random order for every attempt.
+    const order = challenge!.type === "meaning" || challenge!.type === "question" ? shuffledOrder(4) : undefined;
+    // Anti-cheat H (flag only): a jump between far-apart places faster than possible.
+    const fix = { lat: lat as number, lng: lng as number, at: Timestamp.fromMillis(now) };
+    const jumped = locationJump(user.lastFix ? { ...user.lastFix, at: user.lastFix.at.toMillis() } : null, { ...fix, at: now }, distanceM);
     const attempt: AttemptDoc = {
       uid,
       lingoId,
@@ -148,16 +164,17 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
       ...(raidRef ? { raidId: raidRef.id } : {}),
       ...(questionId ? { questionId, level } : {}),
       question: challenge!, // server-only copy, scored by submitAttempt
+      ...(order ? { order } : {}),
       startedAt: Timestamp.fromMillis(now),
       expiresAt: Timestamp.fromMillis(expiresAt),
       status: "open",
     };
     tx.create(attemptRef, attempt);
-    tx.update(userRef(uid), { openAttemptId: attemptRef.id });
+    tx.update(userRef(uid), { openAttemptId: attemptRef.id, lastFix: fix, ...(jumped ? { locationJumps: FieldValue.increment(1) } : {}) });
     if (raidRef) {
       // The one try is used the moment it starts: won, failed and forfeit all count.
       tx.update(raidRef.collection(COL.players).doc(uid), { attemptId: attemptRef.id });
-      return { challenge: challenge!, expiresAt, attemptsLeft: Math.max(0, rules.attemptsPerDay - used), closed, level };
+      return { challenge: challenge!, order, expiresAt, attemptsLeft: Math.max(0, rules.attemptsPerDay - used), closed, level };
     }
     // The try is used the moment Start succeeds (a forfeit uses it too). A second try at the same
     // Lingo doesn't use another of the daily 4. The question counts as seen, and its word as used
@@ -177,6 +194,7 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
 
     return {
       challenge: challenge!,
+      order,
       expiresAt,
       attemptsLeft: Math.max(0, rules.attemptsPerDay - usedAfter),
       lingoTriesLeft: Math.max(0, rules.triesPerLingoPerDay - triesUsed - 1),
@@ -187,7 +205,7 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
 
   return {
     attemptId: attemptRef.id,
-    ...publicChallenge(result.challenge),
+    ...publicChallenge(result.challenge, result.order),
     expiresAt: result.expiresAt,
     serverNow: now,
     attemptsLeft: result.attemptsLeft,

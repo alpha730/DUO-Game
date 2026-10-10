@@ -1,8 +1,10 @@
 import { initializeApp } from "firebase-admin/app";
 import { setGlobalOptions } from "firebase-functions/v2";
+import { APP_CHECK_ENFORCED } from "./lib/appCheck";
 
 initializeApp();
-setGlobalOptions({ region: "asia-south1", maxInstances: 20 });
+// Every callable rejects requests without a valid App Check token (anti-cheat D; lib/appCheck.ts).
+setGlobalOptions({ region: "asia-south1", maxInstances: 20, enforceAppCheck: APP_CHECK_ENFORCED });
 
 // One export per function; each lives in its own file in ./fns.
 export { completeProfile } from "./fns/completeProfile";
@@ -22,3 +24,6 @@ export { adminSuspicious } from "./fns/adminSuspicious";
 export { adminTop20 } from "./fns/adminTop20";
 export { joinRaid } from "./fns/joinRaid";
 export { raidTicker } from "./fns/raidTicker";
+export { adminDuplicates } from "./fns/adminDuplicates";
+export { adminSetDisabled } from "./fns/adminSetDisabled";
+export { redeemPrize } from "./fns/redeemPrize";

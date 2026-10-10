@@ -16,7 +16,9 @@ import { serverNow } from "../lib/clock";
 import { catchRef, db, userRef } from "../lib/db";
 import { requirePlayer } from "../lib/guards";
 import { scoreCatch, scoreRaidCatch } from "../lib/points";
-import { fastAnswerFlag, isSuspect } from "../lib/cheat";
+import { originalChoice } from "../lib/challenge";
+import { fastAnswerFlag, isSuspect, voiceSignals } from "../lib/cheat";
+import { words } from "../lib/match";
 import { scoreAnswer } from "../lib/score";
 import { speedBonus } from "../lib/speed";
 
@@ -80,7 +82,8 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
             },
           }
         : {};
-    const result = scoreAnswer(challenge, { transcript, choice }, rules);
+    // Anti-cheat B: the client sends the position it saw; map it back through this attempt's order.
+    const result = scoreAnswer(challenge, { transcript, choice: originalChoice(choice, attempt.order) }, rules);
     const answerMs = now - attempt.startedAt.toMillis();
     const bonus = result.won ? speedBonus(expiresAt, now, timerSeconds(attempt.type, rules), rules.speedBonusPerSecond) : 0;
 
@@ -101,7 +104,13 @@ export const submitAttempt = onCall<unknown, Promise<SubmitAttemptOutput>>(async
       losses: (user.losses ?? 0) + (result.won ? 0 : 1),
       totalAnswerMs: (user.totalAnswerMs ?? 0) + (result.won ? answerMs : 0),
     };
-    const signals = { suspect: isSuspect(after), ...(flagReason ? { flags: FieldValue.increment(1) } : {}) };
+    // Anti-cheat G (flag only): every Read Aloud win a perfect transcript in under 2 s.
+    const target = challenge.type === "pronounce" ? challenge.word : challenge.type === "speak" ? challenge.phrase : null;
+    const voice =
+      result.won && target !== null
+        ? voiceSignals(user, { perfect: words(transcript ?? "").join(" ") === words(target).join(" "), answerMs })
+        : null;
+    const signals = { suspect: isSuspect(after), ...(flagReason ? { flags: FieldValue.increment(1) } : {}), ...(voice ?? {}) };
     const caught = catchSnap.data() as CatchDoc | undefined;
     const missed = result.missedWords ? { missedWords: result.missedWords } : {};
 

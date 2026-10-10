@@ -6,13 +6,17 @@ export const FORFEIT_URL = "/api/forfeit";
 const KEY = "decade-hunt:active-attempt";
 
 /** Fire-and-forget forfeit with the ID token cached at Start. */
-export function sendForfeit(token: string | null, attemptId: string): void {
+export function sendForfeit(token: string | null, attemptId: string, appCheck: string | null = null): void {
   if (!token) return; // the server auto-forfeits it on the next getMyState/startAttempt anyway
   try {
     void fetch(FORFEIT_URL, {
       method: "POST",
       keepalive: true,
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        ...(appCheck ? { "X-Firebase-AppCheck": appCheck } : {}),
+      },
       body: JSON.stringify({ attemptId }),
     }).catch(() => {});
   } catch {

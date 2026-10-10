@@ -20,6 +20,7 @@ const Raid = lazy(() => import("./screens/Raid"));
 const Admin = lazy(() => import("./screens/Admin"));
 const Redeem = lazy(() => import("./screens/Redeem"));
 const Stage = lazy(() => import("./screens/Stage"));
+const Rules = lazy(() => import("./screens/Rules"));
 
 export default function App() {
   return (
@@ -30,6 +31,8 @@ export default function App() {
           {/* DECISION: public camera/tracking test page for real-phone testing before the backend is
               live (no sign-in, no server calls, catching off). Remove at the Day 9 freeze. */}
           <Route path="/ar-test" element={<Scan testMode />} />
+          {/* Public: anyone can read the rules, signed in or not. */}
+          <Route path="/rules" element={<Rules />} />
           <Route path="/setup" element={<SetupOnly><Setup /></SetupOnly>} />
 
           <Route element={<RequireProfile><NavLayout /></RequireProfile>}>

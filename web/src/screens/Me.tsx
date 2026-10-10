@@ -204,6 +204,9 @@ export default function Me() {
         </button>
       </section>
 
+      <Link className="btn secondary" to="/rules" data-rules-link>
+        Game rules
+      </Link>
       <button className="btn secondary" onClick={() => setAbout(true)} data-about-open>
         About {BRAND.appName}
       </button>

@@ -103,6 +103,9 @@ export default function Home() {
           <ScanIcon size={24} /> Scan a poster
         </Link>
         {me && <LingoPips left={me.attemptsLeft} total={me.attemptsPerDay} />}
+        <Link className="rules-link" to="/rules" data-rules-link>
+          How it works · Game rules →
+        </Link>
       </section>
 
       {error && !me && (

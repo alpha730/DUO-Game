@@ -7,6 +7,7 @@ import {
   signInWithRedirect,
 } from "firebase/auth";
 import { useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import CoBrand from "../components/CoBrand";
 import { CheckIcon } from "../components/Icons";
 import Mascot from "../components/Mascot";
@@ -83,6 +84,9 @@ export default function Login() {
               <CheckIcon /> Top the leaderboard before the final on Oct 22
             </li>
           </ul>
+          <Link className="rules-link" to="/rules" data-rules-link>
+            Read the game rules →
+          </Link>
         </div>
         <div className="login-hero-art">
           <Mascot slot="hero" mood="happy" />

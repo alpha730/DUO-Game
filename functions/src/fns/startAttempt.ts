@@ -25,7 +25,7 @@ import { requirePlayer } from "../lib/guards";
 import { pinnedQuestion, questionPool } from "../lib/questionPool";
 import { levelFor, pickQuestion, streakDayFor, targetWord } from "../lib/questions";
 import { raidPhase } from "../lib/raids";
-import { attemptsUsedToday, triedToday } from "../lib/state";
+import { attemptsUsedToday, triedToday, triesToday } from "../lib/state";
 
 const fail = (code: string, message: string): never => {
   throw new HttpsError("failed-precondition", message, { code });
@@ -72,6 +72,8 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
     const open = await readOpenAttemptTx(tx, user);
     const used = attemptsUsedToday(user, today);
     const tried = triedToday(user, today);
+    const tries = triesToday(user, today);
+    const triesUsed = tries[lingoId] ?? 0;
 
     if (raidRef) {
       // Owl Raid (SPEC §2, §5): joined players only, once unlocked and before endAt, exactly one try
@@ -84,11 +86,17 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
       if (raidPhase(raid, now) !== "active") fail("raid-ended", "This raid is over.");
       if (!raid.unlocked) fail("raid-locked", "The raid isn't unlocked yet — it needs more players.");
     } else {
-      // SPEC §2: ONE try per Lingo per IST day (won, failed or forfeit all close it), 4 different
-      // Lingos a day. Checked on the user doc alone — no query on attempts in the transaction.
+      // SPEC §2: 4 different Lingos per IST day, up to 2 tries each (failed and forfeit use a try; a
+      // win closes the Lingo for the day). Only a new Lingo uses 1 of the 4. Checked on the user doc
+      // and this Lingo's catch doc — no query on attempts in the transaction.
       const name = (lingoSnap.data() as LingoDoc).name;
-      if (tried.includes(lingoId)) fail("already-tried", `You've already tried ${name} today — come back tomorrow`);
-      if (used >= rules.attemptsPerDay || tried.length >= rules.attemptsPerDay) {
+      if ((catchSnap!.data() as CatchDoc | undefined)?.lastCaughtDate === today) {
+        fail("already-caught", `You've already caught ${name} today — come back tomorrow`);
+      }
+      if (triesUsed >= rules.triesPerLingoPerDay) {
+        fail("already-tried", `You've used your ${rules.triesPerLingoPerDay} tries at ${name} today — come back tomorrow`);
+      }
+      if (!tried.includes(lingoId) && (used >= rules.attemptsPerDay || tried.length >= rules.attemptsPerDay)) {
         fail("no-attempts", `You've tried ${rules.attemptsPerDay} Lingos today — come back tomorrow`);
       }
     }
@@ -150,19 +158,30 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
       tx.update(raidRef.collection(COL.players).doc(uid), { attemptId: attemptRef.id });
       return { challenge: challenge!, expiresAt, attemptsLeft: Math.max(0, rules.attemptsPerDay - used), closed, level };
     }
-    // The try is used the moment Start succeeds (a forfeit closes the Lingo too). The question counts
-    // as seen, and its word as used today, from this moment too.
+    // The try is used the moment Start succeeds (a forfeit uses it too). A second try at the same
+    // Lingo doesn't use another of the daily 4. The question counts as seen, and its word as used
+    // today, from this moment too — so a second try always gets a different word.
     const words = user.wordsDate === today ? (user.wordsToday ?? []) : [];
+    const newLingo = !tried.includes(lingoId);
+    const usedAfter = newLingo ? used + 1 : used;
     tx.update(userRef(uid), {
-      attemptsToday: used + 1,
+      attemptsToday: usedAfter,
       attemptsDate: today,
-      triedToday: [...tried, lingoId],
+      triedToday: newLingo ? [...tried, lingoId] : tried,
+      triesToday: { ...tries, [lingoId]: triesUsed + 1 },
       triedDate: today,
       ...(questionId ? { seenQ: [...(user.seenQ ?? []).filter((id) => id !== questionId), questionId] } : {}),
       ...(word ? { wordsToday: [...words, word], wordsDate: today } : {}),
     });
 
-    return { challenge: challenge!, expiresAt, attemptsLeft: rules.attemptsPerDay - used - 1, closed, level };
+    return {
+      challenge: challenge!,
+      expiresAt,
+      attemptsLeft: Math.max(0, rules.attemptsPerDay - usedAfter),
+      lingoTriesLeft: Math.max(0, rules.triesPerLingoPerDay - triesUsed - 1),
+      closed,
+      level,
+    };
   });
 
   return {
@@ -171,6 +190,7 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
     expiresAt: result.expiresAt,
     serverNow: now,
     attemptsLeft: result.attemptsLeft,
+    ...("lingoTriesLeft" in result ? { lingoTriesLeft: result.lingoTriesLeft } : {}),
     ...(result.level ? { level: result.level } : {}),
   };
 });

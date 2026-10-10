@@ -74,10 +74,12 @@ export interface UserDoc {
   /** The user's one open attempt (set by startAttempt, cleared when it ends); avoids querying attempts. */
   openAttemptId?: string | null;
   /**
-   * Lingos tried on `triedDate` (SPEC §2: one try per Lingo per IST day, 4 different Lingos; won,
-   * failed and forfeit all count). Treat as [] when triedDate ≠ today. Raids are not listed here.
+   * Lingos tried on `triedDate` (SPEC §2: 4 different Lingos per IST day; won, failed and forfeit
+   * all count). Treat as [] when triedDate ≠ today. Raids are not listed here.
    */
   triedToday?: string[];
+  /** Tries used per Lingo on `triedDate` (up to rules.triesPerLingoPerDay; a win closes it anyway). */
+  triesToday?: Record<string, number>;
   triedDate?: IstDate | null;
   /** Pool question ids this player has been asked (never repeated across days while others are left). */
   seenQ?: string[];
@@ -138,7 +140,7 @@ export interface LingoDoc {
 /** Editable game numbers (SPEC §2), stored in config/game.rules */
 export interface GameRules {
   attemptsPerDay: number; // 4 different Lingos a day, one try each — won, failed, forfeited all count; raids don't
-  catchesPerLingoPerDay: number; // 1 — ONE try per Lingo per day (won, failed or forfeit all close it)
+  triesPerLingoPerDay: number; // 2 — tries per Lingo per day (failed and forfeit use one; a win closes it)
   favoritesCount: number; // 2
   favoriteChanges: number; // 1 for the whole game
   pronounceSeconds: number; // 15
@@ -165,7 +167,7 @@ export interface GameRules {
 /** SPEC §2 */
 export const DEFAULT_RULES: GameRules = {
   attemptsPerDay: 4,
-  catchesPerLingoPerDay: 1,
+  triesPerLingoPerDay: 2,
   favoritesCount: 2,
   favoriteChanges: 1,
   pronounceSeconds: 15,
@@ -419,6 +421,8 @@ export interface GetMyStateOutput {
   today: IstDate;
   attemptsLeft: number;
   attemptsPerDay: number;
+  /** Tries per Lingo per day (rules.triesPerLingoPerDay). */
+  triesPerLingo: number;
 }
 
 export interface StartAttemptInput {
@@ -448,6 +452,8 @@ export interface StartAttemptOutput {
   serverNow: number;
   /** Daily attempts left after this one (unchanged for raid attempts). */
   attemptsLeft: number;
+  /** Normal tries: tries left on this Lingo today after this one (a second try after a miss). */
+  lingoTriesLeft?: number;
   /** Pool difficulty (normal tries): hard from a favourite's 6th streak day. */
   level?: QuestionLevel;
 }

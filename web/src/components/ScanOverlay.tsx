@@ -85,16 +85,27 @@ export default function ScanOverlay({
         </>
       )}
 
+      {server === "ok" && status.kind === "retry" && (
+        <>
+          <p className="streak" data-retry>
+            Missed it earlier — {status.triesLeft === 1 ? "1 more try" : `${status.triesLeft} more tries`} today
+          </p>
+          <Link className="btn big catch-it" to={`/catch/${lingo.id}`}>
+            Try again!
+          </Link>
+        </>
+      )}
+
       {server === "ok" && status.kind === "caughtToday" && (
         <p className="done" data-closed>
-          Tried today ✓ — come back tomorrow
+          Caught today ✓ — come back tomorrow
           {streak > 0 && <span className="streak"> · 🔥 Day {streak}</span>}
         </p>
       )}
 
       {server === "ok" && status.kind === "triedToday" && (
         <p className="done" data-closed>
-          Tried today ✗ — back tomorrow
+          Both tries used today ✗ — back tomorrow
         </p>
       )}
 

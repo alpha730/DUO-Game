@@ -7,9 +7,18 @@ export function attemptsUsedToday(user: Pick<UserDoc, "attemptsToday" | "attempt
   return user.attemptsDate === today ? user.attemptsToday : 0;
 }
 
-/** Lingos already tried on `today` (one try per Lingo per day); [] when triedDate ≠ today. */
+/** Different Lingos already tried on `today` (4 a day); [] when triedDate ≠ today. */
 export function triedToday(user: Pick<UserDoc, "triedToday" | "triedDate">, today: string): string[] {
   return user.triedDate === today ? (user.triedToday ?? []) : [];
+}
+
+/** Tries used per Lingo on `today`; {} when triedDate ≠ today. A Lingo listed in triedToday without a
+ *  count (written before tries were counted) has used 1. */
+export function triesToday(user: Pick<UserDoc, "triedToday" | "triesToday" | "triedDate">, today: string): Record<string, number> {
+  if (user.triedDate !== today) return {};
+  const counts: Record<string, number> = {};
+  for (const id of user.triedToday ?? []) counts[id] = user.triesToday?.[id] ?? 1;
+  return counts;
 }
 
 export function attemptsLeft(
@@ -25,6 +34,7 @@ export function userView(user: UserDoc, today: string): UserView {
     ...user,
     attemptsToday: attemptsUsedToday(user, today),
     triedToday: triedToday(user, today),
+    triesToday: triesToday(user, today),
     triedDate: today,
     createdAt: millis(user.createdAt) ?? 0,
     pointsReachedAt: millis(user.pointsReachedAt),

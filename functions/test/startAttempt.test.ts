@@ -78,9 +78,9 @@ describe("startAttempt", () => {
     expect(out.attemptsLeft).toBe(3);
   });
 
-  it("refuses a Lingo already tried today; tries from an earlier day don't count", async () => {
+  it("refuses a Lingo with both tries used today; tries from an earlier day don't count", async () => {
     const p = await newPlayer();
-    await adb.doc(`users/${p.uid}`).update({ triedToday: [LINGO.meaning], triedDate: istToday() });
+    await adb.doc(`users/${p.uid}`).update({ triedToday: [LINGO.meaning], triesToday: { [LINGO.meaning]: 2 }, triedDate: istToday() });
     await expect(start(p, LINGO.meaning)).rejects.toMatchObject({ details: { code: "already-tried" } });
     await adb.doc(`users/${p.uid}`).update({ triedDate: "2026-01-01" });
     await expect(start(p, LINGO.meaning)).resolves.toMatchObject({ type: "meaning" });

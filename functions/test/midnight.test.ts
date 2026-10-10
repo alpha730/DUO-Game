@@ -45,7 +45,7 @@ describe("across IST midnight (fake server clock)", () => {
     await win(p, FAV[0]);
     await win(p, FAV[1]);
     await p.call<SetFavoritesInput>("setFavorites")({ lingoIds: FAV });
-    await expect(start(p, FAV[0])).rejects.toMatchObject({ details: { code: "already-tried" } });
+    await expect(start(p, FAV[0])).rejects.toMatchObject({ details: { code: "already-caught" } });
     expect((await state(p)).attemptsLeft).toBe(2);
 
     // Day N+1, 00:00:30 IST: a new day — catchable again, 4 attempts, favourite streak day 1.

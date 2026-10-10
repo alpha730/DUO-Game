@@ -12,7 +12,7 @@ import Mascot from "../components/Mascot";
 import RaidBanner from "../components/RaidBanner";
 import { BRAND, lingoName } from "../config/brand";
 import { useAuth } from "../lib/auth";
-import { dayBefore } from "../lib/catchStatus";
+import { dayBefore, triesLeft, triesUsed } from "../lib/catchStatus";
 import { loadLingos, type Lingo } from "../lib/lingos";
 import { serverOffsetMs, useMyState } from "../lib/myState";
 import { useOpenRaids } from "../lib/raids";
@@ -29,8 +29,9 @@ function FavoriteCard({ lingo, c, me }: { lingo: Lingo; c: CatchView | undefined
   const today = me?.today ?? "";
   const streak = Math.min(liveStreak(c, today), MAX_DAY);
   const caughtToday = !!today && c?.lastCaughtDate === today;
-  const triedToday = !caughtToday && me?.user?.triedDate === today && !!me?.user?.triedToday?.includes(lingo.id);
-  const state = caughtToday ? "caught" : triedToday ? "tried" : "open";
+  const used = caughtToday ? 0 : triesUsed(lingo.id, me);
+  const left = triesLeft(lingo.id, me);
+  const state = caughtToday ? "caught" : used > 0 && left === 0 ? "tried" : used > 0 ? "retry" : "open";
   return (
     <div className="fav-card" data-lingo={lingo.id} data-caught-today={caughtToday} data-state={state} style={{ "--lingo": lingo.color } as React.CSSProperties}>
       <div className="fav-card-art">
@@ -47,7 +48,7 @@ function FavoriteCard({ lingo, c, me }: { lingo: Lingo; c: CatchView | undefined
         <div className="fav-bar" aria-hidden="true">
           <div style={{ width: `${(streak / MAX_DAY) * 100}%` }} />
         </div>
-        <span className="fav-today">{caughtToday ? "Caught today ✓" : triedToday ? "Tried today ✗" : "Not yet today"}</span>
+        <span className="fav-today">{state === "caught" ? "Caught today ✓" : state === "tried" ? "Tried today ✗" : state === "retry" ? `Missed — ${left === 1 ? "1 more try" : `${left} more tries`} today` : "Not yet today"}</span>
       </div>
     </div>
   );

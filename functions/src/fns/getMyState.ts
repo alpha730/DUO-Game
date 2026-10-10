@@ -31,5 +31,6 @@ export const getMyState = onCall<unknown, Promise<GetMyStateOutput>>(async (req)
     today,
     attemptsLeft: user ? attemptsLeft(user, today, rules) : rules.attemptsPerDay,
     attemptsPerDay: rules.attemptsPerDay,
+    triesPerLingo: rules.triesPerLingoPerDay,
   };
 });

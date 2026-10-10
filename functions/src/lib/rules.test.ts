@@ -6,7 +6,7 @@ describe("DEFAULT_RULES", () => {
   it("matches SPEC §2", () => {
     expect(DEFAULT_RULES).toEqual({
       attemptsPerDay: 4,
-      catchesPerLingoPerDay: 1,
+      triesPerLingoPerDay: 2,
       favoritesCount: 2,
       favoriteChanges: 1,
       pronounceSeconds: 15,

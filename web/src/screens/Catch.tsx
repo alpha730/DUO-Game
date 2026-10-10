@@ -22,6 +22,7 @@ import { QuestionTimer, TimeBar } from "../components/QuestionTimer";
 import VoiceChallenge from "../components/VoiceChallenge";
 import { api, apiErrorMessage } from "../lib/api";
 import { haptic, play } from "../lib/feedback";
+import { triesLeft, triesUsed } from "../lib/catchStatus";
 import { auth } from "../lib/firebase";
 import { loadLingos, type Lingo } from "../lib/lingos";
 import { recordAnswer } from "../lib/skills";
@@ -149,6 +150,8 @@ export default function Catch() {
   // Refused for good today (Lingo already tried / 4 Lingos tried / raid over…): no Start button.
   const [closed, setClosed] = useState(false);
   const [challenge, setChallenge] = useState<StartAttemptOutput | null>(null);
+  // Tries left on this Lingo today after the latest start (2 a day; null until a try starts).
+  const [lingoTriesLeft, setLingoTriesLeft] = useState<number | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(reloaded ? { kind: "forfeit" } : null);
   const token = useRef<string | null>(null);
   const submitted = useRef(false);
@@ -230,13 +233,14 @@ export default function Catch() {
       const out = await api.startAttempt({ lingoId, lat: position.lat, lng: position.lng, speech: speechSupported(), ...(raidId ? { raidId } : {}) });
       submitted.current = false;
       setAttemptsLeft(out.attemptsLeft);
+      if (out.lingoTriesLeft !== undefined) setLingoTriesLeft(out.lingoTriesLeft);
       setChallenge(out);
       setPhase("active");
     } catch (err) {
       const code = (err as { details?: { code?: string } }).details?.code;
       setNeedsSpeech(code === "needs-speech");
       setErrorCode(code ?? (err as { code?: string }).code ?? "");
-      setClosed(["raid-tried", "raid-ended", "not-joined", "already-tried", "no-attempts"].includes(code ?? ""));
+      setClosed(["raid-tried", "raid-ended", "not-joined", "already-caught", "already-tried", "no-attempts"].includes(code ?? ""));
       setError(apiErrorMessage(err)); // names the Lingo by its stored name (= the brand's display name)
       setPhase("ready");
     }
@@ -269,7 +273,23 @@ export default function Catch() {
   );
 
 
+  // Second try after a miss (SPEC §2): a fresh question; the same Lingo, so no other of the daily 4 is used.
+  const retry = () => {
+    setChallenge(null);
+    setOutcome(null);
+    setError("");
+    setErrorCode("");
+    submitted.current = false;
+    lastAnswer.current = {};
+    if (position) setPhase("ready");
+    else void runPreflight(); // came here from a reload: no location yet
+    api.getMyState({}).then(setMe, () => {});
+  };
+
   const name = lingo ? lingoName(lingo) : `this ${BRAND.creatureName}`;
+  const triesPerLingo = me?.triesPerLingo ?? 2;
+  // Tries already used on this Lingo today (from the last start, else from getMyState).
+  const used = lingoTriesLeft !== null ? triesPerLingo - lingoTriesLeft : triesUsed(lingoId, me);
 
   return (
     <main className="screen stack catch" data-phase={phase}>
@@ -289,6 +309,11 @@ export default function Catch() {
           {!raidId && me && attemptsLeft !== null && (phase === "preflight" || phase === "ready" || phase === "starting") && (
             <p className="small muted" style={{ margin: 0 }}>
               Lingos left today: {attemptsLeft}/{me.attemptsPerDay}
+            </p>
+          )}
+          {!raidId && me && used > 0 && used < triesPerLingo && (phase === "preflight" || phase === "ready" || phase === "starting") && (
+            <p className="small muted" style={{ margin: 0 }} data-try-number>
+              Try {used + 1} of {triesPerLingo} · a new question
             </p>
           )}
         </div>
@@ -338,6 +363,8 @@ export default function Catch() {
           attemptsLeft={raidId ? null : attemptsLeft}
           attemptsPerDay={me?.attemptsPerDay ?? null}
           raid={!!raidId}
+          triesLeft={raidId ? null : (lingoTriesLeft ?? (me ? triesLeft(lingoId, me) : null))}
+          onRetry={retry}
           prevLevel={me?.catches.find((x) => x.lingoId === lingoId && x.timesCaught > 0)?.level ?? null}
         />
       )}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { attemptsLeft, attemptsUsedToday, catchView, userView } from "./state";
+import { attemptsLeft, attemptsUsedToday, catchView, triesToday, userView } from "./state";
 
 const ts = (ms: number) => ({ seconds: ms / 1000, nanoseconds: 0, toMillis: () => ms, toDate: () => new Date(ms) });
 const rules = { attemptsPerDay: 4 };
@@ -44,5 +44,14 @@ describe("views", () => {
       favStreak: 0,
       maxBonusGiven: false,
     });
+  });
+});
+
+describe("triesToday", () => {
+  it("counts tries per Lingo for today only; an uncounted tried Lingo has used 1", () => {
+    const today = "2026-10-10";
+    expect(triesToday({ triedToday: ["a", "b"], triesToday: { a: 2 }, triedDate: today }, today)).toEqual({ a: 2, b: 1 });
+    expect(triesToday({ triedToday: ["a"], triesToday: { a: 2 }, triedDate: "2026-10-09" }, today)).toEqual({});
+    expect(triesToday({}, today)).toEqual({});
   });
 });

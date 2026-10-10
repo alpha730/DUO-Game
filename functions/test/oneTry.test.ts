@@ -1,5 +1,6 @@
-// SPEC §2 (rule change): each player can TRY 4 DIFFERENT Lingos per IST day, ONE try per Lingo.
-// Won, failed and forfeit all close that Lingo for the day and use 1 of the 4. Raids stay outside.
+// SPEC §2 (rule change): each player can TRY 4 DIFFERENT Lingos per IST day, TWO tries per Lingo.
+// A win closes that Lingo for the day; failed and forfeit use a try. Only a new Lingo uses 1 of the
+// 4 (a second try doesn't). Raids stay outside.
 import { afterAll, afterEach, describe, expect, it } from "vitest";
 import type { AdminCreateRaidOutput, GetMyStateOutput, StartAttemptOutput, SubmitAttemptOutput } from "../src/shared/types";
 import { adb, adminAuth, CAMPUS, cleanupApps, FUNCTIONS_ORIGIN, istToday, newPlayer } from "./helpers";
@@ -16,16 +17,26 @@ const failTry = async (p: Player, lingoId: string) =>
   p.call<object, SubmitAttemptOutput>("submitAttempt")({ attemptId: (await start(p, lingoId)).attemptId, choice: 3, transcript: "zzz" });
 const state = (p: Player) => p.call<object, GetMyStateOutput>("getMyState")({});
 
-describe("one try per Lingo per day, 4 different Lingos", () => {
-  it("fail Lingo 2 → retrying Lingo 2 today is refused (no try used)", async () => {
+describe("2 tries per Lingo per day, 4 different Lingos", () => {
+  it("fail Lingo 2 → a second try is allowed (not another of the 4); after 2 misses it's refused", async () => {
     const p = await newPlayer();
-    expect(await failTry(p, L(2))).toMatchObject({ result: "failed" });
+    const first = await start(p, L(2));
+    expect(first).toMatchObject({ attemptsLeft: 3, lingoTriesLeft: 1 });
+    await p.call("submitAttempt")({ attemptId: first.attemptId, choice: 3, transcript: "zzz" });
+    let s = await state(p);
+    expect(s).toMatchObject({ attemptsLeft: 3, triesPerLingo: 2 });
+    expect(s.user!.triesToday).toEqual({ [L(2)]: 1 });
+
+    const second = await start(p, L(2));
+    expect(second).toMatchObject({ attemptsLeft: 3, lingoTriesLeft: 0 });
+    await p.call("submitAttempt")({ attemptId: second.attemptId, choice: 3, transcript: "zzz" });
     const err = await start(p, L(2)).catch((e) => e);
     expect(err.details.code).toBe("already-tried");
-    expect(err.message).toMatch(/^You've already tried .+ today — come back tomorrow/);
-    const s = await state(p);
+    expect(err.message).toMatch(/^You've used your 2 tries at .+ today — come back tomorrow/);
+    s = await state(p);
     expect(s.attemptsLeft).toBe(3);
     expect(s.user!.triedToday).toEqual([L(2)]);
+    expect(s.user!.triesToday).toEqual({ [L(2)]: 2 });
   });
 
   it("fail 2, then 1, 5 and 7 are all allowed; a 5th different Lingo is refused", async () => {
@@ -36,9 +47,11 @@ describe("one try per Lingo per day, 4 different Lingos", () => {
     expect(err.details.code).toBe("no-attempts");
     expect(err.message).toMatch(/^You've tried 4 Lingos today — come back tomorrow/);
     expect((await state(p)).user!.triedToday).toEqual([L(2), L(1), L(5), L(7)]);
+    // The second try at Lingo 2 still works with all 4 used — it's not a new Lingo.
+    await expect(start(p, L(2))).resolves.toMatchObject({ attemptsLeft: 0, lingoTriesLeft: 0 });
   });
 
-  it("a forfeit closes the Lingo too (left open, or forfeited by the one-chance rule)", async () => {
+  it("a forfeit uses a try too (left open, or forfeited by the one-chance rule)", async () => {
     const p = await newPlayer();
     const a = await start(p, L(3));
     const res = await fetch(`${FUNCTIONS_ORIGIN}/forfeitAttempt`, {
@@ -47,11 +60,13 @@ describe("one try per Lingo per day, 4 different Lingos", () => {
       body: JSON.stringify({ attemptId: a.attemptId }),
     });
     expect(res.status).toBe(204);
+    await expect(start(p, L(3))).resolves.toMatchObject({ lingoTriesLeft: 0 }); // second try
+    await state(p); // auto-forfeit
     await expect(start(p, L(3))).rejects.toMatchObject({ details: { code: "already-tried" } });
     // Started then abandoned (auto-forfeited when the app reopens) also counts.
     await start(p, L(4));
     await state(p); // auto-forfeit
-    await expect(start(p, L(4))).rejects.toMatchObject({ details: { code: "already-tried" } });
+    expect((await state(p)).user!.triesToday).toMatchObject({ [L(3)]: 2, [L(4)]: 1 });
   });
 
   it("refusals before Start don't use a Lingo (needs-speech)", async () => {

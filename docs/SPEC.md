@@ -56,7 +56,7 @@
 - **A raid win does NOT:** change the favourite streak, MAX, `dayStreak` or `attemptsToday`, or set `lastCaughtDate` ("caught today") — the player can still do a normal catch of that Lingo the same day.
 - Logged in `pointsLog` with reason `raid` (+ `speed`, + `allTen` if it completes the set). Wins/losses and answer time count like any attempt.
 
-**Cheat flags (flag only, never block):** an answer arriving < 1.5 s (speak/pronounce) or < 0.8 s (meaning/question) after `startedAt` sets `flagged` + `flagReason` on the attempt and `users.flags`++. Points and results are never changed by a flag; admins review the Suspicious players list before prizes and the final.
+**Cheat flags (flag only, never block):** an answer arriving < 1.5 s (speak/pronounce) or < 0.8 s (meaning/question) after `startedAt` sets `flagged` + `flagReason` on the attempt and `users.flags`++. Points and results are never changed by a flag; admins review the Suspicious players list before prizes and the final. Also flagged (anti-cheat, docs/SECURITY.md): every Read Aloud win a perfect transcript in < 2 s (≥ 5 wins → `voiceSuspect`), and a location jump ≥ 3 km within 5 minutes between Starts (`locationJumps`++).
 
 **Points come only from correct answers.** Every point source above requires a win (catch); nothing is given for logging in or trying.
 
@@ -85,13 +85,14 @@ The same order picks the top 20 for the final round. The live final round on Oct
 ## 4. Data model (Firestore)
 | Path | Fields | Client read |
 |---|---|---|
-| `users/{uid}` | name, email, points, triedToday (lingoId[], the different Lingos tried — max 4) + triesToday ({lingoId: tries}, max 2 each) + triedDate, seenQ (question ids asked, never repeated), wordsToday + wordsDate (words asked today), openAttemptId? (the one open attempt; no queries on `attempts` in transactions), flags? (too-fast answers), suspect? (≥ 10 wins, ≥ 95 % accuracy, avg < 3 s), attemptsToday, attemptsDate, dayStreak, lastPlayDate, lingosCaught (number), allTenBonus (bool), favorites (lingoId[] max 2), favoriteChangesLeft (1), wins, losses, totalAnswerMs, pointsReachedAt, profileDone, createdAt | owner only |
+| `users/{uid}` | name, email, points, triedToday (lingoId[], the different Lingos tried — max 4) + triesToday ({lingoId: tries}, max 2 each) + triedDate, seenQ (question ids asked, never repeated), wordsToday + wordsDate (words asked today), openAttemptId? (the one open attempt; no queries on `attempts` in transactions), flags? (too-fast answers), suspect? (≥ 10 wins, ≥ 95 % accuracy, avg < 3 s), voiceWins? + voicePerfectFast? + voiceSuspect?, lastFix? {lat,lng,at} + locationJumps?, disabled? (admin: every play function refuses, off the leaderboard), spent? (prize desk; balance = points − spent), attemptsToday, attemptsDate, dayStreak, lastPlayDate, lingosCaught (number), allTenBonus (bool), favorites (lingoId[] max 2), favoriteChangesLeft (1), wins, losses, totalAnswerMs, pointsReachedAt, profileDone, createdAt | owner only |
 | `users/{uid}/catches/{lingoId}` | firstCaughtAt, timesCaught, lastCaughtDate, level (1\|2\|3\|'MAX'), favStreak, maxBonusGiven (bool) | owner only |
 | `lingos/{lingoId}` | name (the display name, also used in server messages: Rookie Duo, Curious Duo, Winking Duo, Thumbs-Up Duo, Fierce Duo, Lovestruck Duo, Joyful Duo, Bookworm Duo, Cool Duo, Champion Duo for 2016–2025; same as `brand.ts` OFFICIAL), detYear, posterIndex (0–9), modelUrl, rarity, color | signed-in |
 | `config/game` | startAt, lockAt, locked, campuses ({name, lat, lng, radiusM}[], 1–4; seeded from `scripts/campuses.ts`), rules (table above) | signed-in |
 | `questions/{id}` | the pool (§9): level ('medium'\|'hard'), type ('meaning'\|'question'\|'pronounce'), word? (meaning/pronounce), prompt? + target? (question), options? (4), correctIndex?, accept? (pronounce), explanation | **never** |
 | `challenges/raid_{raidId}` | an Owl Raid's own challenge: type ('pronounce'\|'speak'\|'meaning'\|'question'), word?, accept?, phrase?, prompt?, options? (4), correctIndex? (the old `challenges/{date}_{lingoId}` docs are no longer used) | **never** |
-| `attempts/{id}` | uid, lingoId, date, type, raidId?, questionId? + level? (pool question), question (server-only copy of what was asked, scored by submitAttempt), startedAt, expiresAt, status ('open'\|'won'\|'failed'\|'forfeit'), score?, receivedAt?, answerMs?, speedBonus?, flagged?, flagReason? | **never** |
+| `attempts/{id}` | uid, lingoId, date, type, raidId?, questionId? + level? (pool question), question (server-only copy of what was asked, scored by submitAttempt), startedAt, expiresAt, status ('open'\|'won'\|'failed'\|'forfeit'), score?, receivedAt?, answerMs?, speedBonus?, flagged?, flagReason?, order? (choice questions: the option order shown to this player, shuffled per attempt) | **never** |
+| `limits/{uid}` | minute, calls, starts — per-user rate limit (30 calls / 6 Starts a minute) | **never** |
 | `pointsLog/{id}` | uid, amount, reason, attemptId?, createdAt | **never** |
 | `leaderboard/students` | top: [{uid, name, points, accuracy, avgAnswerMs}] (top 100, in tie-break order), updatedAt | signed-in |
 | `raids/{id}` | posterIndex, lingoId, startAt, endAt, minPlayers (20), unlocked, status (joins never write this doc) | signed-in |
@@ -117,7 +118,9 @@ All callable (`onCall`) unless noted. Every one runs the checks in CLAUDE.md rul
 | `forfeitAttempt` | **HTTP `onRequest`**, header `Authorization: Bearer <idToken>`, body `{attemptId}` | Verify token; if owner + open → `forfeit` and the user's losses++ (same when an expired or auto-forfeited attempt is closed) | 204 |
 | `refreshLeaderboard` | **scheduled**, every 10 min | Query top 300 users by points, sort in code by the tie-break order in §2, keep top 100 | – |
 | `joinRaid` | raidId, lat, lng | Raid active (until endAt, also after unlock); on campus; add player (once, create-if-absent) + increment one random shard in the same batch; read the 10 shards; if sum ≥ minPlayers → unlocked | `{joined, unlocked, tried}` |
-| `redeemPrize` | uid, prizeId | Caller has role volunteer/admin; balance ≥ cost; stock > 0; deduct + log | `{newBalance}` |
+| `redeemPrize` | uid, prizeId | Caller has role volunteer/admin; one transaction: player not disabled, balance (points − spent) ≥ cost, stock > 0; spent += cost, stock −1, `redemptions` doc (leaderboard points unchanged) | `{newBalance, redemptionId}` |
+| `adminSetDisabled` | uid, disabled | Role admin; sets `users.disabled` | `{uid, disabled}` |
+| `adminDuplicates` | – | Role admin, on click: possible duplicate accounts (same/similar name, similar email, made minutes apart) — flag only | `{rows}` |
 | `adminCreateRaid` | posterIndex, lingoId, startAt, minutes? (15), minPlayers? (20), challenge (same shape as a normal challenge) | Role admin only; Lingo on that poster; validate the challenge; write `raids/{id}` + `challenges/raid_{id}` together | `{raidId}` |
 | `adminUpsertQuestions` | questions (the whole pool) | Role admin only; validate every row (unique ids, level/type, 4 distinct options, correctIndex 0–3, explanation); all-or-nothing; replaces the pool | `{written, removed, counts}` |
 | `adminSetConfig`, `lockGame`, `finalControl` | – | Role admin only | – |
@@ -129,6 +132,8 @@ Roles = custom claims `{role:'admin'|'volunteer'}` set by `scripts/setRole.ts`.
 **Date helper** (`functions/src/lib/date.ts`): `istDate(now)` → `YYYY-MM-DD` in Asia/Kolkata; `isYesterday(a,b)`.
 
 **Distance helper** (`functions/src/lib/geo.ts`): haversine metres.
+
+**Every callable** (anti-cheat, docs/SECURITY.md): App Check enforced; players also need a verified email, a non-disabled account and stay within 30 calls / 6 Starts per minute ("Slow down"). `startAttempt` refuses a second Start within 5 s of an open attempt (two tabs/devices at once → `busy`, no try used) and sends choice options in a per-attempt random order; `submitAttempt` maps the chosen position back.
 
 ## 6. Security rules (summary)
 - Default deny.

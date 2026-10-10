@@ -2,7 +2,7 @@
 //    1→10 (+20 × day), Medium questions on days 1–5 and Hard from day 6, MAX + 1,000 once, the all-10
 //    bonus once, a speed bonus on every win. The favourite (Winking Duo) is NOT pinned, so its
 //    questions come from the real pool at the right level.
-import { adb, addDays, patchConfig, Timestamp, answerChoice, BASE, finish, istDate, istMidnight, launch, ok, openAttempt, pinQuestions, DEFAULT_PINS, resetServerClock, resultOutcome, say, setServerClock, signUp, startCatch } from "../lib.mjs";
+import { shot, adb, addDays, patchConfig, Timestamp, answerChoice, BASE, finish, istDate, istMidnight, launch, ok, openAttempt, pinQuestions, DEFAULT_PINS, resetServerClock, resultOutcome, say, setServerClock, signUp, startCatch } from "../lib.mjs";
 
 const FAV = "lingo-2018";
 const FAV2 = "lingo-2019";
@@ -51,7 +51,12 @@ try {
   await page.waitForURL("**/favorites");
   await page.getByRole("button", { name: /Winking Duo/ }).click();
   await page.getByRole("button", { name: /Thumbs-Up Duo/ }).click();
-  await page.getByRole("button", { name: "Save favourites" }).click();
+  await page.getByRole("button", { name: "Save favourites" }).click({ timeout: 10000 }).catch(async (e) => {
+    const picked = await page.locator(".fav-option").evaluateAll((els) => els.map((b) => `${b.textContent.trim().slice(0, 20)}=${b.getAttribute("aria-pressed")}`));
+    console.log("DEBUG favourites:", JSON.stringify(picked), "| buttons:", JSON.stringify(await page.getByRole("button").allInnerTexts()));
+    await shot(page, "05-favourites-stuck");
+    throw e;
+  });
   await page.waitForURL("**/home", { timeout: 15000 });
   ok((await user(uid)).favorites.sort().join() === [FAV, FAV2].join(), "favourites saved");
 

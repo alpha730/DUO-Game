@@ -159,7 +159,9 @@ export async function launch({ init = [], ua, colorScheme = "light", viewport = 
   return { browser, ctx, page, errors };
 }
 
-export const shot = (page, name, opts = {}) => page.screenshot({ path: `${OUT}${name}.png`, ...opts });
+// A screenshot is evidence, not a check: a failed capture (e.g. WebKit on a very long page) never fails a flow.
+export const shot = (page, name, opts = {}) =>
+  page.screenshot({ path: `${OUT}${name}.png`, ...opts }).catch((e) => console.log(`(screenshot ${name} skipped: ${String(e.message).split("\n")[0]})`));
 
 // ---------- Accounts ----------
 let seq = 0;

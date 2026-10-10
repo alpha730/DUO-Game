@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { GetMyStateOutput } from "@shared/types";
 import LevelBadge from "../components/LevelBadge";
@@ -18,11 +18,15 @@ export default function Favorites() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  // The player's own taps win: a state answer that lands after the first tap never resets the pick
+  // (QA: a late second answer undid a tap, so Save never appeared).
+  const touched = useRef(false);
+
   useEffect(() => {
     api.getMyState({}).then(
       (s) => {
         setMe(s);
-        setPicked(s.user?.favorites ?? []);
+        if (!touched.current) setPicked(s.user?.favorites ?? []);
       },
       (err) => setError(apiErrorMessage(err)),
     );
@@ -46,6 +50,7 @@ export default function Favorites() {
 
   function toggle(id: string) {
     if (locked) return;
+    touched.current = true;
     setError("");
     setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : p.length < PICK ? [...p, id] : [p[1], id]));
   }

@@ -423,6 +423,10 @@ export interface GetMyStateOutput {
   attemptsPerDay: number;
   /** Tries per Lingo per day (rules.triesPerLingoPerDay). */
   triesPerLingo: number;
+  /** Game window (ms), for the "starts in" countdown and "the hunt is over"; null if not configured. */
+  startAt: number | null;
+  lockAt: number | null;
+  locked: boolean;
 }
 
 export interface StartAttemptInput {

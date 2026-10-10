@@ -32,5 +32,8 @@ export const getMyState = onCall<unknown, Promise<GetMyStateOutput>>(async (req)
     attemptsLeft: user ? attemptsLeft(user, today, rules) : rules.attemptsPerDay,
     attemptsPerDay: rules.attemptsPerDay,
     triesPerLingo: rules.triesPerLingoPerDay,
+    startAt: config ? config.startAt.toMillis() : null,
+    lockAt: config ? config.lockAt.toMillis() : null,
+    locked: config?.locked ?? false,
   };
 });

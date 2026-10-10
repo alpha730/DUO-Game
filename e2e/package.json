@@ -1,0 +1,17 @@
+{
+  "name": "decade-hunt-e2e",
+  "private": true,
+  "type": "module",
+  "description": "End-to-end tests (Playwright, mobile 375×812, Chromium + WebKit) against the emulators + Vite dev server.",
+  "scripts": {
+    "install-browsers": "playwright-core install chromium webkit",
+    "test": "node run.mjs",
+    "test:chromium": "node run.mjs --browser=chromium",
+    "test:webkit": "node run.mjs --browser=webkit"
+  },
+  "dependencies": {
+    "jsqr": "^1.4.0",
+    "playwright-core": "^1.63.0",
+    "pngjs": "^7.0.0"
+  }
+}

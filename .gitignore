@@ -26,3 +26,6 @@ web/public/brand/
 
 # Local AI scratch output (not part of the app)
 Claude outputs/
+
+# E2E output (screenshots, logs)
+e2e/out/

@@ -3,7 +3,8 @@ import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { COL, RAID_SHARDS, type JoinRaidOutput, type RaidDoc, type RaidPlayerDoc, type RaidShardDoc } from "../shared/types";
 import { serverNow } from "../lib/clock";
 import { db } from "../lib/db";
-import { campusCheck, isEmulator, isValidLatLng } from "../lib/geo";
+import { lenientCampus } from "../lib/emulator";
+import { campusCheck, isValidLatLng } from "../lib/geo";
 import { requirePlayer } from "../lib/guards";
 import { raidPhase } from "../lib/raids";
 
@@ -23,7 +24,7 @@ export const joinRaid = onCall<unknown, Promise<JoinRaidOutput>>(async (req) => 
   const { raidId, lat, lng } = (req.data ?? {}) as Record<string, unknown>;
   if (typeof raidId !== "string" || !/^[\w-]{1,64}$/.test(raidId)) throw new HttpsError("invalid-argument", "Unknown raid.");
   if (!isValidLatLng(lat, lng)) throw new HttpsError("invalid-argument", "We need your location.", { code: "bad-location" });
-  if (campusCheck(lat as number, lng as number, config.campuses ?? [], isEmulator()) === "off-campus") {
+  if (campusCheck(lat as number, lng as number, config.campuses ?? [], await lenientCampus()) === "off-campus") {
     throw new HttpsError("failed-precondition", "You need to be on campus to join the raid.", { code: "off-campus" });
   }
 

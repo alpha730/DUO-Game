@@ -11,6 +11,7 @@ import { CloseIcon, CoinIcon } from "../components/Icons";
 import ScanOverlay from "../components/ScanOverlay";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
+import { usingEmulators } from "../lib/firebase";
 import { inAppBrowser } from "../lib/browser";
 import { haptic, play } from "../lib/feedback";
 import { catchStatus } from "../lib/catchStatus";
@@ -23,6 +24,8 @@ type Status = "starting" | "scanning" | "problem";
 declare const __TARGETS_VERSION__: string;
 
 const IN_APP = inAppBrowser();
+// E2E tests on the emulators only: a fake scanner driven by window.__posterFound(i) (ar/fakeScanner.ts).
+const FAKE_SCANNER = usingEmulators && (window as { __FAKE_SCANNER?: boolean }).__FAKE_SCANNER === true;
 
 // Lazy-loaded route: MindAR + three.js live in this chunk only.
 /**
@@ -86,8 +89,8 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
         const lingosP = testMode ? loadLingos().catch(() => [] as Lingo[]) : loadLingos();
         // Day 8: the AR code (three.js + MindAR, ~470 KB) downloads in parallel with the targets and
         // Lingos instead of before the Scan screen can draw (camera prompt and help show at once).
-        const arP = Promise.all([import("../ar/scanner"), import("../ar/models")]);
-        [lingos, targets, ar] = await Promise.all([lingosP, loadTargets(), arP]);
+        const arP = Promise.all([FAKE_SCANNER ? import("../ar/fakeScanner") : import("../ar/scanner"), import("../ar/models")]);
+        [lingos, targets, ar] = await Promise.all([lingosP, FAKE_SCANNER ? Promise.resolve("") : loadTargets(), arP]);
       } catch (err) {
         throw Object.assign(new Error((err as Error).message), { data: true });
       }

@@ -20,7 +20,8 @@ import { forfeitTx, readOpenAttemptTx } from "../lib/attempts";
 import { publicChallenge } from "../lib/challenge";
 import { istDate } from "../lib/date";
 import { catchRef, db, userRef } from "../lib/db";
-import { campusCheck, isEmulator, isValidLatLng } from "../lib/geo";
+import { lenientCampus } from "../lib/emulator";
+import { campusCheck, isValidLatLng } from "../lib/geo";
 import { requirePlayer } from "../lib/guards";
 import { pinnedQuestion, questionPool } from "../lib/questionPool";
 import { levelFor, pickQuestion, streakDayFor, targetWord } from "../lib/questions";
@@ -43,7 +44,7 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
     throw new HttpsError("invalid-argument", "Unknown raid.");
   }
   if (!isValidLatLng(lat, lng)) throw new HttpsError("invalid-argument", "We need your location.", { code: "bad-location" });
-  if (campusCheck(lat as number, lng as number, config.campuses ?? [], isEmulator()) === "off-campus") {
+  if (campusCheck(lat as number, lng as number, config.campuses ?? [], await lenientCampus()) === "off-campus") {
     fail("off-campus", "You need to be on campus to catch Lingos.");
   }
 

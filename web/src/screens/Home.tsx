@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { LINGO_COUNT, type CatchView, type GetMyStateOutput } from "@shared/types";
 import CoBrand from "../components/CoBrand";
 import EmptyState from "../components/EmptyState";
+import GameClock, { gamePhase, useServerNow } from "../components/GameClock";
 import Hud from "../components/Hud";
 import { ScanIcon } from "../components/Icons";
 import LevelBadge from "../components/LevelBadge";
@@ -79,6 +80,12 @@ export default function Home() {
     .filter((l): l is Lingo => !!l);
   const caughtCount = me?.user?.lingosCaught ?? profile?.lingosCaught ?? 0;
   const firstName = profile?.name.split(" ")[0];
+  const now = useServerNow(me ? serverOffsetMs() : 0);
+  const phase = gamePhase(me, now);
+  // The countdown reached 0: fetch the state again so Home switches to the open game.
+  useEffect(() => {
+    if (me && me.startAt !== null && phase === "before" && me.startAt - now <= 0) reload();
+  }, [me, now, phase, reload]);
 
   return (
     <main className="screen with-nav stack home">
@@ -86,6 +93,7 @@ export default function Home() {
         <CoBrand />
       </header>
       <Hud state={me} />
+      <GameClock phase={phase} me={me} now={now} />
 
       {/* DET-style hero: one clear heading, one clear action. */}
       <section className="home-hero card" aria-label="Scan">
@@ -99,9 +107,15 @@ export default function Home() {
           </div>
           <Mascot slot="hero" mood="happy" className="home-hero-art" />
         </div>
-        <Link to="/scan" className="btn big scan-hero-btn" aria-label="Scan a poster">
-          <ScanIcon size={24} /> Scan a poster
-        </Link>
+        {phase === "open" ? (
+          <Link to="/scan" className="btn big scan-hero-btn" aria-label="Scan a poster">
+            <ScanIcon size={24} /> Scan a poster
+          </Link>
+        ) : (
+          <button className="btn big scan-hero-btn" disabled aria-label="Scan a poster">
+            <ScanIcon size={24} /> {phase === "before" ? "Opens soon" : "Hunt over"}
+          </button>
+        )}
         {me && <LingoPips left={me.attemptsLeft} total={me.attemptsPerDay} />}
         <Link className="rules-link" to="/rules" data-rules-link>
           How it works · Game rules →

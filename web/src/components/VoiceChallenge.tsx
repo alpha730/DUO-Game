@@ -11,7 +11,10 @@ const STOP_HELP: Record<string, string> = {
   "service-not-allowed": "Speech recognition is turned off on this phone.",
 };
 
-/** pronounce / speak (PLAN 3.6): say it into the giant mic; the final transcript is submitted. */
+/**
+ * pronounce / speak as DET "Read Aloud" (PLAN 3.6): listening starts at once; the final transcript is
+ * submitted automatically (or with the card's SUBMIT button).
+ */
 export default function VoiceChallenge({
   challenge,
   onTranscript,
@@ -56,8 +59,8 @@ export default function VoiceChallenge({
   const pronounce = challenge.type === "pronounce";
   return (
     <div className="stack challenge voice" data-listening={listening}>
-      <div className="bubble">
-        <p className="bubble-ask">{pronounce ? "Say this word clearly:" : "Say this sentence:"}</p>
+      <div className="q-prompt">
+        <p className="q-instruction">{pronounce ? "Record yourself saying the word below" : "Record yourself saying the statement below"}</p>
         <p className={pronounce ? "say-word" : "say-phrase"}>{pronounce ? challenge.word : challenge.phrase}</p>
       </div>
 
@@ -70,7 +73,7 @@ export default function VoiceChallenge({
           aria-label={listening ? "Listening" : "Tap to speak again"}
         >
           <span className="mic-pulse" aria-hidden="true" />
-          <MicIcon size={44} />
+          <MicIcon size={36} />
         </button>
         <div className="wave" aria-hidden="true">
           {Array.from({ length: 9 }, (_, i) => (

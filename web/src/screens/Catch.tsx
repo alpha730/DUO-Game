@@ -12,13 +12,13 @@ import { activeAttempt, sendForfeit } from "../catch/forfeit";
 import { requestLocation, requestMic, type CheckState, type Position } from "../catch/preflight";
 import { speechSupported } from "../catch/speech";
 import { useCountdown } from "../catch/useCountdown";
-import ChoiceChallenge from "../components/ChoiceChallenge";
+import ChoiceChallenge, { hasBlank } from "../components/ChoiceChallenge";
 import EmptyState from "../components/EmptyState";
 import { OpenInBrowser } from "../components/CameraHelp";
 import Preflight from "../components/Preflight";
 import Result from "../components/Result";
 import LingoArt from "../components/LingoArt";
-import TimerRing from "../components/TimerRing";
+import { QuestionTimer, TimeBar } from "../components/QuestionTimer";
 import VoiceChallenge from "../components/VoiceChallenge";
 import { api, apiErrorMessage } from "../lib/api";
 import { haptic, play } from "../lib/feedback";
@@ -33,7 +33,17 @@ export type Outcome =
   | { kind: "forfeit" }
   | { kind: "error"; message: string };
 
-/** The running challenge, battle style: the Lingo in a countdown ring, its question, the answer UI. */
+/** DET task names for our challenge types. */
+function taskName(c: StartAttemptOutput): string {
+  if (c.type === "meaning") return "Choose the Meaning";
+  if (c.type === "question") return hasBlank(c) ? "Fill in the Blanks" : "Choose the Answer";
+  return "Read Aloud"; // pronounce + speak
+}
+
+/**
+ * The running challenge as a DET practice-test question: a card with the task name + small Lingo
+ * (mood reaction) and the timer on top, the question, and one SUBMIT button at the bottom.
+ */
 function Active({
   challenge,
   lingo,
@@ -47,7 +57,10 @@ function Active({
   onSubmit: (a: Answer) => void;
 }) {
   const answer = useRef<Answer>({});
-  // Time's up → submit whatever we have; the server decides (and rejects anything past the grace).
+  const [picked, setPicked] = useState<number | null>(null);
+  const [heard, setHeard] = useState("");
+  // Time's up → submit whatever we have (the selected tile or what was heard); the server decides
+  // (and rejects anything past the grace).
   const { leftMs, totalMs, seconds } = useCountdown(challenge.expiresAt, challenge.serverNow, () => onSubmit(answer.current));
   // Last 5 seconds: tick + buzz once per second.
   useEffect(() => {
@@ -58,32 +71,52 @@ function Active({
   // Stable callbacks: a new function each render would restart speech recognition.
   const onTranscript = useCallback((t: string) => {
     answer.current = { transcript: t };
+    setHeard(t);
   }, []);
   const onVoice = useCallback((t: string) => onSubmit({ transcript: t }), [onSubmit]);
+  const pick = (choice: number) => {
+    answer.current = { choice };
+    setPicked(choice);
+  };
+  const voice = isVoiceChallenge(challenge.type);
+  const canSubmit = !checking && (voice ? heard.trim() !== "" : picked !== null);
 
   return (
-    <section className="arena" data-type={challenge.type} data-checking={checking} style={{ "--lingo": lingo?.color } as React.CSSProperties}>
-      <div className="arena-stage">
-        <TimerRing leftMs={leftMs} totalMs={totalMs}>
+    <section className="arena q-card" data-type={challenge.type} data-checking={checking} style={{ "--lingo": lingo?.color } as React.CSSProperties}>
+      <header className="q-top">
+        <div className="q-task">
           {lingo && <LingoArt lingo={lingo} mood={checking ? "wow" : "happy"} className="arena-lingo" />}
-        </TimerRing>
-      </div>
-      {challenge.level === "hard" && (
-        <span className="hard-badge" data-level="hard">
-          🔥 Hard question — your streak is on fire
-        </span>
-      )}
-      {isVoiceChallenge(challenge.type) ? (
-        <VoiceChallenge challenge={challenge} onTranscript={onTranscript} onSubmit={onVoice} />
-      ) : (
-        <ChoiceChallenge challenge={challenge} onChoose={(choice) => onSubmit({ choice })} />
-      )}
-      {checking && (
-        <div className="arena-checking" role="status">
-          <div className="spinner" />
-          <p>Checking your answer…</p>
+          <span className="q-type" data-task>
+            {taskName(challenge)}
+          </span>
         </div>
-      )}
+        <QuestionTimer leftMs={leftMs} />
+      </header>
+      <TimeBar leftMs={leftMs} totalMs={totalMs} />
+      <div className="q-body">
+        {challenge.level === "hard" && (
+          <span className="hard-badge" data-level="hard">
+            🔥 Hard question — your streak is on fire
+          </span>
+        )}
+        {voice ? (
+          <VoiceChallenge challenge={challenge} onTranscript={onTranscript} onSubmit={onVoice} />
+        ) : (
+          <ChoiceChallenge challenge={challenge} picked={picked} onPick={pick} locked={checking} />
+        )}
+      </div>
+      <footer className="q-foot">
+        {checking ? (
+          <div className="arena-checking" role="status">
+            <div className="spinner" />
+            <p>Checking your answer…</p>
+          </div>
+        ) : (
+          <button className="btn big q-submit" disabled={!canSubmit} onClick={() => onSubmit(answer.current)}>
+            Submit
+          </button>
+        )}
+      </footer>
     </section>
   );
 }

@@ -1171,140 +1171,136 @@ a {
   color: var(--on-danger);
 }
 
-/* Battle arena */
-.arena {
+/* DET question card (catch challenge): task name + timer on top, the question, one SUBMIT. */
+body:has(.catch[data-phase="active"]),
+body:has(.catch[data-phase="submitting"]) {
+  background: var(--surface-2); /* DET practice-test grey page */
+}
+
+.catch[data-phase="active"],
+.catch[data-phase="submitting"] {
+  padding-top: calc(12px + var(--safe-top));
+}
+
+/* The question card names the task; the "Catch …" heading is only for before/after. */
+.catch[data-phase="active"] .catch-head,
+.catch[data-phase="submitting"] .catch-head {
+  display: none;
+}
+
+.q-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  min-height: calc(100dvh - 24px - var(--safe-top) - var(--safe-bottom));
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
 }
 
-.arena-stage {
-  display: grid;
-  place-items: center;
-  margin: -8px -16px 0;
-  padding: 6px 0 14px;
-  background: radial-gradient(ellipse 58% 70% at 50% 55%, color-mix(in srgb, var(--lingo, var(--primary)) 42%, var(--bg)) 0, transparent 72%);
+.q-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
 }
 
-.timer-ring {
-  position: relative;
-  width: 178px;
-  height: 178px;
+.q-task {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
-.timer-ring svg {
-  position: absolute;
-  inset: 0;
-  transform: rotate(-90deg);
+.q-task .arena-lingo {
+  flex: none;
+  width: 40px;
 }
 
-.timer-ring-track,
-.timer-ring-fill {
-  fill: none;
-  stroke-width: 7;
+.q-type {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1rem;
+  line-height: 1.15;
 }
 
-.timer-ring-track {
-  stroke: var(--surface-2);
-}
-
-.timer-ring-fill {
-  stroke-linecap: round;
-  transition: stroke-dashoffset 0.1s linear, stroke 0.4s;
-}
-
-.timer-ring-inner {
-  position: absolute;
-  inset: 20px;
-  display: grid;
-  place-items: center;
-}
-
-.arena-lingo {
-  width: 118px;
-  animation: bob 2.2s ease-in-out infinite;
-}
-
-.timer-ring[data-low="true"] {
-  animation: shake 0.5s ease-in-out infinite;
-}
-
-.timer-seconds {
-  position: absolute;
-  left: 50%;
-  bottom: -12px;
-  transform: translateX(-50%);
-  min-width: 56px;
-  padding: 3px 12px;
-  border-radius: 999px;
-  color: var(--on-gold);
+.q-timer {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 1.15rem;
-  text-align: center;
   font-variant-numeric: tabular-nums;
-  box-shadow: 0 3px 0 rgb(0 0 0 / 0.18);
 }
 
-.arena[data-checking="true"] .arena-lingo {
-  animation: wobble 0.7s ease-in-out infinite;
+.q-timer[data-low="true"] {
+  color: var(--danger-text);
+  animation: pulse-soft 1s ease-in-out infinite;
 }
 
-/* The Lingo's speech bubble */
-.bubble {
-  position: relative;
-  padding: 14px 16px;
-  border-radius: 22px;
-  background: var(--surface);
-  border: 2px solid var(--border);
-  box-shadow: 0 var(--edge) 0 var(--border);
-  text-align: center;
-  animation: pop 0.35s var(--pop) both;
-}
-
-.bubble::before {
-  content: "";
-  position: absolute;
-  top: -11px;
-  left: 50%;
-  width: 18px;
-  height: 18px;
-  margin-left: -9px;
-  background: var(--surface);
-  border-left: 2px solid var(--border);
+.q-timebar {
+  height: 6px;
+  background: var(--surface-2);
   border-top: 2px solid var(--border);
-  transform: rotate(45deg);
-  border-radius: 4px 0 0 0;
 }
 
-.bubble p {
+.q-timebar i {
+  display: block;
+  height: 100%;
+  transition: width 0.1s linear, background 0.4s;
+}
+
+.q-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px 16px 18px;
+}
+
+.q-prompt {
+  text-align: center;
+}
+
+.q-prompt p {
   margin: 0;
 }
 
-.bubble-ask {
-  margin-bottom: 4px !important;
-  color: var(--muted);
-  font-weight: 700;
-  font-size: 0.9rem;
+.q-instruction {
+  margin-bottom: 12px !important;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.12rem;
+  line-height: 1.3;
 }
 
 .say-word {
-  font-family: var(--font-display);
   font-size: 2.3rem;
-  font-weight: 800;
-  line-height: 1.1;
+  font-weight: 600;
+  line-height: 1.15;
   word-break: break-word;
 }
 
 .say-phrase {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 800;
-  line-height: 1.35;
+  font-size: 1.22rem;
+  font-weight: 600;
+  line-height: 1.6;
 }
 
-/* 4 big 3D answer buttons */
+.q-blank {
+  display: inline-block;
+  width: 4.2em;
+  margin: 0 0.25em;
+  border-bottom: 3px solid var(--text);
+  vertical-align: baseline;
+}
+
+/* Answer tiles: white, grey border + edge; selected = DET light-blue tile. */
 .choices {
   display: flex;
   flex-direction: column;
@@ -1315,21 +1311,21 @@ a {
   display: flex;
   align-items: center;
   gap: 12px;
-  min-height: 60px;
+  min-height: 56px;
   margin-bottom: var(--edge);
   padding: 10px 14px;
   border: 2px solid var(--border);
-  border-radius: 18px;
+  border-radius: var(--radius-sm);
   background: var(--surface);
   box-shadow: 0 var(--edge) 0 var(--border);
   color: var(--text);
   font: inherit;
-  font-size: 1.08rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 600;
   text-align: left;
   cursor: pointer;
   touch-action: manipulation;
-  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out, background 0.15s;
   animation: slide-up 0.3s calc(var(--n, 0) * 50ms) ease-out both;
 }
 
@@ -1349,37 +1345,53 @@ a {
 }
 
 .choice:disabled {
-  opacity: 0.5;
   cursor: default;
 }
 
 .choice[data-picked="true"] {
-  opacity: 1;
-  background: var(--accent);
-  border-color: var(--accent-dark);
-  box-shadow: 0 var(--edge) 0 var(--accent-dark);
-  color: var(--on-accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  box-shadow: 0 var(--edge) 0 var(--accent-border);
+  color: var(--link);
 }
 
 .choice-letter {
   flex: none;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   display: grid;
   place-items: center;
-  background: var(--surface-2);
+  border: 2px solid var(--border);
   font-family: var(--font-display);
   font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--muted);
 }
 
 .choice[data-picked="true"] .choice-letter {
-  background: rgb(255 255 255 / 0.4);
+  border-color: var(--accent-border);
+  color: var(--link);
 }
 
 .choice-text {
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.q-foot {
+  padding: 14px 16px calc(10px + var(--safe-bottom));
+  border-top: 2px solid var(--border);
+}
+
+.q-foot .btn {
+  margin-bottom: var(--edge);
+}
+
+@keyframes pulse-soft {
+  50% {
+    opacity: 0.55;
+  }
 }
 
 /* Giant mic */
@@ -1395,14 +1407,14 @@ a {
   position: relative;
   display: grid;
   place-items: center;
-  width: 116px;
-  height: 116px;
+  width: 92px;
+  height: 92px;
   margin-bottom: 6px;
   border-radius: 50%;
-  border: 6px solid var(--surface);
-  background: var(--primary);
-  color: var(--on-primary);
-  box-shadow: 0 6px 0 var(--primary-dark), 0 12px 30px var(--primary-glow);
+  border: 0;
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 6px 0 var(--accent-dark);
   cursor: pointer;
   touch-action: manipulation;
   transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
@@ -1410,13 +1422,13 @@ a {
 
 .mic-button:active:not(:disabled) {
   transform: translateY(6px);
-  box-shadow: 0 0 0 var(--primary-dark), 0 6px 16px var(--primary-glow);
+  box-shadow: 0 0 0 var(--accent-dark);
 }
 
 .mic-button[data-listening="true"] {
   background: var(--danger);
   color: var(--on-danger);
-  box-shadow: 0 6px 0 var(--danger-dark), 0 12px 30px var(--danger-border);
+  box-shadow: 0 6px 0 var(--danger-dark);
   cursor: default;
 }
 
@@ -1487,16 +1499,11 @@ a {
 }
 
 .arena-checking {
-  position: absolute;
-  inset: 210px -6px -6px;
-  z-index: 2;
+  min-height: 56px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--bg) 78%, transparent);
   font-family: var(--font-display);
   font-weight: 800;
   animation: fade-in 0.2s ease-out both;

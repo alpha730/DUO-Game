@@ -2733,6 +2733,126 @@ body:has(.catch[data-phase="submitting"]) {
   transform: translateX(22px);
 }
 
+/* Appearance: Light · Dark · System (DET segmented tabs: selected = light-blue tile). */
+.setting-row.appearance {
+  flex-wrap: wrap;
+  cursor: default;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  width: 100%;
+}
+
+.segmented button {
+  min-height: 44px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.segmented button[aria-checked="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--link);
+}
+
+/* Your skills */
+.skills {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.skills h2 {
+  margin: 0;
+}
+
+.skill {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skill-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.skill-val {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.skill-bar {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 2px solid var(--border);
+  overflow: hidden;
+}
+
+.skill-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.6s ease-out;
+}
+
+.skill[data-skill="speaking"] .skill-bar i {
+  background: var(--primary);
+}
+
+.skills-totals {
+  display: flex;
+  gap: 18px;
+  padding-top: 10px;
+  border-top: 2px solid var(--border);
+  color: var(--muted);
+}
+
+.skills-totals strong {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.skills-note {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+/* About sheet */
+.about-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.about-sheet h2 {
+  margin: 4px 0 0;
+}
+
+.about-sheet p {
+  margin: 0;
+  line-height: 1.55;
+}
+
 /* ---------- Owl Raid ---------- */
 .raid-banner {
   display: grid;

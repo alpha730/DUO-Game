@@ -24,6 +24,7 @@ import { api, apiErrorMessage } from "../lib/api";
 import { haptic, play } from "../lib/feedback";
 import { auth } from "../lib/firebase";
 import { loadLingos, type Lingo } from "../lib/lingos";
+import { recordAnswer } from "../lib/skills";
 
 type Phase = "preflight" | "ready" | "starting" | "active" | "submitting" | "done";
 type Answer = Omit<SubmitAttemptInput, "attemptId">;
@@ -250,6 +251,7 @@ export default function Catch() {
       try {
         const data = await api.submitAttempt({ attemptId: challenge.attemptId, ...answer });
         activeAttempt.clear(); // answered: a reload now is harmless
+        recordAnswer(auth.currentUser?.uid, challenge.type, data.result === "won"); // Me → Your skills
         setOutcome({ kind: data.result, data });
       } catch (err) {
         const code = (err as { details?: { code?: string } }).details?.code;

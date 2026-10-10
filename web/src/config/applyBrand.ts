@@ -26,7 +26,9 @@ export function brandCss(brand: BrandSet): string {
   return (
     `${fonts}:root{${common};${vars(brand.themes.light)}}` +
     `@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){${dark}}}` +
-    `:root[data-theme="dark"]{${dark};color-scheme:dark}:root[data-theme="light"]{color-scheme:light}`
+    `:root[data-theme="dark"]{${dark};color-scheme:dark}:root[data-theme="light"]{color-scheme:light}` +
+    // Page colour straight from these variables, so even the very first paint is in the right theme.
+    `html{background:var(--bg);color:var(--text)}`
   );
 }
 

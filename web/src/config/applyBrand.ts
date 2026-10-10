@@ -8,12 +8,14 @@ const vars = (c: BrandColors) =>
     .join(";");
 
 /**
- * The brand as CSS: light theme on :root, dark theme when the phone is in dark mode
- * (prefers-color-scheme). Injected into index.html at build time (vite.config.ts) so the first
- * paint is already on-brand and in the right theme, before any JavaScript runs.
+ * The brand as CSS: light theme on :root; dark when <html data-theme="dark"> (chosen on Me), or when
+ * the phone is in dark mode and no theme was chosen ("System"). Injected into index.html at build
+ * time (vite.config.ts) together with themeBootScript(), so the first paint is already on-brand and
+ * in the right theme, before any JavaScript bundle runs.
  */
 export function brandCss(brand: BrandSet): string {
   const common = `--font-family:${brand.fontFamily};--font-display:${brand.displayFontFamily};color-scheme:light dark`;
+  const dark = vars(brand.themes.dark);
   const fonts = brand.fontFiles
     .map(
       (f) =>
@@ -23,7 +25,25 @@ export function brandCss(brand: BrandSet): string {
     .join("");
   return (
     `${fonts}:root{${common};${vars(brand.themes.light)}}` +
-    `@media (prefers-color-scheme:dark){:root{${vars(brand.themes.dark)}}}`
+    `@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){${dark}}}` +
+    `:root[data-theme="dark"]{${dark};color-scheme:dark}:root[data-theme="light"]{color-scheme:light}`
+  );
+}
+
+/** Saved theme choice (Me → Appearance); absent = follow the phone. Same key as lib/theme.ts. */
+export const THEME_KEY = "theme";
+
+/**
+ * Tiny inline script for <head>: applies a saved Light/Dark choice before the first paint (no flash
+ * of the wrong theme) and points the browser-bar colour at it. "System" needs nothing — the CSS and
+ * the media-specific theme-color metas follow the phone live.
+ */
+export function themeBootScript(brand: BrandSet): string {
+  const colors = JSON.stringify({ light: brand.themes.light.themeColor, dark: brand.themes.dark.themeColor });
+  return (
+    `(function(){try{var t=localStorage.getItem(${JSON.stringify(THEME_KEY)});if(t!=="light"&&t!=="dark")return;` +
+    `document.documentElement.setAttribute("data-theme",t);var c=${colors}[t];` +
+    `document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){m.removeAttribute("media");m.setAttribute("content",c)})}catch(e){}})()`
   );
 }
 
@@ -58,16 +78,29 @@ export function applyBrand(brand: BrandSet): void {
     document.head.append(icon);
   }
   icon.href = brand.logo.mark;
-  document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.remove());
-  for (const { media, content } of themeColorMetas(brand)) {
-    const meta = document.createElement("meta");
-    meta.name = "theme-color";
-    meta.media = media;
-    meta.content = content;
-    document.head.append(meta);
-  }
+  syncThemeColor(brand);
 
   if (import.meta.env.DEV && BRAND_PENDING.length) {
     console.info(`[brand] official items still on placeholder:\n- ${BRAND_PENDING.join("\n- ")}`);
+  }
+}
+
+/**
+ * Browser-bar colour for the current choice: one fixed colour for Light/Dark, or the two
+ * media-specific metas for System (they follow the phone by themselves).
+ */
+export function syncThemeColor(brand: BrandSet): void {
+  document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.remove());
+  const chosen = document.documentElement.getAttribute("data-theme");
+  const metas =
+    chosen === "light" || chosen === "dark"
+      ? [{ media: "", content: brand.themes[chosen].themeColor }]
+      : themeColorMetas(brand);
+  for (const { media, content } of metas) {
+    const meta = document.createElement("meta");
+    meta.name = "theme-color";
+    if (media) meta.media = media;
+    meta.content = content;
+    document.head.append(meta);
   }
 }

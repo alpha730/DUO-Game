@@ -1,7 +1,8 @@
 :root {
   /* Colours (light + dark), fonts and color-scheme come from src/config/brand.ts (applyBrand). */
-  --radius: 20px;
-  --radius-sm: 14px;
+  /* DET shapes: 16px cards, 12–14px buttons and inputs, 2px light-grey borders with a 4px bottom edge. */
+  --radius: 16px;
+  --radius-sm: 12px;
   --edge: 4px; /* the "3D" bottom edge of buttons and cards */
   --nav-h: 68px;
   --safe-top: env(safe-area-inset-top, 0px);
@@ -125,7 +126,7 @@ a {
   text-decoration: none;
 }
 
-/* Chunky card with a solid bottom edge, like a game tile. */
+/* DET card: white, 2px light-grey border, thicker bottom edge. */
 .card {
   background: var(--surface);
   border: 2px solid var(--border);
@@ -145,15 +146,16 @@ a {
   justify-content: center;
   gap: 10px;
   width: 100%;
-  min-height: 56px;
+  min-height: 52px;
   padding: 12px 20px;
   margin-bottom: var(--edge);
   border: 0;
-  border-radius: 18px;
+  border-radius: 14px;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 1.1rem;
-  letter-spacing: 0.02em;
+  font-size: 0.98rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase; /* DET buttons: "PRACTICE FREE", "CONTINUE" */
   color: var(--btn-fg);
   background: var(--btn-bg);
   box-shadow: 0 var(--edge) 0 var(--btn-edge);
@@ -176,10 +178,11 @@ a {
   cursor: default;
 }
 
+/* DET secondary: white tile, grey border + edge, blue label. */
 .btn.secondary {
   --btn-bg: var(--surface);
   --btn-edge: var(--border);
-  --btn-fg: var(--text);
+  --btn-fg: var(--link);
   border: 2px solid var(--border);
 }
 
@@ -205,6 +208,7 @@ a {
   font-weight: 700;
   font-size: 1rem;
   letter-spacing: 0;
+  text-transform: none;
   box-shadow: none;
 }
 
@@ -214,9 +218,9 @@ a {
 }
 
 .btn.big {
-  min-height: 64px;
-  font-size: 1.3rem;
-  border-radius: 22px;
+  min-height: 56px;
+  font-size: 1.05rem;
+  border-radius: 16px;
 }
 
 /* ---------- Forms ---------- */
@@ -231,7 +235,7 @@ a {
 
 .field input,
 .field select {
-  min-height: 54px;
+  min-height: 52px;
   padding: 12px 16px;
   border-radius: var(--radius-sm);
   border: 2px solid var(--border);
@@ -287,7 +291,6 @@ a {
   padding-bottom: var(--safe-bottom);
   background: var(--nav-bg);
   border-top: 2px solid var(--border);
-  box-shadow: 0 -6px 24px var(--shadow);
   z-index: 10;
 }
 
@@ -306,29 +309,34 @@ a {
   justify-content: center;
   gap: 3px;
   min-width: 0;
+  margin: 6px 2px;
+  border: 2px solid transparent;
+  border-radius: 12px;
   color: var(--muted);
   text-decoration: none;
   font-family: var(--font-display);
-  font-size: 0.75rem;
+  font-size: 0.66rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase; /* DET sidebar: "MY TESTS", "PRACTICE" */
 }
 
 .bottom-nav a svg {
   transition: transform 0.2s var(--pop);
 }
 
-.bottom-nav a.active {
-  color: var(--primary-text);
-}
-
-.bottom-nav a.active svg {
-  transform: translateY(-2px) scale(1.12);
+/* DET active item: light-blue tile with a blue border. */
+.bottom-nav a.active:not(.scan-fab) {
+  color: var(--link);
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
 }
 
 .bottom-nav .scan-fab {
   justify-content: flex-end;
-  padding-bottom: 8px;
+  padding-bottom: 2px;
+  margin: 0;
+  border: 0;
   color: var(--text);
 }
 
@@ -343,13 +351,13 @@ a {
   background: var(--primary);
   color: var(--on-primary);
   border: 5px solid var(--nav-bg);
-  box-shadow: 0 var(--edge) 0 var(--primary-dark), 0 8px 22px var(--primary-glow);
+  box-shadow: 0 var(--edge) 0 var(--primary-dark);
   transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
 }
 
 .scan-fab:active .scan-fab-circle {
   transform: translateY(var(--edge));
-  box-shadow: 0 0 0 var(--primary-dark), 0 4px 12px var(--primary-glow);
+  box-shadow: 0 0 0 var(--primary-dark);
 }
 
 .bottom-nav .scan-fab svg,

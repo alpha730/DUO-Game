@@ -37,7 +37,7 @@ const brandFiles = ["fonts", "logos", "mascots", "models"].flatMap((d) =>
 async function brandHtml(preconnect: string[]): Promise<Plugin> {
   (globalThis as { __BRAND_FILES__?: string[] }).__BRAND_FILES__ = brandFiles;
   const { BRAND } = await import("./src/config/brand");
-  const { brandCss, themeColorMetas } = await import("./src/config/applyBrand");
+  const { brandCss, themeBootScript, themeColorMetas } = await import("./src/config/applyBrand");
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
   return {
     name: "brand-html",
@@ -54,6 +54,8 @@ async function brandHtml(preconnect: string[]): Promise<Plugin> {
               `<link rel="icon" href="${esc(BRAND.logo.mark)}" />`,
               ...themeColorMetas(BRAND).map((m) => `<meta name="theme-color" media="${m.media}" content="${esc(m.content)}" />`),
               `<style id="brand-vars">${brandCss(BRAND)}</style>`,
+              // Saved Light/Dark choice (Me → Appearance) applied before the first paint.
+              `<script>${themeBootScript(BRAND)}</script>`,
               // DECISION (UI redesign): no preload for the display font — measured on Fast 3G it delayed the
               // first paint; it loads with font-display: swap (system rounded font until then).
               // TLS to Firebase starts while the JS downloads (several round trips saved on 3G).

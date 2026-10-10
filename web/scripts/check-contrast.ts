@@ -47,6 +47,8 @@ const PAIRS: Array<[keyof BrandColors, ...(keyof BrandColors | string)[]]> = [
   ["onGlass", "cardGlass", "#ffffff"], ["glassMuted", "cardGlass", "#ffffff"],
   ["onGlass", "errorGlass", "#ffffff"], ["onGlass", "overlay", "#ffffff"],
   ["muted", "slotEmpty"],
+  ["link", "accentSoft", "surface"], ["text", "accentSoft", "surface"], ["primaryText", "primarySoft", "surface"],
+  ["dangerText", "dangerSoft", "surface"], ["text", "primarySoft", "surface"], ["text", "dangerSoft", "surface"],
 ];
 
 let failed = 0;

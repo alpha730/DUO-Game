@@ -39,6 +39,9 @@ export interface BrandColors {
   accent: string;
   accentDark: string;
   onAccent: string;
+  /** Selected answer / active tab (DET light-blue tile) + its border; text on it uses `link`. */
+  accentSoft: string;
+  accentBorder: string;
   /** Text links. */
   link: string;
   /** Streak / flame / favourite fills. */
@@ -118,6 +121,16 @@ export interface BrandSet {
   tagline: string;
   /** The partner / exam brand. */
   partnerName: string;
+  /** Co-brand line (login, Home header, splash) when no lockup image is supplied. */
+  coBrandText: string;
+  /** Short co-brand for the share card + leaderboard header. */
+  coBrandShort: string;
+  /** Official co-brand lockup image (e.g. DET × JECRC), or null → coBrandText. */
+  coBrandLockup: string | null;
+  /** Free official practice test ("Get ready for the real DET"), or null → card hidden. */
+  practiceUrl: string | null;
+  /** Short name of the real test, used in copy ("Get ready for the real DET"). */
+  examShortName: string;
   /** What the creatures are called. */
   creatureName: string;
   raidName: string;
@@ -171,6 +184,8 @@ const LIGHT: BrandColors = {
   accent: "#1cb0f6",
   accentDark: "#1690cc",
   onAccent: "#04223a",
+  accentSoft: "rgb(28 176 246 / 0.12)",
+  accentBorder: "#84d8ff",
   link: "#0a66a3",
   warn: "#ff9600",
   warnDark: "#cc6f00",
@@ -230,6 +245,8 @@ const DARK: BrandColors = {
   primaryDark: "#3e8f00",
   primaryText: "#7ddc3a",
   primarySoft: "rgb(88 204 2 / 0.16)",
+  accentSoft: "rgb(28 176 246 / 0.16)",
+  accentBorder: "#1d6f99",
   link: "#6cc9ff",
   warnText: "#ffb347",
   streakBg: "rgb(255 150 0 / 0.16)",
@@ -253,12 +270,132 @@ const DARK: BrandColors = {
   themeColor: "#0b1426",
 };
 
+// ---------- DET palette (official) ----------
+// Taken from the Duolingo English Test site + practice test (reference screenshots): white pages,
+// light-grey card borders with a thicker bottom edge, DET blue for selection/links, Duolingo green
+// for the main action, dark-grey text. Text colours are darkened where the site's own pairs are
+// below 4.5:1 (e.g. white on green/blue buttons → dark text; blue link text → deeper blue).
+const DET_CONFETTI = ["#58CC02", "#1CB0F6", "#FF9600", "#CE82FF", "#FF4B4B", "#FFC800"];
+
+const DET_LIGHT: BrandColors = {
+  bg: "#ffffff",
+  bgAlt: "#d7ffb8",
+  surface: "#ffffff",
+  surface2: "#f7f7f7",
+  border: "#e5e5e5",
+  text: "#3c3c3c",
+  muted: "#6b6b6b",
+  primary: "#58cc02",
+  primaryDark: "#58a700",
+  onPrimary: "#173300", // dark: white on #58cc02 is only 2.1:1
+  primaryText: "#3d7a00",
+  primaryGlow: "rgb(88 204 2 / 0.25)",
+  primarySoft: "#d7ffb8",
+  accent: "#1cb0f6",
+  accentDark: "#1899d6",
+  onAccent: "#04223a", // dark: white on #1cb0f6 is only 2.4:1
+  accentSoft: "#ddf4ff",
+  accentBorder: "#84d8ff",
+  link: "#0b6aa2",
+  warn: "#ff9600",
+  warnDark: "#cd7900",
+  warnText: "#a65800",
+  streakBg: "#fff3e0",
+  flameOff: "#afafaf",
+  favoriteBg: "#fff8e6",
+  danger: "#ff4b4b",
+  dangerDark: "#ea2b2b",
+  onDanger: "#2a0000",
+  dangerSoft: "#ffdfe0",
+  dangerBorder: "#ffb2b2",
+  dangerText: "#b31d1d",
+  missedBg: "#ffdfe0",
+  gold: "#ffc800",
+  goldEnd: "#ff9600",
+  goldDark: "#cd9900",
+  onGold: "#3c2a00",
+  goldGlow: "rgb(255 200 0 / 0.4)",
+  silver: "#d6dde3",
+  bronze: "#f0b080",
+  levelOne: "#f0f0f0",
+  levelTwo: "#d7ffb8",
+  levelThree: "#ddf4ff",
+  onLevel: "#3c3c3c",
+  allTenFrom: "#7c4dff",
+  allTenTo: "#2563eb",
+  onAllTen: "#ffffff",
+  ringGood: "#58cc02",
+  ringMid: "#ffc800",
+  ringLow: "#ff4b4b",
+  slotEmpty: "#f7f7f7",
+  slotMark: "#cfcfcf",
+  overlay: "rgb(30 30 30 / 0.66)",
+  scrim: "rgb(30 30 30 / 0.45)",
+  shadow: "rgb(0 0 0 / 0.08)",
+  // Over the live camera: dark glass in both themes (also used on the dark camera dimmer).
+  cardGlass: "rgb(19 31 36 / 0.9)",
+  onGlass: "#ffffff",
+  glassMuted: "#c2d0d7",
+  errorGlass: "rgb(70 12 18 / 0.92)",
+  navBg: "#ffffff",
+  arStage: "#000",
+  qrBg: "#fff",
+  themeColor: "#ffffff",
+  confetti: DET_CONFETTI,
+};
+
+// Dark: DET has no dark mode; built from the same family (Duolingo's dark greys + the DET accents).
+const DET_DARK: BrandColors = {
+  ...DET_LIGHT,
+  bg: "#131f24",
+  bgAlt: "#1f3a0f",
+  surface: "#1a2a31",
+  surface2: "#22343c",
+  border: "#37464f",
+  text: "#f1f7fb",
+  muted: "#a5b6bf",
+  onPrimary: "#0f2a00",
+  primaryText: "#8ee32a",
+  primaryGlow: "rgb(88 204 2 / 0.2)",
+  primarySoft: "rgb(88 204 2 / 0.16)",
+  onAccent: "#04223a",
+  accentSoft: "rgb(28 176 246 / 0.16)",
+  accentBorder: "#1f7fae",
+  link: "#6cc9ff",
+  warnText: "#ffb347",
+  streakBg: "rgb(255 150 0 / 0.16)",
+  flameOff: "#52656e",
+  favoriteBg: "rgb(255 200 0 / 0.1)",
+  dangerSoft: "rgb(255 75 75 / 0.14)",
+  dangerBorder: "rgb(255 75 75 / 0.45)",
+  dangerText: "#ffa3a3",
+  missedBg: "rgb(255 75 75 / 0.18)",
+  goldGlow: "rgb(255 200 0 / 0.35)",
+  silver: "#c7d0d6",
+  levelOne: "#2b3d46",
+  levelTwo: "#25521a",
+  levelThree: "#164a6b",
+  onLevel: "#ffffff",
+  slotEmpty: "#1a2a31",
+  slotMark: "#37464f",
+  overlay: "rgb(0 0 0 / 0.6)",
+  scrim: "rgb(0 0 0 / 0.6)",
+  shadow: "rgb(0 0 0 / 0.4)",
+  navBg: "#131f24",
+  themeColor: "#131f24",
+};
+
 /** The look before official branding (kept for a one-line revert). */
 export const PLACEHOLDER: BrandSet = {
   appName: "Decade Hunt",
   campaignName: "10 years · 10 Lingos · 2 campuses",
   tagline: "Ten posters are hiding Lingos. Find them, catch them, top the board!",
   partnerName: "the English Test",
+  coBrandText: "Decade Hunt × JECRC",
+  coBrandShort: "JECRC · 10 Years",
+  coBrandLockup: null,
+  practiceUrl: null,
+  examShortName: "the English Test",
   creatureName: "Lingo",
   raidName: "Owl Raid",
   campusName: "JECRC",
@@ -319,8 +456,15 @@ export const OFFICIAL: BrandSet = {
   appName: PLACEHOLDER.appName, // the game's own name — not a Duolingo mark
   campaignName: pending("campaign name", PLACEHOLDER.campaignName),
   partnerName: "Duolingo English Test", // approved (rule 8)
+  coBrandText: "Duolingo English Test × JECRC",
+  coBrandShort: "DET × JECRC · 10 Years",
+  // Official DET × JECRC lockup from the Duolingo team, when supplied; else the text above.
+  coBrandLockup: supplied("DET × JECRC lockup", "logos/det-jecrc-lockup.svg", null),
+  practiceUrl: "https://englishtest.duolingo.com",
+  examShortName: "DET",
   scanHint: "Point at Duo in the middle of the poster", // every final poster shows Duo
-  themes: pending("colours", PLACEHOLDER.themes),
+  // DET palette from the reference screenshots (user, Oct 10); swap in guideline values if supplied.
+  themes: { light: DET_LIGHT, dark: DET_DARK },
   fontFamily: officialFonts.length ? `BrandFont, ${PLACEHOLDER.fontFamily}` : PLACEHOLDER.fontFamily,
   displayFontFamily: officialFonts.length ? `BrandFont, ${PLACEHOLDER.displayFontFamily}` : PLACEHOLDER.displayFontFamily,
   fontFiles: officialFonts.length ? officialFonts : PLACEHOLDER.fontFiles,

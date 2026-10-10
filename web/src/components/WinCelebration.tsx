@@ -77,7 +77,7 @@ function BigMoment({ big, lingo, onClose }: { big: Big; lingo: Lingo | null; onC
   );
 }
 
-/** PLAN 4.7: "+169" count-up, breakdown chips, then a full-screen card for level-up / MAX / all 10. */
+/** PLAN 4.7: "+169" count-up, a DET-style breakdown list, then a full-screen card for level-up / MAX / all 10. */
 export default function WinCelebration({
   data,
   lingoName,
@@ -126,17 +126,37 @@ export default function WinCelebration({
       <p className="points-pop" aria-label={`plus ${data.pointsAdded} points`}>
         +{fmt(shown)}
       </p>
-      <p className="breakdown">
-        <span className="chip">
-          {baseLabel} +{fmt(base)}
-        </span>
-        {data.speedBonus > 0 && <span className="chip chip-speed">⚡ Speed +{data.speedBonus}</span>}
-        {data.favStreak !== undefined && data.favStreak > 0 && !max && <span className="chip chip-streak">🔥 Day {data.favStreak} streak</span>}
-        {max && <span className="chip chip-gold">🌟 MAX +{fmt(max.points)}</span>}
-        {allTen && <span className="chip chip-gold">🏆 All 10 +{fmt(allTen.points)}</span>}
-      </p>
+      {/* DET-style score breakdown: one row per part, then the total for this catch. */}
+      <dl className="breakdown">
+        <div className="bd-row">
+          <dt>{baseLabel}</dt>
+          <dd>+{fmt(base)}</dd>
+        </div>
+        {data.speedBonus > 0 && (
+          <div className="bd-row">
+            <dt>⚡ Speed bonus</dt>
+            <dd>+{data.speedBonus}</dd>
+          </div>
+        )}
+        {max && (
+          <div className="bd-row">
+            <dt>🌟 MAX bonus</dt>
+            <dd>+{fmt(max.points)}</dd>
+          </div>
+        )}
+        {allTen && (
+          <div className="bd-row">
+            <dt>🏆 All 10 bonus</dt>
+            <dd>+{fmt(allTen.points)}</dd>
+          </div>
+        )}
+        <div className="bd-row bd-total">
+          <dt>This catch</dt>
+          <dd>+{fmt(data.pointsAdded)}</dd>
+        </div>
+      </dl>
       <p className="win-total">
-        Total: <strong>{fmt(data.newTotal)}</strong> points
+        Your total: <strong>{fmt(data.newTotal)}</strong> points
       </p>
       {/* Kept in the page (screen readers, tests) even while the full-screen card isn't open. */}
       {big && !showBig && (

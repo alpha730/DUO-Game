@@ -1677,18 +1677,18 @@ body:has(.catch[data-phase="submitting"]) {
     display: none;
   }
 
-  .home-hero .attempts-pill {
+  .attempts-pill {
     gap: 7px;
     padding: 7px 12px;
     font-size: 0.86rem;
     white-space: nowrap;
   }
 
-  .home-hero .pips {
+  .attempts-pill .pips {
     gap: 4px;
   }
 
-  .home-hero .pips i {
+  .attempts-pill .pips i {
     width: 12px;
     height: 12px;
   }
@@ -1900,7 +1900,8 @@ body:has(.catch[data-phase="submitting"]) {
 .result {
   align-items: stretch;
   text-align: center;
-  padding-top: 8px;
+  padding-top: 0;
+  overflow: hidden;
 }
 
 .result p {
@@ -1911,7 +1912,7 @@ body:has(.catch[data-phase="submitting"]) {
   position: relative;
   display: grid;
   place-items: center;
-  height: 170px;
+  height: 140px;
   margin: 0 -16px;
   overflow: hidden;
   background: radial-gradient(ellipse 55% 62% at 50% 62%, color-mix(in srgb, var(--lingo, var(--primary)) 40%, var(--surface)) 0, transparent 72%);
@@ -1920,7 +1921,7 @@ body:has(.catch[data-phase="submitting"]) {
 .result[data-outcome="failed"] .result-hero,
 .result[data-outcome="forfeit"] .result-hero,
 .result[data-outcome="late"] .result-hero {
-  height: 130px;
+  height: 116px;
   background: radial-gradient(ellipse 50% 55% at 50% 62%, var(--surface-2) 0, transparent 72%);
 }
 
@@ -2015,52 +2016,113 @@ body:has(.catch[data-phase="submitting"]) {
   animation: pop 0.6s 0.2s var(--pop) both;
 }
 
+/* DET-style score breakdown: label left, points right, a rule above the total. */
 .breakdown {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px;
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 11px;
-  border-radius: 999px;
-  background: var(--surface-2);
+  width: 100%;
+  margin: 4px 0 0;
+  padding: 4px 14px;
   border: 2px solid var(--border);
-  font-weight: 700;
-  font-size: 0.88rem;
-  animation: slide-up 0.4s ease-out both;
+  border-radius: var(--radius-sm);
+  text-align: left;
 }
 
-.chip:nth-child(2) {
-  animation-delay: 0.6s;
+.bd-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  animation: slide-up 0.35s ease-out both;
 }
-.chip:nth-child(3) {
-  animation-delay: 0.75s;
+
+.bd-row + .bd-row {
+  border-top: 2px solid var(--border);
 }
-.chip:nth-child(4) {
-  animation-delay: 0.9s;
+
+.bd-row:nth-child(2) {
+  animation-delay: 0.15s;
 }
-.chip:first-child {
+.bd-row:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.bd-row:nth-child(4) {
   animation-delay: 0.45s;
 }
 
-.chip-streak {
-  background: var(--streak-bg);
-  border-color: transparent;
-  color: var(--warn-text);
+.bd-row dt {
+  color: var(--muted);
+  font-weight: 600;
 }
 
-.chip-gold {
-  background: linear-gradient(90deg, var(--gold), var(--gold-end));
-  border-color: transparent;
-  color: var(--on-gold);
+.bd-row dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.bd-total dt {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.bd-total dd {
+  color: var(--primary-text);
+  font-size: 1.15rem;
+}
+
+/* DET feedback bar on top of the result card (beats `.result p { margin: 0 }`). */
+.result .result-banner {
+  margin: 0 -16px;
+  padding: 14px 16px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.15rem;
+  text-align: left;
+  background: var(--surface-2);
+  border-bottom: 2px solid var(--border);
+  color: var(--text);
+}
+
+.result-banner[data-kind="won"] {
+  background: var(--primary-soft);
+  color: var(--primary-text);
+}
+
+.result-banner[data-kind="failed"] {
+  background: var(--danger-soft);
+  color: var(--danger-text);
+}
+
+/* "Get ready for the real DET" */
+.prep-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  padding: 14px;
+  border: 2px solid var(--accent-border);
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  text-align: left;
+}
+
+.prep-card h3 {
+  margin: 0 0 4px;
+}
+
+.prep-card p {
+  margin: 0;
+  color: var(--text);
+}
+
+.prep-card .btn {
+  margin-bottom: var(--edge);
 }
 
 .win-total {
+  margin: 0;
   color: var(--muted);
   font-weight: 600;
 }

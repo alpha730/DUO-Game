@@ -8,13 +8,14 @@ import type { Outcome } from "../screens/Catch";
 import LingoArt from "./LingoArt";
 import LingoPips from "./LingoPips";
 import Mascot from "./Mascot";
+import PrepCard from "./PrepCard";
 import WinCelebration, { Confetti } from "./WinCelebration";
 
 /** After a meaning / question try: the right answer and what it means (SPEC §9 — only after answering). */
 function AnswerCard({ answer, won }: { answer: { text: string; explanation?: string }; won: boolean }) {
   return (
     <div className="answer-card" data-answer data-won={won}>
-      <span className="answer-label">{won ? "✓ Right answer" : "The right answer"}</span>
+      <span className="answer-label">{won ? "✓ Correct answer" : "Correct answer"}</span>
       <strong className="answer-text">{answer.text}</strong>
       {answer.explanation && answer.explanation.toLowerCase() !== answer.text.toLowerCase() && (
         <span className="answer-explain">{answer.explanation}</span>
@@ -71,6 +72,7 @@ export default function Result({
         <>
           <WinCelebration data={outcome.data} lingoName={lingoName} lingo={lingo} prevLevel={prevLevel} />
           {outcome.data.answer && <AnswerCard answer={outcome.data.answer} won />}
+          {!raid && <PrepCard oncePerDay />}
           {outcome.data.needsFavorites && (
             <Link className="btn accent" to="/favorites" data-needs-favorites>
               ⭐ Pick your 2 favourites
@@ -127,8 +129,21 @@ export default function Result({
       break;
   }
 
+  // DET feedback bar: "Great job!" (green) / "Not quite" (red) / neutral for lost chances.
+  const banner =
+    outcome.kind === "won"
+      ? "✓ Great job!"
+      : outcome.kind === "failed"
+        ? "✗ Not quite"
+        : outcome.kind === "error"
+          ? "Something went wrong"
+          : "This try is closed";
+
   return (
     <section className="card stack result" data-outcome={outcome.kind} style={{ "--lingo": lingo?.color } as React.CSSProperties}>
+      <p className="result-banner" data-kind={outcome.kind} role="status">
+        {banner}
+      </p>
       <div className="result-hero" aria-hidden="true">
         {won && <Confetti />}
         {lingo && outcome.kind !== "error" ? (

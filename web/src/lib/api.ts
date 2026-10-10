@@ -30,8 +30,18 @@ const DEFAULT_TIMEOUT_MS = 15_000;
 
 const call =
   <I, O>(name: string, timeout = DEFAULT_TIMEOUT_MS) =>
-  async (data: I): Promise<O> =>
-    (await httpsCallable<I, O>(functions, name, { timeout })(data)).data;
+  async (data: I): Promise<O> => {
+    try {
+      return (await httpsCallable<I, O>(functions, name, { timeout })(data)).data;
+    } catch (err) {
+      // Safari reports a request that failed for lack of a network as "internal"; with the phone
+      // offline, every failure is "can't reach the server" (QA bug: iPhone showed "went wrong").
+      if (typeof navigator !== "undefined" && navigator.onLine === false) {
+        throw Object.assign(err instanceof Error ? err : new Error(String(err)), { code: "functions/unavailable" });
+      }
+      throw err;
+    }
+  };
 
 // getMyState auto-forfeits open attempts (SPEC §3.5). If one is still in flight when the player taps
 // Start, it could reach the server after startAttempt and forfeit the brand-new attempt.

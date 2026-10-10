@@ -139,6 +139,16 @@ export async function launch({ init = [], ua, colorScheme = "light", viewport = 
   await ctx.addInitScript(MOCKS);
   for (const s of init) await ctx.addInitScript(s);
   const page = await ctx.newPage();
+  if (BROWSER === "webkit") {
+    // WebKit keeps the cancelled Firestore long-polls of the previous page holding sockets for a
+    // while; against the HTTP/1.1 emulator (6 connections per host) a quick page.goto() can then
+    // stall. Production Firestore is HTTP/2. Going through about:blank releases them.
+    const goto = page.goto.bind(page);
+    page.goto = async (url, opts) => {
+      if (page.url() !== "about:blank") await goto("about:blank");
+      return goto(url, opts);
+    };
+  }
   const errors = [];
   // WebKit reports Firestore's long-poll request, cancelled by a full page.goto(), as an "access
   // control" error. Test-only noise (players navigate inside the app), so it isn't counted.

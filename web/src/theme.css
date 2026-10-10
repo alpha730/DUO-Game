@@ -315,9 +315,9 @@ a {
   color: var(--muted);
   text-decoration: none;
   font-family: var(--font-display);
-  font-size: 0.66rem;
+  font-size: 0.6875rem; /* 11 px — the smallest text in the app (QA: was 10.6 px) */
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase; /* DET sidebar: "MY TESTS", "PRACTICE" */
 }
 
@@ -1892,7 +1892,7 @@ body:has(.catch[data-phase="submitting"]) {
 }
 
 .lingo-slot .level-badge {
-  font-size: 0.66rem;
+  font-size: 0.6875rem; /* 11 px minimum */
   padding: 1px 7px;
 }
 
@@ -2511,9 +2511,9 @@ body:has(.catch[data-phase="submitting"]) {
 }
 
 .board-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  overflow-wrap: anywhere; /* long names wrap (max 40 characters) instead of being cut off */
+  line-height: 1.25;
   font-weight: 700;
 }
 
@@ -2573,16 +2573,13 @@ body:has(.catch[data-phase="submitting"]) {
 .profile-id h1 {
   margin: 0;
   font-size: 1.5rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.2;
+  overflow-wrap: anywhere; /* the whole name, wrapped (QA: was cut off) */
 }
 
 .profile-id p {
   margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere; /* long emails wrap */
 }
 
 .level-row {

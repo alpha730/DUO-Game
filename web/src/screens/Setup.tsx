@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { NAME_MAX, NAME_MIN } from "@shared/types";
+import CoBrand from "../components/CoBrand";
 import Mascot from "../components/Mascot";
 import { api, apiErrorMessage } from "../lib/api";
 import { useAuth } from "../lib/auth";
@@ -30,6 +31,9 @@ export default function Setup() {
 
   return (
     <main className="screen stack setup">
+      <header className="topbar">
+        <CoBrand />
+      </header>
       <section className="login-hero compact">
         <div className="login-hero-art">
           <Mascot slot="hero" mood="wow" />

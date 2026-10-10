@@ -72,7 +72,12 @@ async function brandHtml(preconnect: string[]): Promise<Plugin> {
           .replace(
             '<div id="root"></div>',
             // Painted straight from the HTML (before any JS); React replaces it when it mounts.
-            `<div id="root"><div class="boot" style="min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:var(--bg);color:var(--text);font-family:var(--font-family)"><img src="${esc(BRAND.logo.full)}" alt="" width="72" height="72" /><strong style="font-size:1.8rem;font-family:var(--font-display);font-weight:800">${esc(BRAND.appName)}</strong><span style="color:var(--muted)">${esc(BRAND.campaignName)}</span></div></div>`,
+            // Co-brand on the splash (DET × JECRC lockup if supplied, else its text).
+            `<div id="root"><div class="boot" style="min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:0 24px;text-align:center;background:var(--bg);color:var(--text);font-family:var(--font-family)">` +
+              (BRAND.coBrandLockup
+                ? `<img src="${esc(BRAND.coBrandLockup)}" alt="${esc(BRAND.coBrandText)}" height="40" />`
+                : `<span style="font-family:var(--font-display);font-weight:800;color:var(--primary-text)">${esc(BRAND.coBrandText)}</span>`) +
+              `<strong style="font-size:2rem;font-family:var(--font-display);font-weight:800">${esc(BRAND.appName)}</strong><span style="color:var(--muted)">${esc(BRAND.campaignName)}</span></div></div>`,
           ),
     },
   };

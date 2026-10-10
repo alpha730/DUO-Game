@@ -3257,57 +3257,131 @@ a {
   font-weight: 600;
 }
 
+/* ---------- DET top bar + co-brand ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 -16px;
+  padding: 4px 16px 12px;
+  border-bottom: 2px solid var(--border);
+}
+
+.cobrand {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 6px;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.02rem;
+  line-height: 1.2;
+}
+
+.cobrand-partner {
+  color: var(--primary-text); /* the green "duolingo english test" wordmark colour */
+}
+
+.cobrand-x {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.cobrand-host {
+  color: var(--text);
+}
+
+.cobrand-img {
+  height: 32px;
+  width: auto;
+}
+
+/* Small uppercase label above a heading (DET section labels). */
+.eyebrow {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* DET checklist: green ticks + plain sentences. */
+.ticks {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ticks li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.02rem;
+  line-height: 1.35;
+}
+
+.ticks svg {
+  flex: none;
+}
+
 /* ---------- Login ---------- */
 .login {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
 }
 
 .login-hero {
-  position: relative;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  text-align: center;
-  margin: 0 -16px;
-  padding: 8px 16px 4px;
-  overflow: hidden;
-  background: radial-gradient(circle at 50% 34%, var(--bg-alt) 0, transparent 60%);
+  gap: 8px;
+  padding: 6px 0 4px;
+}
+
+.login-hero-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.login-hero h1 {
+  margin: 0;
+  font-size: clamp(1.7rem, 8vw, 2.1rem);
+  line-height: 1.12;
 }
 
 .login-hero-art {
-  position: relative;
-  margin: 6px 0 2px;
-}
-
-.login-hero-art::before {
-  content: "";
-  position: absolute;
-  inset: 12% -14% -4%;
-  border-radius: 50%;
-  border: 3px dashed var(--primary);
-  opacity: 0.35;
-  animation: spin 18s linear infinite;
+  flex: none;
+  align-self: flex-end;
 }
 
 .login-hero .mascot {
-  width: 150px;
+  width: 96px;
+}
+
+@media (max-width: 350px) {
+  .login-hero:not(.compact) .login-hero-art {
+    display: none; /* the checklist needs the width on the smallest phones */
+  }
 }
 
 .login-hero.compact .mascot {
   width: 112px;
 }
 
-.login-logo {
-  margin-top: 4px;
-  border-radius: 12px;
+.login-hero.compact {
+  flex-direction: column;
+  text-align: center;
 }
 
-.login-hero h1 {
-  margin: 6px 0 2px;
-  font-size: 2.3rem;
-  letter-spacing: 0.01em;
+.login-hero.compact .login-hero-art {
+  align-self: center;
 }
 
 .login-hero.compact h1 {

@@ -110,3 +110,19 @@ export const BoltIcon = ({ size = 18, ...p }: P) => (
     <path fill="currentColor" d="M13.5 2 5 13.5h6L10 22l9-12h-6.2z" />
   </svg>
 );
+
+/** DET-style tick: filled green circle with a check (login list, skills, results). */
+export const CheckIcon = ({ size = 26, ...p }: P) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden focusable={false} {...p}>
+    <circle cx="12" cy="12" r="11" fill="var(--primary)" />
+    <path d="m7 12.4 3.2 3.1L17 8.8" fill="none" stroke="var(--surface)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+/** DET-style clock for the question timer ("0:12 for this question"). */
+export const ClockIcon = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7.5V12l3 2" />
+  </svg>
+);

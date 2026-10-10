@@ -1,5 +1,6 @@
 import { sendEmailVerification } from "firebase/auth";
 import { useCallback, useEffect, useState } from "react";
+import CoBrand from "../components/CoBrand";
 import Mascot from "../components/Mascot";
 import { authErrorMessage, useAuth } from "../lib/auth";
 import { app, auth, usingEmulators } from "../lib/firebase";
@@ -70,6 +71,9 @@ export default function VerifyEmail() {
 
   return (
     <main className="screen stack">
+      <header className="topbar">
+        <CoBrand />
+      </header>
       <section className="login-hero compact">
         <div className="login-hero-art">
           <Mascot slot="hero" mood="wow" badge="✉️" />

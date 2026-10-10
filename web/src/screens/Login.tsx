@@ -7,6 +7,8 @@ import {
   signInWithRedirect,
 } from "firebase/auth";
 import { useState, type FormEvent } from "react";
+import CoBrand from "../components/CoBrand";
+import { CheckIcon } from "../components/Icons";
 import Mascot from "../components/Mascot";
 import { BRAND } from "../config/brand";
 import { authErrorMessage } from "../lib/auth";
@@ -63,14 +65,28 @@ export default function Login() {
 
   return (
     <main className="screen login">
+      <header className="topbar">
+        <CoBrand />
+      </header>
       <section className="login-hero">
+        <div className="login-hero-text">
+          <p className="eyebrow">{BRAND.appName}</p>
+          <h1>Ready to show your English?</h1>
+          <ul className="ticks">
+            <li>
+              <CheckIcon /> Find 10 posters on campus
+            </li>
+            <li>
+              <CheckIcon /> Catch each {BRAND.creatureName} with a quick English question
+            </li>
+            <li>
+              <CheckIcon /> Top the leaderboard before the final on Oct 22
+            </li>
+          </ul>
+        </div>
         <div className="login-hero-art">
           <Mascot slot="hero" mood="happy" />
         </div>
-        <img className="login-logo" src={BRAND.logo.full} alt={BRAND.partnerName} width={44} height={44} />
-        <h1>{BRAND.appName}</h1>
-        <p className="login-campaign">{BRAND.campaignName}</p>
-        <p className="login-tagline">{BRAND.tagline}</p>
       </section>
       <div className="stack login-form">
 

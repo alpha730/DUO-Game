@@ -97,7 +97,7 @@ for (const lingo of ["lingo-2018", "lingo-2023", "lingo-2016"]) {
   if (q.type === "meaning" || q.type === "question") {
     // Tap a wrong option (the right one is only known server-side).
     await page.getByRole("radio").nth(attempt.order.indexOf((q.correctIndex + 1) % 4)).click();
-    await page.getByRole("button", { name: "Submit" }).click();
+    await page.getByRole("button", { name: "Continue" }).click();
   } else {
     await say(page, "zzz");
   }

@@ -278,11 +278,14 @@ export async function startCatch(page, lingoId, { goto = true } = {}) {
 export async function answerChoice(page, text) {
   await clearRateLimits();
   await page.getByRole("radio", { name: new RegExp(`${text}$`) }).click();
-  await page.getByRole("button", { name: "Submit" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
   return resultOutcome(page);
 }
 
+/** Read aloud: tap 🎤 RECORD NOW (DET), then the fake speech engine "hears" the text. */
 export async function say(page, text) {
+  const record = page.locator("[data-record]");
+  if (await record.isVisible().catch(() => false)) await record.click();
   await page.waitForFunction(() => window.__rec?.__running, null, { timeout: 10000 });
   await page.evaluate((t) => window.__say(t), text);
 }

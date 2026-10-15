@@ -1204,10 +1204,11 @@ a {
   color: var(--on-danger);
 }
 
-/* DET question card (catch challenge): task name + timer on top, the question, one SUBMIT. */
+/* DET test item (DET-DESIGN §3): a Snow card on the Polar page — timer header, Swan dividers,
+   bold centred instruction, the item, CONTINUE bottom-right. Calm: no bright fills, no confetti. */
 body:has(.catch[data-phase="active"]),
 body:has(.catch[data-phase="submitting"]) {
-  background: var(--surface-2); /* DET practice-test grey page */
+  background: var(--bg);
 }
 
 .catch[data-phase="active"],
@@ -1215,7 +1216,7 @@ body:has(.catch[data-phase="submitting"]) {
   padding-top: calc(12px + var(--safe-top));
 }
 
-/* The question card names the task; the "Catch …" heading is only for before/after. */
+/* The card names the task; the "Catch …" heading is only for before/after. */
 .catch[data-phase="active"] .catch-head,
 .catch[data-phase="submitting"] .catch-head {
   display: none;
@@ -1232,108 +1233,133 @@ body:has(.catch[data-phase="submitting"]) {
   overflow: hidden;
 }
 
+/* Header row: "⏱ 0:20 for this question" (+ the Lingo, small, on the right). */
 .q-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 10px 14px;
+  min-height: 56px;
+  padding: 8px 14px;
+  border-bottom: 2px solid var(--border);
 }
 
-.q-task {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
-.q-task .arena-lingo {
+.q-top .arena-lingo {
   flex: none;
-  width: 40px;
-}
-
-.q-type {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 1rem;
-  line-height: 1.15;
+  width: 36px;
 }
 
 .q-timer {
-  flex: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-width: 0;
+  padding: 4px 10px 4px 6px;
+  border-radius: 999px;
   color: var(--text);
+  font-size: 1rem;
+}
+
+.q-timer svg {
+  flex: none;
+  color: var(--text);
+}
+
+.timer-seconds {
   font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 1.15rem;
+  font-weight: 700;
+  font-size: 1.1rem;
   font-variant-numeric: tabular-nums;
 }
 
-.q-timer[data-low="true"] {
-  color: var(--danger-text);
+.timer-label {
+  color: var(--muted);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.q-timer[data-phase="mid"] svg {
+  color: var(--warn);
+}
+
+/* Last 5 s: Cardinal clock on a Walking Fish pill (the time text stays Eel for contrast). */
+.q-timer[data-phase="low"] {
+  background: var(--danger-soft);
+}
+
+.q-timer[data-phase="low"] svg {
+  color: var(--danger);
   animation: pulse-soft 1s ease-in-out infinite;
-}
-
-.q-timebar {
-  height: 6px;
-  background: var(--surface-2);
-  border-top: 2px solid var(--border);
-}
-
-.q-timebar i {
-  display: block;
-  height: 100%;
-  transition: width 0.1s linear, background 0.4s;
 }
 
 .q-body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 22px 16px 18px;
+  gap: 14px;
+  padding: 22px 16px 20px;
 }
 
-.q-prompt {
-  text-align: center;
-}
-
-.q-prompt p {
+/* Task name (small) + the DET instruction (bold, centred). */
+.q-type {
   margin: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .q-instruction {
-  margin-bottom: 12px !important;
+  margin: -6px 0 4px;
+  text-align: center;
   font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 1.12rem;
+  font-weight: 700;
+  font-size: 1.2rem;
   line-height: 1.3;
+  color: var(--text);
 }
 
 .say-word {
-  font-size: 2.3rem;
-  font-weight: 600;
+  margin: 0;
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 700;
   line-height: 1.15;
   word-break: break-word;
 }
 
 .say-phrase {
-  font-size: 1.22rem;
-  font-weight: 600;
-  line-height: 1.6;
+  margin: 0;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1.75;
 }
 
+/* Fill in the Blanks: a DET slot in the sentence; shows the selected word (a preview). */
 .q-blank {
   display: inline-block;
-  width: 4.2em;
-  margin: 0 0.25em;
-  border-bottom: 3px solid var(--text);
-  vertical-align: baseline;
+  min-width: 4.5em;
+  min-height: 1.6em;
+  margin: 0 0.2em;
+  padding: 0 0.4em;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+  vertical-align: middle;
+  line-height: 1.45;
+  font-weight: 700;
 }
 
-/* Answer tiles: white, grey border + edge; selected = DET light-blue tile. */
+.q-blank[data-filled="true"] {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+}
+
+/* Multiple choice: full-width option cards with a radio circle; selected = Iguana + Macaw border. */
 .choices {
   display: flex;
   flex-direction: column;
@@ -1343,68 +1369,43 @@ body:has(.catch[data-phase="submitting"]) {
 .choice {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   min-height: 56px;
-  margin-bottom: var(--edge);
-  padding: 10px 14px;
+  padding: 12px 14px;
   border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   background: var(--surface);
-  box-shadow: 0 var(--edge) 0 var(--border);
   color: var(--text);
   font: inherit;
   font-size: 1.05rem;
-  font-weight: 600;
+  font-weight: 400;
   text-align: left;
   cursor: pointer;
   touch-action: manipulation;
-  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out, background 0.15s;
-  animation: slide-up 0.3s calc(var(--n, 0) * 50ms) ease-out both;
-}
-
-.choice:nth-child(2) {
-  --n: 1;
-}
-.choice:nth-child(3) {
-  --n: 2;
-}
-.choice:nth-child(4) {
-  --n: 3;
-}
-
-.choice:active:not(:disabled) {
-  transform: translateY(var(--edge));
-  box-shadow: 0 0 0 var(--border);
+  transition: background 0.12s, border-color 0.12s;
 }
 
 .choice:disabled {
   cursor: default;
 }
 
+.choice-radio {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+}
+
 .choice[data-picked="true"] {
   background: var(--accent-soft);
   border-color: var(--accent-border);
-  box-shadow: 0 var(--edge) 0 var(--accent-border);
-  color: var(--link);
 }
 
-.choice-letter {
-  flex: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  border: 2px solid var(--border);
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-
-.choice[data-picked="true"] .choice-letter {
-  border-color: var(--accent-border);
-  color: var(--link);
+.choice[data-picked="true"] .choice-radio {
+  border-color: var(--accent);
+  background: radial-gradient(circle, var(--accent) 0 5px, var(--surface) 6px);
 }
 
 .choice-text {
@@ -1412,12 +1413,17 @@ body:has(.catch[data-phase="submitting"]) {
   overflow-wrap: anywhere;
 }
 
+/* Footer: Swan divider, the action bottom-right. */
 .q-foot {
-  padding: 14px 16px calc(10px + var(--safe-bottom));
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 16px calc(12px + var(--safe-bottom));
   border-top: 2px solid var(--border);
 }
 
 .q-foot .btn {
+  width: auto;
+  min-width: 168px;
   margin-bottom: var(--edge);
 }
 
@@ -1427,96 +1433,59 @@ body:has(.catch[data-phase="submitting"]) {
   }
 }
 
-/* Giant mic */
-.mic-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding-top: 4px;
+/* Read aloud: the character in the middle, a blue waveform pill (Iguana + Macaw bars). */
+.voice-character {
+  align-self: center;
+  width: 112px;
 }
 
-.mic-button {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 92px;
-  height: 92px;
-  margin-bottom: 6px;
-  border-radius: 50%;
-  border: 0;
+.wave-pill {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: min(100%, 300px);
+  height: 56px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+}
+
+.wave-pill i {
+  width: 4px;
+  height: var(--h);
+  border-radius: 2px;
   background: var(--accent);
-  color: var(--on-accent);
-  box-shadow: 0 6px 0 var(--accent-dark);
-  cursor: pointer;
-  touch-action: manipulation;
-  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+  opacity: 0.55;
 }
 
-.mic-button:active:not(:disabled) {
-  transform: translateY(6px);
-  box-shadow: 0 0 0 var(--accent-dark);
-}
-
-.mic-button[data-listening="true"] {
-  background: var(--danger);
-  color: var(--on-danger);
-  box-shadow: 0 6px 0 var(--danger-dark);
-  cursor: default;
-}
-
-.mic-pulse {
-  position: absolute;
-  inset: -10px;
-  border-radius: 50%;
-  border: 3px solid var(--danger);
-  opacity: 0;
-}
-
-.mic-button[data-listening="true"] .mic-pulse {
-  animation: radar 1.5s ease-out infinite;
-}
-
-.wave {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  height: 36px;
-}
-
-.wave i {
-  width: 6px;
-  height: 8px;
-  border-radius: 3px;
-  background: var(--border);
-}
-
-.voice[data-listening="true"] .wave i {
-  background: var(--danger);
-  animation: wave 0.9s calc(var(--i) * -0.13s) ease-in-out infinite;
+.wave-pill[data-listening="true"] i {
+  opacity: 1;
+  animation: wave 0.9s calc(var(--i) * -0.11s) ease-in-out infinite;
 }
 
 .heard {
   display: flex;
   gap: 10px;
   align-items: center;
-  min-height: 54px;
+  min-height: 52px;
   padding: 12px 14px;
-  border-radius: var(--radius-sm);
-  background: var(--surface-2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
 }
 
 .heard-text {
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 1rem;
 }
 
 .mic-dot {
   flex: none;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: var(--muted);
+  background: var(--border);
 }
 
 .voice[data-listening="true"] .mic-dot {
@@ -1528,17 +1497,16 @@ body:has(.catch[data-phase="submitting"]) {
   margin: 0;
   text-align: center;
   color: var(--muted);
-  font-weight: 600;
 }
 
 .arena-checking {
-  min-height: 56px;
+  min-height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 700;
   animation: fade-in 0.2s ease-out both;
 }
 

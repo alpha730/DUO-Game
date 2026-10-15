@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { StartAttemptOutput } from "@shared/types";
 import { listen } from "../catch/speech";
-import { MicIcon } from "./Icons";
+import type { Lingo } from "../lib/lingos";
+import LingoArt from "./LingoArt";
 
 const STOP_HELP: Record<string, string> = {
   "no-speech": "We didn't hear anything.",
@@ -11,28 +12,47 @@ const STOP_HELP: Record<string, string> = {
   "service-not-allowed": "Speech recognition is turned off on this phone.",
 };
 
+export type VoiceState = "idle" | "listening" | "stopped";
+
 /**
- * pronounce / speak as DET "Read Aloud" (PLAN 3.6): listening starts at once; the final transcript is
- * submitted automatically (or with the card's SUBMIT button).
+ * pronounce / speak as DET "Read aloud" (DET-DESIGN §3): the text to read, a blue waveform pill
+ * (Iguana with Macaw bars, moving while it listens), the character in the middle. Recording starts
+ * from the card's 🎤 RECORD NOW button (`recordKey` changes); the final transcript is submitted
+ * automatically, and whatever was heard is sent if the timer runs out.
  */
 export default function VoiceChallenge({
   challenge,
+  lingo,
+  recordKey,
+  onState,
   onTranscript,
   onSubmit,
 }: {
   challenge: StartAttemptOutput;
+  lingo: Lingo | null;
+  /** Bumped by RECORD NOW: each new value starts listening. */
+  recordKey: number;
+  onState: (s: VoiceState) => void;
   /** Latest text heard — submitted as-is if the timer runs out. */
   onTranscript: (text: string) => void;
   onSubmit: (transcript: string) => void;
 }) {
   const [heard, setHeard] = useState("");
-  const [listening, setListening] = useState(false);
+  const [state, setState] = useState<VoiceState>("idle");
   const [stopped, setStopped] = useState<string | null>(null);
   const cancel = useRef<() => void>(() => {});
 
+  const update = useCallback(
+    (s: VoiceState) => {
+      setState(s);
+      onState(s);
+    },
+    [onState],
+  );
+
   const start = useCallback(() => {
     setStopped(null);
-    setListening(true);
+    update("listening");
     cancel.current = listen({
       onInterim: (t) => {
         setHeard(t);
@@ -41,55 +61,43 @@ export default function VoiceChallenge({
       onFinal: (t) => {
         setHeard(t);
         onTranscript(t);
-        setListening(false);
+        update("stopped");
         onSubmit(t);
       },
       onStopped: (err) => {
-        setListening(false);
+        update("stopped");
         setStopped(err ?? "no-speech");
       },
     });
-  }, [onSubmit, onTranscript]);
+  }, [onSubmit, onTranscript, update]);
 
   useEffect(() => {
-    start();
-    return () => cancel.current();
-  }, [start]);
+    if (recordKey > 0) start();
+  }, [recordKey, start]);
+  useEffect(() => () => cancel.current(), []);
 
   const pronounce = challenge.type === "pronounce";
+  const listening = state === "listening";
   return (
     <div className="stack challenge voice" data-listening={listening}>
-      <div className="q-prompt">
-        <p className="q-instruction">{pronounce ? "Record yourself saying the word below" : "Record yourself saying the statement below"}</p>
-        <p className={pronounce ? "say-word" : "say-phrase"}>{pronounce ? challenge.word : challenge.phrase}</p>
-      </div>
-
-      <div className="mic-area">
-        <button
-          className="mic-button"
-          data-listening={listening}
-          onClick={start}
-          disabled={listening}
-          aria-label={listening ? "Listening" : "Tap to speak again"}
-        >
-          <span className="mic-pulse" aria-hidden="true" />
-          <MicIcon size={36} />
-        </button>
-        <div className="wave" aria-hidden="true">
-          {Array.from({ length: 9 }, (_, i) => (
-            <i key={i} style={{ "--i": i } as React.CSSProperties} />
-          ))}
+      <p className={pronounce ? "say-word" : "say-phrase"}>{pronounce ? challenge.word : challenge.phrase}</p>
+      {lingo && (
+        <div className="voice-character" aria-hidden="true">
+          <LingoArt lingo={lingo} mood={listening ? "wow" : "happy"} />
         </div>
+      )}
+      <div className="wave-pill" data-listening={listening} aria-hidden="true">
+        {Array.from({ length: 21 }, (_, i) => (
+          <i key={i} style={{ "--i": i, "--h": `${8 + ((i * 7) % 22)}px` } as React.CSSProperties} />
+        ))}
       </div>
-
       <div className="heard" aria-live="polite">
         <span className="mic-dot" aria-hidden="true" />
-        <span className="heard-text">{heard || (listening ? "Listening…" : "…")}</span>
+        <span className="heard-text">{heard || (listening ? "Listening…" : "Tap RECORD NOW and read it out loud")}</span>
       </div>
-
       {stopped && (
         <p className="mic-help" role="status">
-          {STOP_HELP[stopped] ?? "Recognition stopped."} Tap the mic to speak again.
+          {STOP_HELP[stopped] ?? "Recognition stopped."} Tap RECORD NOW to try again.
         </p>
       )}
     </div>

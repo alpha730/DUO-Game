@@ -12,14 +12,15 @@ import { activeAttempt, sendForfeit } from "../catch/forfeit";
 import { requestLocation, requestMic, type CheckState, type Position } from "../catch/preflight";
 import { speechSupported } from "../catch/speech";
 import { useCountdown } from "../catch/useCountdown";
-import ChoiceChallenge, { hasBlank } from "../components/ChoiceChallenge";
+import ChoiceChallenge, { choiceInstruction, hasBlank } from "../components/ChoiceChallenge";
 import EmptyState from "../components/EmptyState";
 import { OpenInBrowser } from "../components/CameraHelp";
 import Preflight from "../components/Preflight";
 import Result from "../components/Result";
 import LingoArt from "../components/LingoArt";
-import { QuestionTimer, TimeBar } from "../components/QuestionTimer";
-import VoiceChallenge from "../components/VoiceChallenge";
+import { QuestionTimer } from "../components/QuestionTimer";
+import { MicIcon } from "../components/Icons";
+import VoiceChallenge, { type VoiceState } from "../components/VoiceChallenge";
 import { api, apiErrorMessage } from "../lib/api";
 import { haptic, play } from "../lib/feedback";
 import { triesLeft, triesUsed } from "../lib/catchStatus";
@@ -43,8 +44,10 @@ function taskName(c: StartAttemptOutput): string {
 }
 
 /**
- * The running challenge as a DET practice-test question: a card with the task name + small Lingo
- * (mood reaction) and the timer on top, the question, and one SUBMIT button at the bottom.
+ * The running challenge as a DET test item (DET-DESIGN §3): a Snow card on the Polar page —
+ * header "⏱ 0:20 for this question" (+ the small Lingo), Swan divider, the task + a bold centred
+ * instruction, the item, Swan divider, and CONTINUE bottom-right (🎤 RECORD NOW for Read aloud).
+ * Calm: no confetti or bright colours inside the question.
  */
 function Active({
   challenge,
@@ -61,7 +64,9 @@ function Active({
   const answer = useRef<Answer>({});
   const [picked, setPicked] = useState<number | null>(null);
   const [heard, setHeard] = useState("");
-  // Time's up → submit whatever we have (the selected tile or what was heard); the server decides
+  const [recordKey, setRecordKey] = useState(0);
+  const [voiceState, setVoiceState] = useState<VoiceState>("idle");
+  // Time's up → submit whatever we have (the selected option or what was heard); the server decides
   // (and rejects anything past the grace).
   const { leftMs, totalMs, seconds } = useCountdown(challenge.expiresAt, challenge.serverNow, () => onSubmit(answer.current));
   // Last 5 seconds: tick + buzz once per second.
@@ -81,28 +86,26 @@ function Active({
     setPicked(choice);
   };
   const voice = isVoiceChallenge(challenge.type);
-  const canSubmit = !checking && (voice ? heard.trim() !== "" : picked !== null);
+  const canContinue = !checking && (voice ? heard.trim() !== "" && voiceState !== "listening" : picked !== null);
 
   return (
     <section className="arena q-card" data-type={challenge.type} data-checking={checking} style={{ "--lingo": lingo?.color } as React.CSSProperties}>
       <header className="q-top">
-        <div className="q-task">
-          {lingo && <LingoArt lingo={lingo} mood={checking ? "wow" : "happy"} className="arena-lingo" />}
-          <span className="q-type" data-task>
-            {taskName(challenge)}
-          </span>
-        </div>
-        <QuestionTimer leftMs={leftMs} />
+        <QuestionTimer leftMs={leftMs} totalMs={totalMs} label={voice ? "to speak" : "for this question"} />
+        {lingo && <LingoArt lingo={lingo} mood={checking ? "wow" : "happy"} className="arena-lingo" />}
       </header>
-      <TimeBar leftMs={leftMs} totalMs={totalMs} />
       <div className="q-body">
+        <p className="q-type" data-task>
+          {taskName(challenge)}
+        </p>
+        <p className="q-instruction">{voice ? (challenge.type === "pronounce" ? "Read this word aloud" : "Read this sentence aloud") : choiceInstruction(challenge)}</p>
         {challenge.level === "hard" && (
           <span className="hard-badge" data-level="hard">
             🔥 Hard question — your streak is on fire
           </span>
         )}
         {voice ? (
-          <VoiceChallenge challenge={challenge} onTranscript={onTranscript} onSubmit={onVoice} />
+          <VoiceChallenge challenge={challenge} lingo={lingo} recordKey={recordKey} onState={setVoiceState} onTranscript={onTranscript} onSubmit={onVoice} />
         ) : (
           <ChoiceChallenge challenge={challenge} picked={picked} onPick={pick} locked={checking} />
         )}
@@ -113,9 +116,13 @@ function Active({
             <div className="spinner" />
             <p>Checking your answer…</p>
           </div>
+        ) : voice && !canContinue ? (
+          <button className="btn q-record" disabled={voiceState === "listening"} onClick={() => setRecordKey((k) => k + 1)} data-record>
+            <MicIcon size={20} /> {voiceState === "listening" ? "Listening…" : voiceState === "stopped" ? "Record again" : "Record now"}
+          </button>
         ) : (
-          <button className="btn big q-submit" disabled={!canSubmit} onClick={() => onSubmit(answer.current)}>
-            Submit
+          <button className="btn q-submit" disabled={!canContinue} onClick={() => onSubmit(answer.current)}>
+            Continue
           </button>
         )}
       </footer>

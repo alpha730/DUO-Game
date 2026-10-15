@@ -20,8 +20,8 @@ async function choiceType(label, lingos, wrong, right) {
     const task = (await page.locator("[data-task]").innerText()).trim();
     ok(task.toLowerCase() === label.toLowerCase(), `${lingo}: task label "${task}"`);
     if (label === "Fill in the Blanks") ok((await page.locator(".q-blank").count()) === 1, `${lingo}: the blank is drawn`);
-    // Submit is disabled until an option is picked.
-    ok(await page.getByRole("button", { name: "Submit" }).isDisabled(), `${lingo}: Submit disabled before picking`);
+    // CONTINUE is disabled until an option is picked (DET: Swan/Hare).
+    ok(await page.getByRole("button", { name: "Continue" }).isDisabled(), `${lingo}: CONTINUE disabled before picking`);
     const outcome = await answerChoice(page, option);
     ok(outcome === expected, `${label}: "${option}" → ${outcome} (expected ${expected})`);
     if (expected === "failed") {

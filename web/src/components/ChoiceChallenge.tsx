@@ -1,16 +1,21 @@
 import type { StartAttemptOutput } from "@shared/types";
 
-const LETTERS = ["A", "B", "C", "D"];
-
-/** The sentence with its blank ("__" / "___") drawn as a DET-style underline gap. */
-function WithBlank({ text }: { text: string }) {
+/**
+ * The sentence with its blank ("__" / "___") as a DET slot. Once an option is selected, its word
+ * shows in the slot (a preview — nothing is sent until CONTINUE).
+ */
+function WithBlank({ text, fill }: { text: string; fill: string | null }) {
   const parts = text.split(/_{2,}/);
   return (
     <>
       {parts.map((p, i) => (
         <span key={i}>
           {p}
-          {i < parts.length - 1 && <span className="q-blank" aria-label="blank" />}
+          {i < parts.length - 1 && (
+            <span className="q-blank" data-filled={fill !== null} aria-label={fill ? `blank: ${fill}` : "blank"}>
+              {fill ?? ""}
+            </span>
+          )}
         </span>
       ))}
     </>
@@ -19,9 +24,15 @@ function WithBlank({ text }: { text: string }) {
 
 export const hasBlank = (c: StartAttemptOutput) => /_{2,}/.test(c.prompt ?? "");
 
+/** The DET instruction line for a choice question. */
+export function choiceInstruction(c: StartAttemptOutput): string {
+  if (c.type === "meaning") return "Select the closest meaning of the word";
+  return hasBlank(c) ? "Complete the sentence with the correct word" : "Select the best answer";
+}
+
 /**
- * meaning / question as a DET practice question: an instruction line, the word or sentence, then 4
- * answer tiles. A tap only selects (light-blue tile); the card's SUBMIT button sends it.
+ * meaning / question as a DET test item: the word or sentence, then full-width option cards with a
+ * radio circle (DET-DESIGN §3). A tap only selects (Iguana card, Macaw border); CONTINUE sends it.
  */
 export default function ChoiceChallenge({
   challenge,
@@ -37,16 +48,16 @@ export default function ChoiceChallenge({
 }) {
   const meaning = challenge.type === "meaning";
   const blank = hasBlank(challenge);
+  const options = challenge.options ?? [];
   return (
     <div className="stack challenge">
-      <div className="q-prompt">
-        <p className="q-instruction">
-          {meaning ? "Select the closest meaning of the word" : blank ? "Select the best word to fill in the blank" : "Select the best answer"}
-        </p>
-        {meaning ? <p className="say-word">{challenge.word}</p> : <p className="say-phrase">{blank ? <WithBlank text={challenge.prompt ?? ""} /> : challenge.prompt}</p>}
-      </div>
+      {meaning ? (
+        <p className="say-word">{challenge.word}</p>
+      ) : (
+        <p className="say-phrase">{blank ? <WithBlank text={challenge.prompt ?? ""} fill={picked === null ? null : options[picked]} /> : challenge.prompt}</p>
+      )}
       <div className="choices" role="radiogroup" aria-label="Answers">
-        {(challenge.options ?? []).map((opt, i) => (
+        {options.map((opt, i) => (
           <button
             key={i}
             type="button"
@@ -57,9 +68,7 @@ export default function ChoiceChallenge({
             disabled={locked}
             onClick={() => onPick(i)}
           >
-            <span className="choice-letter" aria-hidden="true">
-              {LETTERS[i]}
-            </span>
+            <span className="choice-radio" aria-hidden="true" />
             <span className="choice-text">{opt}</span>
           </button>
         ))}

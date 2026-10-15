@@ -1,30 +1,23 @@
 import { ClockIcon } from "./Icons";
 
 /**
- * DET-style question timer: "0:12" with a clock, top right of the question card, plus a thin time
- * bar under the top bar. Only shows the time (SPEC §3.3: the server is the real timer).
- * Green → yellow → red; the last 5 s turn red and pulse (data-low).
+ * DET test header timer (DET-DESIGN §3): "⏱ 0:20 for this question" — clock icon, bold time, label.
+ * Only shows the time (SPEC §3.3: the server is the real timer). Half the time gone → Fox clock;
+ * the last 5 s → Cardinal clock on a Walking Fish pill (data-low). No bar, no colours elsewhere:
+ * the question itself stays calm.
  */
-export function QuestionTimer({ leftMs }: { leftMs: number }) {
+export function QuestionTimer({ leftMs, totalMs, label = "for this question" }: { leftMs: number; totalMs: number; label?: string }) {
   const seconds = Math.max(0, Math.ceil(leftMs / 1000));
   const mm = Math.floor(seconds / 60);
   const ss = String(seconds % 60).padStart(2, "0");
+  const phase = seconds <= 5 ? "low" : totalMs && leftMs / totalMs <= 0.5 ? "mid" : "ok";
   return (
-    <span className="q-timer timer" data-low={seconds <= 5} role="timer" aria-label={`${seconds} seconds left for this question`}>
+    <span className="q-timer timer" data-low={seconds <= 5} data-phase={phase} role="timer" aria-label={`${seconds} seconds left ${label}`}>
       <ClockIcon size={20} />
-      <span className="timer-seconds" data-seconds={seconds}>
+      <strong className="timer-seconds" data-seconds={seconds}>
         {mm}:{ss}
-      </span>
+      </strong>
+      <span className="timer-label">{label}</span>
     </span>
-  );
-}
-
-export function TimeBar({ leftMs, totalMs }: { leftMs: number; totalMs: number }) {
-  const frac = totalMs ? Math.max(0, Math.min(1, leftMs / totalMs)) : 0;
-  const color = frac > 0.5 ? "var(--ring-good)" : frac > 0.25 ? "var(--ring-mid)" : "var(--ring-low)";
-  return (
-    <div className="q-timebar" aria-hidden="true">
-      <i style={{ width: `${frac * 100}%`, background: color }} />
-    </div>
   );
 }

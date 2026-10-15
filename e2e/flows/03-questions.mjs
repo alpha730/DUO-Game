@@ -71,7 +71,7 @@ await startCatch(page, "lingo-2018");
 const open = await openAttempt(uid);
 await open.ref.update({ expiresAt: Timestamp.fromMillis(Date.now() - 2500) });
 const outcome = await answerChoice(page, "unwilling");
-ok(outcome === "late" && (await resultText(page)).includes("Time was up"), `late right answer → "${outcome}" (Time was up)`);
+ok(outcome === "late" && /time was up/i.test(await resultText(page)), `late right answer → "${outcome}" (Time was up)`);
 const a = (await open.ref.get()).data();
 const u = (await adb.doc(`users/${uid}`).get()).data();
 ok(a.status === "forfeit" && u.points === 0, `late: attempt ${a.status}, 0 points (got ${u.points})`);

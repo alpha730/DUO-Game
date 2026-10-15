@@ -1937,7 +1937,16 @@ body:has(.catch[data-phase="submitting"]) {
 
 .result-title {
   margin: 0;
-  font-size: 1.75rem;
+  text-align: center;
+}
+
+.result-hero .duo-emotion {
+  width: 124px;
+  height: auto;
+}
+
+.headline.keep-case {
+  text-transform: none;
 }
 
 .result[data-outcome="won"] .result-title {
@@ -2084,14 +2093,18 @@ body:has(.catch[data-phase="submitting"]) {
   color: var(--text);
 }
 
+/* Correct: Sea Sponge + Tree Frog edge; wrong: Walking Fish + Cardinal edge. Text stays Eel
+   (Tree Frog / Fire Ant text on those tints is below 4.5:1). */
 .result-banner[data-kind="won"] {
   background: var(--primary-soft);
-  color: var(--primary-text);
+  border-bottom-color: var(--primary-dark);
+  color: var(--text);
 }
 
 .result-banner[data-kind="failed"] {
   background: var(--danger-soft);
-  color: var(--danger-text);
+  border-bottom-color: var(--danger);
+  color: var(--text);
 }
 
 /* "Get ready for the real DET" */
@@ -3592,7 +3605,7 @@ body:has(.catch[data-phase="submitting"]) {
 
 .answer-card[data-won="true"] {
   background: var(--primary-soft);
-  border-color: transparent;
+  border-color: var(--primary-dark);
 }
 
 .answer-label {

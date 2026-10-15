@@ -8,6 +8,7 @@ import type { Outcome } from "../screens/Catch";
 import LingoArt from "./LingoArt";
 import LingoPips from "./LingoPips";
 import Mascot from "./Mascot";
+import { PatternBg } from "./BrandArt";
 import PrepCard from "./PrepCard";
 import WinCelebration, { Confetti } from "./WinCelebration";
 
@@ -93,7 +94,7 @@ export default function Result({
       );
       break;
     case "failed":
-      title = "Not this time";
+      title = "not this time";
       body = (
         <>
           <p className="muted result-note">{lingoName} slipped away.</p>
@@ -120,7 +121,7 @@ export default function Result({
       );
       break;
     case "forfeit":
-      title = "Chance lost";
+      title = "chance lost";
       body = (
         <p className="muted result-note">
           You left the app during the challenge, so this {raid ? "raid try" : "try"} is gone — stay in the app until you answer!
@@ -128,11 +129,11 @@ export default function Result({
       );
       break;
     case "late":
-      title = "Time was up";
+      title = "time was up";
       body = <p className="muted result-note">The answer arrived too late, so this chance is lost.</p>;
       break;
     case "error":
-      title = "Something went wrong";
+      title = "something went wrong";
       body = <p className="muted result-note">{outcome.message}</p>;
       break;
   }
@@ -152,15 +153,20 @@ export default function Result({
       <p className="result-banner" data-kind={outcome.kind} role="status">
         {banner}
       </p>
-      <div className="result-hero" aria-hidden="true">
+      {/* Celebration lives here, never inside the question: DET pattern tile, Duo's emotion, confetti. */}
+      <div className="result-hero has-pattern" aria-hidden="true">
+        <PatternBg />
         {won && <Confetti />}
-        {lingo && outcome.kind !== "error" ? (
+        {(won ? BRAND.duo.happy : BRAND.duo.sad) && outcome.kind !== "error" ? (
+          <img className={`duo-emotion ${won ? "react-win" : "react-fail"}`} src={(won ? BRAND.duo.happy : BRAND.duo.sad)!} alt="" />
+        ) : lingo && outcome.kind !== "error" ? (
           <LingoArt lingo={lingo} mood={won ? "happy" : "sad"} className={won ? "react-win" : "react-fail"} />
         ) : (
           <Mascot slot={won ? "celebrate" : "oops"} mood={won ? "happy" : "sad"} />
         )}
       </div>
-      <h2 className="result-title">{title}</h2>
+      {/* Feather headline: lowercase, except a Lingo's name (names keep their capitals). */}
+      <h2 className={`result-title headline ${won ? "keep-case" : ""}`}>{title}</h2>
       {body}
       {attemptsLeft !== null && attemptsPerDay !== null && (
         <div className="result-left">

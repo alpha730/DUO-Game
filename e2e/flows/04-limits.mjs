@@ -42,7 +42,7 @@ ok((await answerChoice(page, "since")) === "won", "2nd try at one of the 4 still
 await startCatch(page, "lingo-2018");
 let attempt = await openAttempt(uid);
 await hide(page);
-ok((await resultOutcome(page)) === "forfeit" && (await resultText(page)).includes("Chance lost"), "tab switch → 'Chance lost'");
+ok((await resultOutcome(page)) === "forfeit" && /chance lost/i.test(await resultText(page)), "tab switch → 'Chance lost'");
 await page.waitForTimeout(800);
 ok((await attempt.ref.get()).data().status === "forfeit", "tab switch → attempt forfeited on the server");
 ok((await user(uid)).losses === 1, "forfeit counts as a loss");

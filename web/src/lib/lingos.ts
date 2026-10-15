@@ -1,4 +1,5 @@
 import { COL, type LingoDoc } from "@shared/types";
+import { BRAND } from "../config/brand";
 
 export type Lingo = LingoDoc & { id: string };
 
@@ -9,7 +10,12 @@ export function loadLingos(): Promise<Lingo[]> {
   cache ??= import("./firestore")
     .then(({ db, collection, getDocs }) => getDocs(collection(db, COL.lingos)))
     .then((snap) =>
-      snap.docs.map((d) => ({ id: d.id, ...(d.data() as LingoDoc) })).sort((a, b) => a.posterIndex - b.posterIndex),
+      snap.docs
+        .map((d) => {
+          const doc = d.data() as LingoDoc;
+          return { id: d.id, ...doc, color: BRAND.lingoColors[d.id] ?? doc.color };
+        })
+        .sort((a, b) => a.posterIndex - b.posterIndex),
     )
     .catch((err) => {
       cache = null; // allow a retry

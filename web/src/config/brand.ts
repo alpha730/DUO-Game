@@ -203,6 +203,8 @@ export interface BrandSet {
   lingoNames: Record<string, string>;
   /** lingoId → 2D art for the Dex / Catch screens; missing → placeholder critter in the Lingo's colour. */
   lingoArt: Record<string, string>;
+  /** lingoId → display colour (overrides the colour stored with the Lingo; empty = keep it). */
+  lingoColors: Record<string, string>;
 }
 
 const CONFETTI = ["#58CC02", "#1CB0F6", "#FF9600", "#CE82FF", "#FF4B4B", "#FFC800"];
@@ -540,6 +542,7 @@ export const PLACEHOLDER: BrandSet = {
     "lingo-2025": "Decka",
   },
   lingoArt: {},
+  lingoColors: {},
 };
 
 // ---------- Official (Duolingo-supplied) ----------
@@ -606,6 +609,19 @@ export const OFFICIAL: BrandSet = {
   practiceUrl: "https://englishtest.duolingo.com",
   examShortName: "DET",
   scanHint: "Point at Duo in the middle of the poster", // every final poster shows Duo
+  // Each Lingo in a DET palette colour (display only — the stored colours stay as they are).
+  lingoColors: {
+    "lingo-2016": DET.owl,
+    "lingo-2017": DET.macaw,
+    "lingo-2018": DET.fox,
+    "lingo-2019": DET.beetle,
+    "lingo-2020": DET.cardinal,
+    "lingo-2021": DET.bee,
+    "lingo-2022": DET.humpback,
+    "lingo-2023": DET.maskGreen,
+    "lingo-2024": DET.betta,
+    "lingo-2025": DET.narwhal,
+  },
   // DET Juicy palette (docs/DET-DESIGN.md §1): named tokens → light + our dark derivation.
   themes: { light: DET_LIGHT, dark: DET_DARK },
   // DIN Next Rounded for all UI + body; uppercase DIN Bold buttons; Feather Bold headlines only.

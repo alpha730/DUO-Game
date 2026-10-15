@@ -1655,9 +1655,7 @@ body:has(.catch[data-phase="submitting"]) {
 }
 
 .home-hero h1 {
-  margin: 0 0 6px;
-  font-size: clamp(1.45rem, 7vw, 1.75rem);
-  line-height: 1.12;
+  margin: 0 0 6px; /* size + face: .headline (Feather rules) */
 }
 
 .home-hero-text p.muted {

@@ -107,17 +107,17 @@ export default function Home() {
             <p className="eyebrow">
               Hi {firstName} <span aria-hidden="true">👋</span>
             </p>
-            <h1>Ready to show your English?</h1>
+            <h1 className="headline">ready to show your English?</h1>
             <p className="muted">Scan a poster on campus to meet a {BRAND.creatureName}.</p>
           </div>
           <Mascot slot="hero" mood="happy" className="home-hero-art" />
         </div>
         {phase === "open" ? (
-          <Link to="/scan" className="btn big scan-hero-btn" aria-label="Scan a poster">
+          <Link to="/scan" className="btn big brand scan-hero-btn" aria-label="Scan a poster">
             <ScanIcon size={24} /> Scan a poster
           </Link>
         ) : (
-          <button className="btn big scan-hero-btn" disabled aria-label="Scan a poster">
+          <button className="btn big brand scan-hero-btn" disabled aria-label="Scan a poster">
             <ScanIcon size={24} /> {phase === "before" ? "Opens soon" : "Hunt over"}
           </button>
         )}

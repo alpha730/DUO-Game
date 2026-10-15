@@ -42,6 +42,17 @@ export async function drawShareCard(canvas: HTMLCanvasElement, s: ShareStats): P
   bg.addColorStop(1, c.primaryDark);
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, SHARE_W, SHARE_H);
+  // DET 10 pattern tile (dark), subtle, when supplied.
+  const tileSrc = BRAND.det10.pattern.dark ?? BRAND.det10.pattern.light;
+  const tile = tileSrc ? await loadImage(tileSrc) : null;
+  const pattern = tile && ctx.createPattern(tile, "repeat");
+  if (pattern) {
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = pattern;
+    ctx.fillRect(0, 0, SHARE_W, SHARE_H);
+    ctx.restore();
+  }
 
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
@@ -57,8 +68,14 @@ export async function drawShareCard(canvas: HTMLCanvasElement, s: ShareStats): P
     ctx.fillText(t, SHARE_W / 2, y);
   };
 
-  const logo = await loadImage(BRAND.logo.full);
-  if (logo) ctx.drawImage(logo, SHARE_W / 2 - 90, 170, 180, 180);
+  // The DET 10 lockup (white, for the dark card) when supplied, else the DET 10 logo / app logo.
+  const logoSrc = BRAND.det10.lockupV.dark ?? BRAND.det10.logo.dark ?? BRAND.logo.full;
+  const logo = await loadImage(logoSrc);
+  if (logo) {
+    const h = 200;
+    const w = Math.min(SHARE_W - 240, (logo.naturalWidth / (logo.naturalHeight || 1)) * h || h);
+    ctx.drawImage(logo, (SHARE_W - w) / 2, 160, w, h);
+  }
   text(BRAND.appName, 470, 92, c.text, 800);
   text(BRAND.campaignName, 540, 40, c.muted, 600);
 

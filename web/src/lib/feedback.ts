@@ -2,6 +2,8 @@
 // (web/public/sfx, made by scripts/make-sfx.mjs). Sounds are fetched after the player's first tap,
 // which also unlocks audio (iOS only allows it from a user gesture). Mute is saved per phone.
 
+import { BRAND } from "../config/brand";
+
 export type Sfx = "found" | "correct" | "wrong" | "levelup" | "tick";
 const SOUNDS: Sfx[] = ["found", "correct", "wrong", "levelup", "tick"];
 const MUTE_KEY = "dh-muted";
@@ -48,7 +50,8 @@ function unlock(): void {
   // moment later, at low priority — the first sound is needed when a poster is found, not instantly.
   setTimeout(() => {
     for (const name of SOUNDS) {
-      fetch(`/sfx/${name}.mp3`, { priority: "low" } as RequestInit)
+      // The kit's official sounds when supplied (assets/brand/sounds), else ours.
+      fetch(BRAND.sounds[name] ?? `/sfx/${name}.mp3`, { priority: "low" } as RequestInit)
         .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
         .then((b) => new Promise<AudioBuffer>((res, rej) => ctx.decodeAudioData(b, res, rej)))
         .then((buf) => buffers.set(name, buf))

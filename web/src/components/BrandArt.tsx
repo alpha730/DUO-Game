@@ -40,9 +40,10 @@ export function HeroArt({
 }
 
 /** A DET 10-Year icon (Dex, Me, empty states); else the given emoji. */
-export function Det10Icon({ name, fallback, className = "" }: { name: Det10IconName; fallback: string; className?: string }) {
+export function Det10Icon({ name, fallback, className = "" }: { name: Det10IconName; fallback?: string; className?: string }) {
   const src = BRAND.det10.icons[name];
   if (src) return <img className={`det10-icon ${className}`} src={src} alt="" />;
+  if (!fallback) return null;
   return (
     <span className={`det10-icon det10-icon-fallback ${className}`} aria-hidden="true">
       {fallback}

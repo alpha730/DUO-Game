@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { LINGO_COUNT, type CatchView } from "@shared/types";
 import Hud from "../components/Hud";
+import { Det10Icon } from "../components/BrandArt";
 import { CloseIcon, StarIcon } from "../components/Icons";
 import LevelBadge from "../components/LevelBadge";
 import LingoArt from "../components/LingoArt";
@@ -130,7 +131,9 @@ export default function Dex() {
     <main className="screen with-nav stack dex">
       <Hud state={me} />
       <div className="section-title">
-        <h1 style={{ margin: 0 }}>Dex</h1>
+        <h1 className="headline with-icon" style={{ margin: 0 }}>
+          <Det10Icon name="backpack" /> dex
+        </h1>
         <span className="dex-count">
           <strong>{caughtCount}</strong>/{LINGO_COUNT} caught
         </span>

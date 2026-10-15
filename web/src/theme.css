@@ -3778,3 +3778,51 @@ body:has(.catch[data-phase="submitting"]) {
   position: relative;
   z-index: 1;
 }
+
+.with-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.with-icon .det10-icon {
+  width: 36px;
+  height: 36px;
+}
+
+/* Kit level badges: the emblem / scallop behind the label. */
+.level-badge[data-art="kit"] {
+  position: relative;
+  gap: 4px;
+}
+
+.level-badge-art {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.level-badge[data-level="MAX"][data-art="kit"] {
+  padding-left: 4px;
+}
+
+.empty-state .hero-art {
+  width: 140px;
+  margin: 0 auto;
+}
+
+.board-det10 {
+  height: 28px;
+  width: auto;
+}
+
+.about-art {
+  width: 160px;
+  margin: 4px auto 0;
+}
+
+.nav-kit-icon {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}

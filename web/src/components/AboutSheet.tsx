@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { BRAND } from "../config/brand";
+import { HeroArt } from "./BrandArt";
 import CoBrand from "./CoBrand";
 import { CloseIcon } from "./Icons";
 
@@ -18,6 +19,7 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
           <CloseIcon />
         </button>
         <CoBrand />
+        <HeroArt name="duoInstitutions" className="about-art" />
         <h2>About {BRAND.appName}</h2>
         <p>
           The {BRAND.partnerName} turns 10 — a decade of making English tests accessible to anyone, anywhere. To celebrate,

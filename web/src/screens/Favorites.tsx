@@ -69,7 +69,7 @@ export default function Favorites() {
 
   return (
     <main className="screen stack">
-      <h1>{isChange ? "Your favourites" : "Pick 2 favourites"}</h1>
+      <h1 className="headline">{isChange ? "your favourites" : "pick 2 favourites"}</h1>
       <p className="muted">
         Only favourite {BRAND.creatureName}s build a streak — catch one 10 days in a row to unlock its MAX form.
       </p>

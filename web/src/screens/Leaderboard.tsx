@@ -1,3 +1,4 @@
+import { ThemedImg } from "../components/BrandArt";
 import { db, doc, onSnapshot } from "../lib/firestore";
 import { useEffect, useState } from "react";
 import { COL, DOC, type StudentRow } from "@shared/types";
@@ -64,11 +65,12 @@ export default function Leaderboard() {
     <main className="screen with-nav stack board-screen">
       <Hud state={me} />
       <header className="board-head">
-        <p className="eyebrow" data-cobrand>
+        <p className="eyebrow with-icon" data-cobrand>
+          <ThemedImg art={BRAND.det10.logo} alt="" className="board-det10" />
           {BRAND.coBrandShort}
         </p>
         <div className="section-title">
-          <h1 style={{ margin: 0 }}>Leaderboard</h1>
+          <h1 className="headline" style={{ margin: 0 }}>leaderboard</h1>
           {board?.updatedAt && <span className="small muted">Updated {ago(board.updatedAt)}</span>}
         </div>
       </header>

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { LINGO_COUNT } from "@shared/types";
 import AboutSheet from "../components/AboutSheet";
+import { Det10Icon } from "../components/BrandArt";
 import { CoinIcon, FlameIcon, SoundIcon } from "../components/Icons";
 import PrepCard from "../components/PrepCard";
 import ShareCard from "../components/ShareCard";
@@ -39,7 +40,9 @@ function SkillBar({ label, sub, c }: { label: string; sub: string; c: { right: n
 function SkillsPanel({ skills, wins, accuracy }: { skills: SkillCounts; wins: number; accuracy: number | null }) {
   return (
     <section className="card skills" aria-label="Your skills" data-skills>
-      <h2>Your skills</h2>
+      <h2 className="with-icon">
+        <Det10Icon name="books" /> Your skills
+      </h2>
       <SkillBar label="Reading" sub="Choose the Meaning + Fill in the Blanks" c={skills.reading} />
       <SkillBar label="Speaking" sub="Read Aloud" c={skills.speaking} />
       <div className="skills-totals">
@@ -164,7 +167,9 @@ export default function Me() {
       <PrepCard />
 
       <section className="card qr-card" aria-label="Your prize QR code">
-        <h2>🎁 Prize QR</h2>
+        <h2 className="with-icon">
+          <Det10Icon name="key" fallback="🎁" /> Prize QR
+        </h2>
         <canvas ref={qr} className="qr" data-uid={user?.uid} aria-label="QR code of your account" />
         <p className="small muted" style={{ margin: 0 }}>
           Show this at the prize desk. Prizes go only to this account, and your name must match your college ID card.

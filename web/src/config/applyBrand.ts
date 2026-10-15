@@ -34,7 +34,14 @@ export function brandCss(brand: BrandSet): string {
     `@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){${dark}}}` +
     `:root[data-theme="dark"]{${dark};color-scheme:dark}:root[data-theme="light"]{color-scheme:light}` +
     // Page colour straight from these variables, so even the very first paint is in the right theme.
-    `html{background:var(--bg);color:var(--text)}`
+    `html{background:var(--bg);color:var(--text)}` +
+    // Kit art with light + dark versions (components/BrandArt.tsx; also the splash).
+    `.themed-dark{display:none}` +
+    `@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .themed-light{display:none}:root:not([data-theme="light"]) .themed-dark{display:inline-block}}` +
+    `:root[data-theme="dark"] .themed-light{display:none}:root[data-theme="dark"] .themed-dark{display:inline-block}` +
+    `.pattern-bg{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.5;background:var(--pattern-light) center/320px repeat}` +
+    `@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pattern-bg{background-image:var(--pattern-dark)}}` +
+    `:root[data-theme="dark"] .pattern-bg{background-image:var(--pattern-dark)}`
   );
 }
 

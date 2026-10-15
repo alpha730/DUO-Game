@@ -10,7 +10,7 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import CoBrand from "../components/CoBrand";
 import { CheckIcon } from "../components/Icons";
-import Mascot from "../components/Mascot";
+import { HeroArt } from "../components/BrandArt";
 import { BRAND } from "../config/brand";
 import { authErrorMessage } from "../lib/auth";
 import { auth } from "../lib/firebase";
@@ -72,7 +72,8 @@ export default function Login() {
       <section className="login-hero">
         <div className="login-hero-text">
           <p className="eyebrow">{BRAND.appName}</p>
-          <h1>Ready to show your English?</h1>
+          {/* Feather headline (DET-DESIGN §2): lowercase, ≥ 40 px, ≤ 10 words, left-aligned. */}
+          <h1 className="headline">ready to show your English?</h1>
           <ul className="ticks">
             <li>
               <CheckIcon /> Find 10 posters on campus
@@ -89,7 +90,7 @@ export default function Login() {
           </Link>
         </div>
         <div className="login-hero-art">
-          <Mascot slot="hero" mood="happy" />
+          <HeroArt name="beaComputerDuo" />
         </div>
       </section>
       <div className="stack login-form">

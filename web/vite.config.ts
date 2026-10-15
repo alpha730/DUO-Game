@@ -75,12 +75,22 @@ async function brandHtml(preconnect: string[]): Promise<Plugin> {
           .replace(
             '<div id="root"></div>',
             // Painted straight from the HTML (before any JS); React replaces it when it mounts.
-            // Co-brand on the splash (DET × JECRC lockup if supplied, else its text).
-            `<div id="root"><div class="boot" style="min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:0 24px;text-align:center;background:var(--bg);color:var(--text);font-family:var(--font-family)">` +
+            // DET splash: pattern tile (if supplied), the DET 10 vertical lockup × JECRC (or the
+            // DET × JECRC lockup / its text), the game's name in the headline face.
+            `<div id="root"><div class="boot" style="position:relative;overflow:hidden;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:0 24px;text-align:center;background:var(--bg);color:var(--text);font-family:var(--font-family)">` +
+              (BRAND.det10.pattern.light || BRAND.det10.pattern.dark
+                ? `<span class="pattern-bg" style="--pattern-light:url('${esc(BRAND.det10.pattern.light ?? BRAND.det10.pattern.dark!)}');--pattern-dark:url('${esc(BRAND.det10.pattern.dark ?? BRAND.det10.pattern.light!)}')"></span>`
+                : "") +
+              `<span style="position:relative;display:flex;flex-direction:column;align-items:center;gap:12px">` +
               (BRAND.coBrandLockup
-                ? `<img src="${esc(BRAND.coBrandLockup)}" alt="${esc(BRAND.coBrandText)}" height="40" />`
-                : `<span style="font-family:var(--font-display);font-weight:800;color:var(--primary-text)">${esc(BRAND.coBrandText)}</span>`) +
-              `<strong style="font-size:2rem;font-family:var(--font-display);font-weight:800">${esc(BRAND.appName)}</strong><span style="color:var(--muted)">${esc(BRAND.campaignName)}</span></div></div>`,
+                ? `<img src="${esc(BRAND.coBrandLockup)}" alt="${esc(BRAND.coBrandText)}" height="48" />`
+                : BRAND.det10.lockupV.light || BRAND.det10.lockupV.dark
+                  ? `<img class="themed-light" src="${esc(BRAND.det10.lockupV.light ?? BRAND.det10.lockupV.dark!)}" alt="${esc(BRAND.partnerName)} · 10 years" height="96" />` +
+                    `<img class="themed-dark" src="${esc(BRAND.det10.lockupV.dark ?? BRAND.det10.lockupV.light!)}" alt="" height="96" />` +
+                    `<span style="font-family:var(--font-display);font-weight:700">× JECRC</span>`
+                  : `<span style="font-family:var(--font-display);font-weight:700">${esc(BRAND.coBrandText)}</span>`) +
+              `<strong style="font-size:2.5rem;line-height:1.05;letter-spacing:-0.02em;font-family:var(--font-headline);font-weight:800">${esc(BRAND.appName)}</strong>` +
+              `<span>${esc(BRAND.campaignName)}</span></span></div></div>`,
           ),
     },
   };

@@ -272,7 +272,7 @@ a {
   padding: 12px 16px;
   border-radius: var(--radius-sm);
   border: 2px solid var(--border);
-  background: var(--surface-2);
+  background: var(--surface); /* DET: white fields on the Polar page */
   color: var(--text);
   font: inherit;
   font-weight: 500;
@@ -3493,9 +3493,7 @@ body:has(.catch[data-phase="submitting"]) {
 }
 
 .login-hero h1 {
-  margin: 0;
-  font-size: clamp(1.7rem, 8vw, 2.1rem);
-  line-height: 1.12;
+  margin: 0; /* size + face: .headline (Feather rules) */
 }
 
 .login-hero-art {
@@ -3503,7 +3501,8 @@ body:has(.catch[data-phase="submitting"]) {
   align-self: flex-end;
 }
 
-.login-hero .mascot {
+.login-hero .mascot,
+.login-hero .hero-art {
   width: 96px;
 }
 
@@ -3732,4 +3731,39 @@ body:has(.catch[data-phase="submitting"]) {
   padding: 4px 12px;
   font-size: 0.75rem;
   white-space: nowrap;
+}
+
+/* ---------- DET kit art (components/BrandArt.tsx) ---------- */
+.hero-art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.det10-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.det10-icon-fallback {
+  font-size: 1.6rem;
+}
+
+.cobrand-img {
+  height: 28px;
+  width: auto;
+}
+
+/* A screen or card with a pattern-tile background keeps its content above it. */
+.has-pattern {
+  position: relative;
+  isolation: isolate;
+}
+
+.has-pattern > :not(.pattern-bg) {
+  position: relative;
+  z-index: 1;
 }

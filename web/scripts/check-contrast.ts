@@ -52,6 +52,10 @@ const PAIRS: Array<[keyof BrandColors, ...(keyof BrandColors | string)[]]> = [
   ["dangerText", "dangerSoft", "surface"], ["text", "primarySoft", "surface"], ["text", "dangerSoft", "surface"],
 ];
 
+// Documented brand exceptions (docs/ACCESSIBILITY.md): white uppercase DIN Bold labels on the Owl /
+// Macaw buttons, as in Duolingo / DET. Reported, not counted as failures.
+const EXCEPTIONS = new Set(["onPrimary on primary", "onAction on action", "onAccent on accent"]);
+
 let failed = 0;
 for (const [name, c] of Object.entries(BRAND.themes) as Array<[string, BrandColors]>) {
   const rows: string[] = [];
@@ -59,8 +63,9 @@ for (const [name, c] of Object.entries(BRAND.themes) as Array<[string, BrandColo
     const layers = bg.map((k) => (k.startsWith("#") ? k : (c[k as keyof BrandColors] as string)));
     const r = ratio(flatten(c[fg] as string), flatten(...layers));
     const okay = r >= 4.5;
-    if (!okay) failed++;
-    rows.push(`${okay ? "  ok" : "FAIL"} ${r.toFixed(2).padStart(5)}  ${fg} on ${bg.join(" over ")}`);
+    const exception = !okay && EXCEPTIONS.has(`${fg} on ${bg.join(" over ")}`);
+    if (!okay && !exception) failed++;
+    rows.push(`${okay ? "  ok" : exception ? " EXC" : "FAIL"} ${r.toFixed(2).padStart(5)}  ${fg} on ${bg.join(" over ")}${exception ? "  (brand exception: white button label)" : ""}`);
   }
   console.log(`\n${name}\n${rows.join("\n")}`);
 }

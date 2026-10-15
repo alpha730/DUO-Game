@@ -1,9 +1,10 @@
 // Day 8: daily rules across IST midnight with a fake server clock (emulator-only `_emulator/clock`):
 // caught-today and the daily 4 reset at 00:00 IST, favourite streak +1 on the next day, a missed day
 // resets it (level kept), and a real 10-day streak reaches MAX + 1000 once.
-import { afterAll, afterEach, describe, expect, it } from "vitest";
+import { Timestamp } from "firebase-admin/firestore";
+import { afterAll, afterEach, describe, expect, it, onTestFinished } from "vitest";
 import type { GetMyStateOutput, SetFavoritesInput, StartAttemptOutput, SubmitAttemptOutput } from "../src/shared/types";
-import { adb, CAMPUS, cleanupApps, DEFAULT_PINS, istToday, newPlayer, pinQuestions } from "./helpers";
+import { adb, CAMPUS, cleanupApps, DEFAULT_PINS, istToday, newPlayer, patchConfig, pinQuestions } from "./helpers";
 
 type Player = Awaited<ReturnType<typeof newPlayer>>;
 const DAY = 86_400_000;
@@ -70,6 +71,9 @@ describe("across IST midnight (fake server clock)", () => {
   }, 60_000);
 
   it("a real 10-day favourite streak: Level 2 at day 3, Level 3 at day 6, MAX + 1000 at day 10 (once)", async () => {
+    // 11 fake days from today can run past the real lock (Oct 22): move it out for this test only.
+    const restoreLock = await patchConfig({ lockAt: Timestamp.fromMillis(istMidnight(N) + 30 * 86_400_000) });
+    onTestFinished(() => restoreLock());
     await useTestChallenges();
     const p = await newPlayer();
     await setClock(istMidnight(N) + 10 * 3_600_000);

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { BRAND } from "../config/brand";
+import { HeroArt } from "./BrandArt";
 
 const SEEN_KEY = "prepCardDay";
 const localDay = () => new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD, this phone's day (display only)
@@ -33,11 +34,13 @@ export default function PrepCard({ oncePerDay = false }: { oncePerDay?: boolean 
   if (!show || !BRAND.practiceUrl) return null;
   return (
     <section className="prep-card" data-prep>
+      <HeroArt name="duoSeal" className="prep-art" />
       <div>
         <h3>Get ready for the real {BRAND.examShortName}</h3>
         <p className="muted">Try the free official practice test — same question types, real timing.</p>
       </div>
       <a className="btn secondary" href={BRAND.practiceUrl} target="_blank" rel="noopener noreferrer">
+        {BRAND.uiIcons.practice && <img className="btn-kit-icon" src={BRAND.uiIcons.practice} alt="" aria-hidden="true" loading="lazy" />}
         Practice free ↗
       </a>
     </section>

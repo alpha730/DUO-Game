@@ -90,7 +90,7 @@ export default function Home() {
   return (
     <main className="screen with-nav stack home">
       <header className="topbar">
-        <CoBrand />
+        <CoBrand variant="compact" />
       </header>
       <Hud state={me} />
       <GameClock phase={phase} me={me} now={now} />
@@ -123,6 +123,7 @@ export default function Home() {
         )}
         {me && <LingoPips left={me.attemptsLeft} total={me.attemptsPerDay} />}
         <Link className="rules-link" to="/rules" data-rules-link>
+          {BRAND.uiIcons.overview && <img className="link-icon" src={BRAND.uiIcons.overview} alt="" aria-hidden="true" loading="lazy" />}
           How it works · Game rules →
         </Link>
       </section>
@@ -130,6 +131,7 @@ export default function Home() {
       {error && !me && (
         <EmptyState
           badge="📶"
+          duo="dizzy"
           title="You're offline"
           data-empty="offline"
           actions={

@@ -5,6 +5,10 @@ import type { CatchStatus } from "../lib/catchStatus";
 import type { Lingo } from "../lib/lingos";
 import type { Raid } from "../lib/raids";
 import LevelBadge from "./LevelBadge";
+import { Det10Icon, DuoArt } from "./BrandArt";
+
+/** Dex categories → DET 10 icons. */
+const RARITY_ICON = { common: "books", rare: "globe", epic: "key", legendary: "doorOpen" } as const;
 
 /** Bottom sheet shown while a poster is tracked (SPEC §8): who it is + Catch it / why not today. */
 export default function ScanOverlay({
@@ -41,7 +45,10 @@ export default function ScanOverlay({
           <h2>{lingoName(lingo)}</h2>
           <p className="scan-card-meta">
             <span>{lingo.detYear}</span>
-            <span className="dex-rarity">{lingo.rarity}</span>
+            <span className="dex-rarity">
+              <Det10Icon name={RARITY_ICON[lingo.rarity]} className="chip-icon" />
+              {lingo.rarity}
+            </span>
             {level ? <LevelBadge level={level} /> : <span className="scan-new">New!</span>}
             {status.favorite && <span className="scan-fav">⭐ Favourite</span>}
           </p>
@@ -110,7 +117,8 @@ export default function ScanOverlay({
       )}
 
       {server === "ok" && status.kind === "noAttempts" && (
-        <div className="done" data-closed>
+        <div className="done done-sleep" data-closed>
+          <DuoArt mood="sleep" className="sleep-art" />
           <strong>No Lingos left today</strong>
           <span className="small">You've tried {attemptsPerDay ?? 4} Lingos today — come back tomorrow</span>
         </div>

@@ -19,6 +19,10 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
           <CloseIcon />
         </button>
         <CoBrand />
+        <p className="about-place">
+          {BRAND.emblems.india && <img src={BRAND.emblems.india} alt="" aria-hidden="true" loading="lazy" decoding="async" />}
+          JECRC, Jaipur
+        </p>
         <HeroArt name="duoInstitutions" className="about-art" />
         <h2>About {BRAND.appName}</h2>
         <p>

@@ -1926,7 +1926,7 @@ body:has(.catch[data-phase="submitting"]) {
 .result[data-outcome="failed"] .result-hero,
 .result[data-outcome="forfeit"] .result-hero,
 .result[data-outcome="late"] .result-hero {
-  height: 116px;
+  height: 140px;
   background: radial-gradient(ellipse 50% 55% at 50% 62%, var(--surface-2) 0, transparent 72%);
 }
 
@@ -3796,20 +3796,18 @@ body:has(.catch[data-phase="submitting"]) {
   height: 36px;
 }
 
-/* Kit level badges: the emblem / scallop behind the label. */
-.level-badge[data-art="kit"] {
-  position: relative;
-  gap: 4px;
+/* Kit level badges: the DET scallop (wavy bottom edge) as the badge shape. MAX = gold. */
+.level-badge[data-shape="scallop"] {
+  padding: 2px 10px 5px;
+  border-radius: 6px 6px 0 0;
+  -webkit-mask: var(--scallop) center / 100% 100% no-repeat;
+  mask: var(--scallop) center / 100% 100% no-repeat;
+  box-shadow: none;
 }
 
-.level-badge-art {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
-}
-
-.level-badge[data-level="MAX"][data-art="kit"] {
-  padding-left: 4px;
+.level-badge[data-shape="scallop"][data-level="MAX"] {
+  background: var(--gold);
+  color: var(--on-gold);
 }
 
 .empty-state .hero-art {
@@ -3831,4 +3829,219 @@ body:has(.catch[data-phase="submitting"]) {
   width: 26px;
   height: 26px;
   object-fit: contain;
+}
+
+/* Result: Duo's emotion with the caught Lingo small beside it; the seal for MAX / all 10. */
+.result-hero .duo-art {
+  position: relative;
+  width: 116px;
+  height: 116px;
+  object-fit: contain;
+}
+
+.result[data-outcome="failed"] .result-hero .result-lingo,
+.result[data-outcome="forfeit"] .result-hero .result-lingo,
+.result[data-outcome="late"] .result-hero .result-lingo {
+  width: 52px;
+}
+
+.result-hero .result-lingo {
+  position: absolute;
+  right: calc(50% - 112px);
+  bottom: 6px;
+  width: 52px;
+}
+
+.result-seal {
+  position: absolute;
+  left: calc(50% - 128px);
+  top: 10px;
+  width: 64px;
+  height: auto;
+  animation: pop 0.6s 0.2s var(--pop) both;
+}
+
+/* ---------- DET × JECRC lockup (components/CoBrand.tsx) ---------- */
+.lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--text);
+}
+
+.lockup-det {
+  display: block;
+  height: 26px;
+  width: auto;
+  max-width: 62vw;
+}
+
+.lockup[data-variant="compact"] .lockup-det {
+  height: 22px;
+}
+
+.lockup-x {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.05rem;
+  color: var(--muted);
+}
+
+.lockup-divider {
+  width: 1.5px;
+  height: 24px;
+  background: var(--border);
+}
+
+/* "JECRC" in Feather Bold (names keep their capitals). */
+.lockup-jecrc {
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-size: 1.3rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.lockup[data-variant="compact"] .lockup-jecrc {
+  font-size: 1.1rem;
+}
+
+.lockup-jecrc-img {
+  height: 26px;
+  width: auto;
+}
+
+.lockup[data-white] {
+  color: var(--det-snow);
+}
+
+.lockup[data-white] .lockup-jecrc,
+.lockup[data-white] .lockup-x {
+  color: var(--det-snow);
+}
+
+/* Stacked (Login): DET 10 stacked lockup above "× JECRC". */
+.lockup[data-variant="stacked"] {
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lockup[data-variant="stacked"] .lockup-det {
+  height: 84px;
+}
+
+.lockup[data-variant="stacked"] .lockup-divider {
+  display: none;
+}
+
+.lockup[data-variant="stacked"] .lockup-x {
+  gap: 8px;
+}
+
+.login-lockup {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 2px;
+}
+
+.board-lockup {
+  margin-bottom: 6px;
+}
+
+.topbar .lockup {
+  max-width: 100%;
+}
+
+@media (max-width: 340px) {
+  .lockup-det {
+    height: 22px;
+  }
+
+  .lockup[data-variant="compact"] .lockup-det {
+    height: 19px;
+  }
+
+  .lockup-jecrc {
+    font-size: 1.1rem;
+  }
+
+  .lockup-x {
+    gap: 7px;
+  }
+}
+
+/* ---------- Kit art spots ---------- */
+.about-place {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.about-place img {
+  width: 36px;
+  height: 36px;
+}
+
+.prep-card .prep-art {
+  width: 96px;
+  align-self: center;
+}
+
+.btn-kit-icon,
+.link-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.headline-icon {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.sleep-art {
+  display: block;
+  width: 110px;
+  height: auto;
+  margin: 0 auto 4px;
+}
+
+.done-sleep {
+  align-items: center;
+  text-align: center;
+}
+
+.chip-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 3px;
+  vertical-align: -3px;
+}
+
+.stat-icon {
+  width: 26px;
+  height: 26px;
+}
+
+.duo-art {
+  display: block;
+  object-fit: contain;
+}
+
+.empty-state .duo-art,
+.empty-state .hero-art {
+  width: 150px;
+  height: auto;
+  margin: 0 auto;
 }

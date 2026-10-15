@@ -7,8 +7,8 @@ import type { Lingo } from "../lib/lingos";
 import type { Outcome } from "../screens/Catch";
 import LingoArt from "./LingoArt";
 import LingoPips from "./LingoPips";
-import Mascot from "./Mascot";
-import { PatternBg } from "./BrandArt";
+import { Det10Seal, DuoArt, PatternBg } from "./BrandArt";
+import type { DuoMood } from "../config/brand";
 import PrepCard from "./PrepCard";
 import WinCelebration, { Confetti } from "./WinCelebration";
 
@@ -58,6 +58,21 @@ export default function Result({
 }) {
   const left = attemptsLeft ?? 0;
   const won = outcome.kind === "won";
+  // Duo's emotion (DET-DESIGN §4): win = Joyous, MAX = HeartEyes, all 10 = CoolGuy; a miss = Sad,
+  // leaving the app = Flee, an error = dizzy. The DET 10 seal joins the MAX / all-10 moments.
+  const bonusKinds = won ? outcome.data.bonuses.map((b) => b.kind) : [];
+  const big = bonusKinds.includes("max") || bonusKinds.includes("allTen");
+  const duoMood: DuoMood = won
+    ? bonusKinds.includes("allTen")
+      ? "coolGuy"
+      : bonusKinds.includes("max")
+        ? "heartEyes"
+        : "joyous"
+    : outcome.kind === "forfeit"
+      ? "flee"
+      : outcome.kind === "error"
+        ? "dizzy"
+        : "sad";
   // A miss (wrong, forfeit, too late) with a try left on this Lingo → offer the second try.
   const canRetry = !raid && !won && outcome.kind !== "error" && (triesLeft ?? 0) > 0 && !!onRetry;
 
@@ -157,13 +172,9 @@ export default function Result({
       <div className="result-hero has-pattern" aria-hidden="true">
         <PatternBg />
         {won && <Confetti />}
-        {(won ? BRAND.duo.happy : BRAND.duo.sad) && outcome.kind !== "error" ? (
-          <img className={`duo-emotion ${won ? "react-win" : "react-fail"}`} src={(won ? BRAND.duo.happy : BRAND.duo.sad)!} alt="" />
-        ) : lingo && outcome.kind !== "error" ? (
-          <LingoArt lingo={lingo} mood={won ? "happy" : "sad"} className={won ? "react-win" : "react-fail"} />
-        ) : (
-          <Mascot slot={won ? "celebrate" : "oops"} mood={won ? "happy" : "sad"} />
-        )}
+        {big && <Det10Seal className="result-seal" />}
+        <DuoArt mood={duoMood} fallback={won ? "celebrate" : "oops"} className={won ? "react-win" : "react-fail"} />
+        {lingo && outcome.kind !== "error" && <LingoArt lingo={lingo} mood={won ? "happy" : "sad"} className="result-lingo" />}
       </div>
       {/* Feather headline: lowercase, except a Lingo's name (names keep their capitals). */}
       <h2 className={`result-title headline ${won ? "keep-case" : ""}`}>{title}</h2>

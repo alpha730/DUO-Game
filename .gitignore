@@ -29,3 +29,10 @@ Claude outputs/
 
 # E2E output (screenshots, logs)
 e2e/out/
+
+# Licensed Duolingo brand fonts + raw downloads (do not publish)
+assets/brand/fonts/
+assets/brand/_to_delete/
+
+# Brand-derived app icons (web/scripts/app-icons.mjs)
+web/public/brand-icons/

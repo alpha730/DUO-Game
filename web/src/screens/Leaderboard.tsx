@@ -1,4 +1,4 @@
-import { ThemedImg } from "../components/BrandArt";
+import CoBrand from "../components/CoBrand";
 import { db, doc, onSnapshot } from "../lib/firestore";
 import { useEffect, useState } from "react";
 import { COL, DOC, type StudentRow } from "@shared/types";
@@ -6,7 +6,6 @@ import { api, apiErrorMessage } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { usingEmulators } from "../lib/firebase";
 import Hud from "../components/Hud";
-import { BRAND } from "../config/brand";
 import { useMyState } from "../lib/myState";
 import { initial } from "../lib/trainer";
 
@@ -65,9 +64,8 @@ export default function Leaderboard() {
     <main className="screen with-nav stack board-screen">
       <Hud state={me} />
       <header className="board-head">
-        <p className="eyebrow with-icon" data-cobrand>
-          <ThemedImg art={BRAND.det10.logo} alt="" className="board-det10" />
-          {BRAND.coBrandShort}
+        <p className="eyebrow board-lockup" data-cobrand>
+          <CoBrand variant="compact" />
         </p>
         <div className="section-title">
           <h1 className="headline" style={{ margin: 0 }}>leaderboard</h1>

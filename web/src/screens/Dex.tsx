@@ -3,6 +3,9 @@ import { Link, useSearchParams } from "react-router-dom";
 import { LINGO_COUNT, type CatchView } from "@shared/types";
 import Hud from "../components/Hud";
 import { Det10Icon } from "../components/BrandArt";
+
+/** Dex categories → DET 10 icons. */
+const RARITY_ICON = { common: "books", rare: "globe", epic: "key", legendary: "doorOpen" } as const;
 import { CloseIcon, StarIcon } from "../components/Icons";
 import LevelBadge from "../components/LevelBadge";
 import LingoArt from "../components/LingoArt";
@@ -65,7 +68,10 @@ function DetailSheet({
           {favorite && <StarIcon className="dex-fav" aria-label="Favourite" />}
         </div>
         <p className="muted" style={{ margin: 0 }}>
-          {BRAND.creatureName} of {lingo.detYear} · <span className="dex-rarity">{lingo.rarity}</span>
+          {BRAND.creatureName} of {lingo.detYear} · <span className="dex-rarity">
+              <Det10Icon name={RARITY_ICON[lingo.rarity]} className="chip-icon" />
+              {lingo.rarity}
+            </span>
         </p>
         {caught ? (
           <>

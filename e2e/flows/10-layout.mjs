@@ -49,6 +49,8 @@ const AUDIT = () => {
     const rect = el.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0 || cs.visibility === "hidden" || el.closest("[aria-hidden=true], .rotate-notice, svg, canvas")) continue;
     if (el.closest("button:disabled, [disabled]")) continue; // disabled controls are exempt (WCAG 1.4.3)
+    // Documented brand exception (docs/ACCESSIBILITY.md): white labels on filled Owl / Macaw buttons.
+    if (el.closest(".btn:not(.secondary):not(.link):not(.danger):not(.gold)")) continue;
     let op = 1;
     for (let e = el; e; e = e.parentElement) op *= Number(getComputedStyle(e).opacity);
     if (op < 0.99) continue; // mid-animation or intentionally faded decoration

@@ -5,6 +5,7 @@
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { gzipSync } from "node:zlib";
+import { optimize } from "svgo";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -52,6 +53,7 @@ const brandSrc = join(src, "brand");
 const brandDest = resolve(here, "../public/brand");
 rmSync(brandDest, { recursive: true, force: true });
 const brandCopied = [];
+let svgSaved = 0;
 const DO_NOT_USE = /china|japan|red[\s_-]?bull|operating[\s_-]?principles|universit/i;
 const SHIPPED = /\.(svg|png|webp|jpg|jpeg|glb|mp3|ogg|wav|m4a|woff2?)$/i;
 function copyDir(rel) {
@@ -68,11 +70,28 @@ function copyDir(rel) {
     }
     if (!SHIPPED.test(f)) continue;
     mkdirSync(join(brandDest, rel), { recursive: true });
-    cpSync(from, join(brandDest, rel, f));
+    if (/\.svg$/i.test(f)) {
+      // svgo, conservatively: colours and <style> blocks are left alone (some kit SVGs use
+      // display-p3 colours with hex fallbacks), viewBox and ids kept.
+      const svg = readFileSync(from, "utf8");
+      const out = optimize(svg, {
+        multipass: true,
+        plugins: [
+          {
+            name: "preset-default",
+            params: { overrides: { convertColors: false, minifyStyles: false, inlineStyles: false, removeViewBox: false, cleanupIds: false } },
+          },
+        ],
+      }).data;
+      writeFileSync(join(brandDest, rel, f), out);
+      svgSaved += svg.length - out.length;
+    } else {
+      cpSync(from, join(brandDest, rel, f));
+    }
     brandCopied.push(`${rel.replace(/\\/g, "/")}/${f}`);
   }
 }
-for (const d of ["logos", "mascots", "models", "det10", "hero", "ui-icons", "emblems", "sounds"]) copyDir(d);
+for (const d of ["logos", "mascots", "models", "det10", "hero", "ui-icons", "emblems", "sounds", "jecrc"]) copyDir(d);
 // Fonts: the kit's OTF/TTF → Latin-subset WOFF2 (scripts/brand-fonts.py, needs Python + fontTools).
 if (existsSync(join(brandSrc, "fonts")) && readdirSync(join(brandSrc, "fonts")).some((f) => /\.(otf|ttf|woff2?)$/i.test(f))) {
   const py = spawnSync(process.platform === "win32" ? "python" : "python3", [join(here, "brand-fonts.py")], { stdio: "inherit" });
@@ -80,7 +99,7 @@ if (existsSync(join(brandSrc, "fonts")) && readdirSync(join(brandSrc, "fonts")).
   const out = join(brandDest, "fonts");
   if (existsSync(out)) for (const f of readdirSync(out)) brandCopied.push(`fonts/${f}`);
 }
-copied.push(brandCopied.length ? `brand: ${brandCopied.join(", ")}` : "brand: (no files supplied yet)");
+copied.push(brandCopied.length ? `brand: ${brandCopied.length} files (svgo saved ${Math.round(svgSaved / 1024)} KB)` : "brand: (no files supplied yet)");
 
 console.log(`assets synced: ${copied.join(", ")}`);
 if (tooBig.length) {

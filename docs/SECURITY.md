@@ -131,3 +131,8 @@ server side is done and tested.
    upload example, which includes 2 real pool answers. It's fixed in the code (QA bug #5).
 9. **Disabled players can still load their state.** `getMyState` still answers for them (read-only),
    so the app can show "Your account is paused". Every other function refuses.
+
+## Brand exception (not a security item)
+
+White uppercase DIN Bold labels on the Owl / Macaw buttons are a deliberate brand exception to the
+4.5:1 contrast rule (2.09 / 2.44:1). Details and how to undo it: [ACCESSIBILITY.md](ACCESSIBILITY.md).

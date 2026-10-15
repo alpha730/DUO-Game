@@ -10,7 +10,7 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import CoBrand from "../components/CoBrand";
 import { CheckIcon } from "../components/Icons";
-import { HeroArt } from "../components/BrandArt";
+import { HeroArt, PatternBg } from "../components/BrandArt";
 import { BRAND } from "../config/brand";
 import { authErrorMessage } from "../lib/auth";
 import { auth } from "../lib/firebase";
@@ -65,9 +65,10 @@ export default function Login() {
   };
 
   return (
-    <main className="screen login">
-      <header className="topbar">
-        <CoBrand />
+    <main className="screen login has-pattern">
+      <PatternBg />
+      <header className="login-lockup">
+        <CoBrand variant="stacked" />
       </header>
       <section className="login-hero">
         <div className="login-hero-text">

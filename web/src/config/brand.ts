@@ -120,6 +120,8 @@ export type Det10Icon = "backpack" | "books" | "building" | "doorClosed" | "door
 export type HeroName = "beaComputerDuo" | "duoInstitutions" | "beaCertificateDuo" | "linComputer" | "zariCertified" | "beaDuoSurfing" | "duoSeal";
 export type UiIconName = "test" | "practice" | "rules" | "overview" | "testSetup" | "cart" | "search" | "id" | "mail" | "microscope";
 export type SoundName = "correct" | "wrong" | "levelup" | "found" | "tick";
+/** Duo poses used by the app (assets/brand/mascots/Duo_*.svg). */
+export type DuoMood = "wave" | "joyous" | "heartEyes" | "coolGuy" | "sad" | "flee" | "dizzy" | "sleep";
 
 export interface FontFile {
   family: string;
@@ -172,16 +174,23 @@ export interface BrandSet {
     lockupV: Themed;
     /** Pattern tile for subtle backgrounds: light tile in the light theme, dark tile in dark. */
     pattern: Themed;
-    icons: Record<Det10Icon, string | null>;
+    /** The DET 10 seal (share card, MAX / all-10 celebrations). */
+    seal: string | null;
+    /** Icons: full style in the light theme, mono in dark. */
+    icons: Record<Det10Icon, Themed>;
   };
+  /** JECRC's own logo (assets/brand/jecrc/), else "JECRC" set in Feather Bold. */
+  jecrcLogo: Themed;
+  /** App icon / favicon (the green DET emblem). */
+  appIcon: string | null;
   /** DET hero illustrations (Login, About, empty states, "Get ready for the real DET"). */
   heroes: Record<HeroName, string | null>;
   /** DET UI icons (nav + info). */
   uiIcons: Record<UiIconName, string | null>;
-  /** DET emblems / scallops (level badges: scallop = MAX). */
-  emblems: { emblem: string | null; scallop: string | null };
-  /** Duo emotions (Result: happy win / sad fail). */
-  duo: { happy: string | null; sad: string | null };
+  /** DET scallop (level-badge shape; MAX = gold) + the India flag emblem (About: "JECRC, Jaipur"). */
+  emblems: { scallop: string | null; india: string | null };
+  /** Duo emotions & poses (Result, errors, no attempts left, welcome). */
+  duo: Record<DuoMood, string | null>;
   /** Official in-app sounds; null → our own placeholder sounds in /sfx. */
   sounds: Record<SoundName, string | null>;
   logo: {
@@ -386,19 +395,21 @@ const DET_LIGHT: BrandColors = {
   // Brand / celebrate / Scan: Owl with its Tree Frog 3D edge.
   primary: DET.owl,
   primaryDark: DET.treeFrog,
-  onPrimary: DET.mantaRay, // white on Owl is 2.1:1
+  // BRAND EXCEPTION (user decision, docs/ACCESSIBILITY.md): white uppercase DIN Bold labels on Owl /
+  // Macaw buttons like Duolingo / DET, although white on them is 2.1 / 2.4:1. All other text ≥ 4.5:1.
+  onPrimary: DET.snow,
   primaryText: DET.eel, // no green in the kit reaches 4.5:1 on white; green stays on fills and icons
   primaryGlow: tint("owl", 0.25),
   primarySoft: DET.seaSponge,
   // Primary action (DET "CONTINUE"): Macaw with its Whale edge.
   action: DET.macaw,
   actionDark: DET.whale,
-  onAction: DET.mantaRay, // white on Macaw is 2.4:1
+  onAction: DET.snow, // brand exception, see onPrimary
   disabledBg: DET.swan,
   onDisabled: DET.hare,
   accent: DET.macaw,
   accentDark: DET.whale,
-  onAccent: DET.mantaRay,
+  onAccent: DET.snow, // brand exception (Macaw buttons)
   accentSoft: DET.iguana, // selected option fill (text on it: Eel)
   accentBorder: DET.macaw,
   link: DET.narwhal, // Humpback 4.6:1 on Polar, Narwhal 7.0:1
@@ -520,12 +531,23 @@ export const PLACEHOLDER: BrandSet = {
     lockupH: { light: null, dark: null },
     lockupV: { light: null, dark: null },
     pattern: { light: null, dark: null },
-    icons: { backpack: null, books: null, building: null, doorClosed: null, doorOpen: null, globe: null, key: null },
+    seal: null,
+    icons: {
+      backpack: { light: null, dark: null },
+      books: { light: null, dark: null },
+      building: { light: null, dark: null },
+      doorClosed: { light: null, dark: null },
+      doorOpen: { light: null, dark: null },
+      globe: { light: null, dark: null },
+      key: { light: null, dark: null },
+    },
   },
+  jecrcLogo: { light: null, dark: null },
+  appIcon: null,
   heroes: { beaComputerDuo: null, duoInstitutions: null, beaCertificateDuo: null, linComputer: null, zariCertified: null, beaDuoSurfing: null, duoSeal: null },
   uiIcons: { test: null, practice: null, rules: null, overview: null, testSetup: null, cart: null, search: null, id: null, mail: null, microscope: null },
-  emblems: { emblem: null, scallop: null },
-  duo: { happy: null, sad: null },
+  emblems: { scallop: null, india: null },
+  duo: { wave: null, joyous: null, heartEyes: null, coolGuy: null, sad: null, flee: null, dizzy: null, sleep: null },
   sounds: { correct: null, wrong: null, levelup: null, found: null, tick: null },
   logo: { full: "/favicon.svg", mark: "/favicon.svg" },
   mascots: { hero: null, celebrate: null, oops: null },
@@ -636,16 +658,19 @@ export const OFFICIAL: BrandSet = {
     lockupH: { light: kit("DET 10 lockup horizontal (green)", "det10", /lockup_h/i, any("green", "black")), dark: kit("DET 10 lockup horizontal (white)", "det10", /lockup_h/i, /white/i) },
     lockupV: { light: kit("DET 10 lockup vertical (green)", "det10", /lockup_v/i, any("green", "black")), dark: kit("DET 10 lockup vertical (white)", "det10", /lockup_v/i, /white/i) },
     pattern: { light: kit("DET 10 pattern tile (light)", "det10", /pattern_tile_light/i), dark: kit("DET 10 pattern tile (dark)", "det10", /pattern_tile_dark/i) },
+    seal: kit("DET 10 seal", "det10", /det_10_seal/i),
     icons: {
-      backpack: kit("DET 10 icon backpack", "det10/icons", /backpack/i),
-      books: kit("DET 10 icon books", "det10/icons", /books/i),
-      building: kit("DET 10 icon building", "det10/icons", /building/i),
-      doorClosed: kit("DET 10 icon door closed", "det10/icons", /door_?closed/i),
-      doorOpen: kit("DET 10 icon door open", "det10/icons", /door_?open/i),
-      globe: kit("DET 10 icon globe", "det10/icons", /globe/i),
-      key: kit("DET 10 icon key", "det10/icons", w("key")),
+      backpack: { light: kit("DET 10 icon backpack (full)", "det10", /icon_full_backpack/i) ?? kit("DET 10 icon backpack (1c)", "det10", /icon_1c_backpack/i), dark: kit("DET 10 icon backpack (mono)", "det10", /icon_mono_backpack/i) },
+      books: { light: kit("DET 10 icon books (full)", "det10", /icon_full_books/i) ?? kit("DET 10 icon books (1c)", "det10", /icon_1c_books/i), dark: kit("DET 10 icon books (mono)", "det10", /icon_mono_books/i) },
+      building: { light: kit("DET 10 icon building (full)", "det10", /icon_full_building/i) ?? kit("DET 10 icon building (1c)", "det10", /icon_1c_building/i), dark: kit("DET 10 icon building (mono)", "det10", /icon_mono_building/i) },
+      doorClosed: { light: kit("DET 10 icon door closed (full)", "det10", /icon_full_door_closed/i) ?? kit("DET 10 icon door closed (1c)", "det10", /icon_1c_door_closed/i), dark: kit("DET 10 icon door closed (mono)", "det10", /icon_mono_door_closed/i) },
+      doorOpen: { light: kit("DET 10 icon door open (full)", "det10", /icon_full_door_open/i) ?? kit("DET 10 icon door open (1c)", "det10", /icon_1c_door_open/i), dark: kit("DET 10 icon door open (mono)", "det10", /icon_mono_door_open/i) },
+      globe: { light: kit("DET 10 icon globe (full)", "det10", /icon_full_globe/i) ?? kit("DET 10 icon globe (1c)", "det10", /icon_1c_globe/i), dark: kit("DET 10 icon globe (mono)", "det10", /icon_mono_globe/i) },
+      key: { light: kit("DET 10 icon key (full)", "det10", /icon_full_key/i) ?? kit("DET 10 icon key (1c)", "det10", /icon_1c_key/i), dark: kit("DET 10 icon key (mono)", "det10", /icon_mono_key/i) },
     },
   },
+  jecrcLogo: { light: kit("JECRC logo", "jecrc", any("color", "colour", "dark", "black", "logo")), dark: kit("JECRC logo (white)", "jecrc", any("white", "light", "reverse")) },
+  appIcon: kit("app icon (green DET emblem)", "logos", /GreenEmblem/i),
   heroes: {
     beaComputerDuo: kit("hero BeaComputerDuo", "hero", /bea_?computer_?duo/i),
     duoInstitutions: kit("hero DuoInstitutions", "hero", /duo_?institutions/i),
@@ -656,19 +681,28 @@ export const OFFICIAL: BrandSet = {
     duoSeal: kit("hero Duo_seal", "hero", /duo_?seal/i),
   },
   uiIcons: {
-    test: kit("UI icon Test", "ui-icons", w("test")),
+    test: kit("UI icon Test", "ui-icons", /StatIcon_Test/i),
     practice: kit("UI icon Practice", "ui-icons", /practice/i),
-    rules: kit("UI icon Rules", "ui-icons", /rules/i),
+    rules: kit("UI icon Rules", "ui-icons", /Icon_Rules/i),
     overview: kit("UI icon Overview", "ui-icons", /overview/i),
     testSetup: kit("UI icon TestSetup", "ui-icons", /test_?setup/i),
-    cart: kit("UI icon Cart", "ui-icons", /cart/i),
+    cart: kit("UI icon Cart", "ui-icons", /StatIcon_Cart/i),
     search: kit("UI icon magnifying glass", "ui-icons", /magnif/i),
-    id: kit("UI icon ID", "ui-icons", w("id")),
+    id: kit("UI icon ID", "ui-icons", /^ID\.svg$/i),
     mail: kit("UI icon mail", "ui-icons", /mail/i),
     microscope: kit("UI icon microscope", "ui-icons", /microscope/i),
   },
-  emblems: { emblem: kit("DET emblem", "emblems", /emblem/i), scallop: kit("DET scallop (MAX badge)", "emblems", /scallop/i) },
-  duo: { happy: kit("Duo emotion: happy", "mascots", any("happy", "celebrat", "cheer", "excited")), sad: kit("Duo emotion: sad", "mascots", any("sad", "cry", "upset")) },
+  emblems: { scallop: kit("DET scallop", "emblems", /scallops\/ScallopTall_2\.svg$/i), india: kit("India flag emblem", "emblems", /FlagEmblem_India/i) },
+  duo: {
+    wave: kit("Duo_Wave", "mascots", /^Duo_Wave\./i),
+    joyous: kit("Duo_Joyous", "mascots", /^Duo_Joyous\./i),
+    heartEyes: kit("Duo_HeartEyes", "mascots", /^Duo_HeartEyes\./i),
+    coolGuy: kit("Duo_CoolGuy", "mascots", /^Duo_CoolGuy\./i),
+    sad: kit("Duo_Sad", "mascots", /^Duo_Sad\./i),
+    flee: kit("Duo_Flee", "mascots", /^Duo_Flee\./i),
+    dizzy: kit("Duo_dizzy", "mascots", /^Duo_dizzy\./i),
+    sleep: kit("Duo_Sleep", "mascots", /^Duo_Sleep\./i),
+  },
   sounds: {
     correct: kit("sound: correct", "sounds", any("correct", "right", "success")),
     wrong: kit("sound: wrong", "sounds", any("wrong", "incorrect", "error")),
@@ -677,13 +711,14 @@ export const OFFICIAL: BrandSet = {
     tick: kit("sound: timer tick", "sounds", any("tick", "timer", "clock")),
   },
   logo: {
-    full: supplied("logo", "logos/logo.svg", PLACEHOLDER.logo.full),
-    mark: supplied("logo mark / favicon", "logos/mark.svg", PLACEHOLDER.logo.mark),
+    full: kit("DET horizontal logo", "logos", /HorizontalGreenLogo-JuicyDET-.*Primary/i) ?? PLACEHOLDER.logo.full,
+    mark: kit("favicon (green DET emblem)", "logos", /GreenEmblem/i) ?? PLACEHOLDER.logo.mark,
   },
   mascots: {
-    hero: supplied("mascot: welcome", "mascots/hero.png", PLACEHOLDER.mascots.hero),
-    celebrate: supplied("mascot: celebrate", "mascots/celebrate.png", PLACEHOLDER.mascots.celebrate),
-    oops: supplied("mascot: oops (error states)", "mascots/oops.png", PLACEHOLDER.mascots.oops),
+    // Duo poses from the kit: welcome = Duo_Wave, celebrate = Duo_Joyous, oops = Duo_dizzy.
+    hero: kit("mascot: welcome (Duo_Wave)", "mascots", /^Duo_Wave\./i),
+    celebrate: kit("mascot: celebrate (Duo_Joyous)", "mascots", /^Duo_Joyous\./i),
+    oops: kit("mascot: oops (Duo_dizzy)", "mascots", /^Duo_dizzy\./i),
   },
   // Duo's moods on the final posters (assets/posters/final), posterIndex 0–9 = 2016–2025. Same names
   // as the lingos collection (scripts/lingos.ts), so server messages match what the app shows.

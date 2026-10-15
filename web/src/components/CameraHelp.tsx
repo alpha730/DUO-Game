@@ -176,7 +176,7 @@ export default function CameraHelp({
   }
 
   return (
-    <EmptyState className="camera-help" role="alert" data-problem={problem.kind} mood={mood} badge={badge} title={title} actions={actions}>
+    <EmptyState hero="zariCertified" className="camera-help" role="alert" data-problem={problem.kind} mood={mood} badge={badge} title={title} actions={actions}>
       <div className="empty-body">{body}</div>
     </EmptyState>
   );

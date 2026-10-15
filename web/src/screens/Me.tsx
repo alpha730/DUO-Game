@@ -136,24 +136,24 @@ export default function Me() {
             <span>days in a row</span>
           </div>
           <div className="stat-box" data-stat="caught">
-            <span aria-hidden="true">📖</span>
+            <Det10Icon name="books" fallback="📖" className="stat-icon" />
             <strong>
               {profile?.lingosCaught ?? 0}/{LINGO_COUNT}
             </strong>
             <span>{BRAND.creatureName}s caught</span>
           </div>
           <div className="stat-box" data-stat="wins">
-            <span aria-hidden="true">🎯</span>
+            <Det10Icon name="backpack" fallback="🎯" className="stat-icon" />
             <strong>{wins}</strong>
             <span>catches</span>
           </div>
           <div className="stat-box" data-stat="accuracy">
-            <span aria-hidden="true">✅</span>
+            <Det10Icon name="key" fallback="✅" className="stat-icon" />
             <strong>{accuracy === null ? "—" : `${accuracy}%`}</strong>
             <span>accuracy</span>
           </div>
           <div className="stat-box" data-stat="speed">
-            <span aria-hidden="true">⚡</span>
+            <Det10Icon name="doorOpen" fallback="⚡" className="stat-icon" />
             <strong>{avgSec === null ? "—" : `${avgSec}s`}</strong>
             <span>avg answer</span>
           </div>

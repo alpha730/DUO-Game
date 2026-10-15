@@ -32,6 +32,7 @@ const listFiles = (dir: string, rel = ""): string[] =>
       )
     : [];
 const brandFiles = listFiles(brandDir);
+const appIcons = existsSync(fileURLToPath(new URL("./public/brand-icons/apple-touch-icon.png", import.meta.url)));
 
 /** Writes the active brand into index.html (title, favicon, theme colour, CSS variables) so the very
  *  first paint is on-brand — no flash before the JS bundle loads. Same source: src/config/brand.ts. */
@@ -53,6 +54,8 @@ async function brandHtml(preconnect: string[]): Promise<Plugin> {
             [
               `<title>${esc(BRAND.appName)}</title>`,
               `<link rel="icon" href="${esc(BRAND.logo.mark)}" />`,
+              // Home-screen icons from the green DET emblem (web/scripts/app-icons.mjs), when generated.
+              ...(appIcons ? [`<link rel="apple-touch-icon" href="/brand-icons/apple-touch-icon.png" />`, `<link rel="icon" type="image/png" sizes="192x192" href="/brand-icons/icon-192.png" />`] : []),
               ...themeColorMetas(BRAND).map((m) => `<meta name="theme-color" media="${m.media}" content="${esc(m.content)}" />`),
               `<style id="brand-vars">${brandCss(BRAND)}</style>`,
               // Saved Light/Dark choice (Me → Appearance) applied before the first paint.
@@ -84,10 +87,14 @@ async function brandHtml(preconnect: string[]): Promise<Plugin> {
               `<span style="position:relative;display:flex;flex-direction:column;align-items:center;gap:12px">` +
               (BRAND.coBrandLockup
                 ? `<img src="${esc(BRAND.coBrandLockup)}" alt="${esc(BRAND.coBrandText)}" height="48" />`
-                : BRAND.det10.lockupV.light || BRAND.det10.lockupV.dark
-                  ? `<img class="themed-light" src="${esc(BRAND.det10.lockupV.light ?? BRAND.det10.lockupV.dark!)}" alt="${esc(BRAND.partnerName)} · 10 years" height="96" />` +
-                    `<img class="themed-dark" src="${esc(BRAND.det10.lockupV.dark ?? BRAND.det10.lockupV.light!)}" alt="" height="96" />` +
-                    `<span style="font-family:var(--font-display);font-weight:700">× JECRC</span>`
+                : BRAND.det10.lockupH.light || BRAND.det10.lockupH.dark
+                  ? // DET 10 horizontal lockup (green on light, white on dark) + divider + × + "JECRC" in Feather Bold.
+                    `<span style="display:flex;align-items:center;gap:10px">` +
+                    `<img class="themed-light" src="${esc(BRAND.det10.lockupH.light ?? BRAND.det10.lockupH.dark!)}" alt="${esc(BRAND.partnerName)} · 10 years" height="28" />` +
+                    `<img class="themed-dark" src="${esc(BRAND.det10.lockupH.dark ?? BRAND.det10.lockupH.light!)}" alt="" height="28" />` +
+                    `<span style="width:1.5px;height:24px;background:var(--border)"></span>` +
+                    `<span style="color:var(--muted)">×</span>` +
+                    `<span style="font-family:var(--font-headline);font-weight:800;font-size:1.3rem">JECRC</span></span>`
                   : `<span style="font-family:var(--font-display);font-weight:700">${esc(BRAND.coBrandText)}</span>`) +
               `<strong style="font-size:2.5rem;line-height:1.05;letter-spacing:-0.02em;font-family:var(--font-headline);font-weight:800">${esc(BRAND.appName)}</strong>` +
               `<span>${esc(BRAND.campaignName)}</span></span></div></div>`,

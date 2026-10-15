@@ -32,7 +32,7 @@ export default function Setup() {
   return (
     <main className="screen stack setup">
       <header className="topbar">
-        <CoBrand />
+        <CoBrand variant="compact" />
       </header>
       <section className="login-hero compact">
         <div className="login-hero-art">

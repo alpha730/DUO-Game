@@ -36,12 +36,14 @@ export function brandCss(brand: BrandSet): string {
     // Page colour straight from these variables, so even the very first paint is in the right theme.
     `html{background:var(--bg);color:var(--text)}` +
     // Kit art with light + dark versions (components/BrandArt.tsx; also the splash).
-    `.themed-dark{display:none}` +
-    `@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .themed-light{display:none}:root:not([data-theme="light"]) .themed-dark{display:inline-block}}` +
-    `:root[data-theme="dark"] .themed-light{display:none}:root[data-theme="dark"] .themed-dark{display:inline-block}` +
-    `.pattern-bg{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.5;background:var(--pattern-light) center/320px repeat}` +
-    `@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pattern-bg{background-image:var(--pattern-dark)}}` +
-    `:root[data-theme="dark"] .pattern-bg{background-image:var(--pattern-dark)}`
+    // (!important: the hidden version must stay hidden whatever display a component gives its image)
+    `.themed-dark{display:none!important}` +
+    `@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .themed-light{display:none!important}:root:not([data-theme="light"]) .themed-dark{display:revert!important}}` +
+    `:root[data-theme="dark"] .themed-light{display:none!important}:root[data-theme="dark"] .themed-dark{display:revert!important}` +
+    // Pattern tiles: subtle (the tiles carry their own green ground), never behind question text.
+    `.pattern-bg{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.14;background:var(--pattern-light) center/360px repeat}` +
+    `@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pattern-bg{background-image:var(--pattern-dark);opacity:.22}}` +
+    `:root[data-theme="dark"] .pattern-bg{background-image:var(--pattern-dark);opacity:.22}`
   );
 }
 

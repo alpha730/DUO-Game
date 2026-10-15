@@ -57,11 +57,14 @@ export default function Rules() {
   return (
     <main className="screen stack rules" data-rules>
       <header className="topbar">
-        <CoBrand />
+        <CoBrand variant="compact" />
       </header>
       <div>
         <p className="eyebrow">{BRAND.appName}</p>
-        <h1 className="headline" style={{ margin: 0 }}>game rules</h1>
+        <h1 className="headline with-icon" style={{ margin: 0 }}>
+          {BRAND.uiIcons.rules && <img className="headline-icon" src={BRAND.uiIcons.rules} alt="" aria-hidden="true" />}
+          game rules
+        </h1>
         <p className="muted" style={{ margin: "6px 0 0" }}>
           The same rules for every player. The game server checks all of them — points, timers and limits can't be
           changed from a phone.

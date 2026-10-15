@@ -68,15 +68,16 @@ export async function drawShareCard(canvas: HTMLCanvasElement, s: ShareStats): P
     ctx.fillText(t, SHARE_W / 2, y);
   };
 
-  // The DET 10 lockup (white, for the dark card) when supplied, else the DET 10 logo / app logo.
-  const logoSrc = BRAND.det10.lockupV.dark ?? BRAND.det10.logo.dark ?? BRAND.logo.full;
-  const logo = await loadImage(logoSrc);
-  if (logo) {
-    const h = 200;
-    const w = Math.min(SHARE_W - 240, (logo.naturalWidth / (logo.naturalHeight || 1)) * h || h);
-    ctx.drawImage(logo, (SHARE_W - w) / 2, 160, w, h);
+  // The DET 10 seal on top (else the logo).
+  const seal = await loadImage(BRAND.det10.seal ?? BRAND.logo.full);
+  if (seal) {
+    const h = 220;
+    const w = (seal.naturalWidth / (seal.naturalHeight || 1)) * h || h;
+    ctx.drawImage(seal, (SHARE_W - w) / 2, 140, w, h);
   }
-  text(BRAND.appName, 470, 92, c.text, 800);
+  ctx.font = `800 96px ${BRAND.headlineFontFamily}`;
+  ctx.fillStyle = c.text;
+  ctx.fillText(BRAND.appName, SHARE_W / 2, 470);
   text(BRAND.campaignName, 540, 40, c.muted, 600);
 
   text("I caught", 800, 64, c.text, 700);
@@ -98,7 +99,38 @@ export async function drawShareCard(canvas: HTMLCanvasElement, s: ShareStats): P
 
   text(`${fmt(s.points)} pts`, 1480, 120, c.gold, 900);
   text(s.name, 1600, 52, c.text, 600);
-  text(BRAND.coBrandShort, 1800, 40, c.primaryText, 800); // "DET × JECRC · 10 Years"
+  // DET × JECRC lockup: the white DET 10 horizontal lockup + divider + × + JECRC (logo or Feather).
+  const det = await loadImage(BRAND.det10.lockupH.dark ?? "");
+  const jecrcLogo = BRAND.jecrcLogo.dark ? await loadImage(BRAND.jecrcLogo.dark) : null;
+  if (det) {
+    const h = 64;
+    const detW = (det.naturalWidth / (det.naturalHeight || 1)) * h;
+    ctx.font = `800 64px ${BRAND.headlineFontFamily}`;
+    const jW = jecrcLogo ? (jecrcLogo.naturalWidth / (jecrcLogo.naturalHeight || 1)) * h : ctx.measureText("JECRC").width;
+    const gap = 28;
+    const xW = 40;
+    let x = (SHARE_W - (detW + gap + 3 + gap + xW + gap + jW)) / 2;
+    const y = 1760;
+    ctx.drawImage(det, x, y, detW, h);
+    x += detW + gap;
+    ctx.fillStyle = c.border;
+    ctx.fillRect(x, y + 4, 3, h - 8);
+    x += 3 + gap;
+    ctx.fillStyle = c.muted;
+    ctx.font = `400 48px ${font}`;
+    ctx.textAlign = "left";
+    ctx.fillText("×", x, y + 48);
+    x += xW + gap;
+    if (jecrcLogo) ctx.drawImage(jecrcLogo, x, y, jW, h);
+    else {
+      ctx.fillStyle = c.text;
+      ctx.font = `800 64px ${BRAND.headlineFontFamily}`;
+      ctx.fillText("JECRC", x, y + 54);
+    }
+    ctx.textAlign = "center";
+  } else {
+    text(BRAND.coBrandShort, 1800, 40, c.primaryText, 800); // "DET × JECRC · 10 Years"
+  }
 }
 
 export function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {

@@ -13,6 +13,7 @@ import { requestLocation, requestMic, type CheckState, type Position } from "../
 import { speechSupported } from "../catch/speech";
 import { useCountdown } from "../catch/useCountdown";
 import ChoiceChallenge, { choiceInstruction, hasBlank } from "../components/ChoiceChallenge";
+import { DuoArt } from "../components/BrandArt";
 import EmptyState from "../components/EmptyState";
 import { OpenInBrowser } from "../components/CameraHelp";
 import Preflight from "../components/Preflight";
@@ -335,14 +336,17 @@ export default function Catch() {
               <p className="muted">{error} Head back to {BRAND.campusName} and find a poster — then tap Start again.</p>
             </EmptyState>
           ) : error && (errorCode === "functions/unavailable" || errorCode === "functions/deadline-exceeded") ? (
-            <EmptyState badge="📶" title="You're offline" role="alert" data-empty="offline">
+            <EmptyState badge="📶" duo="dizzy" title="You're offline" role="alert" data-empty="offline">
               <p className="muted">{error}</p>
             </EmptyState>
           ) : (
             error && (
-              <p className="error" role="alert">
-                {error}
-              </p>
+              <>
+                {errorCode === "no-attempts" && <DuoArt mood="sleep" className="sleep-art" />}
+                <p className="error" role="alert">
+                  {error}
+                </p>
+              </>
             )
           )}
           {needsSpeech && <OpenInBrowser />}

@@ -61,7 +61,7 @@ const before = (await adb.doc(`users/${uid}`).get()).data();
 await page.locator("[data-raid-start]").click();
 await page.waitForURL(`**/catch/lingo-2018?raid=${raidId}`);
 await startCatch(page, "", { goto: false });
-ok((await page.locator(".q-prompt").innerText()).replace(/\s+/g, " ").includes("We ten years!"), "the raid's own question is shown");
+ok((await page.locator(".say-phrase").innerText()).replace(/\s+/g, " ").includes("We ten years!"), "the raid's own question is shown");
 ok((await answerChoice(page, "are celebrating")) === "won", "raid answer → won");
 const breakdown = (await page.locator(".breakdown").innerText()).replace(/\s+/g, " ");
 ok(/Owl Raid \+150/.test(breakdown), `breakdown: "${breakdown}"`);

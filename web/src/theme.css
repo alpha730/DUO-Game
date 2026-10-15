@@ -1,7 +1,7 @@
 :root {
   /* Colours (light + dark), fonts and color-scheme come from src/config/brand.ts (applyBrand). */
   /* DET shapes: 16px cards, 12–14px buttons and inputs, 2px light-grey borders with a 4px bottom edge. */
-  --radius: 16px;
+  --radius: 16px; /* DET cards */
   --radius-sm: 12px;
   --edge: 4px; /* the "3D" bottom edge of buttons and cards */
   --nav-h: 68px;
@@ -43,6 +43,21 @@ h3,
 
 h1 {
   font-size: 1.75rem;
+}
+
+/* Feather Bold headline (DET-DESIGN §2): "shout-outs" only — lowercase, ≥ 40 px, ≤ 10 words,
+   left-aligned, tight leading (100–110 %), tracking −20. Longer text uses DIN (h1/h2). */
+.headline {
+  margin: 0 0 8px;
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-size: max(2.5rem, 40px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-transform: lowercase;
+  text-align: left;
+  hyphens: none;
+  overflow-wrap: normal;
 }
 
 h2 {
@@ -136,10 +151,11 @@ a {
 }
 
 /* ---------- 3D pressable buttons ---------- */
+/* Primary action (DET "CONTINUE"): Macaw with a Whale 3D edge, uppercase DIN Bold label. */
 .btn {
-  --btn-bg: var(--primary);
-  --btn-edge: var(--primary-dark);
-  --btn-fg: var(--on-primary);
+  --btn-bg: var(--action);
+  --btn-edge: var(--action-dark);
+  --btn-fg: var(--on-action);
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -152,10 +168,10 @@ a {
   border: 0;
   border-radius: 14px;
   font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 700;
   font-size: 0.98rem;
   letter-spacing: 0.08em;
-  text-transform: uppercase; /* DET buttons: "PRACTICE FREE", "CONTINUE" */
+  text-transform: uppercase; /* DET buttons: "CONTINUE", "RECORD NOW" (DIN Bold, not Feather) */
   color: var(--btn-fg);
   background: var(--btn-bg);
   box-shadow: 0 var(--edge) 0 var(--btn-edge);
@@ -171,11 +187,26 @@ a {
   box-shadow: 0 0 0 var(--btn-edge);
 }
 
+/* DET disabled: Swan fill, Hare label, no edge. */
 .btn:disabled {
-  --btn-bg: var(--surface-2);
-  --btn-edge: var(--border);
-  --btn-fg: var(--muted);
+  --btn-bg: var(--disabled-bg);
+  --btn-edge: transparent;
+  --btn-fg: var(--on-disabled);
   cursor: default;
+}
+
+/* Brand / celebrate / Scan: Owl with its Tree Frog edge. */
+.btn.brand {
+  --btn-bg: var(--primary);
+  --btn-edge: var(--primary-dark);
+  --btn-fg: var(--on-primary);
+}
+
+/* Gold (raids, points): Bee with its Camel edge. */
+.btn.gold {
+  --btn-bg: var(--gold);
+  --btn-edge: var(--gold-dark);
+  --btn-fg: var(--on-gold);
 }
 
 /* DET secondary: white tile, grey border + edge, blue label. */
@@ -192,10 +223,12 @@ a {
   --btn-fg: var(--on-accent);
 }
 
+/* Danger: outlined (no palette text colour reaches 4.5:1 on a Cardinal fill). */
 .btn.danger {
-  --btn-bg: var(--danger);
+  --btn-bg: var(--surface);
   --btn-edge: var(--danger-dark);
   --btn-fg: var(--on-danger);
+  border: 2px solid var(--danger);
 }
 
 .btn.link {
@@ -524,39 +557,39 @@ a {
 }
 
 .critter-belly {
-  fill: #fff;
+  fill: var(--det-snow);
   opacity: 0.32;
 }
 
 .critter-shine {
   fill: none;
-  stroke: #fff;
+  stroke: var(--det-snow);
   stroke-width: 5;
   stroke-linecap: round;
   opacity: 0.45;
 }
 
 .critter-cheek {
-  fill: #ff7a9a;
+  fill: var(--det-flamingo);
   opacity: 0.45;
 }
 
 .critter-eye {
-  fill: #fff;
+  fill: var(--det-snow);
 }
 
 .critter-pupil,
 .critter-mouth {
-  fill: #1a1f2e;
+  fill: var(--det-eel);
 }
 
 .critter-glint {
-  fill: #fff;
+  fill: var(--det-snow);
 }
 
 .critter-line {
   fill: none;
-  stroke: #1a1f2e;
+  stroke: var(--det-eel);
   stroke-width: 4;
   stroke-linecap: round;
 }
@@ -2446,7 +2479,7 @@ body:has(.catch[data-phase="submitting"]) {
   border-radius: 16px 16px 6px 6px;
   background: var(--medal);
   color: var(--on-gold);
-  box-shadow: inset 0 -6px 0 rgb(0 0 0 / 0.12);
+  box-shadow: inset 0 -6px 0 var(--shadow);
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 1.6rem;
@@ -2911,7 +2944,7 @@ body:has(.catch[data-phase="submitting"]) {
 .raid-kicker {
   padding: 1px 8px;
   border-radius: 999px;
-  background: rgb(0 0 0 / 0.25);
+  background: var(--scrim);
   font-size: 0.7rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -3168,7 +3201,7 @@ body:has(.catch[data-phase="submitting"]) {
   content: "";
   position: absolute;
   inset: -40% -60%;
-  background: linear-gradient(105deg, transparent 40%, rgb(255 255 255 / 0.45) 50%, transparent 60%);
+  background: linear-gradient(105deg, transparent 40%, color-mix(in srgb, var(--det-snow) 45%, transparent) 50%, transparent 60%);
   animation: shine 3.2s ease-in-out infinite;
   pointer-events: none;
 }

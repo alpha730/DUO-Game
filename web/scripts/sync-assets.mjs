@@ -3,6 +3,7 @@
 // `npm run dev` / `npm run build` — no code changes needed.
 // Cost rules (CLAUDE.md): models must be ≤ 500 KB (Draco) — the build fails otherwise.
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { gzipSync } from "node:zlib";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -44,18 +45,40 @@ for (const f of ["draco_decoder.wasm", "draco_wasm_wrapper.js", "draco_decoder.j
 }
 copied.push(`draco/r${threeRev}/`);
 
-// Brand files supplied by the Duolingo team (CLAUDE.md rule 8) → /brand/. Guidelines stay private.
+// Brand files supplied by the Duolingo team (CLAUDE.md rule 8, docs/DET-DESIGN.md §4) → /brand/.
+// Never shipped: guidelines/, det-reference/ (visual reference only) and anything on the kit's
+// do-not-use list (university logos, Operating Principles graphics, DET China/Japan logos, RedBull).
 const brandSrc = join(src, "brand");
 const brandDest = resolve(here, "../public/brand");
 rmSync(brandDest, { recursive: true, force: true });
 const brandCopied = [];
-for (const d of ["fonts", "logos", "mascots", "models"]) {
-  const dir = join(brandSrc, d);
+const DO_NOT_USE = /china|japan|red[\s_-]?bull|operating[\s_-]?principles|universit/i;
+const SHIPPED = /\.(svg|png|webp|jpg|jpeg|glb|mp3|ogg|wav|m4a|woff2?)$/i;
+function copyDir(rel) {
+  const dir = join(brandSrc, rel);
   for (const f of existsSync(dir) ? readdirSync(dir).filter((x) => !x.startsWith(".")) : []) {
-    mkdirSync(join(brandDest, d), { recursive: true });
-    cpSync(join(dir, f), join(brandDest, d, f));
-    brandCopied.push(`${d}/${f}`);
+    const from = join(dir, f);
+    if (statSync(from).isDirectory()) {
+      copyDir(join(rel, f));
+      continue;
+    }
+    if (DO_NOT_USE.test(join(rel, f))) {
+      console.warn(`! brand: not shipped (do-not-use list): ${rel}/${f}`);
+      continue;
+    }
+    if (!SHIPPED.test(f)) continue;
+    mkdirSync(join(brandDest, rel), { recursive: true });
+    cpSync(from, join(brandDest, rel, f));
+    brandCopied.push(`${rel.replace(/\\/g, "/")}/${f}`);
   }
+}
+for (const d of ["logos", "mascots", "models", "det10", "hero", "ui-icons", "emblems", "sounds"]) copyDir(d);
+// Fonts: the kit's OTF/TTF → Latin-subset WOFF2 (scripts/brand-fonts.py, needs Python + fontTools).
+if (existsSync(join(brandSrc, "fonts")) && readdirSync(join(brandSrc, "fonts")).some((f) => /\.(otf|ttf|woff2?)$/i.test(f))) {
+  const py = spawnSync(process.platform === "win32" ? "python" : "python3", [join(here, "brand-fonts.py")], { stdio: "inherit" });
+  if (py.status !== 0) console.warn("! brand fonts not converted (needs Python 3 + `pip install fonttools brotli`) — Nunito is used");
+  const out = join(brandDest, "fonts");
+  if (existsSync(out)) for (const f of readdirSync(out)) brandCopied.push(`fonts/${f}`);
 }
 copied.push(brandCopied.length ? `brand: ${brandCopied.join(", ")}` : "brand: (no files supplied yet)");
 

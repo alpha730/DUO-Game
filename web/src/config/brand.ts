@@ -25,7 +25,7 @@ export interface BrandColors {
   border: string;
   text: string;
   muted: string;
-  /** Main action colour (3D buttons, Scan button, progress). */
+  /** Brand colour: celebration, wins, the Scan button, progress. */
   primary: string;
   /** The solid "3D" bottom edge under primary buttons. */
   primaryDark: string;
@@ -35,6 +35,13 @@ export interface BrandColors {
   primaryText: string;
   primaryGlow: string;
   primarySoft: string;
+  /** Primary action (DET "CONTINUE" buttons) + its 3D edge + text on it. */
+  action: string;
+  actionDark: string;
+  onAction: string;
+  /** Disabled buttons (DET: Swan fill, Hare label). Disabled controls are exempt from the 4.5:1 rule. */
+  disabledBg: string;
+  onDisabled: string;
   /** Secondary action colour (selected answers, info). */
   accent: string;
   accentDark: string;
@@ -104,6 +111,16 @@ export interface BrandColors {
   confetti: string[];
 }
 
+/** An asset with a light-theme and a dark-theme version (null = not supplied). */
+export interface Themed {
+  light: string | null;
+  dark: string | null;
+}
+export type Det10Icon = "backpack" | "books" | "building" | "doorClosed" | "doorOpen" | "globe" | "key";
+export type HeroName = "beaComputerDuo" | "duoInstitutions" | "beaCertificateDuo" | "linComputer" | "zariCertified" | "beaDuoSurfing" | "duoSeal";
+export type UiIconName = "test" | "practice" | "rules" | "overview" | "testSetup" | "cart" | "search" | "id" | "mail" | "microscope";
+export type SoundName = "correct" | "wrong" | "levelup" | "found" | "tick";
+
 export interface FontFile {
   family: string;
   /** Path under /brand/fonts/ (e.g. "/brand/fonts/xyz-bold.woff2"). */
@@ -144,6 +161,29 @@ export interface BrandSet {
   displayFontFamily: string;
   /** @font-face files loaded at startup. */
   fontFiles: FontFile[];
+  /** Feather Bold — headlines only (lowercase, ≥ 40 px, ≤ 10 words, left-aligned; DET-DESIGN §2). */
+  headlineFontFamily: string;
+  /** Font files preloaded in index.html (only DIN Regular + Bold, when supplied). */
+  preloadFonts: string[];
+  /** DET 10-Year visual identity (docs/DET-DESIGN.md §4), each null until supplied. */
+  det10: {
+    logo: Themed;
+    lockupH: Themed;
+    lockupV: Themed;
+    /** Pattern tile for subtle backgrounds: light tile in the light theme, dark tile in dark. */
+    pattern: Themed;
+    icons: Record<Det10Icon, string | null>;
+  };
+  /** DET hero illustrations (Login, About, empty states, "Get ready for the real DET"). */
+  heroes: Record<HeroName, string | null>;
+  /** DET UI icons (nav + info). */
+  uiIcons: Record<UiIconName, string | null>;
+  /** DET emblems / scallops (level badges: scallop = MAX). */
+  emblems: { emblem: string | null; scallop: string | null };
+  /** Duo emotions (Result: happy win / sad fail). */
+  duo: { happy: string | null; sad: string | null };
+  /** Official in-app sounds; null → our own placeholder sounds in /sfx. */
+  sounds: Record<SoundName, string | null>;
   logo: {
     /** Logo / wordmark shown on the login screen. */
     full: string;
@@ -181,6 +221,11 @@ const LIGHT: BrandColors = {
   primaryText: "#2b7a00",
   primaryGlow: "rgb(88 204 2 / 0.4)",
   primarySoft: "rgb(88 204 2 / 0.14)",
+  action: "#58cc02",
+  actionDark: "#46a302",
+  onAction: "#0d2600",
+  disabledBg: "#eef2f8",
+  onDisabled: "#56637d",
   accent: "#1cb0f6",
   accentDark: "#1690cc",
   onAccent: "#04223a",
@@ -270,119 +315,180 @@ const DARK: BrandColors = {
   themeColor: "#0b1426",
 };
 
-// ---------- DET palette (official) ----------
-// Taken from the Duolingo English Test site + practice test (reference screenshots): white pages,
-// light-grey card borders with a thicker bottom edge, DET blue for selection/links, Duolingo green
-// for the main action, dark-grey text. Text colours are darkened where the site's own pairs are
-// below 4.5:1 (e.g. white on green/blue buttons → dark text; blue link text → deeper blue).
-const DET_CONFETTI = ["#58CC02", "#1CB0F6", "#FF9600", "#CE82FF", "#FF4B4B", "#FFC800"];
+// ---------- DET Juicy palette (official, docs/DET-DESIGN.md §1) ----------
+// The ONLY colours in the app: every role below is one of these tokens (or a transparent tint of
+// one). They're also CSS variables (--det-owl, --det-macaw, …) for the rare direct use.
+// Contrast is checked, not assumed (web/scripts/check-contrast.ts): where the kit's own pairs are
+// below 4.5:1 the text uses a darker palette colour — e.g. Manta Ray (not white) on Macaw / Owl / Bee
+// buttons, Eel (not Wolf) for secondary text, Narwhal for links, Eel on the correct / wrong / selected
+// tints with the coloured border + icon carrying the meaning.
+export const DET = {
+  // Core
+  featherGreen: "#58CC02",
+  maskGreen: "#89E219",
+  // Neutrals
+  eel: "#4B4B4B",
+  wolf: "#777777",
+  hare: "#AFAFAF",
+  swan: "#E5E5E5",
+  polar: "#F7F7F7",
+  snow: "#FFFFFF",
+  // Extended: main · dark (3D edge) · light · lightest (tint)
+  owl: "#58CC02",
+  treeFrog: "#58A700",
+  turtle: "#A5ED6E",
+  seaSponge: "#D7FFB8",
+  macaw: "#1CB0F6",
+  whale: "#1899D6",
+  bluejay: "#84D8FF",
+  iguana: "#DDF4FF",
+  cardinal: "#FF4B4B",
+  fireAnt: "#EA2B2B",
+  flamingo: "#FFB2B2",
+  walkingFish: "#FFDFE0",
+  bee: "#FFC800",
+  camel: "#E7A601",
+  duck: "#FBE56D",
+  canary: "#FFF5D3",
+  fox: "#FF9600",
+  guineaPig: "#CD7900",
+  beetle: "#CE82FF",
+  betta: "#9069CD",
+  humpback: "#2B70C9",
+  narwhal: "#1453A3",
+  mantaRay: "#042C60",
+  // Dark theme — our derivation (§1; the kit has no dark mode)
+  night: "#131F24",
+  nightSurface: "#1C2B33",
+  nightBorder: "#37464F",
+  nightText: "#F1F7FB",
+} as const;
+export type DetToken = keyof typeof DET;
+
+/** A token with transparency (tints in dark mode, overlays, shadows) — still the same colour. */
+const tint = (t: DetToken, alpha: number) => {
+  const h = DET[t].slice(1);
+  return `rgb(${parseInt(h.slice(0, 2), 16)} ${parseInt(h.slice(2, 4), 16)} ${parseInt(h.slice(4, 6), 16)} / ${alpha})`;
+};
+
+const DET_CONFETTI = [DET.owl, DET.macaw, DET.fox, DET.beetle, DET.cardinal, DET.bee];
 
 const DET_LIGHT: BrandColors = {
-  bg: "#ffffff",
-  bgAlt: "#d7ffb8",
-  surface: "#ffffff",
-  surface2: "#f7f7f7",
-  border: "#e5e5e5",
-  text: "#3c3c3c",
-  muted: "#6b6b6b",
-  primary: "#58cc02",
-  primaryDark: "#58a700",
-  onPrimary: "#173300", // dark: white on #58cc02 is only 2.1:1
-  primaryText: "#3d7a00",
-  primaryGlow: "rgb(88 204 2 / 0.25)",
-  primarySoft: "#d7ffb8",
-  accent: "#1cb0f6",
-  accentDark: "#1899d6",
-  onAccent: "#04223a", // dark: white on #1cb0f6 is only 2.4:1
-  accentSoft: "#ddf4ff",
-  accentBorder: "#84d8ff",
-  link: "#0b6aa2",
-  warn: "#ff9600",
-  warnDark: "#cd7900",
-  warnText: "#a65800",
-  streakBg: "#fff3e0",
-  flameOff: "#afafaf",
-  favoriteBg: "#fff8e6",
-  danger: "#ff4b4b",
-  dangerDark: "#ea2b2b",
-  onDanger: "#2a0000",
-  dangerSoft: "#ffdfe0",
-  dangerBorder: "#ffb2b2",
-  dangerText: "#b31d1d",
-  missedBg: "#ffdfe0",
-  gold: "#ffc800",
-  goldEnd: "#ff9600",
-  goldDark: "#cd9900",
-  onGold: "#3c2a00",
-  goldGlow: "rgb(255 200 0 / 0.4)",
-  silver: "#d6dde3",
-  bronze: "#f0b080",
-  levelOne: "#f0f0f0",
-  levelTwo: "#d7ffb8",
-  levelThree: "#ddf4ff",
-  onLevel: "#3c3c3c",
-  allTenFrom: "#7c4dff",
-  allTenTo: "#2563eb",
-  onAllTen: "#ffffff",
-  ringGood: "#58cc02",
-  ringMid: "#ffc800",
-  ringLow: "#ff4b4b",
-  slotEmpty: "#f7f7f7",
-  slotMark: "#cfcfcf",
-  overlay: "rgb(30 30 30 / 0.66)",
-  scrim: "rgb(30 30 30 / 0.45)",
-  shadow: "rgb(0 0 0 / 0.08)",
-  // Over the live camera: dark glass in both themes (also used on the dark camera dimmer).
-  cardGlass: "rgb(19 31 36 / 0.9)",
-  onGlass: "#ffffff",
-  glassMuted: "#c2d0d7",
-  errorGlass: "rgb(70 12 18 / 0.92)",
-  navBg: "#ffffff",
-  arStage: "#000",
-  qrBg: "#fff",
-  themeColor: "#ffffff",
+  bg: DET.polar, // page behind the cards
+  bgAlt: DET.seaSponge,
+  surface: DET.snow, // cards
+  surface2: DET.polar,
+  border: DET.swan,
+  text: DET.eel,
+  muted: DET.eel, // Wolf is 4.48:1 on Snow / 4.18:1 on Polar — below 4.5, so secondary text is Eel (lighter weight)
+  // Brand / celebrate / Scan: Owl with its Tree Frog 3D edge.
+  primary: DET.owl,
+  primaryDark: DET.treeFrog,
+  onPrimary: DET.mantaRay, // white on Owl is 2.1:1
+  primaryText: DET.eel, // no green in the kit reaches 4.5:1 on white; green stays on fills and icons
+  primaryGlow: tint("owl", 0.25),
+  primarySoft: DET.seaSponge,
+  // Primary action (DET "CONTINUE"): Macaw with its Whale edge.
+  action: DET.macaw,
+  actionDark: DET.whale,
+  onAction: DET.mantaRay, // white on Macaw is 2.4:1
+  disabledBg: DET.swan,
+  onDisabled: DET.hare,
+  accent: DET.macaw,
+  accentDark: DET.whale,
+  onAccent: DET.mantaRay,
+  accentSoft: DET.iguana, // selected option fill (text on it: Eel)
+  accentBorder: DET.macaw,
+  link: DET.narwhal, // Humpback 4.6:1 on Polar, Narwhal 7.0:1
+  // Streak / timer warning
+  warn: DET.fox,
+  warnDark: DET.guineaPig,
+  warnText: DET.eel,
+  streakBg: DET.canary,
+  flameOff: DET.hare,
+  favoriteBg: DET.canary,
+  // Wrong / danger: Cardinal fills and borders; text stays Eel (Fire Ant on Walking Fish is 3.5:1).
+  danger: DET.cardinal,
+  dangerDark: DET.fireAnt,
+  onDanger: DET.eel,
+  dangerSoft: DET.walkingFish,
+  dangerBorder: DET.cardinal,
+  dangerText: DET.eel,
+  missedBg: DET.walkingFish,
+  // Gold / points / raids: Bee with its Camel edge.
+  gold: DET.bee,
+  goldEnd: DET.fox,
+  goldDark: DET.camel,
+  onGold: DET.mantaRay,
+  goldGlow: tint("bee", 0.4),
+  silver: DET.swan,
+  bronze: DET.fox,
+  levelOne: DET.swan,
+  levelTwo: DET.seaSponge,
+  levelThree: DET.iguana,
+  onLevel: DET.eel,
+  allTenFrom: DET.humpback,
+  allTenTo: DET.narwhal,
+  onAllTen: DET.snow, // ≥ 4.9:1 on both
+  ringGood: DET.owl,
+  ringMid: DET.fox,
+  ringLow: DET.cardinal,
+  slotEmpty: DET.polar,
+  slotMark: DET.swan,
+  overlay: tint("night", 0.8),
+  scrim: tint("night", 0.45),
+  shadow: tint("eel", 0.1),
+  // Over the live camera: Night glass in both themes.
+  cardGlass: tint("night", 0.9),
+  onGlass: DET.snow,
+  glassMuted: DET.swan,
+  errorGlass: tint("night", 0.94),
+  navBg: DET.snow,
+  arStage: DET.night,
+  qrBg: DET.snow,
+  themeColor: DET.polar,
   confetti: DET_CONFETTI,
 };
 
-// Dark: DET has no dark mode; built from the same family (Duolingo's dark greys + the DET accents).
+// Dark: our derivation (§1) — Night surfaces, the accent hexes unchanged, 15–20 % tints.
 const DET_DARK: BrandColors = {
   ...DET_LIGHT,
-  bg: "#131f24",
-  bgAlt: "#1f3a0f",
-  surface: "#1a2a31",
-  surface2: "#22343c",
-  border: "#37464f",
-  text: "#f1f7fb",
-  muted: "#a5b6bf",
-  onPrimary: "#0f2a00",
-  primaryText: "#8ee32a",
-  primaryGlow: "rgb(88 204 2 / 0.2)",
-  primarySoft: "rgb(88 204 2 / 0.16)",
-  onAccent: "#04223a",
-  accentSoft: "rgb(28 176 246 / 0.16)",
-  accentBorder: "#1f7fae",
-  link: "#6cc9ff",
-  warnText: "#ffb347",
-  streakBg: "rgb(255 150 0 / 0.16)",
-  flameOff: "#52656e",
-  favoriteBg: "rgb(255 200 0 / 0.1)",
-  dangerSoft: "rgb(255 75 75 / 0.14)",
-  dangerBorder: "rgb(255 75 75 / 0.45)",
-  dangerText: "#ffa3a3",
-  missedBg: "rgb(255 75 75 / 0.18)",
-  goldGlow: "rgb(255 200 0 / 0.35)",
-  silver: "#c7d0d6",
-  levelOne: "#2b3d46",
-  levelTwo: "#25521a",
-  levelThree: "#164a6b",
-  onLevel: "#ffffff",
-  slotEmpty: "#1a2a31",
-  slotMark: "#37464f",
-  overlay: "rgb(0 0 0 / 0.6)",
-  scrim: "rgb(0 0 0 / 0.6)",
-  shadow: "rgb(0 0 0 / 0.4)",
-  navBg: "#131f24",
-  themeColor: "#131f24",
+  bg: DET.night,
+  bgAlt: tint("owl", 0.16),
+  surface: DET.nightSurface,
+  surface2: tint("nightBorder", 0.35),
+  border: DET.nightBorder,
+  text: DET.nightText,
+  muted: DET.hare,
+  primaryText: DET.owl,
+  disabledBg: DET.nightBorder,
+  onDisabled: DET.wolf,
+  primaryGlow: tint("owl", 0.2),
+  primarySoft: tint("owl", 0.18),
+  accentSoft: tint("macaw", 0.18),
+  accentBorder: DET.macaw,
+  link: DET.bluejay,
+  warnText: DET.fox,
+  streakBg: tint("fox", 0.16),
+  flameOff: DET.nightBorder,
+  favoriteBg: tint("bee", 0.12),
+  onDanger: DET.nightText,
+  dangerSoft: tint("cardinal", 0.16),
+  dangerText: DET.flamingo,
+  missedBg: tint("cardinal", 0.18),
+  goldGlow: tint("bee", 0.35),
+  silver: DET.hare,
+  levelOne: DET.nightBorder,
+  levelTwo: tint("owl", 0.2),
+  levelThree: tint("macaw", 0.2),
+  onLevel: DET.nightText,
+  slotEmpty: DET.nightSurface,
+  slotMark: DET.nightBorder,
+  overlay: tint("night", 0.7),
+  scrim: tint("night", 0.6),
+  shadow: tint("night", 0.5),
+  navBg: DET.night,
+  themeColor: DET.night,
 };
 
 /** The look before official branding (kept for a one-line revert). */
@@ -405,6 +511,20 @@ export const PLACEHOLDER: BrandSet = {
   // Nunito (SIL Open Font License, web/public/fonts/OFL-Nunito.txt) — not a brand font.
   displayFontFamily: 'GameDisplay, ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
   fontFiles: [{ family: "GameDisplay", src: "/fonts/nunito-800.woff2", weight: "800" }],
+  headlineFontFamily: 'GameDisplay, ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+  preloadFonts: [],
+  det10: {
+    logo: { light: null, dark: null },
+    lockupH: { light: null, dark: null },
+    lockupV: { light: null, dark: null },
+    pattern: { light: null, dark: null },
+    icons: { backpack: null, books: null, building: null, doorClosed: null, doorOpen: null, globe: null, key: null },
+  },
+  heroes: { beaComputerDuo: null, duoInstitutions: null, beaCertificateDuo: null, linComputer: null, zariCertified: null, beaDuoSurfing: null, duoSeal: null },
+  uiIcons: { test: null, practice: null, rules: null, overview: null, testSetup: null, cart: null, search: null, id: null, mail: null, microscope: null },
+  emblems: { emblem: null, scallop: null },
+  duo: { happy: null, sad: null },
+  sounds: { correct: null, wrong: null, levelup: null, found: null, tick: null },
   logo: { full: "/favicon.svg", mark: "/favicon.svg" },
   mascots: { hero: null, celebrate: null, oops: null },
   lingoNames: {
@@ -440,16 +560,39 @@ function pending<T>(item: string, fallback: T): T {
   return fallback;
 }
 
-// Expected file names are listed in assets/brand/README.md.
-const officialFonts: FontFile[] = (
-  [
-    ["fonts/brand-regular.woff2", "400"],
-    ["fonts/brand-bold.woff2", "700"],
-  ] as const
-)
-  .filter(([p]) => FILES.has(p))
-  .map(([p, weight]) => ({ family: "BrandFont", src: `/brand/${p}`, weight }));
-if (!officialFonts.length) BRAND_PENDING.push("font (expects assets/brand/fonts/brand-regular.woff2 + brand-bold.woff2)");
+/**
+ * A kit file under /brand/<dir>/ whose name matches every pattern (case-insensitive), SVG preferred;
+ * else null and the item is listed as pending. The kit's exact file names vary, so they're matched
+ * by the names in docs/DET-DESIGN.md §4 (e.g. "det_10_lockup_h" + "green").
+ */
+function kit(item: string, dir: string, ...patterns: RegExp[]): string | null {
+  const hit = [...FILES]
+    .filter((f) => f.startsWith(`${dir}/`) && patterns.every((p) => p.test(f.slice(dir.length + 1))))
+    .sort((x, y) => Number(!x.endsWith(".svg")) - Number(!y.endsWith(".svg")) || x.length - y.length)[0];
+  if (hit) return `/brand/${hit}`;
+  BRAND_PENDING.push(`${item} (expects assets/brand/${dir}/)`);
+  return null;
+}
+const w = (word: string) => new RegExp(`(^|[^a-z])${word}([^a-z]|$)`, "i");
+const any = (...words: string[]) => new RegExp(words.join("|"), "i");
+
+// Fonts (DET-DESIGN §2): the kit's OTF/TTF converted to WOFF2 by scripts/brand-fonts.py. Missing →
+// Nunito (OFL, web/public/fonts), which the kit lists as the web fallback.
+const font = (name: string) => (FILES.has(`fonts/${name}.woff2`) ? `/brand/fonts/${name}.woff2` : null);
+const DIN = { light: font("din-light"), regular: font("din-regular"), medium: font("din-medium"), bold: font("din-bold") };
+const FEATHER = font("feather-bold");
+if (!DIN.regular || !DIN.bold) BRAND_PENDING.push("font DIN Next Rounded (expects assets/brand/fonts/*DIN*Regular/Bold*.otf) — Nunito used");
+if (!FEATHER) BRAND_PENDING.push("font Feather Bold (expects assets/brand/fonts/*Feather*Bold*.otf) — Nunito ExtraBold used");
+const NUNITO: FontFile[] = [
+  { family: "Nunito", src: "/fonts/nunito-400.woff2", weight: "400" },
+  { family: "Nunito", src: "/fonts/nunito-700.woff2", weight: "700" },
+  { family: "Nunito", src: "/fonts/nunito-800.woff2", weight: "800" },
+];
+const SYSTEM = 'ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+const dinFiles: FontFile[] = (["light", "regular", "medium", "bold"] as const).flatMap((k, i) =>
+  DIN[k] ? [{ family: "DIN Next Rounded", src: DIN[k]!, weight: String([300, 400, 500, 700][i]) }] : [],
+);
+const hasDin = Boolean(DIN.regular && DIN.bold);
 
 export const OFFICIAL: BrandSet = {
   ...PLACEHOLDER,
@@ -463,11 +606,60 @@ export const OFFICIAL: BrandSet = {
   practiceUrl: "https://englishtest.duolingo.com",
   examShortName: "DET",
   scanHint: "Point at Duo in the middle of the poster", // every final poster shows Duo
-  // DET palette from the reference screenshots (user, Oct 10); swap in guideline values if supplied.
+  // DET Juicy palette (docs/DET-DESIGN.md §1): named tokens → light + our dark derivation.
   themes: { light: DET_LIGHT, dark: DET_DARK },
-  fontFamily: officialFonts.length ? `BrandFont, ${PLACEHOLDER.fontFamily}` : PLACEHOLDER.fontFamily,
-  displayFontFamily: officialFonts.length ? `BrandFont, ${PLACEHOLDER.displayFontFamily}` : PLACEHOLDER.displayFontFamily,
-  fontFiles: officialFonts.length ? officialFonts : PLACEHOLDER.fontFiles,
+  // DIN Next Rounded for all UI + body; uppercase DIN Bold buttons; Feather Bold headlines only.
+  fontFamily: hasDin ? `"DIN Next Rounded", Nunito, ${SYSTEM}` : `Nunito, ${SYSTEM}`,
+  displayFontFamily: hasDin ? `"DIN Next Rounded", Nunito, ${SYSTEM}` : `Nunito, ${SYSTEM}`,
+  headlineFontFamily: FEATHER ? `"Feather Bold", Nunito, ${SYSTEM}` : `Nunito, ${SYSTEM}`,
+  fontFiles: [...dinFiles, ...(FEATHER ? [{ family: "Feather Bold", src: FEATHER, weight: "700" }] : []), ...(hasDin ? [] : NUNITO)],
+  // Only DIN Regular + Bold are preloaded (Nunito isn't: preloading delayed the first paint on 3G).
+  preloadFonts: hasDin ? [DIN.regular!, DIN.bold!] : [],
+  det10: {
+    logo: { light: kit("DET 10 logo (green)", "det10", w("det_10_green")), dark: kit("DET 10 logo (white)", "det10", w("det_10_white")) },
+    lockupH: { light: kit("DET 10 lockup horizontal (green)", "det10", /lockup_h/i, any("green", "black")), dark: kit("DET 10 lockup horizontal (white)", "det10", /lockup_h/i, /white/i) },
+    lockupV: { light: kit("DET 10 lockup vertical (green)", "det10", /lockup_v/i, any("green", "black")), dark: kit("DET 10 lockup vertical (white)", "det10", /lockup_v/i, /white/i) },
+    pattern: { light: kit("DET 10 pattern tile (light)", "det10", /pattern_tile_light/i), dark: kit("DET 10 pattern tile (dark)", "det10", /pattern_tile_dark/i) },
+    icons: {
+      backpack: kit("DET 10 icon backpack", "det10/icons", /backpack/i),
+      books: kit("DET 10 icon books", "det10/icons", /books/i),
+      building: kit("DET 10 icon building", "det10/icons", /building/i),
+      doorClosed: kit("DET 10 icon door closed", "det10/icons", /door_?closed/i),
+      doorOpen: kit("DET 10 icon door open", "det10/icons", /door_?open/i),
+      globe: kit("DET 10 icon globe", "det10/icons", /globe/i),
+      key: kit("DET 10 icon key", "det10/icons", w("key")),
+    },
+  },
+  heroes: {
+    beaComputerDuo: kit("hero BeaComputerDuo", "hero", /bea_?computer_?duo/i),
+    duoInstitutions: kit("hero DuoInstitutions", "hero", /duo_?institutions/i),
+    beaCertificateDuo: kit("hero BeaCertificateDuo", "hero", /bea_?certificate/i),
+    linComputer: kit("hero LinComputer", "hero", /lin_?computer/i),
+    zariCertified: kit("hero Zari_certified", "hero", /zari/i),
+    beaDuoSurfing: kit("hero bea duo surfing", "hero", /surfing/i),
+    duoSeal: kit("hero Duo_seal", "hero", /duo_?seal/i),
+  },
+  uiIcons: {
+    test: kit("UI icon Test", "ui-icons", w("test")),
+    practice: kit("UI icon Practice", "ui-icons", /practice/i),
+    rules: kit("UI icon Rules", "ui-icons", /rules/i),
+    overview: kit("UI icon Overview", "ui-icons", /overview/i),
+    testSetup: kit("UI icon TestSetup", "ui-icons", /test_?setup/i),
+    cart: kit("UI icon Cart", "ui-icons", /cart/i),
+    search: kit("UI icon magnifying glass", "ui-icons", /magnif/i),
+    id: kit("UI icon ID", "ui-icons", w("id")),
+    mail: kit("UI icon mail", "ui-icons", /mail/i),
+    microscope: kit("UI icon microscope", "ui-icons", /microscope/i),
+  },
+  emblems: { emblem: kit("DET emblem", "emblems", /emblem/i), scallop: kit("DET scallop (MAX badge)", "emblems", /scallop/i) },
+  duo: { happy: kit("Duo emotion: happy", "mascots", any("happy", "celebrat", "cheer", "excited")), sad: kit("Duo emotion: sad", "mascots", any("sad", "cry", "upset")) },
+  sounds: {
+    correct: kit("sound: correct", "sounds", any("correct", "right", "success")),
+    wrong: kit("sound: wrong", "sounds", any("wrong", "incorrect", "error")),
+    levelup: kit("sound: level up", "sounds", any("level", "complete")),
+    found: kit("sound: found", "sounds", any("found", "appear", "pop")),
+    tick: kit("sound: timer tick", "sounds", any("tick", "timer", "clock")),
+  },
   logo: {
     full: supplied("logo", "logos/logo.svg", PLACEHOLDER.logo.full),
     mark: supplied("logo mark / favicon", "logos/mark.svg", PLACEHOLDER.logo.mark),

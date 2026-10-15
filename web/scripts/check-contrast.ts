@@ -33,16 +33,17 @@ const ratio = (a: number[], b: number[]) => {
 
 // [text token, ...background layers (top first)]. The camera behind glass is worst-cased as white.
 const PAIRS: Array<[keyof BrandColors, ...(keyof BrandColors | string)[]]> = [
-  ["text", "bg"], ["text", "surface"], ["text", "surface2"], ["text", "navBg"],
+  ["text", "bg"], ["text", "surface"], ["text", "surface2", "surface"], ["text", "navBg"],
   ["text", "primarySoft", "surface"], ["text", "streakBg", "surface"], ["text", "favoriteBg", "surface"],
-  ["muted", "bg"], ["muted", "surface"], ["muted", "surface2"], ["muted", "navBg"],
-  ["onPrimary", "primary"], ["onAccent", "accent"], ["onDanger", "danger"],
-  ["primaryText", "bg"], ["primaryText", "surface"], ["primaryText", "surface2"],
+  ["muted", "bg"], ["muted", "surface"], ["muted", "surface2", "surface"], ["muted", "navBg"],
+  ["onPrimary", "primary"], ["onAction", "action"], ["onAccent", "accent"], ["onDanger", "surface"], // danger buttons are outlined
+  ["link", "surface2", "surface"], ["text", "missedBg", "surface"], ["text", "levelTwo", "surface"], ["text", "levelThree", "surface"],
+  ["primaryText", "bg"], ["primaryText", "surface"], ["primaryText", "surface2", "surface"],
   ["link", "bg"], ["link", "surface"],
   ["warnText", "bg"], ["warnText", "surface"], ["warnText", "streakBg", "surface"], ["warnText", "favoriteBg", "surface"],
-  ["dangerText", "surface"], ["dangerText", "dangerSoft", "surface"], ["dangerText", "missedBg", "surface2"], ["dangerText", "missedBg", "surface"],
+  ["dangerText", "surface"], ["dangerText", "dangerSoft", "surface"], ["dangerText", "missedBg", "surface2", "surface"], ["dangerText", "missedBg", "surface"],
   ["onGold", "gold"], ["onGold", "goldEnd"], ["onGold", "silver"], ["onGold", "bronze"],
-  ["onLevel", "levelOne"], ["onLevel", "levelTwo"], ["onLevel", "levelThree"],
+  ["onLevel", "levelOne", "surface"], ["onLevel", "levelTwo", "surface"], ["onLevel", "levelThree", "surface"],
   ["onAllTen", "allTenFrom"], ["onAllTen", "allTenTo"],
   ["onGlass", "cardGlass", "#ffffff"], ["glassMuted", "cardGlass", "#ffffff"],
   ["onGlass", "errorGlass", "#ffffff"], ["onGlass", "overlay", "#ffffff"],

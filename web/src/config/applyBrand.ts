@@ -1,4 +1,4 @@
-import { BRAND_PENDING, type BrandColors, type BrandSet } from "./brand";
+import { BRAND_PENDING, DET, type BrandColors, type BrandSet } from "./brand";
 
 const kebab = (s: string) => s.replace(/[A-Z0-9]+/g, (m) => `-${m.toLowerCase()}`);
 const vars = (c: BrandColors) =>
@@ -14,7 +14,13 @@ const vars = (c: BrandColors) =>
  * in the right theme, before any JavaScript bundle runs.
  */
 export function brandCss(brand: BrandSet): string {
-  const common = `--font-family:${brand.fontFamily};--font-display:${brand.displayFontFamily};color-scheme:light dark`;
+  // The DET palette by name (--det-owl, --det-macaw, …; the same in both themes) + the role variables.
+  const palette = Object.entries(DET)
+    .map(([k, v]) => `--det${kebab(k.charAt(0).toUpperCase() + k.slice(1))}:${v}`)
+    .join(";");
+  const common =
+    `--font-family:${brand.fontFamily};--font-display:${brand.displayFontFamily};` +
+    `--font-headline:${brand.headlineFontFamily};${palette};color-scheme:light dark`;
   const dark = vars(brand.themes.dark);
   const fonts = brand.fontFiles
     .map(

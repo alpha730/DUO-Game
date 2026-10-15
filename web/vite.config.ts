@@ -21,16 +21,17 @@ const threeRev = JSON.parse(
   readFileSync(new URL("./node_modules/three/package.json", import.meta.url), "utf8"),
 ).version.split(".")[1];
 
-// Brand files supplied by the Duolingo team (CLAUDE.md rule 8), e.g. "logos/logo.svg". brand.ts only
-// switches an official item on when its file is here; sync-assets copies them to /brand/.
-const brandDir = fileURLToPath(new URL("../assets/brand", import.meta.url));
-const brandFiles = ["fonts", "logos", "mascots", "models"].flatMap((d) =>
-  existsSync(`${brandDir}/${d}`)
-    ? readdirSync(`${brandDir}/${d}`)
-        .filter((f) => !f.startsWith("."))
-        .map((f) => `${d}/${f}`)
-    : [],
-);
+// Brand files supplied by the Duolingo team (CLAUDE.md rule 8), as shipped: scripts/sync-assets.mjs
+// copies assets/brand/ (and converts the kit fonts) into public/brand/ before Vite starts. brand.ts
+// switches an official item on only when its file is here, e.g. "det10/det_10_green.svg".
+const brandDir = fileURLToPath(new URL("./public/brand", import.meta.url));
+const listFiles = (dir: string, rel = ""): string[] =>
+  existsSync(dir)
+    ? readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
+        e.name.startsWith(".") ? [] : e.isDirectory() ? listFiles(`${dir}/${e.name}`, `${rel}${e.name}/`) : [`${rel}${e.name}`],
+      )
+    : [];
+const brandFiles = listFiles(brandDir);
 
 /** Writes the active brand into index.html (title, favicon, theme colour, CSS variables) so the very
  *  first paint is on-brand — no flash before the JS bundle loads. Same source: src/config/brand.ts. */
@@ -58,6 +59,8 @@ async function brandHtml(preconnect: string[]): Promise<Plugin> {
               `<script>${themeBootScript(BRAND)}</script>`,
               // DECISION (UI redesign): no preload for the display font — measured on Fast 3G it delayed the
               // first paint; it loads with font-display: swap (system rounded font until then).
+              // Only DIN Regular + Bold are preloaded (when supplied); Nunito isn't (it delayed first paint).
+              ...BRAND.preloadFonts.map((f) => `<link rel="preload" href="${esc(f)}" as="font" type="font/woff2" crossorigin />`),
               // TLS to Firebase starts while the JS downloads (several round trips saved on 3G).
               ...preconnect.map((h) => `<link rel="preconnect" href="${h}" crossorigin />`),
             ].join("\n    "),

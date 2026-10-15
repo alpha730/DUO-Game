@@ -15,6 +15,15 @@ const fmt = (n: number) => n.toLocaleString("en-IN");
 export const shareText = (s: ShareStats) =>
   `I caught ${s.caught}/${LINGO_COUNT} ${BRAND.creatureName}s · ${fmt(s.points)} pts in ${BRAND.appName}!`;
 
+/** Runs one decorative drawing step; a failure (e.g. Safari and an SVG in a canvas) never stops the card. */
+function safely(step: string, draw: () => void): void {
+  try {
+    draw();
+  } catch (err) {
+    console.warn(`share card: ${step} skipped`, err);
+  }
+}
+
 function loadImage(src: string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
     const img = new Image();
@@ -45,14 +54,15 @@ export async function drawShareCard(canvas: HTMLCanvasElement, s: ShareStats): P
   // DET 10 pattern tile (dark), subtle, when supplied.
   const tileSrc = BRAND.det10.pattern.dark ?? BRAND.det10.pattern.light;
   const tile = tileSrc ? await loadImage(tileSrc) : null;
-  const pattern = tile && ctx.createPattern(tile, "repeat");
-  if (pattern) {
-    ctx.save();
-    ctx.globalAlpha = 0.35;
-    ctx.fillStyle = pattern;
-    ctx.fillRect(0, 0, SHARE_W, SHARE_H);
-    ctx.restore();
-  }
+  if (tile)
+    safely("pattern", () => {
+      // Draw the tile repeatedly (createPattern with an SVG image fails in Safari).
+      const size = 360;
+      ctx.save();
+      ctx.globalAlpha = 0.3;
+      for (let y = 0; y < SHARE_H; y += size) for (let x = 0; x < SHARE_W; x += size) ctx.drawImage(tile, x, y, size, size);
+      ctx.restore();
+    });
 
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
@@ -70,11 +80,12 @@ export async function drawShareCard(canvas: HTMLCanvasElement, s: ShareStats): P
 
   // The DET 10 seal on top (else the logo).
   const seal = await loadImage(BRAND.det10.seal ?? BRAND.logo.full);
-  if (seal) {
-    const h = 220;
-    const w = (seal.naturalWidth / (seal.naturalHeight || 1)) * h || h;
-    ctx.drawImage(seal, (SHARE_W - w) / 2, 140, w, h);
-  }
+  if (seal)
+    safely("seal", () => {
+      const h = 220;
+      const w = (seal.naturalWidth / (seal.naturalHeight || 1)) * h || h;
+      ctx.drawImage(seal, (SHARE_W - w) / 2, 140, w, h);
+    });
   ctx.font = `800 96px ${BRAND.headlineFontFamily}`;
   ctx.fillStyle = c.text;
   ctx.fillText(BRAND.appName, SHARE_W / 2, 470);
@@ -102,31 +113,33 @@ export async function drawShareCard(canvas: HTMLCanvasElement, s: ShareStats): P
   // DET × JECRC lockup: the white DET 10 horizontal lockup + divider + × + JECRC (logo or Feather).
   const det = await loadImage(BRAND.det10.lockupH.dark ?? "");
   const jecrcLogo = BRAND.jecrcLogo.dark ? await loadImage(BRAND.jecrcLogo.dark) : null;
-  if (det) {
-    const h = 64;
-    const detW = (det.naturalWidth / (det.naturalHeight || 1)) * h;
-    ctx.font = `800 64px ${BRAND.headlineFontFamily}`;
-    const jW = jecrcLogo ? (jecrcLogo.naturalWidth / (jecrcLogo.naturalHeight || 1)) * h : ctx.measureText("JECRC").width;
-    const gap = 28;
-    const xW = 40;
-    let x = (SHARE_W - (detW + gap + 3 + gap + xW + gap + jW)) / 2;
-    const y = 1760;
-    ctx.drawImage(det, x, y, detW, h);
-    x += detW + gap;
-    ctx.fillStyle = c.border;
-    ctx.fillRect(x, y + 4, 3, h - 8);
-    x += 3 + gap;
-    ctx.fillStyle = c.muted;
-    ctx.font = `400 48px ${font}`;
-    ctx.textAlign = "left";
-    ctx.fillText("×", x, y + 48);
-    x += xW + gap;
-    if (jecrcLogo) ctx.drawImage(jecrcLogo, x, y, jW, h);
-    else {
-      ctx.fillStyle = c.text;
+  if (det && (det.naturalWidth || 0) > 0) {
+    safely("lockup", () => {
+      const h = 64;
+      const detW = (det.naturalWidth / (det.naturalHeight || 1)) * h;
       ctx.font = `800 64px ${BRAND.headlineFontFamily}`;
-      ctx.fillText("JECRC", x, y + 54);
-    }
+      const jW = jecrcLogo ? (jecrcLogo.naturalWidth / (jecrcLogo.naturalHeight || 1)) * h : ctx.measureText("JECRC").width;
+      const gap = 28;
+      const xW = 40;
+      let x = (SHARE_W - (detW + gap + 3 + gap + xW + gap + jW)) / 2;
+      const y = 1760;
+      ctx.drawImage(det, x, y, detW, h);
+      x += detW + gap;
+      ctx.fillStyle = c.border;
+      ctx.fillRect(x, y + 4, 3, h - 8);
+      x += 3 + gap;
+      ctx.fillStyle = c.muted;
+      ctx.font = `400 48px ${font}`;
+      ctx.textAlign = "left";
+      ctx.fillText("×", x, y + 48);
+      x += xW + gap;
+      if (jecrcLogo) ctx.drawImage(jecrcLogo, x, y, jW, h);
+      else {
+        ctx.fillStyle = c.text;
+        ctx.font = `800 64px ${BRAND.headlineFontFamily}`;
+        ctx.fillText("JECRC", x, y + 54);
+      }
+    });
     ctx.textAlign = "center";
   } else {
     text(BRAND.coBrandShort, 1800, 40, c.primaryText, 800); // "DET × JECRC · 10 Years"

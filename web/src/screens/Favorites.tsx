@@ -96,7 +96,7 @@ export default function Favorites() {
             aria-pressed={picked.includes(c.lingoId)}
           >
             <span className="fav-option-art" aria-hidden="true">
-              <LingoArt lingo={c.lingo} mood={picked.includes(c.lingoId) ? "happy" : "calm"} />
+              <LingoArt lingo={c.lingo} mood={picked.includes(c.lingoId) ? "happy" : "calm"} level={c.level} favStreak={current.includes(c.lingoId) ? c.favStreak : 0} />
             </span>
             <strong>{lingoName(c.lingo)}</strong>
             <span className="small muted">{c.lingo.detYear}</span>

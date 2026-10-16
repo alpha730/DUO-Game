@@ -2,7 +2,6 @@ import { BRAND, lingoName } from "../config/brand";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { LINGO_COUNT, type GetMyStateOutput } from "@shared/types";
-import type { Object3D } from "three";
 import { CameraError } from "../ar/cameraError";
 import type { Scanner } from "../ar/scanner";
 import { loadTargets } from "../ar/targets";
@@ -24,6 +23,11 @@ type Status = "starting" | "scanning" | "problem";
 declare const __TARGETS_VERSION__: string;
 
 const IN_APP = inAppBrowser();
+// Official brand: each Lingo is its 2D Duo pose as a paper standee (no .glb models are loaded).
+// Placeholder brand: the 3D models from the lingos collection.
+const STANDEE = BRAND.arMode === "standee";
+/** Standee texture for poster i: the 1024 px PNG made at build, else the pose itself. */
+const standeeUrl = (lingoId: string) => BRAND.lingoStandee[lingoId] ?? BRAND.lingoArt[lingoId] ?? null;
 // E2E tests on the emulators only: a fake scanner driven by window.__posterFound(i) (ar/fakeScanner.ts).
 const FAKE_SCANNER = usingEmulators && (window as { __FAKE_SCANNER?: boolean }).__FAKE_SCANNER === true;
 
@@ -83,19 +87,50 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
     (async () => {
       let lingos: Lingo[];
       let targets: string;
-      let ar: [typeof import("../ar/scanner"), typeof import("../ar/models")];
+      let ar: [typeof import("../ar/scanner"), typeof import("../ar/models") | null];
       try {
         // Test mode is signed out, so lingos may be unreadable: track bare posters instead.
         const lingosP = testMode ? loadLingos().catch(() => [] as Lingo[]) : loadLingos();
         // Day 8: the AR code (three.js + MindAR, ~470 KB) downloads in parallel with the targets and
         // Lingos instead of before the Scan screen can draw (camera prompt and help show at once).
-        const arP = Promise.all([FAKE_SCANNER ? import("../ar/fakeScanner") : import("../ar/scanner"), import("../ar/models")]);
+        const arP = Promise.all([
+          FAKE_SCANNER ? import("../ar/fakeScanner") : import("../ar/scanner"),
+          STANDEE ? null : import("../ar/models"),
+        ]);
         [lingos, targets, ar] = await Promise.all([lingosP, FAKE_SCANNER ? Promise.resolve("") : loadTargets(), arP]);
       } catch (err) {
         throw Object.assign(new Error((err as Error).message), { data: true });
       }
       if (cancelled) return;
-      const [{ createScanner }, { cachedModel, loadModel }] = ar;
+      const [{ createScanner }, models] = ar;
+      /** Shows Lingo `id`'s art / model on poster i (once per scanner session). */
+      const show = (i: number, id: string, modelUrl: string, s: Scanner) => {
+        const place = () => {
+          if (cancelled) return;
+          loaded.add(i);
+          if (current === i) setModelReady(true);
+        };
+        if (STANDEE || !models) {
+          const url = standeeUrl(id);
+          if (!url) return;
+          s.setStandee(i, url).then(place, (err) => console.error(`standee ${url}`, err));
+          return;
+        }
+        const cached = models.cachedModel(modelUrl); // loaded on an earlier visit → instant
+        if (cached) {
+          s.setModel(i, cached);
+          place();
+          return;
+        }
+        models
+          .loadModel(modelUrl)
+          .then((model) => {
+            if (cancelled) return;
+            s.setModel(i, model);
+            place();
+          })
+          .catch((err) => console.error(`model ${modelUrl}`, err));
+      };
       const byPoster = new Map(lingos.map((l) => [l.posterIndex, l]));
       // DECISION: with no game data yet (e.g. production before seeding), still track every poster
       // so the camera and tracking can be tested; the card says the game isn't set up.
@@ -110,42 +145,16 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
           const l = byPoster.get(i);
           if (!l) {
             setBarePoster(i);
-            // DECISION: /ar-test is signed out, so the lingos collection can't be read; show the model
-            // by the file naming convention (poster i → lingo-<2016+i>.glb) so tracking + model can be
+            // DECISION: /ar-test is signed out, so the lingos collection can't be read; show the art /
+            // model by the file naming convention (poster i → lingo-<2016+i>) so tracking + art can be
             // checked on real phones.
-            if (testMode && !loaded.has(i)) {
-              const url = `/assets/models/lingo-${2016 + i}.glb`;
-              const cached = cachedModel(url);
-              const place = (m: Object3D) => {
-                if (cancelled) return;
-                s.setModel(i, m);
-                loaded.add(i);
-                if (current === i) setModelReady(true);
-              };
-              if (cached) place(cached);
-              else loadModel(url).then(place, (err) => console.error(`model ${url}`, err));
-            }
             setModelReady(loaded.has(i));
+            if (testMode && !loaded.has(i)) show(i, `lingo-${2016 + i}`, `/assets/models/lingo-${2016 + i}.glb`, s);
             return;
           }
           setLingo(l);
-          if (!loaded.has(i)) {
-            const cached = cachedModel(l.modelUrl); // loaded on an earlier visit → instant
-            if (cached) {
-              s.setModel(i, cached);
-              loaded.add(i);
-            }
-          }
           setModelReady(loaded.has(i));
-          if (loaded.has(i)) return;
-          loadModel(l.modelUrl)
-            .then((model) => {
-              if (cancelled) return;
-              s.setModel(i, model);
-              loaded.add(i);
-              if (current === i) setModelReady(true);
-            })
-            .catch((err) => console.error(`model ${l.modelUrl}`, err));
+          if (!loaded.has(i)) show(i, l.id, l.modelUrl, s);
         },
         onLost: (i) => {
           if (current !== i) return;

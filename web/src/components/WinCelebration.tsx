@@ -4,6 +4,7 @@ import { BRAND } from "../config/brand";
 import { haptic, play } from "../lib/feedback";
 import type { Lingo } from "../lib/lingos";
 import LingoArt from "./LingoArt";
+import { DuoArt } from "./BrandArt";
 
 const fmt = (n: number) => n.toLocaleString("en-IN");
 const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
@@ -49,7 +50,7 @@ export function Confetti({ pieces = 36 }: { pieces?: number }) {
   );
 }
 
-type Big = { kind: "level-up" | "max" | "all-ten"; icon: string; title: string; sub: string };
+type Big = { kind: "level-up" | "max" | "all-ten"; icon: string; title: string; sub: string; level: Level };
 
 /** Full-screen card for the big moments (level up, MAX form, all 10). */
 function BigMoment({ big, lingo, onClose }: { big: Big; lingo: Lingo | null; onClose: () => void }) {
@@ -62,7 +63,13 @@ function BigMoment({ big, lingo, onClose }: { big: Big; lingo: Lingo | null; onC
       <section className="celebration-card" data-big={big.kind} role="dialog" aria-modal="true" aria-label={big.title} onClick={(e) => e.stopPropagation()}>
         <Confetti pieces={44} />
         <div className="celebration-art">
-          {lingo ? <LingoArt lingo={lingo} className="react-win" /> : <span className="celebration-icon">{big.icon}</span>}
+          {big.kind === "max" && BRAND.duo.trophy ? (
+            <DuoArt mood="trophy" className="react-win celebration-duo" />
+          ) : lingo ? (
+            <LingoArt lingo={lingo} level={big.kind === "max" ? "MAX" : big.level} className="react-win" />
+          ) : (
+            <span className="celebration-icon">{big.icon}</span>
+          )}
         </div>
         <span className="celebration-kicker">
           {big.icon} {big.kind === "max" ? "MAX form" : big.kind === "all-ten" ? "Collection complete" : "Level up"}
@@ -100,11 +107,11 @@ export default function WinCelebration({
 
   // The biggest moment gets the full-screen card (MAX beats all-10 beats level up).
   const big: Big | null = max
-    ? { kind: "max", icon: "🌟", title: `${lingoName} MAX form unlocked! +${fmt(max.points)}`, sub: "10 days in a row — legendary dedication." }
+    ? { kind: "max", icon: "🌟", title: `${lingoName} MAX form unlocked! +${fmt(max.points)}`, sub: "10 days in a row — legendary dedication.", level: "MAX" }
     : allTen
-      ? { kind: "all-ten", icon: "🏆", title: `All 10 ${BRAND.creatureName}s collected! +${fmt(allTen.points)}`, sub: "Every poster, every year. The full Dex!" }
+      ? { kind: "all-ten", icon: "🏆", title: `All 10 ${BRAND.creatureName}s collected! +${fmt(allTen.points)}`, sub: "Every poster, every year. The full Dex!", level: data.newLevel }
       : levelUp
-        ? { kind: "level-up", icon: "⬆️", title: `${lingoName} reached Level ${String(data.newLevel)}!`, sub: "Keep catching it to grow it further." }
+        ? { kind: "level-up", icon: "⬆️", title: `${lingoName} reached Level ${String(data.newLevel)}!`, sub: "Keep catching it to grow it further.", level: data.newLevel }
         : null;
   const [showBig, setShowBig] = useState(false);
   useEffect(() => {

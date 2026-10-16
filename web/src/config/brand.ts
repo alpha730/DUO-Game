@@ -93,6 +93,9 @@ export interface BrandColors {
   // Dex
   slotEmpty: string;
   slotMark: string;
+  /** Uncaught Lingo silhouette: the art turned black, at this opacity, with this edge glow (dark theme). */
+  silhouetteOpacity: string;
+  silhouetteEdge: string;
   // Overlays and camera glass (the camera is always dark, in both themes)
   overlay: string;
   scrim: string;
@@ -121,7 +124,31 @@ export type HeroName = "beaComputerDuo" | "duoInstitutions" | "beaCertificateDuo
 export type UiIconName = "test" | "practice" | "rules" | "overview" | "testSetup" | "cart" | "search" | "id" | "mail" | "microscope";
 export type SoundName = "correct" | "wrong" | "levelup" | "found" | "tick";
 /** Duo poses used by the app (assets/brand/mascots/Duo_*.svg). */
-export type DuoMood = "wave" | "joyous" | "heartEyes" | "coolGuy" | "sad" | "flee" | "dizzy" | "sleep";
+export type DuoMood =
+  | "wave"
+  | "joyous"
+  | "heartEyes"
+  | "coolGuy"
+  | "sad"
+  | "flee"
+  | "dizzy"
+  | "sleep"
+  /** Read Aloud question. */
+  | "microphone"
+  /** Streak flame / streak toast. */
+  | "streak"
+  /** "No Lingos left today". */
+  | "nightOwl"
+  /** "Get ready for the real DET" card. */
+  | "det"
+  /** MAX celebration. */
+  | "trophy"
+  /** Rules / How to play. */
+  | "pointer"
+  /** Profile setup welcome. */
+  | "welcome"
+  /** Me → "Your skills". */
+  | "placementTest";
 
 export interface FontFile {
   family: string;
@@ -212,6 +239,13 @@ export interface BrandSet {
   lingoNames: Record<string, string>;
   /** lingoId → 2D art for the Dex / Catch screens; missing → placeholder critter in the Lingo's colour. */
   lingoArt: Record<string, string>;
+  /**
+   * How a found Lingo appears on the poster: "standee" = its 2D art as an upright paper cut-out
+   * (lingoStandee, else lingoArt), "model" = the 3D .glb from the lingos collection.
+   */
+  arMode: "standee" | "model";
+  /** lingoId → 1024 px PNG of lingoArt for the AR standee (made by web/scripts/sync-assets.mjs). */
+  lingoStandee: Record<string, string>;
   /** lingoId → display colour (overrides the colour stored with the Lingo; empty = keep it). */
   lingoColors: Record<string, string>;
 }
@@ -275,6 +309,8 @@ const LIGHT: BrandColors = {
   ringLow: "#ff4b4b",
   slotEmpty: "#e3e8f1",
   slotMark: "#b3bfd2",
+  silhouetteOpacity: "0.7",
+  silhouetteEdge: "transparent",
   overlay: "rgb(10 20 40 / 0.66)",
   scrim: "rgb(10 20 40 / 0.5)",
   shadow: "rgb(20 33 61 / 0.14)",
@@ -448,6 +484,8 @@ const DET_LIGHT: BrandColors = {
   ringLow: DET.cardinal,
   slotEmpty: DET.polar,
   slotMark: DET.swan,
+  silhouetteOpacity: "0.72", // black at .72 ≈ Eel
+  silhouetteEdge: "transparent",
   overlay: tint("night", 0.8),
   scrim: tint("night", 0.45),
   shadow: tint("eel", 0.1),
@@ -497,6 +535,8 @@ const DET_DARK: BrandColors = {
   onLevel: DET.nightText,
   slotEmpty: DET.nightSurface,
   slotMark: DET.nightBorder,
+  silhouetteOpacity: "1", // a dark shape on Night needs its edge to read
+  silhouetteEdge: DET.wolf,
   overlay: tint("night", 0.7),
   scrim: tint("night", 0.6),
   shadow: tint("night", 0.5),
@@ -547,7 +587,24 @@ export const PLACEHOLDER: BrandSet = {
   heroes: { beaComputerDuo: null, duoInstitutions: null, beaCertificateDuo: null, linComputer: null, zariCertified: null, beaDuoSurfing: null, duoSeal: null },
   uiIcons: { test: null, practice: null, rules: null, overview: null, testSetup: null, cart: null, search: null, id: null, mail: null, microscope: null },
   emblems: { scallop: null, india: null },
-  duo: { wave: null, joyous: null, heartEyes: null, coolGuy: null, sad: null, flee: null, dizzy: null, sleep: null },
+  duo: {
+    wave: null,
+    joyous: null,
+    heartEyes: null,
+    coolGuy: null,
+    sad: null,
+    flee: null,
+    dizzy: null,
+    sleep: null,
+    microphone: null,
+    streak: null,
+    nightOwl: null,
+    det: null,
+    trophy: null,
+    pointer: null,
+    welcome: null,
+    placementTest: null,
+  },
   sounds: { correct: null, wrong: null, levelup: null, found: null, tick: null },
   logo: { full: "/favicon.svg", mark: "/favicon.svg" },
   mascots: { hero: null, celebrate: null, oops: null },
@@ -564,6 +621,9 @@ export const PLACEHOLDER: BrandSet = {
     "lingo-2025": "Decka",
   },
   lingoArt: {},
+  // The placeholder critters as 3D models (assets/models/lingo-<year>.glb).
+  arMode: "model",
+  lingoStandee: {},
   lingoColors: {},
 };
 
@@ -618,6 +678,20 @@ const dinFiles: FontFile[] = (["light", "regular", "medium", "bold"] as const).f
   DIN[k] ? [{ family: "DIN Next Rounded", src: DIN[k]!, weight: String([300, 400, 500, 700][i]) }] : [],
 );
 const hasDin = Boolean(DIN.regular && DIN.bold);
+
+/** Official Duo pose per Lingo, by posterIndex 0–9 (= lingo-2016 … lingo-2025, names below). */
+export const LINGO_POSES = [
+  "Duo_Straight_On_Grounded.svg", // 0 Rookie Duo
+  "Duo_Detective.svg", // 1 Curious Duo
+  "Duo_Skip.svg", // 2 Winking Duo
+  "Duo_Wave.svg", // 3 Thumbs-Up Duo
+  "Duo_Serious.svg", // 4 Fierce Duo
+  "Duo_Heart.svg", // 5 Lovestruck Duo
+  "Duo_Joyous.svg", // 6 Joyful Duo
+  "duo_v2_books.svg", // 7 Bookworm Duo
+  "duo_v2_sunglasses.svg", // 8 Cool Duo
+  "Duo_Grad_Jump.svg", // 9 Champion Duo
+] as const;
 
 export const OFFICIAL: BrandSet = {
   ...PLACEHOLDER,
@@ -702,6 +776,14 @@ export const OFFICIAL: BrandSet = {
     flee: kit("Duo_Flee", "mascots", /^Duo_Flee\./i),
     dizzy: kit("Duo_dizzy", "mascots", /^Duo_dizzy\./i),
     sleep: kit("Duo_Sleep", "mascots", /^Duo_Sleep\./i),
+    microphone: kit("Microphone_Duo", "mascots", /^Microphone_Duo\./i),
+    streak: kit("Duo_streak_04", "mascots", /^Duo_streak_04\./i),
+    nightOwl: kit("Duo_NightOwl", "mascots", /^Duo_NightOwl\./i),
+    det: kit("img-duo-det", "mascots", /^img-duo-det\./i),
+    trophy: kit("Duo_Trophy", "mascots", /^Duo_Trophy\./i),
+    pointer: kit("Duo_Pointer", "mascots", /^Duo_Pointer\./i),
+    welcome: kit("Duo_Welcome", "mascots", /^Duo_Welcome\./i),
+    placementTest: kit("Duo_PlacementTest", "mascots", /^Duo_PlacementTest\./i),
   },
   sounds: {
     correct: kit("sound: correct", "sounds", any("correct", "right", "success")),
@@ -734,11 +816,21 @@ export const OFFICIAL: BrandSet = {
     "lingo-2024": "Cool Duo",
     "lingo-2025": "Champion Duo",
   },
-  // Character art per Lingo (assets/brand/mascots/lingo-<year>.png), only where supplied.
+  // Each Lingo is an official Duo pose (assets/brand/mascots/), by posterIndex. A missing file falls
+  // back to Duo_Wave, never to the placeholder critter.
   lingoArt: Object.fromEntries(
+    LINGO_POSES.flatMap((file, i) => {
+      const art = kit(`Lingo ${i} pose (${file})`, "mascots", new RegExp(`^${file.replace(/\./g, "\\.")}$`, "i"));
+      const src = art ?? kit("mascot: welcome (Duo_Wave)", "mascots", /^Duo_Wave\./i);
+      return src ? [[`lingo-${2016 + i}`, src]] : [];
+    }),
+  ),
+  // AR: the pose as a paper standee on the poster (no 3D models in the official brand).
+  arMode: "standee",
+  lingoStandee: Object.fromEntries(
     Array.from({ length: 10 }, (_, i) => `lingo-${2016 + i}`)
-      .filter((id) => FILES.has(`mascots/${id}.png`))
-      .map((id) => [id, `/brand/mascots/${id}.png`]),
+      .filter((id) => FILES.has(`standees/${id}.png`))
+      .map((id) => [id, `/brand/standees/${id}.png`]),
   ),
 };
 

@@ -28,5 +28,6 @@ export function createScanner(
       delete w.__posterLost;
     },
     setModel() {},
+    async setStandee() {},
   };
 }

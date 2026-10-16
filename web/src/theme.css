@@ -3798,7 +3798,9 @@ body:has(.catch[data-phase="submitting"]) {
 
 /* Kit level badges: the DET scallop (wavy bottom edge) as the badge shape. MAX = gold. */
 .level-badge[data-shape="scallop"] {
-  padding: 2px 10px 5px;
+  /* DIN's caps sit high in the line box: room above them, the scallop's waves below. */
+  padding: 4px 10px 6px;
+  line-height: 1.15;
   border-radius: 6px 6px 0 0;
   -webkit-mask: var(--scallop) center / 100% 100% no-repeat;
   mask: var(--scallop) center / 100% 100% no-repeat;
@@ -4044,4 +4046,180 @@ body:has(.catch[data-phase="submitting"]) {
   width: 150px;
   height: auto;
   margin: 0 auto;
+}
+
+/* ---------- Official Lingo art (components/LingoArt.tsx): a Duo pose + the level look ---------- */
+.lingo-pose {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  --max-glow: 0px;
+}
+
+.lingo-pose img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: 50% 100%;
+  filter: drop-shadow(0 0 var(--max-glow) var(--gold-glow)) drop-shadow(0 0 calc(var(--fav-glow, 0) * 10px) var(--warn));
+}
+
+/* Not caught yet: the same art as a dark silhouette (an edge glow keeps it visible on dark cards). */
+.lingo-pose.is-silhouette img {
+  filter: brightness(0) opacity(var(--silhouette-opacity)) drop-shadow(0 0 1px var(--silhouette-edge)) drop-shadow(0 0 1px var(--silhouette-edge));
+}
+
+/* Lv 2: thin green ring · Lv 3: gold ring + sparkle · MAX: gold ring, scallop badge + glow. */
+.lingo-pose[data-level="2"]::before,
+.lingo-pose[data-level="3"]::before,
+.lingo-pose[data-level="MAX"]::before {
+  content: "";
+  position: absolute;
+  inset: 3%;
+  border-radius: 50%;
+  border: max(1.5px, 2.5cqw) solid var(--primary);
+}
+
+.lingo-pose[data-level="3"]::before,
+.lingo-pose[data-level="MAX"]::before {
+  border-color: var(--gold);
+}
+
+.lingo-pose[data-level="2"],
+.lingo-pose[data-level="3"],
+.lingo-pose[data-level="MAX"] {
+  container-type: inline-size;
+}
+
+.lingo-pose[data-level="2"]::before {
+  border-width: max(1.5px, 2cqw);
+}
+
+.lingo-pose[data-level="3"]::before {
+  border-width: max(2px, 3cqw);
+}
+
+.lingo-pose[data-level="MAX"] img {
+  --max-glow: max(4px, 7cqw);
+}
+
+.lingo-pose[data-level="MAX"]::before {
+  border-width: max(2px, 3.5cqw);
+  box-shadow: 0 0 max(6px, 10cqw) var(--gold-glow);
+}
+
+.lingo-sparkle {
+  position: absolute;
+  z-index: 2;
+  top: 4%;
+  right: 6%;
+  width: 22%;
+  aspect-ratio: 1;
+  background: var(--gold);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  animation: twinkle 2.2s ease-in-out infinite;
+}
+
+/* MAX: a gold scallop ribbon across the bottom of the art ("MAX" on it when there's room). */
+.lingo-max {
+  position: absolute;
+  z-index: 2;
+  left: 22%;
+  right: 22%;
+  bottom: 2%;
+  display: grid;
+  place-items: center;
+  padding: 1cqw 0 3cqw;
+  border-radius: 4px;
+  background: var(--gold);
+  color: var(--on-gold);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: max(11px, 11cqw);
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+}
+
+.lingo-max[data-shape="scallop"] {
+  border-radius: 0;
+  -webkit-mask: var(--scallop) center / 100% 100% no-repeat;
+  mask: var(--scallop) center / 100% 100% no-repeat;
+}
+
+/* Small art (question header, Dex strip): the ribbon without text. */
+@container (max-width: 99px) {
+  .lingo-max {
+    left: 28%;
+    right: 28%;
+    height: 9%;
+    padding: 0;
+    font-size: 0;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.6) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+}
+
+/* Scan card: the found Lingo's pose instead of the colour dot. */
+.scan-card-head .scan-card-pose {
+  flex: none;
+  width: 56px;
+}
+
+.voice-character .voice-duo {
+  width: 100%;
+  height: auto;
+}
+
+.celebration-art .celebration-duo {
+  width: 130px;
+  height: auto;
+}
+
+/* Extra official Duo poses */
+.setup-duo {
+  width: 120px;
+  height: auto;
+}
+
+.rules-duo {
+  width: min(200px, 60%);
+  height: auto;
+  margin: 10px auto 0;
+}
+
+.skills-duo {
+  width: 88px;
+  height: auto;
+  align-self: center;
+}
+
+/* Day-streak flame Duo: grey until today's first win. */
+.streak-duo {
+  display: block;
+  flex: none;
+  object-fit: contain;
+}
+
+.streak-duo[data-lit="false"] {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
+.hud-flame .streak-duo[data-lit="true"] {
+  animation: flicker 1.6s ease-in-out infinite;
+  transform-origin: 50% 90%;
 }

@@ -174,7 +174,7 @@ export default function Result({
         {won && <Confetti />}
         {big && <Det10Seal className="result-seal" />}
         <DuoArt mood={duoMood} fallback={won ? "celebrate" : "oops"} className={won ? "react-win" : "react-fail"} />
-        {lingo && outcome.kind !== "error" && <LingoArt lingo={lingo} mood={won ? "happy" : "sad"} className="result-lingo" />}
+        {lingo && outcome.kind !== "error" && <LingoArt lingo={lingo} mood={won ? "happy" : "sad"} level={outcome.kind === "won" ? outcome.data.newLevel : prevLevel} className="result-lingo" />}
       </div>
       {/* Feather headline: lowercase, except a Lingo's name (names keep their capitals). */}
       <h2 className={`result-title headline ${won ? "keep-case" : ""}`}>{title}</h2>

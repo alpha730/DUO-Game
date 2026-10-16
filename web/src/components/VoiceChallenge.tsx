@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { StartAttemptOutput } from "@shared/types";
 import { listen } from "../catch/speech";
 import type { Lingo } from "../lib/lingos";
+import { BRAND } from "../config/brand";
+import { DuoArt } from "./BrandArt";
 import LingoArt from "./LingoArt";
 
 const STOP_HELP: Record<string, string> = {
@@ -83,7 +85,7 @@ export default function VoiceChallenge({
       <p className={pronounce ? "say-word" : "say-phrase"}>{pronounce ? challenge.word : challenge.phrase}</p>
       {lingo && (
         <div className="voice-character" aria-hidden="true">
-          <LingoArt lingo={lingo} mood={listening ? "wow" : "happy"} />
+          {BRAND.duo.microphone ? <DuoArt mood="microphone" className="voice-duo" /> : <LingoArt lingo={lingo} mood={listening ? "wow" : "happy"} />}
         </div>
       )}
       <div className="wave-pill" data-listening={listening} aria-hidden="true">

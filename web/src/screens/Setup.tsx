@@ -1,7 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { NAME_MAX, NAME_MIN } from "@shared/types";
+import { DuoArt } from "../components/BrandArt";
 import CoBrand from "../components/CoBrand";
 import Mascot from "../components/Mascot";
+import { BRAND } from "../config/brand";
 import { api, apiErrorMessage } from "../lib/api";
 import { useAuth } from "../lib/auth";
 
@@ -36,7 +38,7 @@ export default function Setup() {
       </header>
       <section className="login-hero compact">
         <div className="login-hero-art">
-          <Mascot slot="hero" mood="wow" />
+          {BRAND.duo.welcome ? <DuoArt mood="welcome" className="setup-duo" /> : <Mascot slot="hero" mood="wow" />}
         </div>
         <h1>Set up your profile</h1>
         <p className="muted">Use the name on your college ID card — prizes are only handed over if it matches.</p>

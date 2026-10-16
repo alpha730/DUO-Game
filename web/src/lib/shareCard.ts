@@ -5,6 +5,8 @@ export interface ShareStats {
   name: string;
   caught: number;
   points: number;
+  /** Lingo ids caught (when known): their Duo poses fill the slots, the rest are silhouettes. */
+  caughtIds?: string[];
 }
 
 export const SHARE_W = 1080;
@@ -95,21 +97,51 @@ export async function drawShareCard(canvas: HTMLCanvasElement, s: ShareStats): P
   text(`${s.caught}/${LINGO_COUNT}`, 1010, 230, c.primary, 900);
   text(`${BRAND.creatureName}s`, 1100, 64, c.text, 700);
 
-  // One slot per Lingo: filled for each caught.
-  const r = 34;
-  const gap = 22;
-  const rowW = 5 * (2 * r) + 4 * gap;
-  for (let i = 0; i < LINGO_COUNT; i++) {
-    const x = (SHARE_W - rowW) / 2 + r + (i % 5) * (2 * r + gap);
-    const y = 1210 + Math.floor(i / 5) * (2 * r + gap);
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fillStyle = i < s.caught ? c.gold : c.slotEmpty;
-    ctx.fill();
+  // One slot per Lingo (posterIndex order): its Duo pose when caught, a silhouette when not. The
+  // standee PNGs are used when there (Safari draws SVGs into a canvas unreliably). Without art or
+  // the caught list: gold dots for the number caught.
+  const ids = Array.from({ length: LINGO_COUNT }, (_, i) => `lingo-${2016 + i}`);
+  const artSrc = (id: string) => BRAND.lingoStandee[id] ?? BRAND.lingoArt[id];
+  const arts = s.caughtIds ? await Promise.all(ids.map((id) => (artSrc(id) ? loadImage(artSrc(id)!) : Promise.resolve(null)))) : [];
+  if (s.caughtIds && arts.every(Boolean)) {
+    const size = 128;
+    const gap = 18;
+    const rowW = 5 * size + 4 * gap;
+    for (let i = 0; i < LINGO_COUNT; i++) {
+      const x = (SHARE_W - rowW) / 2 + (i % 5) * (size + gap);
+      const y = 1140 + Math.floor(i / 5) * (size + gap);
+      const img = arts[i]!;
+      safely(`lingo ${i}`, () => {
+        if (s.caughtIds!.includes(ids[i])) {
+          ctx.drawImage(img, x, y, size, size);
+          return;
+        }
+        const off = document.createElement("canvas");
+        off.width = off.height = size;
+        const o = off.getContext("2d")!;
+        o.drawImage(img, 0, 0, size, size);
+        o.globalCompositeOperation = "source-in";
+        o.fillStyle = c.slotEmpty;
+        o.fillRect(0, 0, size, size);
+        ctx.drawImage(off, x, y);
+      });
+    }
+  } else {
+    const r = 34;
+    const gap = 22;
+    const rowW = 5 * (2 * r) + 4 * gap;
+    for (let i = 0; i < LINGO_COUNT; i++) {
+      const x = (SHARE_W - rowW) / 2 + r + (i % 5) * (2 * r + gap);
+      const y = 1210 + Math.floor(i / 5) * (2 * r + gap);
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = i < s.caught ? c.gold : c.slotEmpty;
+      ctx.fill();
+    }
   }
 
-  text(`${fmt(s.points)} pts`, 1480, 120, c.gold, 900);
-  text(s.name, 1600, 52, c.text, 600);
+  text(`${fmt(s.points)} pts`, 1530, 120, c.gold, 900);
+  text(s.name, 1640, 52, c.text, 600);
   // DET × JECRC lockup: the white DET 10 horizontal lockup + divider + × + JECRC (logo or Feather).
   const det = await loadImage(BRAND.det10.lockupH.dark ?? "");
   const jecrcLogo = BRAND.jecrcLogo.dark ? await loadImage(BRAND.jecrcLogo.dark) : null;

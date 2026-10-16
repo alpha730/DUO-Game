@@ -5,6 +5,7 @@ import type { CatchStatus } from "../lib/catchStatus";
 import type { Lingo } from "../lib/lingos";
 import type { Raid } from "../lib/raids";
 import LevelBadge from "./LevelBadge";
+import LingoArt from "./LingoArt";
 import { Det10Icon, DuoArt } from "./BrandArt";
 
 /** Dex categories → DET 10 icons. */
@@ -39,7 +40,13 @@ export default function ScanOverlay({
   return (
     <section className="scan-card" aria-live="polite" data-kind={kind} style={{ "--lingo": lingo.color } as React.CSSProperties}>
       <div className="scan-card-head">
-        <span className="scan-card-dot" aria-hidden="true" />
+        {BRAND.lingoArt[lingo.id] ? (
+          <span className="scan-card-pose" aria-hidden="true">
+            <LingoArt lingo={lingo} level={level} favStreak={streak} />
+          </span>
+        ) : (
+          <span className="scan-card-dot" aria-hidden="true" />
+        )}
         <div className="scan-card-title">
           <span className="scan-card-kicker">You found a {BRAND.creatureName}!</span>
           <h2>{lingoName(lingo)}</h2>
@@ -118,7 +125,7 @@ export default function ScanOverlay({
 
       {server === "ok" && status.kind === "noAttempts" && (
         <div className="done done-sleep" data-closed>
-          <DuoArt mood="sleep" className="sleep-art" />
+          <DuoArt mood={BRAND.duo.nightOwl ? "nightOwl" : "sleep"} className="sleep-art" />
           <strong>No Lingos left today</strong>
           <span className="small">You've tried {attemptsPerDay ?? 4} Lingos today — come back tomorrow</span>
         </div>

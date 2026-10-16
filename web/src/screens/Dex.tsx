@@ -59,7 +59,7 @@ function DetailSheet({
           <CloseIcon />
         </button>
         <div className="dex-sheet-art" data-level={c?.level}>
-          <LingoArt lingo={lingo} silhouette={!caught} />
+          <LingoArt lingo={lingo} silhouette={!caught} level={c?.level} favStreak={streak} />
         </div>
         <div className="dex-sheet-head">
           <span className="dex-no">#{String(lingo.posterIndex + 1).padStart(2, "0")}</span>
@@ -166,7 +166,7 @@ export default function Dex() {
               >
                 <span className="dex-no">#{String(i + 1).padStart(2, "0")}</span>
                 {l && favorites.includes(l.id) && <StarIcon className="dex-fav" />}
-                <span className="dex-card-art">{l && <LingoArt lingo={l} silhouette={!caught} />}</span>
+                <span className="dex-card-art">{l && <LingoArt lingo={l} silhouette={!caught} level={c?.level} favStreak={favorites.includes(l.id) ? c?.favStreak : 0} />}</span>
                 <span className="dex-card-name">{caught ? lingoName(l!) : "???"}</span>
                 <span className="dex-card-meta">
                   <span className="dex-year">{l?.detYear ?? 2016 + i}</span>

@@ -1,5 +1,6 @@
 import { BRAND, type Det10Icon as Det10IconName, type DuoMood, type HeroName, type Themed } from "../config/brand";
 import type { Mood } from "./Critter";
+import { FlameIcon } from "./Icons";
 import Mascot from "./Mascot";
 
 /**
@@ -47,6 +48,13 @@ export function DuoArt({ mood, fallback = "oops", className = "" }: { mood: DuoM
   const src = BRAND.duo[mood];
   if (src) return <img className={`duo-art ${className}`} src={src} alt="" loading="lazy" decoding="async" data-duo={mood} />;
   return <Mascot slot={fallback} mood={mood === "sad" || mood === "flee" || mood === "dizzy" ? "sad" : "happy"} className={className} />;
+}
+
+/** The day-streak flame: the kit's flame Duo (Duo_streak_04), else our flame icon. Grey until today's first win. */
+export function StreakFlame({ lit, size = 20, className = "" }: { lit: boolean; size?: number; className?: string }) {
+  const src = BRAND.duo.streak;
+  if (src) return <img className={`streak-duo ${className}`} src={src} alt="" aria-hidden="true" width={size} height={size} data-lit={lit} decoding="async" />;
+  return <FlameIcon size={size} className={className} data-lit={lit} />;
 }
 
 /** The DET 10 seal (share card, MAX / all-10 celebrations). */

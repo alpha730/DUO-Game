@@ -36,7 +36,7 @@ function FavoriteCard({ lingo, c, me }: { lingo: Lingo; c: CatchView | undefined
   return (
     <div className="fav-card" data-lingo={lingo.id} data-caught-today={caughtToday} data-state={state} style={{ "--lingo": lingo.color } as React.CSSProperties}>
       <div className="fav-card-art">
-        <LingoArt lingo={lingo} mood={caughtToday ? "happy" : "calm"} />
+        <LingoArt lingo={lingo} mood={caughtToday ? "happy" : "calm"} level={c?.level} favStreak={streak} />
       </div>
       <div className="fav-card-body">
         <div className="fav-card-name">
@@ -187,7 +187,7 @@ export default function Home() {
                 style={l ? ({ "--lingo": l.color } as React.CSSProperties) : undefined}
                 aria-label={l ? `${lingoName(l)} (${l.detYear}): ${caught ? `caught, level ${c!.level}` : "not caught"}` : undefined}
               >
-                <span className="slot-art">{l && <LingoArt lingo={l} silhouette={!caught} />}</span>
+                <span className="slot-art">{l && <LingoArt lingo={l} silhouette={!caught} level={c?.level} />}</span>
                 <span className="slot-name">{caught ? lingoName(l!) : "???"}</span>
                 {caught ? <LevelBadge level={c!.level} /> : <span className="slot-year">{l?.detYear ?? 2016 + i}</span>}
               </Link>

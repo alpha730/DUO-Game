@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import type { GetMyStateOutput } from "@shared/types";
 import { useAuth } from "../lib/auth";
 import { fmt, initial, liveDayStreak, playerLevel } from "../lib/trainer";
-import { CoinIcon, FlameIcon } from "./Icons";
+import { StreakFlame } from "./BrandArt";
+import { CoinIcon } from "./Icons";
 
 /**
  * Top HUD on Home / Dex / Leaderboard: avatar + level, 🔥 day streak (grey until today's first win),
@@ -31,7 +32,7 @@ export default function Hud({ state }: { state: GetMyStateOutput | null }) {
         title={streak.lit ? "Days in a row with a catch" : "Catch a Lingo today to keep your streak"}
         aria-label={`${streak.days} day streak${streak.lit ? "" : ", not yet today"}`}
       >
-        <FlameIcon />
+        <StreakFlame lit={streak.lit} />
         <span>{streak.days}</span>
       </span>
       <span className="hud-chip hud-points" data-points={points} aria-label={`${fmt(points)} points`}>

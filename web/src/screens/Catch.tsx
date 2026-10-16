@@ -297,6 +297,7 @@ export default function Catch() {
 
   const name = lingo ? lingoName(lingo) : `this ${BRAND.creatureName}`;
   const triesPerLingo = me?.triesPerLingo ?? 2;
+  const level = me?.catches.find((x) => x.lingoId === lingoId && x.timesCaught > 0)?.level ?? null;
   // Tries already used on this Lingo today (from the last start, else from getMyState).
   const used = lingoTriesLeft !== null ? triesPerLingo - lingoTriesLeft : triesUsed(lingoId, me);
 
@@ -304,7 +305,7 @@ export default function Catch() {
     <main className="screen stack catch" data-phase={phase}>
       {(phase === "preflight" || phase === "ready" || phase === "starting") && lingo && (
         <div className="catch-spotlight" style={{ "--lingo": lingo.color } as React.CSSProperties} aria-hidden="true">
-          <LingoArt lingo={lingo} />
+          <LingoArt lingo={lingo} level={level} />
         </div>
       )}
       <header className="catch-head">
@@ -342,7 +343,7 @@ export default function Catch() {
           ) : (
             error && (
               <>
-                {errorCode === "no-attempts" && <DuoArt mood="sleep" className="sleep-art" />}
+                {errorCode === "no-attempts" && <DuoArt mood={BRAND.duo.nightOwl ? "nightOwl" : "sleep"} className="sleep-art" />}
                 <p className="error" role="alert">
                   {error}
                 </p>
@@ -377,7 +378,7 @@ export default function Catch() {
           raid={!!raidId}
           triesLeft={raidId ? null : (lingoTriesLeft ?? (me ? triesLeft(lingoId, me) : null))}
           onRetry={retry}
-          prevLevel={me?.catches.find((x) => x.lingoId === lingoId && x.timesCaught > 0)?.level ?? null}
+          prevLevel={level}
         />
       )}
     </main>

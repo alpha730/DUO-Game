@@ -83,7 +83,10 @@ function copyDir(rel) {
           },
         ],
       }).data;
-      writeFileSync(join(brandDest, rel, f), out);
+      // Scallops are used as CSS masks stretched to a badge (100% × 100%): they must stretch, not
+      // keep their 4.7:1 ratio (which left only a thin middle band visible). Sizing only, art unchanged.
+      const stretched = /scallop/i.test(f) && !/preserveAspectRatio/.test(out) ? out.replace(/<svg\b/, '<svg preserveAspectRatio="none"') : out;
+      writeFileSync(join(brandDest, rel, f), stretched);
       svgSaved += svg.length - out.length;
     } else {
       cpSync(from, join(brandDest, rel, f));
@@ -100,6 +103,44 @@ if (existsSync(join(brandSrc, "fonts")) && readdirSync(join(brandSrc, "fonts")).
   if (existsSync(out)) for (const f of readdirSync(out)) brandCopied.push(`fonts/${f}`);
 }
 copied.push(brandCopied.length ? `brand: ${brandCopied.length} files (svgo saved ${Math.round(svgSaved / 1024)} KB)` : "brand: (no files supplied yet)");
+
+// AR standees: each Lingo's official pose (brand.ts OFFICIAL.lingoArt) → a 1024 × 1024 PNG texture,
+// art centred and standing on the bottom edge (transparent around it). brand.ts is imported as-is
+// (Node strips the types), seeing the brand files just copied.
+if (brandCopied.some((f) => f.startsWith("mascots/"))) {
+  globalThis.__BRAND_FILES__ = brandCopied;
+  const { OFFICIAL } = await import("../src/config/brand.ts");
+  const { Resvg } = await import("@resvg/resvg-js");
+  const SIZE = 1024;
+  const PAD = 24; // px around the art (soft edge for the texture filter)
+  mkdirSync(join(brandDest, "standees"), { recursive: true });
+  let made = 0;
+  for (const [id, url] of Object.entries(OFFICIAL.lingoArt)) {
+    const file = join(brandSrc, url.replace(/^\/brand\//, ""));
+    if (!/\.svg$/i.test(file) || !existsSync(file)) continue;
+    const svg = readFileSync(file, "utf8");
+    const { width, height } = new Resvg(svg); // the pose's own size (only the aspect ratio matters)
+    const box = SIZE - 2 * PAD;
+    const scale = Math.min(box / width, box / height);
+    const w = width * scale;
+    const h = height * scale;
+    // Nest the pose in a square SVG: centred horizontally, feet on the bottom padding. Its root <svg>
+    // gets our position + size; its own viewBox scales the art into it.
+    const inner = svg
+      .replace(/<\?xml[^>]*>/, "")
+      .replace(/<svg\b[^>]*>/, (tag) =>
+        tag
+          .replace(/\s(width|height|x|y)="[^"]*"/g, "")
+          .replace(/^<svg/, `<svg x="${(SIZE - w) / 2}" y="${SIZE - PAD - h}" width="${w}" height="${h}"${/viewBox=/.test(tag) ? "" : ` viewBox="0 0 ${width} ${height}"`}`),
+      );
+    const square = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}">${inner}</svg>`;
+    const png = new Resvg(square, { fitTo: { mode: "original" } }).render().asPng();
+    writeFileSync(join(brandDest, "standees", `${id}.png`), png);
+    brandCopied.push(`standees/${id}.png`);
+    made++;
+  }
+  copied.push(`standees: ${made} × ${SIZE} px`);
+}
 
 console.log(`assets synced: ${copied.join(", ")}`);
 if (tooBig.length) {

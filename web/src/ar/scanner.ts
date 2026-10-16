@@ -4,6 +4,7 @@
 import { MindARThree, type MindARAnchor } from "mind-ar/dist/mindar-image-three.prod.js";
 import { Clock, DirectionalLight, HemisphereLight, Texture, Vector3, type Mesh, type Object3D } from "three";
 import { withCameraErrors } from "./cameraError";
+import { createStandee, loadStandeeTexture, type Standee } from "./standee";
 
 export interface ScannerEvents {
   onFound(posterIndex: number): void;
@@ -22,8 +23,10 @@ export interface ScannerOptions {
 export interface Scanner {
   start(): Promise<void>;
   stop(): void;
-  /** Places `model` on the poster's anchor (replacing anything there). */
+  /** Places `model` on the poster's anchor (replacing anything there). Placeholder brand (3D). */
   setModel(posterIndex: number, model: Object3D): void;
+  /** Places the Lingo's 2D art as a paper standee on the poster (official brand). Resolves when shown. */
+  setStandee(posterIndex: number, textureUrl: string): Promise<void>;
 }
 
 // MindAR binds window "resize" to this.resize in its constructor and never removes it; after a failed
@@ -80,11 +83,13 @@ export function createScanner(
 
   const anchors = new Map<number, MindARAnchor>();
   const models = new Map<number, Object3D>();
+  const standees = new Map<number, Standee>();
   const popAt = new Map<number, number>(); // posterIndex → performance.now() when its pop-in started
   for (const i of posterIndexes) {
     const anchor = mindar.addAnchor(i);
     anchor.onTargetFound = () => {
       popAt.set(i, performance.now());
+      standees.get(i)?.pop(performance.now());
       events.onFound(i);
     };
     anchor.onTargetLost = () => events.onLost(i);
@@ -137,6 +142,7 @@ export function createScanner(
     });
     mindar.scene.clear();
     models.clear();
+    standees.clear();
 
     // Phones allow only a few WebGL contexts; release ours instead of waiting for GC.
     mindar.renderer.dispose();
@@ -181,6 +187,7 @@ export function createScanner(
       model.position.z = HOVER_Z + Math.sin(t * 2.2) * BOB_HEIGHT;
       model.rotation.y = Math.sin(t * 0.9) * 0.35 + (1 - k) * Math.PI * 1.5;
     }
+    for (const [i, standee] of standees) if (anchors.get(i)?.group.visible) standee.update(t, now, mindar.camera);
     placeMarker();
     mindar.renderer.render(mindar.scene, mindar.camera);
   }
@@ -214,6 +221,16 @@ export function createScanner(
       anchor.group.add(model);
       models.set(i, model);
       popAt.set(i, performance.now()); // the model just arrived (it may have loaded after the poster was found)
+    },
+    async setStandee(i, url) {
+      const anchor = anchors.get(i);
+      if (!anchor || standees.has(i)) return;
+      const texture = await loadStandeeTexture(url);
+      if (stopped || standees.has(i)) return;
+      const standee = createStandee(texture);
+      anchor.group.add(standee.object);
+      standees.set(i, standee);
+      standee.pop(performance.now()); // the art just arrived (it may have loaded after the poster was found)
     },
   };
 }

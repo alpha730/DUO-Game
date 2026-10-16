@@ -7,14 +7,15 @@ export default function ShareCard({ stats }: { stats: ShareStats }) {
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
-  const { name, caught, points } = stats;
+  const { name, caught, points, caughtIds } = stats;
+  const caughtKey = caughtIds?.join(",");
 
   useEffect(() => {
     let url: string | null = null;
     let live = true;
     const el = canvas.current;
     if (!el) return;
-    drawShareCard(el, { name, caught, points })
+    drawShareCard(el, { name, caught, points, caughtIds: caughtKey === undefined ? undefined : caughtKey ? caughtKey.split(",") : [] })
       .then(() => canvasToBlob(el))
       .then((b) => {
         if (!live) return;
@@ -26,7 +27,7 @@ export default function ShareCard({ stats }: { stats: ShareStats }) {
       live = false;
       if (url) URL.revokeObjectURL(url);
     };
-  }, [name, caught, points]);
+  }, [name, caught, points, caughtKey]);
 
   async function share() {
     if (!canvas.current) return;

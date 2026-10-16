@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { DEFAULT_RULES, type GameConfigDoc, type GameRules } from "@shared/types";
+import { DuoArt } from "../components/BrandArt";
 import CoBrand from "../components/CoBrand";
 import { BRAND } from "../config/brand";
 import { useAuth } from "../lib/auth";
@@ -65,6 +66,7 @@ export default function Rules() {
           {BRAND.uiIcons.rules && <img className="headline-icon" src={BRAND.uiIcons.rules} alt="" aria-hidden="true" />}
           game rules
         </h1>
+        {BRAND.duo.pointer && <DuoArt mood="pointer" className="rules-duo" />}
         <p className="muted" style={{ margin: "6px 0 0" }}>
           The same rules for every player. The game server checks all of them — points, timers and limits can't be
           changed from a phone.

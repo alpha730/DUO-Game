@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { LINGO_COUNT } from "@shared/types";
 import AboutSheet from "../components/AboutSheet";
-import { Det10Icon } from "../components/BrandArt";
-import { CoinIcon, FlameIcon, SoundIcon } from "../components/Icons";
+import { Det10Icon, DuoArt, StreakFlame } from "../components/BrandArt";
+import { CoinIcon, SoundIcon } from "../components/Icons";
 import PrepCard from "../components/PrepCard";
 import ShareCard from "../components/ShareCard";
 import { BRAND } from "../config/brand";
@@ -43,6 +43,7 @@ function SkillsPanel({ skills, wins, accuracy }: { skills: SkillCounts; wins: nu
       <h2 className="with-icon">
         <Det10Icon name="books" /> Your skills
       </h2>
+      {BRAND.duo.placementTest && <DuoArt mood="placementTest" className="skills-duo" />}
       <SkillBar label="Reading" sub="Choose the Meaning + Fill in the Blanks" c={skills.reading} />
       <SkillBar label="Speaking" sub="Read Aloud" c={skills.speaking} />
       <div className="skills-totals">
@@ -131,7 +132,7 @@ export default function Me() {
             <span>points</span>
           </div>
           <div className="stat-box" data-stat="streak">
-            <FlameIcon size={22} className="stat-flame" data-lit={streak.lit} />
+            <StreakFlame size={streak.lit ? 30 : 22} className="stat-flame" lit={streak.lit} />
             <strong>{streak.days}</strong>
             <span>days in a row</span>
           </div>
@@ -181,7 +182,7 @@ export default function Me() {
           {profile.favorites.length === 0 ? "⭐ Pick your 2 favourites" : `⭐ Change favourites (${profile.favoriteChangesLeft} left)`}
         </Link>
       )}
-      {profile && <ShareCard stats={{ name: profile.name, caught: profile.lingosCaught, points: profile.points }} />}
+      {profile && <ShareCard stats={{ name: profile.name, caught: profile.lingosCaught, points: profile.points, caughtIds: me?.catches.filter((c) => c.timesCaught > 0).map((c) => c.lingoId) }} />}
 
       <section className="card settings">
         <div className="setting-row appearance">

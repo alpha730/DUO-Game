@@ -733,8 +733,9 @@ export const OFFICIAL: BrandSet = {
   preloadFonts: hasDin ? [DIN.regular!, DIN.bold!] : [],
   det10: {
     logo: { light: kit("DET 10 logo (green)", "det10", w("det_10_green")), dark: kit("DET 10 logo (white)", "det10", w("det_10_white")) },
-    lockupH: { light: kit("DET 10 lockup horizontal (green)", "det10", /lockup_h/i, any("green", "black")), dark: kit("DET 10 lockup horizontal (white)", "det10", /lockup_h/i, /white/i) },
-    lockupV: { light: kit("DET 10 lockup vertical (green)", "det10", /lockup_v/i, any("green", "black")), dark: kit("DET 10 lockup vertical (white)", "det10", /lockup_v/i, /white/i) },
+    // Green is DET's primary logo colour (light theme); white on dark / green backgrounds.
+    lockupH: { light: kit("DET 10 lockup horizontal (green)", "det10", /lockup_h/i, /green/i), dark: kit("DET 10 lockup horizontal (white)", "det10", /lockup_h/i, /white/i) },
+    lockupV: { light: kit("DET 10 lockup vertical (green)", "det10", /lockup_v/i, /green/i), dark: kit("DET 10 lockup vertical (white)", "det10", /lockup_v/i, /white/i) },
     pattern: { light: kit("DET 10 pattern tile (light)", "det10", /pattern_tile_light/i), dark: kit("DET 10 pattern tile (dark)", "det10", /pattern_tile_dark/i) },
     seal: kit("DET 10 seal", "det10", /det_10_seal/i),
     icons: {

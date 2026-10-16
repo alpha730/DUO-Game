@@ -43,7 +43,7 @@ for (const width of [375, 320]) {
       ok(a.jecrc.length === 1 && a.jecrc[0] === expect && a.loaded, `${tag} ${name}: shows ${expect} (${a.jecrc.join(",") || "none"})`);
       ok(!a.text, `${tag} ${name}: no "JECRC" text fallback`);
       ok(a.divider === divider, `${tag} ${name}: divider ${divider ? "shown" : "hidden"}`);
-      ok(a.detSrc.includes(scheme === "dark" ? "white" : "green") || a.detSrc.includes("black"), `${tag} ${name}: DET 10 lockup for the ${scheme} theme (${a.detSrc})`);
+      ok(a.detSrc.includes(scheme === "dark" ? "white" : "green"), `${tag} ${name}: DET 10 lockup ${scheme === "dark" ? "white" : "green"} for the ${scheme} theme (${a.detSrc})`);
       const ratio = a.jecrcH / (a.detH || 1);
       ok(ratio > 1.2 && ratio < 1.7, `${tag} ${name}: heights matched (JECRC ${a.jecrcH.toFixed(0)} / DET ${a.detH.toFixed(0)} px)`);
       ok(a.inside && a.overflowX <= 0, `${tag} ${name}: fits the screen (no sideways scroll)`);

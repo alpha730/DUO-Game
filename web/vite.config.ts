@@ -41,6 +41,10 @@ async function brandHtml(preconnect: string[]): Promise<Plugin> {
   const { BRAND } = await import("./src/config/brand");
   const { brandCss, themeBootScript, themeColorMetas } = await import("./src/config/applyBrand");
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  /** Light + dark versions of a kit image for the splash (the theme CSS shows one). */
+  const themed = (art: { light: string | null; dark: string | null }, alt: string, height: number) =>
+    `<img class="themed-light" src="${esc(art.light ?? art.dark!)}" alt="${esc(alt)}" height="${height}" style="height:${height}px;width:auto" />` +
+    `<img class="themed-dark" src="${esc(art.dark ?? art.light!)}" alt="" height="${height}" style="height:${height}px;width:auto" />`;
   return {
     name: "brand-html",
     transformIndexHtml: {
@@ -88,13 +92,18 @@ async function brandHtml(preconnect: string[]): Promise<Plugin> {
               (BRAND.coBrandLockup
                 ? `<img src="${esc(BRAND.coBrandLockup)}" alt="${esc(BRAND.coBrandText)}" height="48" />`
                 : BRAND.det10.lockupH.light || BRAND.det10.lockupH.dark
-                  ? // DET 10 horizontal lockup (green on light, white on dark) + divider + × + "JECRC" in Feather Bold.
-                    `<span style="display:flex;align-items:center;gap:10px">` +
-                    `<img class="themed-light" src="${esc(BRAND.det10.lockupH.light ?? BRAND.det10.lockupH.dark!)}" alt="${esc(BRAND.partnerName)} · 10 years" height="28" />` +
-                    `<img class="themed-dark" src="${esc(BRAND.det10.lockupH.dark ?? BRAND.det10.lockupH.light!)}" alt="" height="28" />` +
-                    `<span style="width:1.5px;height:24px;background:var(--border)"></span>` +
+                  ? // Same as CoBrand (full): DET 10 horizontal lockup (green on light, white on dark) | divider |
+                    // × | the JECRC logo (colour on light, its white knockout on dark; the shield under
+                    // 360 px), or "JECRC" in Feather Bold without the files.
+                    `<span style="display:flex;align-items:center;gap:12px">` +
+                    themed(BRAND.det10.lockupH, `${BRAND.partnerName} · 10 years`, 26) +
+                    `<span class="lockup-divider" style="width:1.5px;height:36px;background:var(--border)"></span>` +
                     `<span style="color:var(--muted)">×</span>` +
-                    `<span style="font-family:var(--font-headline);font-weight:800;font-size:1.3rem">JECRC</span></span>`
+                    (BRAND.jecrcLogo.light || BRAND.jecrcLogo.dark
+                      ? `<span class="lockup-jecrc-full">${themed(BRAND.jecrcLogo, "JECRC University", 40)}</span>` +
+                        (BRAND.jecrcMark.light || BRAND.jecrcMark.dark ? `<span class="lockup-jecrc-small">${themed(BRAND.jecrcMark, "JECRC University", 34)}</span>` : "")
+                      : `<span style="font-family:var(--font-headline);font-weight:800;font-size:1.3rem">JECRC</span>`) +
+                    `</span>`
                   : `<span style="font-family:var(--font-display);font-weight:700">${esc(BRAND.coBrandText)}</span>`) +
               `<strong style="font-size:2.5rem;line-height:1.05;letter-spacing:-0.02em;font-family:var(--font-headline);font-weight:800">${esc(BRAND.appName)}</strong>` +
               `<span>${esc(BRAND.campaignName)}</span></span></div></div>`,

@@ -76,8 +76,13 @@ const token = await (await import("../lib.mjs")).idTokenFor(email, "secret123");
 const started = await callFn("startAttempt", { lingoId: "lingo-2018", ...FOUNDATION }, token);
 ok(started.ok, "attempt started (app then 'killed')");
 await page.goto(BASE + "/home");
-await page.waitForTimeout(2500);
-const a = (await adb.doc(`attempts/${started.data.attemptId}`).get()).data();
+// Poll (the emulator sometimes takes ~3 s per call) instead of a fixed wait.
+let a;
+for (let i = 0; i < 30; i++) {
+  a = (await adb.doc(`attempts/${started.data.attemptId}`).get()).data();
+  if (a.status !== "open") break;
+  await page.waitForTimeout(500);
+}
 ok(a.status === "forfeit", `reopening the app auto-forfeits it (${a.status})`);
 ok((await user(uid)).openAttemptId == null, "no open attempt left on the user");
 await finish(browser, errors);

@@ -142,15 +142,17 @@ export async function drawShareCard(canvas: HTMLCanvasElement, s: ShareStats): P
 
   text(`${fmt(s.points)} pts`, 1530, 120, c.gold, 900);
   text(s.name, 1640, 52, c.text, 600);
-  // DET × JECRC lockup: the white DET 10 horizontal lockup + divider + × + JECRC (logo or Feather).
+  // DET × JECRC lockup: the white DET 10 horizontal lockup | divider | × | the JECRC white knockout
+  // logo (never recoloured; 1.55× the DET height to match it by eye), or "JECRC" in Feather.
   const det = await loadImage(BRAND.det10.lockupH.dark ?? "");
   const jecrcLogo = BRAND.jecrcLogo.dark ? await loadImage(BRAND.jecrcLogo.dark) : null;
   if (det && (det.naturalWidth || 0) > 0) {
     safely("lockup", () => {
       const h = 64;
+      const jH = Math.round(h * 1.55);
       const detW = (det.naturalWidth / (det.naturalHeight || 1)) * h;
       ctx.font = `800 64px ${BRAND.headlineFontFamily}`;
-      const jW = jecrcLogo ? (jecrcLogo.naturalWidth / (jecrcLogo.naturalHeight || 1)) * h : ctx.measureText("JECRC").width;
+      const jW = jecrcLogo ? (jecrcLogo.naturalWidth / (jecrcLogo.naturalHeight || 1)) * jH : ctx.measureText("JECRC").width;
       const gap = 28;
       const xW = 40;
       let x = (SHARE_W - (detW + gap + 3 + gap + xW + gap + jW)) / 2;
@@ -158,14 +160,14 @@ export async function drawShareCard(canvas: HTMLCanvasElement, s: ShareStats): P
       ctx.drawImage(det, x, y, detW, h);
       x += detW + gap;
       ctx.fillStyle = c.border;
-      ctx.fillRect(x, y + 4, 3, h - 8);
+      ctx.fillRect(x, y - (jH - h) / 2 + 6, 3, jH - 12);
       x += 3 + gap;
       ctx.fillStyle = c.muted;
       ctx.font = `400 48px ${font}`;
       ctx.textAlign = "left";
       ctx.fillText("×", x, y + 48);
       x += xW + gap;
-      if (jecrcLogo) ctx.drawImage(jecrcLogo, x, y, jW, h);
+      if (jecrcLogo) ctx.drawImage(jecrcLogo, x, y - (jH - h) / 2, jW, jH);
       else {
         ctx.fillStyle = c.text;
         ctx.font = `800 64px ${BRAND.headlineFontFamily}`;

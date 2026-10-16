@@ -40,6 +40,9 @@ export function brandCss(brand: BrandSet): string {
     `.themed-dark{display:none!important}` +
     `@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .themed-light{display:none!important}:root:not([data-theme="light"]) .themed-dark{display:revert!important}}` +
     `:root[data-theme="dark"] .themed-light{display:none!important}:root[data-theme="dark"] .themed-dark{display:revert!important}` +
+    // DET × JECRC lockup (CoBrand + the splash): the full JECRC logo, its shield alone under 360 px.
+    `.lockup-jecrc-full,.lockup-jecrc-small{display:inline-flex;align-items:center}.lockup-jecrc-small{display:none}` +
+    `@media (max-width:359px){.lockup-jecrc-full{display:none}.lockup-jecrc-small{display:inline-flex}}` +
     // Pattern tiles: subtle (the tiles carry their own green ground), never behind question text.
     `.pattern-bg{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.14;background:var(--pattern-light) center/360px repeat}` +
     `@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pattern-bg{background-image:var(--pattern-dark);opacity:.22}}` +

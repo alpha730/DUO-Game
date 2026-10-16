@@ -94,7 +94,10 @@ for (const [width, scheme] of [[375, "light"], [375, "dark"], [320, "light"]]) {
   // --- Home: favourite cards + Dex strip + streak flame Duo.
   await page.goto(BASE + "/home");
   await page.locator(".fav-card .lingo-pose img").first().waitFor({ timeout: 20000 });
-  ok((await page.locator(".fav-card[data-lingo=lingo-2019] .lingo-pose").getAttribute("data-level")) === "MAX", `${tag}: Home favourite card has the MAX look`);
+  await page.locator(".fav-card[data-lingo=lingo-2019] .lingo-pose[data-level=MAX]").waitFor({ timeout: 15000 }).then(
+    () => ok(true, `${tag}: Home favourite card has the MAX look`),
+    () => ok(false, `${tag}: Home favourite card has the MAX look`),
+  );
   ok((await page.locator(".lingo-slot .lingo-pose").count()) === 10 && (await page.locator(".critter").count()) === 0, `${tag}: Home Dex strip — 10 poses, no critter`);
   ok((await page.locator(".hud-flame img.streak-duo").getAttribute("src"))?.includes("Duo_streak_04"), `${tag}: HUD streak flame = Duo_streak_04`);
   await page.waitForTimeout(900); // entrance animations

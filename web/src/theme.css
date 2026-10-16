@@ -3864,30 +3864,36 @@ body:has(.catch[data-phase="submitting"]) {
 }
 
 /* ---------- DET × JECRC lockup (components/CoBrand.tsx) ---------- */
+/* The two official logos side by side with clear space (≥ 12 px) around each. Heights are matched
+   by eye, not by box: the JECRC logo (shield + 4 lines) needs ~1.55× the DET 10 lockup's height to
+   carry the same weight; the shield alone ~1.3×. */
 .lockup {
+  --det-h: 26px;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   min-width: 0;
   max-width: 100%;
+  padding: 4px 0;
   color: var(--text);
+}
+
+.lockup[data-variant="compact"] {
+  --det-h: 22px;
+  gap: 10px;
 }
 
 .lockup-det {
   display: block;
-  height: 26px;
+  height: var(--det-h);
   width: auto;
   max-width: 62vw;
-}
-
-.lockup[data-variant="compact"] .lockup-det {
-  height: 22px;
 }
 
 .lockup-x {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   font-family: var(--font-display);
   font-weight: 400;
   font-size: 1.05rem;
@@ -3896,11 +3902,23 @@ body:has(.catch[data-phase="submitting"]) {
 
 .lockup-divider {
   width: 1.5px;
-  height: 24px;
+  height: calc(var(--det-h) * 1.4);
   background: var(--border);
 }
 
-/* "JECRC" in Feather Bold (names keep their capitals). */
+.lockup-jecrc-logo {
+  display: block;
+  height: calc(var(--det-h) * 1.55);
+  width: auto;
+}
+
+.lockup-jecrc-mark {
+  display: block;
+  height: calc(var(--det-h) * 1.3);
+  width: auto;
+}
+
+/* Fallback when no JECRC files: "JECRC" in Feather Bold (names keep their capitals). */
 .lockup-jecrc {
   font-family: var(--font-headline);
   font-weight: 800;
@@ -3914,36 +3932,10 @@ body:has(.catch[data-phase="submitting"]) {
   font-size: 1.1rem;
 }
 
-.lockup-jecrc-img {
-  height: 26px;
-  width: auto;
-}
-
-.lockup[data-white] {
-  color: var(--det-snow);
-}
-
+.lockup[data-white],
 .lockup[data-white] .lockup-jecrc,
 .lockup[data-white] .lockup-x {
   color: var(--det-snow);
-}
-
-/* Stacked (Login): DET 10 stacked lockup above "× JECRC". */
-.lockup[data-variant="stacked"] {
-  flex-direction: column;
-  gap: 6px;
-}
-
-.lockup[data-variant="stacked"] .lockup-det {
-  height: 84px;
-}
-
-.lockup[data-variant="stacked"] .lockup-divider {
-  display: none;
-}
-
-.lockup[data-variant="stacked"] .lockup-x {
-  gap: 8px;
 }
 
 .login-lockup {
@@ -3960,21 +3952,22 @@ body:has(.catch[data-phase="submitting"]) {
   max-width: 100%;
 }
 
-@media (max-width: 340px) {
-  .lockup-det {
-    height: 22px;
+@media (max-width: 359px) {
+  .lockup {
+    --det-h: 22px;
+    gap: 10px;
   }
 
-  .lockup[data-variant="compact"] .lockup-det {
-    height: 19px;
+  .lockup[data-variant="compact"] {
+    --det-h: 19px;
+  }
+
+  .lockup-x {
+    gap: 10px;
   }
 
   .lockup-jecrc {
     font-size: 1.1rem;
-  }
-
-  .lockup-x {
-    gap: 7px;
   }
 }
 
@@ -4222,4 +4215,10 @@ body:has(.catch[data-phase="submitting"]) {
 .hud-flame .streak-duo[data-lit="true"] {
   animation: flicker 1.6s ease-in-out infinite;
   transform-origin: 50% 90%;
+}
+
+/* About: the full lockup on its own line under the close button (clear space around both logos). */
+.about-sheet > .lockup {
+  align-self: center;
+  margin-top: 46px;
 }

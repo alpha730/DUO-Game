@@ -206,8 +206,11 @@ export interface BrandSet {
     /** Icons: full style in the light theme, mono in dark. */
     icons: Record<Det10Icon, Themed>;
   };
-  /** JECRC's own logo (assets/brand/jecrc/), else "JECRC" set in Feather Bold. */
+  /** JECRC's full logo (assets/brand/jecrc/): colour on light, the supplied white knockout on dark /
+   *  green / the share card; else "JECRC" set in Feather Bold. Never recoloured. */
   jecrcLogo: Themed;
+  /** JECRC shield only (compact lockups and screens under 360 px). */
+  jecrcMark: Themed;
   /** App icon / favicon (the green DET emblem). */
   appIcon: string | null;
   /** DET hero illustrations (Login, About, empty states, "Get ready for the real DET"). */
@@ -583,6 +586,7 @@ export const PLACEHOLDER: BrandSet = {
     },
   },
   jecrcLogo: { light: null, dark: null },
+  jecrcMark: { light: null, dark: null },
   appIcon: null,
   heroes: { beaComputerDuo: null, duoInstitutions: null, beaCertificateDuo: null, linComputer: null, zariCertified: null, beaDuoSurfing: null, duoSeal: null },
   uiIcons: { test: null, practice: null, rules: null, overview: null, testSetup: null, cart: null, search: null, id: null, mail: null, microscope: null },
@@ -743,7 +747,8 @@ export const OFFICIAL: BrandSet = {
       key: { light: kit("DET 10 icon key (full)", "det10", /icon_full_key/i) ?? kit("DET 10 icon key (1c)", "det10", /icon_1c_key/i), dark: kit("DET 10 icon key (mono)", "det10", /icon_mono_key/i) },
     },
   },
-  jecrcLogo: { light: kit("JECRC logo", "jecrc", any("color", "colour", "dark", "black", "logo")), dark: kit("JECRC logo (white)", "jecrc", any("white", "light", "reverse")) },
+  jecrcLogo: { light: kit("JECRC logo (colour)", "jecrc", /^jecrc-logo\.(svg|png)$/i), dark: kit("JECRC logo (white)", "jecrc", /^jecrc-logo-white\.(svg|png)$/i) },
+  jecrcMark: { light: kit("JECRC mark (colour)", "jecrc", /^jecrc-mark\.(svg|png)$/i), dark: kit("JECRC mark (white)", "jecrc", /^jecrc-mark-white\.(svg|png)$/i) },
   appIcon: kit("app icon (green DET emblem)", "logos", /GreenEmblem/i),
   heroes: {
     beaComputerDuo: kit("hero BeaComputerDuo", "hero", /bea_?computer_?duo/i),

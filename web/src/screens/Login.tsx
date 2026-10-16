@@ -68,7 +68,7 @@ export default function Login() {
     <main className="screen login has-pattern">
       <PatternBg />
       <header className="login-lockup">
-        <CoBrand variant="stacked" />
+        <CoBrand />
       </header>
       <section className="login-hero">
         <div className="login-hero-text">

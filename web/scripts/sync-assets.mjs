@@ -56,19 +56,33 @@ const brandCopied = [];
 let svgSaved = 0;
 const DO_NOT_USE = /china|japan|red[\s_-]?bull|operating[\s_-]?principles|universit/i;
 const SHIPPED = /\.(svg|png|webp|jpg|jpeg|glb|mp3|ogg|wav|m4a|woff2?)$/i;
-function copyDir(rel) {
+/** A PNG resampled to `height` px tall (resvg draws it as an <image>; colours untouched). */
+async function downscalePng(file, height) {
+  const { Resvg } = await import("@resvg/resvg-js");
+  const buf = readFileSync(file);
+  const w = buf.readUInt32BE(16); // PNG IHDR width / height
+  const h = buf.readUInt32BE(20);
+  if (h <= height) return buf;
+  const width = Math.round((w / h) * height);
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${width}" height="${height}">` +
+    `<image width="${width}" height="${height}" xlink:href="data:image/png;base64,${buf.toString("base64")}"/></svg>`;
+  return new Resvg(svg).render().asPng();
+}
+
+async function copyDir(rel) {
   const dir = join(brandSrc, rel);
   for (const f of existsSync(dir) ? readdirSync(dir).filter((x) => !x.startsWith(".")) : []) {
     const from = join(dir, f);
     if (statSync(from).isDirectory()) {
-      copyDir(join(rel, f));
+      await copyDir(join(rel, f));
       continue;
     }
     if (DO_NOT_USE.test(join(rel, f))) {
       console.warn(`! brand: not shipped (do-not-use list): ${rel}/${f}`);
       continue;
     }
-    if (!SHIPPED.test(f)) continue;
+    if (!SHIPPED.test(f) || /-original\./i.test(f)) continue; // originals are kept in the repo, not shipped
     mkdirSync(join(brandDest, rel), { recursive: true });
     if (/\.svg$/i.test(f)) {
       // svgo, conservatively: colours and <style> blocks are left alone (some kit SVGs use
@@ -88,13 +102,17 @@ function copyDir(rel) {
       const stretched = /scallop/i.test(f) && !/preserveAspectRatio/.test(out) ? out.replace(/<svg\b/, '<svg preserveAspectRatio="none"') : out;
       writeFileSync(join(brandDest, rel, f), stretched);
       svgSaved += svg.length - out.length;
+    } else if (/^jecrc/i.test(rel) && /\.png$/i.test(f)) {
+      // JECRC logos arrive as large PNGs (up to 700 KB): ship a 144 px tall copy (3× the biggest
+      // on-screen size), resampled only — never recoloured.
+      writeFileSync(join(brandDest, rel, f), await downscalePng(from, 144));
     } else {
       cpSync(from, join(brandDest, rel, f));
     }
     brandCopied.push(`${rel.replace(/\\/g, "/")}/${f}`);
   }
 }
-for (const d of ["logos", "mascots", "models", "det10", "hero", "ui-icons", "emblems", "sounds", "jecrc"]) copyDir(d);
+for (const d of ["logos", "mascots", "models", "det10", "hero", "ui-icons", "emblems", "sounds", "jecrc"]) await copyDir(d);
 // Fonts: the kit's OTF/TTF → Latin-subset WOFF2 (scripts/brand-fonts.py, needs Python + fontTools).
 if (existsSync(join(brandSrc, "fonts")) && readdirSync(join(brandSrc, "fonts")).some((f) => /\.(otf|ttf|woff2?)$/i.test(f))) {
   const py = spawnSync(process.platform === "win32" ? "python" : "python3", [join(here, "brand-fonts.py")], { stdio: "inherit" });

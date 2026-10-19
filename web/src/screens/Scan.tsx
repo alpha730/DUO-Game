@@ -1,7 +1,7 @@
 import { BRAND, lingoName } from "../config/brand";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { LINGO_COUNT, type GetMyStateOutput } from "@shared/types";
+import { LINGO_COUNT, type GetMyStateOutput, type Level } from "@shared/types";
 import { CameraError } from "../ar/cameraError";
 import type { Scanner } from "../ar/scanner";
 import { loadTargets } from "../ar/targets";
@@ -28,6 +28,11 @@ const IN_APP = inAppBrowser();
 const STANDEE = BRAND.arMode === "standee";
 /** Standee texture for poster i: the 1024 px PNG made at build, else the pose itself. */
 const standeeUrl = (lingoId: string) => BRAND.lingoStandee[lingoId] ?? BRAND.lingoArt[lingoId] ?? null;
+/** /ar-test?level=1|2|3|MAX previews a level look on every standee (no sign-in needed). */
+const testLevel = (): Level | null => {
+  const v = new URLSearchParams(window.location.search).get("level")?.toUpperCase();
+  return v === "MAX" ? "MAX" : v === "1" || v === "2" || v === "3" ? (Number(v) as Level) : null;
+};
 // E2E tests on the emulators only: a fake scanner driven by window.__posterFound(i) (ar/fakeScanner.ts).
 const FAKE_SCANNER = usingEmulators && (window as { __FAKE_SCANNER?: boolean }).__FAKE_SCANNER === true;
 
@@ -39,6 +44,7 @@ const FAKE_SCANNER = usingEmulators && (window as { __FAKE_SCANNER?: boolean }).
 export default function Scan({ testMode = false }: { testMode?: boolean }) {
   const container = useRef<HTMLDivElement>(null);
   const marker = useRef<HTMLDivElement>(null); // the scan ring; follows the tracked poster
+  const scannerRef = useRef<Scanner | null>(null); // for the standee level look
   const { profile } = useAuth();
   const [found, setFound] = useState(0); // bumps on every "poster found" (restarts the sparkle burst)
   const [status, setStatus] = useState<Status>("starting");
@@ -164,6 +170,7 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
         },
       }, { marker: marker.current });
       scanner = s;
+      scannerRef.current = s;
       await s.start();
       if (!cancelled) setStatus("scanning");
     })().catch((err: unknown) => {
@@ -184,6 +191,7 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
     return () => {
       cancelled = true;
       scanner?.stop();
+      scannerRef.current = null;
     };
   }, [blocked, run]);
 
@@ -198,6 +206,13 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
     if (!tracking && marker.current) marker.current.style.transform = "";
   }, [tracking]);
   const caught = lingo ? me?.catches.find((c) => c.lingoId === lingo.id && c.timesCaught > 0) : undefined;
+  // Standee level look (Lv 1 plain … MAX gold scallop). Re-applied when the art arrives and after a
+  // catch levels the Lingo up (getMyState refresh) — a higher level plays the burst.
+  const standeeLevel: Level | null = testMode ? testLevel() : (caught?.level ?? null);
+  const posterInView = lingo?.posterIndex ?? (testMode ? bareposter : null);
+  useEffect(() => {
+    if (posterInView !== null) scannerRef.current?.setStandeeLevel(posterInView, standeeLevel);
+  }, [posterInView, standeeLevel, modelReady]);
 
   return (
     <main className="ar-screen no-nav" data-tracking={tracking}>

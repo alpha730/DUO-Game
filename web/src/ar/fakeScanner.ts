@@ -29,5 +29,6 @@ export function createScanner(
     },
     setModel() {},
     async setStandee() {},
+    setStandeeLevel() {},
   };
 }

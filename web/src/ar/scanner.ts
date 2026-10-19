@@ -3,6 +3,7 @@
 // DECISION: three is pinned to 0.151.3 — mind-ar 1.2.5 imports `sRGBEncoding`, removed in three r152.
 import { MindARThree, type MindARAnchor } from "mind-ar/dist/mindar-image-three.prod.js";
 import { Clock, DirectionalLight, HemisphereLight, Texture, Vector3, type Mesh, type Object3D } from "three";
+import type { Level } from "@shared/types";
 import { withCameraErrors } from "./cameraError";
 import { createStandee, loadStandeeTexture, type Standee } from "./standee";
 
@@ -27,6 +28,8 @@ export interface Scanner {
   setModel(posterIndex: number, model: Object3D): void;
   /** Places the Lingo's 2D art as a paper standee on the poster (official brand). Resolves when shown. */
   setStandee(posterIndex: number, textureUrl: string): Promise<void>;
+  /** The player's level for that poster's Lingo (null = not caught): changes the standee's look. */
+  setStandeeLevel(posterIndex: number, level: Level | null): void;
 }
 
 // MindAR binds window "resize" to this.resize in its constructor and never removes it; after a failed
@@ -84,6 +87,7 @@ export function createScanner(
   const anchors = new Map<number, MindARAnchor>();
   const models = new Map<number, Object3D>();
   const standees = new Map<number, Standee>();
+  const levels = new Map<number, Level | null>(); // set before or after the standee exists
   const popAt = new Map<number, number>(); // posterIndex → performance.now() when its pop-in started
   for (const i of posterIndexes) {
     const anchor = mindar.addAnchor(i);
@@ -227,10 +231,16 @@ export function createScanner(
       if (!anchor || standees.has(i)) return;
       const texture = await loadStandeeTexture(url);
       if (stopped || standees.has(i)) return;
-      const standee = createStandee(texture);
+      const standee = createStandee(texture, i);
+      if (levels.has(i)) standee.setLevel(levels.get(i) ?? null, performance.now()); // no burst: first look
       anchor.group.add(standee.object);
       standees.set(i, standee);
       standee.pop(performance.now()); // the art just arrived (it may have loaded after the poster was found)
+    },
+    setStandeeLevel(i, level) {
+      if (levels.has(i) && levels.get(i) === level) return;
+      levels.set(i, level);
+      standees.get(i)?.setLevel(level, performance.now());
     },
   };
 }

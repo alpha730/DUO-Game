@@ -171,7 +171,7 @@ The catch challenge is a DET practice-test question: task name (Choose the Meani
 - targets.mind ships gzipped (`targets.mind.gz`, unpacked in the browser; raw fallback) and, with the .glb models, is kept in Cache Storage after the first download (`web/src/lib/assetCache.ts`). Only `?v=<hash>` URLs are cached; a new hash downloads once and replaces the old version.
 
 ## 9. Content — the question pool
-- `scripts/content/question-pool-2026.json` (456 questions; review copy `docs/Decade_Hunt_Question_Pool.xlsx`), loaded with `scripts/loadQuestions.ts` (emulator, or `--prod --project <id>`) or uploaded on `/admin`. Validated first (unique ids, level, type, 4 different options, correctIndex 0–3, explanation); all-or-nothing; the upload replaces the pool. `challenges-2026.json` (the old date × Lingo set) stays in the repo as an archive and is not loaded.
+- `scripts/content/question-pool-2026.json` (456 questions; review copy `docs/Decade_Hunt_Question_Pool.xlsx`), loaded with `scripts/loadQuestions.ts` (emulator, or `--prod --project <id>`) or uploaded on `/admin`. Validated first (unique ids, level, type, 4 different options, correctIndex 0–3, explanation); all-or-nothing; the upload replaces the pool. The old easy date × Lingo set (`challenges-2026.json`) was removed; `scripts/removeOldChallenges.ts` deletes its leftover `challenges/{date}_{lingoId}` docs from a database that still has them (raid challenges are kept).
 - Item: `{id, level:'medium'|'hard', type:'meaning'|'question'|'pronounce', word?, prompt?, target?, options?, correctIndex?, explanation}`.
   - meaning: "What is the closest meaning of “<word>”?" + 4 options
   - question: fill-in-the-blank `prompt` + 4 options (`target` = the answer word)

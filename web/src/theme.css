@@ -4621,3 +4621,29 @@ body:has(.catch[data-phase="submitting"]) {
   grid-column: 1 / -1;
   margin: 0;
 }
+
+/* Login: the one-day event's round times (public/event), before sign-in. */
+.login-rounds {
+  list-style: none;
+  margin: 4px 0 8px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.login-rounds li {
+  display: grid;
+  padding: 6px 10px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 0.8rem;
+  line-height: 1.25;
+}
+.login-rounds li span {
+  color: var(--muted);
+}
+.login-rounds li strong {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+}

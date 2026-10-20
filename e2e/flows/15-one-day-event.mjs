@@ -19,6 +19,8 @@ const FAV = [
 
 const configRef = adb.doc("config/game");
 const configBefore = (await configRef.get()).data();
+const publicRef = adb.doc("public/event");
+const publicBefore = (await publicRef.get()).data();
 const { browser, page, errors } = await launch();
 let p = null; // the player — removed at the end (a qualified player would top other flows' Top 20)
 
@@ -33,6 +35,28 @@ try {
   ok(/Round 3: 11:00–11:20/.test(out) && /Written/.test(out), `oneDayEvent.ts wrote 3 rounds (${out.split("\n").filter(Boolean).slice(1, 4).join(" / ")})`);
   const cfg = (await configRef.get()).data();
   ok(cfg.rounds?.length === 3 && cfg.rules.favoritesCount === 2 && cfg.rules.favoriteChanges === 0 && cfg.rules.favMaxStreak === 3, "config/game: 3 rounds + one-day rules (2 favourites, no changes, MAX at 3)");
+  const pub = (await publicRef.get()).data();
+  ok(pub?.date === DATE && pub.rounds?.length === 3 && pub.rounds[0].startAt.toMillis() === at("10:00") && Object.keys(pub).sort().join() === "date,rounds", "public/event: { date, rounds } only (no rules or other game data)");
+
+  // --- Signed out: the login screen and Rules show the round times (public/event).
+  {
+    const anon = await launch();
+    await anon.page.goto(BASE + "/");
+    const list = anon.page.locator("[data-login-rounds]");
+    const shown = await list.waitFor({ timeout: 20000 }).then(() => true, () => false);
+    const text = shown ? (await list.innerText()).replace(/\s+/g, " ") : "";
+    ok(/Round 1 10:00–10:20/.test(text) && /Round 2 10:30–10:50/.test(text) && /Round 3 11:00–11:20/.test(text), `signed out: login shows the rounds ("${text}")`);
+    ok((await anon.page.locator(".ticks").innerText()).includes("3 rounds on"), "signed out: login says 3 rounds on the day");
+    await shot(anon.page, "15-login-rounds");
+    await anon.page.goto(BASE + "/rules");
+    const sec = anon.page.locator("[data-rules-section=rounds]");
+    const rt = (await sec.waitFor({ timeout: 20000 }).then(() => sec.innerText(), () => "")).replace(/\s+/g, " ");
+    ok(/Round 1 10:00 – 10:20/.test(rt) && /Round 3 11:00 – 11:20/.test(rt), `signed out: Rules shows the rounds (${rt.slice(0, 60)}…)`);
+    ok((await anon.page.locator("[data-rules-section=daily]").count()) === 0 && (await anon.page.locator("[data-rules-section=favourites]").innerText()).includes("MAX"), "signed out: Rules uses the one-day tables");
+    await shot(anon.page, "15-rules-signed-out", { fullPage: true });
+    errors.push(...anon.errors);
+    await anon.browser.close();
+  }
 
   await pinQuestions();
   p = await makeUser({ name: "Round Runner" });
@@ -98,6 +122,7 @@ try {
   const before = (await adb.doc(`users/${p.uid}`).get()).data();
   await page.goto(BASE + `/catch/${FAV[0].id}`);
   await page.getByRole("button", { name: "Start" }).waitFor({ timeout: 25000 });
+  await page.waitForFunction(() => /Lingos left/.test(document.querySelector(".catch-head")?.textContent ?? ""), null, { timeout: 15000 }).catch(() => {});
   const head = (await page.locator(".catch-head").innerText()).replace(/\s+/g, " ");
   ok(head.includes("Lingos left this round: 4/4"), `wording: Catch header "${head}"`);
   await page.getByRole("button", { name: "Start" }).click();
@@ -200,11 +225,14 @@ try {
 } finally {
   await resetServerClock();
   if (configBefore) await configRef.set(configBefore); // back to the multi-day game for the other flows
+  if (publicBefore) await publicRef.set(publicBefore);
+  else await publicRef.delete();
   if (p) {
     const catches = await adb.collection(`users/${p.uid}/catches`).get();
     await Promise.all([...catches.docs.map((d) => d.ref.delete()), adb.doc(`users/${p.uid}`).delete()]);
   }
 }
 ok(!(await configRef.get()).data().rounds, "config/game restored (no rounds)");
+ok(!(await publicRef.get()).exists || !!publicBefore, "public/event removed again (the multi-day game shows no rounds)");
 ok(!p || !(await adb.doc(`users/${p.uid}`).get()).exists, "the flow's player is removed (no leftover for other flows)");
 await finish(browser, errors);

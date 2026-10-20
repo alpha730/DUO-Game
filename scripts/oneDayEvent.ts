@@ -1,14 +1,15 @@
 // Turns the game into the ONE-DAY EVENT (Oct 22): 3 rounds, per-round tries and streaks, 3 levels
 // (Lv 1 → Lv 2 → MAX), 2 favourites with no swaps, favourites to MAX rank right after points.
 // Writes config/game: rounds, startAt (= round 1 start), lockAt (= last round end), locked = false and
-// rules = current rules + ONE_DAY_RULES (shared/types.ts). Nothing else is touched.
+// rules = current rules + ONE_DAY_RULES (shared/types.ts); and public/event = { date, rounds }, which
+// anyone can read (the login screen + Rules show the times before sign-in). Nothing else is touched.
 //   Emulator (default):  npx tsx scripts/oneDayEvent.ts
 //   Production:          GOOGLE_APPLICATION_CREDENTIALS=key.json npx tsx scripts/oneDayEvent.ts --prod --project <id>
 //   Options:             --date 2026-10-22   --rounds 10:00-11:30,12:30-14:00,15:00-16:00   --dry-run
 // Times are IST. Re-run it to change the times.
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
-import { COL, DEFAULT_RULES, DOC, ONE_DAY_RULES, type GameConfigDoc } from "../shared/types";
+import { COL, DEFAULT_RULES, DOC, ONE_DAY_RULES, type GameConfigDoc, type PublicEventDoc } from "../shared/types";
 
 const args = process.argv.slice(2);
 const opt = (name: string, fallback: string) => {
@@ -54,11 +55,14 @@ if (dry) {
   console.log("Dry run — nothing written.");
   process.exit(0);
 }
+const roundDocs = rounds.map((r) => ({ startAt: Timestamp.fromMillis(r.startAt), endAt: Timestamp.fromMillis(r.endAt) }));
+const publicEvent: Omit<PublicEventDoc, "rounds"> & { rounds: typeof roundDocs } = { date, rounds: roundDocs };
+await db.collection(COL.public).doc(DOC.publicEvent).set(publicEvent);
 await ref.update({
-  rounds: rounds.map((r) => ({ startAt: Timestamp.fromMillis(r.startAt), endAt: Timestamp.fromMillis(r.endAt) })),
+  rounds: roundDocs,
   startAt: Timestamp.fromMillis(rounds[0].startAt),
   lockAt: Timestamp.fromMillis(rounds.at(-1)!.endAt),
   locked: false,
   rules,
 });
-console.log("Written — the game uses it straight away.");
+console.log("Written (config/game + public/event) — the game uses it straight away.");

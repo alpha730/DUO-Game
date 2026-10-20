@@ -6,7 +6,7 @@ import {
   signInWithPopup,
   signInWithRedirect,
 } from "firebase/auth";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import CoBrand from "../components/CoBrand";
 import { CheckIcon } from "../components/Icons";
@@ -14,6 +14,8 @@ import { HeroArt, PatternBg } from "../components/BrandArt";
 import { BRAND } from "../config/brand";
 import { authErrorMessage } from "../lib/auth";
 import { auth } from "../lib/firebase";
+import { istTime } from "../lib/period";
+import { eventDay, loadPublicEvent, type PublicEvent } from "../lib/publicEvent";
 
 const IGNORED = new Set(["auth/popup-closed-by-user", "auth/cancelled-popup-request"]);
 
@@ -23,6 +25,15 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  // One-day event: the round times, before sign-in (public/event; null = the multi-day game).
+  const [event, setEvent] = useState<PublicEvent | null>(null);
+  useEffect(() => {
+    let live = true;
+    void loadPublicEvent().then((ev) => live && setEvent(ev));
+    return () => {
+      live = false;
+    };
+  }, []);
 
   async function run(action: () => Promise<unknown>) {
     setBusy(true);
@@ -83,9 +94,22 @@ export default function Login() {
               <CheckIcon /> Catch each {BRAND.creatureName} with a quick English question
             </li>
             <li>
-              <CheckIcon /> Top the leaderboard before the final on Oct 22
+              <CheckIcon />{" "}
+              {event ? `Top the leaderboard — ${event.rounds.length} rounds on ${eventDay(event.date)}` : "Top the leaderboard before the final on Oct 22"}
             </li>
           </ul>
+          {event && (
+            <ol className="login-rounds" aria-label={`Rounds on ${eventDay(event.date)} (IST)`} data-login-rounds>
+              {event.rounds.map((r, i) => (
+                <li key={r.startAt}>
+                  <span>Round {i + 1}</span>
+                  <strong>
+                    {istTime(r.startAt)}–{istTime(r.endAt)}
+                  </strong>
+                </li>
+              ))}
+            </ol>
+          )}
           <Link className="rules-link" to="/rules" data-rules-link>
             Read the game rules →
           </Link>

@@ -31,7 +31,9 @@ const SIGNED_IN_READABLE = [
   "prizes/prize1",
   "final/state",
 ];
-const ALL = [...NEVER_READABLE, ...SIGNED_IN_READABLE, "users/alice", "users/alice/catches/lingo1"];
+/** Anyone, signed in or not: the one-day event's round times (written by scripts/oneDayEvent.ts). */
+const PUBLIC_READABLE = ["public/event"];
+const ALL = [...NEVER_READABLE, ...SIGNED_IN_READABLE, ...PUBLIC_READABLE, "users/alice", "users/alice/catches/lingo1"];
 
 beforeAll(async () => {
   env = await initializeTestEnvironment({
@@ -82,6 +84,24 @@ describe("signed-in readable", () => {
   }
 });
 
+describe("public (one-day event times)", () => {
+  it("public/event: anyone can read it, signed out too", async () => {
+    for (const ctx of [anon(), alice(), admin()]) await assertSucceeds(getDoc(doc(ctx, "public/event")));
+  });
+  it("public/event: nobody writes it from a client (not even an admin claim)", async () => {
+    const event = { date: "2026-10-22", rounds: [{ startAt: 1, endAt: 2 }] };
+    for (const ctx of [anon(), alice(), admin()]) {
+      await assertFails(setDoc(doc(ctx, "public/event"), event));
+      await assertFails(updateDoc(doc(ctx, "public/event"), { date: "2026-10-23" }));
+      await assertFails(deleteDoc(doc(ctx, "public/event")));
+      await assertFails(setDoc(doc(ctx, "public/other"), event));
+    }
+  });
+  it("public is only public/*: config/game stays signed-in only", async () => {
+    await assertFails(getDoc(doc(anon(), "config/game")));
+  });
+});
+
 describe("users", () => {
   it("owner can read own user and catches", async () => {
     await assertSucceeds(getDoc(doc(alice(), "users/alice")));
@@ -109,8 +129,9 @@ describe("read matrix", () => {
   for (const path of ALL) {
     const own = path.startsWith("users/alice");
     const open = SIGNED_IN_READABLE.includes(path);
+    const everyone = PUBLIC_READABLE.includes(path);
     for (const [who, ctx] of Object.entries(WHO)) {
-      const allowed = own ? who === "owner" : open ? who !== "anon" : false;
+      const allowed = everyone || (own ? who === "owner" : open ? who !== "anon" : false);
       it(`${path}: ${who} ${allowed ? "can" : "cannot"} read`, async () => {
         await (allowed ? assertSucceeds : assertFails)(getDoc(doc(ctx(), path)));
       });

@@ -49,6 +49,12 @@ service cloud.firestore {
       allow read: if signedIn();
       allow write: if false;
     }
+    // Anyone, signed in or not: the one-day event's round times (public/event, written by
+    // scripts/oneDayEvent.ts) for the login screen and Rules.
+    match /public/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
 
     // Everything else (attempts, challenges, questions, pointsLog, redemptions, raid players): denied.
   }

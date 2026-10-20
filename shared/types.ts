@@ -49,12 +49,14 @@ export const COL = {
   redemptions: "redemptions",
   final: "final",
   limits: "limits", // per-user rate-limit counters (server-only)
+  public: "public", // readable by anyone, signed in or not (public/event)
 } as const;
 
 export const DOC = {
   gameConfig: "game", // config/game
   studentsBoard: "students", // leaderboard/students
   finalState: "state", // final/state
+  publicEvent: "event", // public/event
 } as const;
 
 /** challenges/{date}_{lingoId} */
@@ -784,4 +786,15 @@ export interface AdminPrizeRow extends PrizeDoc {
 }
 export interface AdminPrizesOutput {
   prizes: AdminPrizeRow[];
+}
+
+/**
+ * public/event — readable by ANYONE (signed out too), written only by scripts/oneDayEvent.ts: the
+ * round times, so the login screen and Rules can show them before anyone signs in. No rules, no
+ * other game data (config/game stays signed-in only).
+ */
+export interface PublicEventDoc {
+  /** IST date of the event, YYYY-MM-DD */
+  date: IstDate;
+  rounds: GameRound[];
 }

@@ -11,7 +11,29 @@ npx tsx scripts/oneDayEvent.ts --prod --project decade-hunt-66f6e --rounds 10:00
 
 (IST times; `--date 2026-10-22` is the default; `--dry-run` shows what it would write.)
 It writes `config/game`: `rounds`, `startAt` = round 1 start, `lockAt` = last round end,
-`locked = false`, and `rules` = current rules + `ONE_DAY_RULES` (shared/types.ts).
+`locked = false`, and `rules` = current rules + `ONE_DAY_RULES` (shared/types.ts); and
+`public/event` = `{ date, rounds }` — readable by anyone (firestore.rules), so the login screen and
+Rules show the round times before sign-in. No client writes it.
+
+Before the event, wipe the players' practice data (staff keep their roles and data):
+
+```
+npx tsx scripts/resetForEvent.ts --prod --project decade-hunt-66f6e          # dry run: counts only
+npx tsx scripts/resetForEvent.ts --prod --project decade-hunt-66f6e --yes    # do it
+```
+
+`--delete-users` also deletes the players' Auth accounts and user docs (they sign up again).
+
+## On the day
+
+- `/stage` (admin, laptop → projector, 16:9): round status + countdown, the live top 10 (every
+  ~30 s; ★★ Fav MAX = qualified, listed first after the lock), Refresh leaderboard, Lock game, and
+  the sudden-death question for a tie at the top (`adminStageQuestion`: a random hard meaning /
+  fill-in-the-blank question, never repeated in the session; the answer only on "Reveal answer").
+- `/redeem` (volunteer or admin, phone): scan the player's prize QR (Me page) or type the code under
+  it → name, points, balance → pick a prize → Confirm (`redeemPrize`).
+- `/admin` → Prizes: add / edit / remove prizes (name, cost, stock), with the number redeemed.
+- `/ar-test` is staff only.
 
 ## Rules
 
@@ -41,5 +63,7 @@ It writes `config/game`: `rounds`, `startAt` = round 1 start, `lockAt` = last ro
 - `lib/rank.ts`: `favMaxCount` ranks right after points; `isQualified` = 2.
 - Web: `getMyState.round` drives the "Round 2 of 3 · until 14:00" line under the HUD and all
   "this round / next round" wording (`web/src/lib/period.ts`); without rounds the old wording stays.
+  `useRoundRefresh` (lib/myState.ts) re-fetches getMyState when the round ends or the next starts
+  (server time), so Home / Scan / Dex / Leaderboard switch by themselves.
 - Looks: Lv 1 = the old Lv 2 look, Lv 2 = the old Lv 3 look, MAX = MAX (2D `LingoArt` and the AR standee).
 - Without `config.rounds` the multi-day game behaves exactly as before (all old tests pass).

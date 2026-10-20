@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { DEFAULT_RULES, type GameConfigDoc, type GameRules } from "@shared/types";
+import { DEFAULT_RULES, ONE_DAY_RULES, type GameConfigDoc, type GameRules } from "@shared/types";
 import { DuoArt } from "../components/BrandArt";
 import CoBrand from "../components/CoBrand";
 import { BRAND } from "../config/brand";
 import { useAuth } from "../lib/auth";
 import { istTime } from "../lib/period";
+import { loadPublicEvent } from "../lib/publicEvent";
 
 type Row = [rule: string, value: React.ReactNode];
 
@@ -30,7 +31,9 @@ function Table({ title, rows, id }: { title: string; rows: Row[]; id: string }) 
 /**
  * Public rules table (SPEC §2) — open to everyone, signed in or not. The numbers come from the game's
  * rules: the defaults, replaced by the live config/game values once the player is signed in (config
- * is only readable when signed in), so the page always matches what the server enforces.
+ * is only readable when signed in), so the page always matches what the server enforces. Signed
+ * out, the one-day event's round times come from public/event (readable by anyone), with the
+ * one-day rules (ONE_DAY_RULES) that scripts/oneDayEvent.ts sets with them.
  */
 export default function Rules() {
   const { user } = useAuth();
@@ -40,8 +43,17 @@ export default function Rules() {
   const [rounds, setRounds] = useState<{ startAt: number; endAt: number }[] | null>(null);
 
   useEffect(() => {
-    if (!user) return;
     let live = true;
+    if (!user) {
+      void loadPublicEvent().then((ev) => {
+        if (!live || !ev) return;
+        setRounds(ev.rounds);
+        setRules({ ...DEFAULT_RULES, ...ONE_DAY_RULES });
+      });
+      return () => {
+        live = false;
+      };
+    }
     import("../lib/firestore")
       .then(({ db, doc, getDoc }) => getDoc(doc(db, "config", "game")))
       .then((s) => {

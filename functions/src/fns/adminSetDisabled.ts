@@ -1,12 +1,13 @@
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { userRef } from "../lib/db";
 import { requireRole } from "../lib/guards";
+import { STAFF_INSTANCES } from "../lib/instances";
 
 /**
  * Admin "Disable player" (anti-cheat F): sets users.disabled. Every player function then refuses
  * (lib/guards.ts), and the next leaderboard refresh leaves them out. Re-enabling undoes it.
  */
-export const adminSetDisabled = onCall<unknown, Promise<{ uid: string; disabled: boolean }>>(async (req) => {
+export const adminSetDisabled = onCall<unknown, Promise<{ uid: string; disabled: boolean }>>(STAFF_INSTANCES, async (req) => {
   requireRole(req, ["admin"]);
   const { uid, disabled } = (req.data ?? {}) as { uid?: unknown; disabled?: unknown };
   if (typeof uid !== "string" || !/^[\w-]{1,128}$/.test(uid) || typeof disabled !== "boolean") {

@@ -4,6 +4,7 @@ import { playerRow } from "../lib/adminPlayers";
 import { db } from "../lib/db";
 import { findDuplicates } from "../lib/duplicates";
 import { requireRole } from "../lib/guards";
+import { STAFF_INSTANCES } from "../lib/instances";
 
 /**
  * Admin "Possible duplicate accounts" (anti-cheat F): same/similar names, similar emails, made within
@@ -11,7 +12,7 @@ import { requireRole } from "../lib/guards";
  * DECISION: spotting near-duplicates needs every name, so this reads all players — but only when an
  * admin clicks (≈ 20,000 small reads, about a rupee), never on a schedule or for a ranking (cost rules).
  */
-export const adminDuplicates = onCall<unknown, Promise<AdminPlayersOutput>>(async (req) => {
+export const adminDuplicates = onCall<unknown, Promise<AdminPlayersOutput>>(STAFF_INSTANCES, async (req) => {
   requireRole(req, ["admin"]);
   const snap = await db().collection(COL.users).where("profileDone", "==", true).get();
   const users = new Map(snap.docs.map((d) => [d.id, d.data() as UserDoc]));

@@ -4,9 +4,10 @@ import type { AdminSetConfigInput, GameConfigDoc } from "../shared/types";
 import { parseConfigPatch } from "../lib/admin";
 import { configRef, loadConfig } from "../lib/db";
 import { requireRole } from "../lib/guards";
+import { STAFF_INSTANCES } from "../lib/instances";
 
 /** Admin: edit config/game (PLAN 7.2) — times, campus centre + radius, lock, rules (merged). */
-export const adminSetConfig = onCall<AdminSetConfigInput, Promise<{ ok: true }>>(async (req) => {
+export const adminSetConfig = onCall<AdminSetConfigInput, Promise<{ ok: true }>>(STAFF_INSTANCES, async (req) => {
   requireRole(req, ["admin"]);
   const config = await loadConfig();
   if (!config) throw new HttpsError("failed-precondition", "Game is not configured — run the seed first.");

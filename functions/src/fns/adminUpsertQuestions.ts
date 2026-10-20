@@ -4,13 +4,14 @@ import { db } from "../lib/db";
 import { requireRole } from "../lib/guards";
 import { dropPoolCache } from "../lib/questionPool";
 import { MAX_POOL_WRITES, countQuestions, parseQuestionPool } from "../lib/questions";
+import { STAFF_INSTANCES } from "../lib/instances";
 
 /**
  * Admin: upload the question pool (SPEC §9). Every row is validated first (unique ids, level/type,
  * 4 different options, correctIndex 0–3); any error → nothing is written and the bad rows come back.
  * The upload replaces the pool: ids not in it are removed. One batch = all-or-nothing.
  */
-export const adminUpsertQuestions = onCall<AdminUpsertQuestionsInput, Promise<AdminUpsertQuestionsOutput>>(async (req) => {
+export const adminUpsertQuestions = onCall<AdminUpsertQuestionsInput, Promise<AdminUpsertQuestionsOutput>>(STAFF_INSTANCES, async (req) => {
   requireRole(req, ["admin"]);
   const parsed = parseQuestionPool(req.data?.questions);
   if ("errors" in parsed) {

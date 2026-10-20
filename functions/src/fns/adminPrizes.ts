@@ -3,6 +3,7 @@ import { COL, type AdminPrizeRow, type AdminPrizesOutput, type PrizeDoc } from "
 import { db } from "../lib/db";
 import { requireRole } from "../lib/guards";
 import { parsePrize, PRIZE_ID } from "../lib/prizes";
+import { STAFF_INSTANCES } from "../lib/instances";
 
 /** Every prize with its redemptions so far (one count query per prize — a handful of prizes). */
 async function listPrizes(): Promise<AdminPrizeRow[]> {
@@ -20,7 +21,7 @@ async function listPrizes(): Promise<AdminPrizeRow[]> {
  * Admin: the prize list (PLAN 7.x) — add, edit (name, cost, stock) and remove, validated here
  * (lib/prizes.ts); clients never write prizes. Removing a prize keeps its redemptions (history).
  */
-export const adminPrizes = onCall<unknown, Promise<AdminPrizesOutput>>(async (req) => {
+export const adminPrizes = onCall<unknown, Promise<AdminPrizesOutput>>(STAFF_INSTANCES, async (req) => {
   requireRole(req, ["admin"]);
   const d = (req.data ?? {}) as { action?: unknown; id?: unknown };
   const prizes = db().collection(COL.prizes);

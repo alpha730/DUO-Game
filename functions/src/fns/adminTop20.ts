@@ -5,6 +5,7 @@ import { db, userRef } from "../lib/db";
 import { requireRole } from "../lib/guards";
 import { refreshStudentsBoard } from "../lib/leaderboard";
 import { isQualified } from "../lib/rank";
+import { STAFF_INSTANCES } from "../lib/instances";
 
 const TOP = 20;
 
@@ -13,7 +14,7 @@ const TOP = 20;
  * the 10-minute refresh), then returns the first 20 — qualified players (both favourites at MAX)
  * first, each group in leaderboard order — with email + cheat flags.
  */
-export const adminTop20 = onCall<unknown, Promise<AdminPlayersOutput>>(async (req) => {
+export const adminTop20 = onCall<unknown, Promise<AdminPlayersOutput>>(STAFF_INSTANCES, async (req) => {
   requireRole(req, ["admin"]);
   await refreshStudentsBoard();
   const board = (await db().collection(COL.leaderboard).doc(DOC.studentsBoard).get()).data() as StudentsBoardDoc | undefined;

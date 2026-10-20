@@ -3,6 +3,7 @@ import { COL, type AdminPlayersOutput, type UserDoc } from "../shared/types";
 import { playerRow } from "../lib/adminPlayers";
 import { db } from "../lib/db";
 import { requireRole } from "../lib/guards";
+import { STAFF_INSTANCES } from "../lib/instances";
 
 const LIMIT = 200;
 
@@ -11,7 +12,7 @@ const LIMIT = 200;
  * (≥ 10 wins, ≥ 95 % accuracy, avg < 3 s — kept current as users.suspect by submitAttempt).
  * Two small indexed queries, only when the admin clicks; never reads all users (cost rules).
  */
-export const adminSuspicious = onCall<unknown, Promise<AdminPlayersOutput>>(async (req) => {
+export const adminSuspicious = onCall<unknown, Promise<AdminPlayersOutput>>(STAFF_INSTANCES, async (req) => {
   requireRole(req, ["admin"]);
   const users = db().collection(COL.users);
   // + Read Aloud always perfect and fast (anti-cheat G) and campus location jumps (H).

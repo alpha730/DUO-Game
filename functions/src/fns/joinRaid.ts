@@ -7,6 +7,7 @@ import { lenientCampus } from "../lib/emulator";
 import { campusCheck, isValidLatLng } from "../lib/geo";
 import { requirePlayer } from "../lib/guards";
 import { raidPhase } from "../lib/raids";
+import { RAID_INSTANCES } from "../lib/instances";
 
 /**
  * Join an active Owl Raid (SPEC §5, PLAN 6.1): on campus; counted once per player; unlocks at
@@ -18,7 +19,7 @@ import { raidPhase } from "../lib/raids";
  * (raids/{id}/shards/{0..9}) in one batch; the count is the sum of the shards. The raid doc is
  * written once, when the sum first reaches minPlayers (`unlocked`, idempotent).
  */
-export const joinRaid = onCall<unknown, Promise<JoinRaidOutput>>(async (req) => {
+export const joinRaid = onCall<unknown, Promise<JoinRaidOutput>>(RAID_INSTANCES, async (req) => {
   const now = await serverNow();
   const { uid, config } = await requirePlayer(req, now);
   const { raidId, lat, lng } = (req.data ?? {}) as Record<string, unknown>;

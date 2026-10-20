@@ -5,6 +5,7 @@ import { parseChallenge } from "../lib/challenge";
 import { db } from "../lib/db";
 import { requireRole } from "../lib/guards";
 import { planRaid } from "../lib/raids";
+import { STAFF_INSTANCES } from "../lib/instances";
 
 const MESSAGES = {
   "bad-input": "Give a poster, a Lingo, a start time and a sensible length.",
@@ -19,7 +20,7 @@ const MESSAGES = {
  * The raid has its own challenge (never today's normal one), stored server-only at
  * challenges/raid_{raidId} in the same batch as the raid.
  */
-export const adminCreateRaid = onCall<unknown, Promise<AdminCreateRaidOutput>>(async (req) => {
+export const adminCreateRaid = onCall<unknown, Promise<AdminCreateRaidOutput>>(STAFF_INSTANCES, async (req) => {
   requireRole(req, ["admin"]);
   const input = (req.data ?? {}) as Record<string, unknown>;
   const lingoId = typeof input.lingoId === "string" ? input.lingoId : "";

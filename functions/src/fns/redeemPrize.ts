@@ -5,6 +5,7 @@ import { db, userRef } from "../lib/db";
 import { requireRole } from "../lib/guards";
 import { rateLimit } from "../lib/rateLimit";
 import { serverNow } from "../lib/clock";
+import { DESK_INSTANCES } from "../lib/instances";
 
 const fail = (code: string, message: string): never => {
   throw new HttpsError("failed-precondition", message, { code });
@@ -18,7 +19,7 @@ const fail = (code: string, message: string): never => {
  * DECISION: balance = points − spent. Leaderboard points stay as earned (a prize mustn't cost a
  * player their place before the final).
  */
-export const redeemPrize = onCall<unknown, Promise<RedeemPrizeOutput>>(async (req) => {
+export const redeemPrize = onCall<unknown, Promise<RedeemPrizeOutput>>(DESK_INSTANCES, async (req) => {
   const byUid = requireRole(req, ["volunteer", "admin"]);
   await rateLimit(byUid, "call", await serverNow());
   const { uid, prizeId } = (req.data ?? {}) as { uid?: unknown; prizeId?: unknown };

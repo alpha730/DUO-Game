@@ -3,6 +3,7 @@ import { STAGE_SEEN_MAX, type AdminStageQuestionOutput } from "../shared/types";
 import { requireRole } from "../lib/guards";
 import { questionPool } from "../lib/questionPool";
 import { pickStageQuestion, stageReveal } from "../lib/stage";
+import { STAFF_INSTANCES } from "../lib/instances";
 
 const ID = /^[\w-]{1,128}$/;
 
@@ -11,7 +12,7 @@ const ID = /^[\w-]{1,128}$/;
  * question the stage hasn't shown this session, without its answer; "reveal" = its answer, asked
  * for only when the host taps "Reveal answer". Reads the cached pool (no extra Firestore reads).
  */
-export const adminStageQuestion = onCall<unknown, Promise<AdminStageQuestionOutput>>(async (req) => {
+export const adminStageQuestion = onCall<unknown, Promise<AdminStageQuestionOutput>>(STAFF_INSTANCES, async (req) => {
   requireRole(req, ["admin"]);
   const d = (req.data ?? {}) as { action?: unknown; seen?: unknown; id?: unknown };
   const pool = await questionPool();

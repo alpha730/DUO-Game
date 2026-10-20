@@ -2,9 +2,10 @@ import { onCall } from "firebase-functions/v2/https";
 import { isEmulator } from "../lib/geo";
 import { requireAuth, requireRole } from "../lib/guards";
 import { refreshStudentsBoard } from "../lib/leaderboard";
+import { STAFF_INSTANCES } from "../lib/instances";
 
 /** Admin "refresh now" (PLAN 5.1) — same work as the 10-minute schedule. */
-export const adminRefreshLeaderboard = onCall<unknown, Promise<{ rows: number }>>(async (req) => {
+export const adminRefreshLeaderboard = onCall<unknown, Promise<{ rows: number }>>(STAFF_INSTANCES, async (req) => {
   // DECISION: the emulator never runs the schedule, so for laptop play any signed-in player may
   // refresh there. Production: admins only.
   if (isEmulator()) requireAuth(req);

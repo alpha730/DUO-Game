@@ -6,6 +6,7 @@ import { countQuestions } from "../lib/questions";
 import { playPeriod } from "../lib/date";
 import { db, loadConfig } from "../lib/db";
 import { requireRole } from "../lib/guards";
+import { STAFF_INSTANCES } from "../lib/instances";
 
 /**
  * Admin stats (PLAN 7.2): users, attempts today, wins today, and the question pool per level × type
@@ -14,7 +15,7 @@ import { requireRole } from "../lib/guards";
  * DECISION (cost rules): totals use count() aggregations — they read no user documents (billed
  * 1 read per 1000 index entries, ~20 reads for 20k users). Only on the admin's click, never live.
  */
-export const adminStats = onCall<unknown, Promise<AdminStatsOutput>>(async (req) => {
+export const adminStats = onCall<unknown, Promise<AdminStatsOutput>>(STAFF_INSTANCES, async (req) => {
   requireRole(req, ["admin"]);
   const config = await loadConfig();
   if (!config) throw new HttpsError("failed-precondition", "Game is not configured — run the seed first.");

@@ -4,12 +4,13 @@ import { serverNow } from "../lib/clock";
 import { userRef } from "../lib/db";
 import { requireRole } from "../lib/guards";
 import { rateLimit } from "../lib/rateLimit";
+import { DESK_INSTANCES } from "../lib/instances";
 
 /**
  * Prize desk (/redeem): a volunteer/admin looks up the player behind a QR code (= uid) — name,
  * points and balance (points − spent). Players' docs are owner-read only, so the desk asks here.
  */
-export const deskPlayer = onCall<unknown, Promise<DeskPlayerOutput>>(async (req) => {
+export const deskPlayer = onCall<unknown, Promise<DeskPlayerOutput>>(DESK_INSTANCES, async (req) => {
   const byUid = requireRole(req, ["volunteer", "admin"]);
   await rateLimit(byUid, "call", await serverNow());
   const uid = (req.data as { uid?: unknown } | null)?.uid;

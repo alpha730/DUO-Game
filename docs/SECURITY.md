@@ -49,7 +49,7 @@ question.
 
 | Threat | Protection | Proved by |
 |---|---|---|
-| A script calling the functions directly with a real account | Every callable enforces App Check (`setGlobalOptions({ enforceAppCheck })`), and the forfeit endpoint verifies the `X-Firebase-AppCheck` header. The web app gets its tokens from reCAPTCHA v3 (invisible). Firestore enforcement is a console switch (see the README). | `security.test.ts` D: "callables refuse a call without an App Check token", "the forfeit endpoint refuses…"; 11-security: "every function call carries an App Check token", "the forfeit request is accepted with its App Check token" |
+| A script calling the functions directly with a real account | Every callable enforces App Check (`setGlobalOptions({ enforceAppCheck })`), and the forfeit endpoint verifies the `X-Firebase-AppCheck` header. The web app gets its tokens from reCAPTCHA Enterprise (invisible). Firestore enforcement is a console switch (see the README). | `security.test.ts` D: "callables refuse a call without an App Check token", "the forfeit endpoint refuses…"; 11-security: "every function call carries an App Check token", "the forfeit request is accepted with its App Check token" |
 
 On the emulators there's no App Check backend, so they decode tokens without checking a signature.
 Local play and the tests use an unsigned debug token (`web/src/lib/firebase.ts`,

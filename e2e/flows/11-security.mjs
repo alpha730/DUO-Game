@@ -116,7 +116,8 @@ await page.evaluate(() => {
   Object.defineProperty(document, "visibilityState", { value: "hidden", configurable: true });
   document.dispatchEvent(new Event("visibilitychange"));
 });
-await page.waitForTimeout(1500);
+// Poll: the emulator sometimes takes longer than a fixed wait to close the attempt.
+for (let t = 0; t < 40 && (await adb.doc(`attempts/${forfeitedId}`).get()).data().status === "open"; t++) await page.waitForTimeout(250);
 const forfeit = fnRequests.slice(before).find((r) => r.url.includes("forfeit"));
 // The server refuses a forfeit without a valid App Check token, so "forfeit" on the server proves it
 // (WebKit doesn't show keepalive requests to the test, Chromium does: then the header is checked too).

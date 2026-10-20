@@ -3,7 +3,7 @@ import { isEmulator } from "./geo";
 
 /**
  * Firebase App Check (anti-cheat D): callables and the forfeit endpoint only answer requests that
- * carry a valid App Check token, i.e. come from the real app (reCAPTCHA v3), not a script.
+ * carry a valid App Check token, i.e. come from the real app (reCAPTCHA Enterprise), not a script.
  * On by default; `ENFORCE_APP_CHECK=false` in functions/.env.<project> is the emergency switch
  * (README → App Check).
  */

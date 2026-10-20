@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { CustomProvider, getToken, initializeAppCheck, ReCaptchaV3Provider, type AppCheck } from "firebase/app-check";
+import { CustomProvider, getToken, initializeAppCheck, ReCaptchaEnterpriseProvider, type AppCheck } from "firebase/app-check";
 import { connectAuthEmulator, getAuth } from "firebase/auth";
 import { connectFunctionsEmulator, getFunctions } from "firebase/functions";
 
@@ -29,7 +29,7 @@ if (usingEmulators) {
 }
 
 // Firebase App Check (anti-cheat D): every call to our functions and Firestore carries a token that
-// proves it comes from this app on this site (reCAPTCHA v3, invisible), so a script calling the
+// proves it comes from this app on this site (reCAPTCHA Enterprise, invisible), so a script calling the
 // functions directly is refused. Set up: README → App Check.
 function emulatorToken(): string {
   // The emulators decode App Check tokens without checking a signature (there's no App Check
@@ -51,7 +51,8 @@ function startAppCheck(): AppCheck | null {
   }
   // A registered debug token lets a desktop/test browser through (never set in the live build).
   if (env.VITE_APPCHECK_DEBUG_TOKEN) (self as { FIREBASE_APPCHECK_DEBUG_TOKEN?: string }).FIREBASE_APPCHECK_DEBUG_TOKEN = env.VITE_APPCHECK_DEBUG_TOKEN;
-  return initializeAppCheck(app, { provider: new ReCaptchaV3Provider(env.VITE_RECAPTCHA_SITE_KEY), isTokenAutoRefreshEnabled: true });
+  // VITE_RECAPTCHA_SITE_KEY = the reCAPTCHA Enterprise key ID (a score-based website key).
+  return initializeAppCheck(app, { provider: new ReCaptchaEnterpriseProvider(env.VITE_RECAPTCHA_SITE_KEY), isTokenAutoRefreshEnabled: true });
 }
 
 export const appCheck = startAppCheck();

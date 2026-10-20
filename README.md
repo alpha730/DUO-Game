@@ -29,15 +29,17 @@ scanner only exists when the app runs against the emulators.
 ## App Check (do this before going live)
 
 The functions **refuse every call without an App Check token** (anti-cheat D). The web app gets its
-tokens from reCAPTCHA v3, which is invisible to players. One-time setup:
+tokens from **reCAPTCHA Enterprise** (`ReCaptchaEnterpriseProvider` in `web/src/lib/firebase.ts`),
+which is invisible to players. One-time setup:
 
-1. **reCAPTCHA v3 key.** Go to <https://www.google.com/recaptcha/admin/create> → choose
-   *Score based (v3)*. Domains: `decade-hunt-66f6e.web.app`, `decade-hunt-66f6e.firebaseapp.com`
-   (and any custom domain). Copy the **site key** and the **secret key**.
-2. **Register the app.** Firebase console → *App Check* → *Apps* → the web app → *reCAPTCHA* →
-   paste the **secret key** → Save.
-3. **Site key in the build.** In `web/.env` (git-ignored), set `VITE_RECAPTCHA_SITE_KEY=<site key>`.
-   Then build and deploy Hosting **together with** the functions (see Deploy below).
+1. **reCAPTCHA Enterprise key.** Google Cloud console (project `decade-hunt-66f6e`) → *Security* →
+   *reCAPTCHA* → *Create key*: platform **Website**, domains `decade-hunt-66f6e.web.app`,
+   `decade-hunt-66f6e.firebaseapp.com` (and any custom domain), **score-based** (no checkbox
+   challenge). Copy its **key ID**. There is no secret key with Enterprise.
+2. **Register the app.** Firebase console → *App Check* → *Apps* → the web app →
+   *reCAPTCHA Enterprise* → paste the **key ID** → Save (keep the default score threshold, 0.5).
+3. **Key ID in the build.** In `web/.env` (git-ignored), set `VITE_RECAPTCHA_SITE_KEY=<key ID>`
+   (same variable name as before). Then build and deploy Hosting (see Deploy below).
 4. **Firestore enforcement.** Firebase console → *App Check* → *APIs* → *Cloud Firestore*. First
    watch the metrics for about an hour after launch: almost all requests should show as *verified*.
    Then press **Enforce**. Cloud Functions are already enforced in code; there's no console switch

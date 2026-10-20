@@ -11,6 +11,7 @@ import { BRAND } from "../config/brand";
 import { useAuth } from "../lib/auth";
 import { haptic, isMuted, play, setMuted } from "../lib/feedback";
 import { useMyState } from "../lib/myState";
+import { periodWords } from "../lib/period";
 import { readSkills, type SkillCounts } from "../lib/skills";
 import { getThemePref, setThemePref, type ThemePref } from "../lib/theme";
 import { fmt, initial, liveDayStreak, playerLevel, POINTS_PER_LEVEL } from "../lib/trainer";
@@ -134,7 +135,7 @@ export default function Me() {
           <div className="stat-box" data-stat="streak">
             <StreakFlame size={streak.lit ? 30 : 22} className="stat-flame" lit={streak.lit} />
             <strong>{streak.days}</strong>
-            <span>days in a row</span>
+            <span>{periodWords(me?.round).unit}s in a row</span>
           </div>
           <div className="stat-box" data-stat="caught">
             <Det10Icon name="books" fallback="📖" className="stat-icon" />

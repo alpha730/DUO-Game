@@ -39,6 +39,9 @@ const catchDoc = async (p: Player, l = "lingo-2018") => (await adb.doc(`users/${
 
 describe("across IST midnight (fake server clock)", () => {
   it("caught-today and the daily 4 reset at 00:00 IST; favourite streak +1; missed day resets it, level kept", async () => {
+    // 4 fake days from today can run past the real lock (Oct 22): move it out for this test only.
+    const restoreLock = await patchConfig({ lockAt: Timestamp.fromMillis(istMidnight(N) + 30 * 86_400_000) });
+    onTestFinished(() => restoreLock());
     await useTestChallenges();
     const p = await newPlayer();
     // Day N, 23:58 IST: first catches of both, then pick them as favourites.

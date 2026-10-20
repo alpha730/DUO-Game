@@ -2,9 +2,10 @@
 // days, no repeated word in a day, fallback when a player has seen everything, answers never sent
 // before answering, scored against the stored question, explanation after.
 import { readFileSync } from "node:fs";
+import { Timestamp } from "firebase-admin/firestore";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import type { GetMyStateOutput, StartAttemptOutput, SubmitAttemptOutput } from "../src/shared/types";
-import { adb, CAMPUS, cleanupApps, istToday, newPlayer, pinQuestions, setQuestionPool, unpinQuestions } from "./helpers";
+import { adb, CAMPUS, cleanupApps, istToday, newPlayer, patchConfig, pinQuestions, setQuestionPool, unpinQuestions } from "./helpers";
 
 type Player = Awaited<ReturnType<typeof newPlayer>>;
 const POOL = JSON.parse(readFileSync(new URL("../../scripts/content/question-pool-2026.json", import.meta.url), "utf8"));
@@ -32,9 +33,16 @@ async function favouriteOnDay(p: Player, lingoId: string, day: number, lastCaugh
   await adb.doc(`users/${p.uid}`).update({ favorites: [lingoId, "lingo-2025"], lingosCaught: 2 });
 }
 
-beforeAll(unpinQuestions); // this suite exercises the real picking, not pinned questions
+// Some tests move the server clock days ahead, which can pass the real lock (Oct 22, calendar-
+// dependent): move the lock out for this suite and put it back after.
+let restoreLock: () => Promise<unknown> = async () => {};
+beforeAll(async () => {
+  await unpinQuestions(); // this suite exercises the real picking, not pinned questions
+  restoreLock = await patchConfig({ lockAt: Timestamp.fromMillis(istMidnight(istToday()) + 30 * 86_400_000) });
+});
 afterEach(() => clock.delete());
 afterAll(async () => {
+  await restoreLock();
   await clock.delete();
   await setQuestionPool(POOL);
   await pinQuestions();

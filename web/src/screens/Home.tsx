@@ -71,6 +71,7 @@ export default function Home() {
   const { profile } = useAuth();
   // Fresh on every visit (e.g. right after a catch); getMyState also auto-forfeits any open attempt.
   const { state: me, error, reload } = useMyState(0);
+  const w = periodWords(me?.round); // "today" / "this round" (one-day event)
   const [lingos, setLingos] = useState<Lingo[]>([]);
   const raids = useOpenRaids();
 
@@ -133,7 +134,7 @@ export default function Home() {
             <ScanIcon size={24} /> {phase === "before" ? "Opens soon" : "Hunt over"}
           </button>
         )}
-        {me && <LingoPips left={me.attemptsLeft} total={me.attemptsPerDay} />}
+        {me && <LingoPips left={me.attemptsLeft} total={me.attemptsPerDay} when={w.now} />}
         <Link className="rules-link" to="/rules" data-rules-link>
           {BRAND.uiIcons.overview && <img className="link-icon" src={BRAND.uiIcons.overview} alt="" aria-hidden="true" loading="lazy" />}
           How it works · Game rules →
@@ -160,7 +161,7 @@ export default function Home() {
         <section className="stack" aria-label="Favourites" style={{ gap: 10 }}>
           <div className="section-title">
             <h3>⭐ Favourites</h3>
-            <span className="small muted">10-day streak = MAX</span>
+            <span className="small muted">{me?.round ? `${me.round.of} rounds in a row = MAX` : "10-day streak = MAX"}</span>
           </div>
           <div className="fav-cards">
             {favorites.map((l) => (

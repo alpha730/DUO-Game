@@ -128,7 +128,7 @@ export default function WinCelebration({
     : prevLevel === null
       ? "First catch"
       : data.favStreak
-        ? `Favourite · day ${data.favStreak}`
+        ? `Favourite · ${round ? "round" : "day"} ${data.favStreak}`
         : "Catch";
 
   return (

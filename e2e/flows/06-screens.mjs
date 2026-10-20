@@ -59,6 +59,9 @@ await page.locator(".hud-points").waitFor();
 const pts = Number((await page.locator(".hud-points").getAttribute("data-points")) ?? -1);
 ok(pts === u.points, `Home HUD points ${pts} = server ${u.points}`);
 ok((await page.locator(".hud-left").getAttribute("data-left")) === "1", "Home: 1 Lingo left today (3 tried)");
+// Multi-day game (no config.rounds): the day wording (flow 15 checks the one-day "this round" wording).
+ok((await page.locator(".attempts-pill .pips-label").innerText()).trim() === "Lingos left today:", "wording: Home pill says 'Lingos left today:'");
+ok((await page.locator(".hud-round").count()) === 0, "wording: no round line without rounds");
 
 // --- Leaderboard: 3 others above/below, refresh, podium, my row.
 const others = [];
@@ -82,6 +85,7 @@ await shot(page, "06-leaderboard");
 await page.goto(BASE + "/me");
 await page.locator("canvas.qr").waitFor({ timeout: 15000 });
 await page.waitForTimeout(400);
+ok((await page.locator("[data-stat=streak] span").last().innerText()).trim() === "days in a row", "wording: Me streak stat says 'days in a row'");
 const img = await page.evaluate(() => {
   const c = document.querySelector("canvas.qr");
   const d = c.getContext("2d").getImageData(0, 0, c.width, c.height);

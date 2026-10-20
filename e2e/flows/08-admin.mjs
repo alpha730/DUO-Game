@@ -11,7 +11,10 @@ page.on("dialog", (d) => d.accept());
 const admin = await makeUser({ name: "QA Admin", role: "admin" });
 const player = await makeUser({ name: "Locked Out" });
 const cheater = await makeUser({ name: "Speedy Cheater" });
-await adb.doc(`users/${cheater.uid}`).update({ points: 8_888_888, flags: 4, wins: 12, losses: 0, totalAnswerMs: 12 * 700, suspect: true });
+// Top of the Top 20 whatever other flows left behind: qualified (both favourites at MAX — qualified
+// players come first) and far more points than any flow or test creates.
+const TOP_POINTS = 98_765_432;
+await adb.doc(`users/${cheater.uid}`).update({ points: TOP_POINTS, favMaxCount: 2, flags: 4, wins: 12, losses: 0, totalAnswerMs: 12 * 700, suspect: true });
 
 try {
   // Non-admins can't open /admin.
@@ -84,7 +87,7 @@ try {
   const csv = readFileSync(csvPath, "utf8").replace(/^﻿/, "");
   const [head, first] = csv.split(/\r\n/);
   ok(head.startsWith("rank,name,email,points,fav_max,qualified,accuracy_pct,avg_answer_s,wins,flags,suspect"), `CSV header: ${head}`);
-  ok(first.includes('"8888888"') && first.includes('"4"'), `CSV row 1 has the flags: ${first}`);
+  ok(first.includes(`"${TOP_POINTS}"`) && first.includes('"4"') && first.includes('"2","yes"'), `CSV row 1 = the planted player, qualified, with the flags: ${first}`);
   ok(csv.trim().split(/\r\n/).length - 1 <= 20, "≤ 20 rows");
   await shot(page, "08-admin", { fullPage: true });
 
@@ -109,6 +112,6 @@ try {
   ok(!(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)), "admin: no horizontal scroll at 375 px");
 } finally {
   await adb.doc("config/game").set(cfgBefore);
-  await adb.doc(`users/${cheater.uid}`).update({ points: 0, flags: 0, suspect: false });
+  await adb.doc(`users/${cheater.uid}`).update({ points: 0, favMaxCount: 0, flags: 0, suspect: false });
 }
 await finish(browser, errors);

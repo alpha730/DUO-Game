@@ -8,6 +8,7 @@ import { loadTargets } from "../ar/targets";
 import CameraHelp, { type ScanProblem } from "../components/CameraHelp";
 import { CloseIcon, CoinIcon } from "../components/Icons";
 import ScanOverlay from "../components/ScanOverlay";
+import { periodWords } from "../lib/period";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { usingEmulators } from "../lib/firebase";
@@ -247,7 +248,7 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
             <span>{fmt(profile?.points ?? 0)}</span>
           </span>
           {me && (
-            <span className="hud-chip scan-chip" data-left={me.attemptsLeft} title="Lingos left today">
+            <span className="hud-chip scan-chip" data-left={me.attemptsLeft} title={`Lingos left ${periodWords(me.round).now}`}>
               <span className="hud-left-label">Lingos left </span>
               <strong>
                 {me.attemptsLeft}/{me.attemptsPerDay}

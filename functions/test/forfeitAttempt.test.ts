@@ -69,7 +69,8 @@ describe("forfeitAttempt", () => {
   it("works same-origin through the dev proxy (/api/forfeit)", async () => {
     const p = await newPlayer();
     const a = await start(p);
-    const res = await fetch("http://localhost:5173/api/forfeit", {
+    // 127.0.0.1, not localhost: another local dev server on [::1]:5173 would answer "localhost".
+    const res = await fetch("http://127.0.0.1:5173/api/forfeit", {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-Firebase-AppCheck": APP_CHECK_TOKEN, Authorization: `Bearer ${await p.idToken()}` },
       body: JSON.stringify({ attemptId: a.attemptId }),

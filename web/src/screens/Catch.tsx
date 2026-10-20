@@ -27,6 +27,7 @@ import { haptic, play } from "../lib/feedback";
 import { triesLeft, triesUsed } from "../lib/catchStatus";
 import { appCheckToken, auth } from "../lib/firebase";
 import { loadLingos, type Lingo } from "../lib/lingos";
+import { periodWords } from "../lib/period";
 import { recordAnswer } from "../lib/skills";
 
 type Phase = "preflight" | "ready" | "starting" | "active" | "submitting" | "done";
@@ -313,12 +314,12 @@ export default function Catch() {
           <h1 style={{ margin: 0 }}>{raidId ? `${BRAND.raidName} · ${name}` : `Catch ${name}`}</h1>
           {raidId && (phase === "preflight" || phase === "ready" || phase === "starting") && (
             <p className="small muted" style={{ margin: 0 }} data-raid-try>
-              One try · doesn't use your daily attempts
+              One try · doesn't use your {me?.round ? "round's" : "daily"} attempts
             </p>
           )}
           {!raidId && me && attemptsLeft !== null && (phase === "preflight" || phase === "ready" || phase === "starting") && (
             <p className="small muted" style={{ margin: 0 }}>
-              Lingos left today: {attemptsLeft}/{me.attemptsPerDay}
+              Lingos left {periodWords(me.round).now}: {attemptsLeft}/{me.attemptsPerDay}
             </p>
           )}
           {!raidId && me && used > 0 && used < triesPerLingo && (phase === "preflight" || phase === "ready" || phase === "starting") && (

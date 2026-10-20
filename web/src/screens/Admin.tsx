@@ -71,22 +71,24 @@ function Stats() {
   const { busy, status, run } = useAction();
   const load = useCallback(() => run(async () => (setStats(await api.adminStats({})), "Updated.")).catch(() => {}), [run]);
   useEffect(() => void load(), [load]);
+  // One-day event (config.rounds set): the server counts the current round, keyed "2026-10-22#R2".
+  const period = stats && /#R\d+$/.test(stats.today) ? "this round" : "today";
   return (
     <Section title="Stats">
       {stats && (
         <>
-          <div className="stat-grid">
+          <div className="stat-grid" data-period={period}>
             <div data-stat="users">
               <strong>{stats.users.toLocaleString("en-IN")}</strong>
               <span className="small muted">players</span>
             </div>
             <div data-stat="attempts">
               <strong>{stats.attemptsToday.toLocaleString("en-IN")}</strong>
-              <span className="small muted">attempts today</span>
+              <span className="small muted">attempts {period}</span>
             </div>
             <div data-stat="wins">
               <strong>{stats.winsToday.toLocaleString("en-IN")}</strong>
-              <span className="small muted">wins today</span>
+              <span className="small muted">wins {period}</span>
             </div>
           </div>
           <QuestionCountsTable counts={stats.questions} total={stats.questionTotal} />

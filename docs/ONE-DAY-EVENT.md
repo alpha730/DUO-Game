@@ -15,6 +15,9 @@ It writes `config/game`: `rounds`, `startAt` = round 1 start, `lockAt` = last ro
 `public/event` = `{ date, rounds }` — readable by anyone (firestore.rules), so the login screen and
 Rules show the round times before sign-in. No client writes it.
 
+Turn the event off again (back to the multi-day game) with `--off`: it removes `rounds` from
+`config/game` and deletes `public/event` (times, lock and rules stay as they are).
+
 Before the event, wipe the players' practice data (staff keep their roles and data):
 
 ```

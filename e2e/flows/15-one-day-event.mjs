@@ -222,6 +222,27 @@ try {
   ok((await page.locator(".hud-round").innerText()).trim() === "Round 2 starts at 11:32", "live: Dex shows the gap too");
   ok(await liveLine("Round 2 of 2 · until 11:40", 80000), "live: Dex switches to \"Round 2 of 2 · until 11:40\" when round 2 starts (no reload)");
   ok((await page.locator(".hud-round").getAttribute("data-active")) === "true", "live: the line is active again");
+
+  // --- --off: rounds removed from config/game, public/event deleted → the multi-day game again.
+  const dryOff = execFileSync("npx", ["tsx", "scripts/oneDayEvent.ts", "--off", "--dry-run"], { cwd: ROOT, encoding: "utf8", shell: true, env: { ...process.env, FIRESTORE_EMULATOR_HOST: "127.0.0.1:8085" } });
+  ok(/remove 2 rounds/.test(dryOff) && /delete public\/event/.test(dryOff) && (await configRef.get()).data().rounds?.length === 2 && (await publicRef.get()).exists, "--off --dry-run: says what it would do, writes nothing");
+  const lockBefore = (await configRef.get()).data().lockAt.toMillis();
+  const off = execFileSync("npx", ["tsx", "scripts/oneDayEvent.ts", "--off"], { cwd: ROOT, encoding: "utf8", shell: true, env: { ...process.env, FIRESTORE_EMULATOR_HOST: "127.0.0.1:8085" } });
+  const cfgOff = (await configRef.get()).data();
+  ok(/Done/.test(off) && cfgOff.rounds === undefined && cfgOff.lockAt.toMillis() === lockBefore, "--off: rounds removed from config/game (times kept)");
+  ok(!(await publicRef.get()).exists, "--off: public/event deleted");
+  await resetServerClock();
+  r = await roundLine().catch(() => ({ text: "(no line)" }));
+  ok(r.text === "(no line)", `--off: no round line in the HUD (${r.text})`);
+  {
+    const anon = await launch();
+    await anon.page.goto(BASE + "/");
+    await anon.page.locator(".ticks").waitFor({ timeout: 20000 });
+    await anon.page.waitForTimeout(1500); // the public/event read
+    ok((await anon.page.locator("[data-login-rounds]").count()) === 0 && (await anon.page.locator(".ticks").innerText()).includes("final on Oct 22"), "--off: login shows no rounds (multi-day wording)");
+    errors.push(...anon.errors);
+    await anon.browser.close();
+  }
 } finally {
   await resetServerClock();
   if (configBefore) await configRef.set(configBefore); // back to the multi-day game for the other flows

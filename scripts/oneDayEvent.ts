@@ -6,9 +6,11 @@
 //   Emulator (default):  npx tsx scripts/oneDayEvent.ts
 //   Production:          GOOGLE_APPLICATION_CREDENTIALS=key.json npx tsx scripts/oneDayEvent.ts --prod --project <id>
 //   Options:             --date 2026-10-22   --rounds 10:00-11:30,12:30-14:00,15:00-16:00   --dry-run
+//   Turn it off:         --off  removes `rounds` from config/game and deletes public/event (back to the
+//                        multi-day game; times, lock and rules are left as they are)
 // Times are IST. Re-run it to change the times.
 import { initializeApp } from "firebase-admin/app";
-import { getFirestore, Timestamp } from "firebase-admin/firestore";
+import { FieldValue, getFirestore, Timestamp } from "firebase-admin/firestore";
 import { COL, DEFAULT_RULES, DOC, ONE_DAY_RULES, type GameConfigDoc, type PublicEventDoc } from "../shared/types";
 
 const args = process.argv.slice(2);
@@ -24,6 +26,24 @@ const spec = opt("rounds", "10:00-11:30,12:30-14:00,15:00-16:00");
 if (!prod) process.env.FIRESTORE_EMULATOR_HOST ??= "127.0.0.1:8085";
 if (prod && projectId.startsWith("demo-")) throw new Error("--prod needs --project <real project id>");
 if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("--date must be YYYY-MM-DD");
+
+if (args.includes("--off")) {
+  initializeApp({ projectId });
+  const fs = getFirestore();
+  const cfg = fs.collection(COL.config).doc(DOC.gameConfig);
+  const pub = fs.collection(COL.public).doc(DOC.publicEvent);
+  const [c, p] = await Promise.all([cfg.get(), pub.get()]);
+  const n = ((c.data() as GameConfigDoc | undefined)?.rounds ?? []).length;
+  console.log(`${prod ? projectId : "Emulator"} — one-day event OFF: remove ${n} rounds from config/game, ${p.exists ? "delete" : "no"} public/event.`);
+  if (dry) {
+    console.log("Dry run — nothing written.");
+    process.exit(0);
+  }
+  if (c.exists) await cfg.update({ rounds: FieldValue.delete() });
+  await pub.delete();
+  console.log("Done — back to the multi-day game (times, lock and rules unchanged).");
+  process.exit(0);
+}
 
 const ist = (hhmm: string) => {
   if (!/^\d{1,2}:\d{2}$/.test(hhmm)) throw new Error(`Bad time "${hhmm}" (use HH:MM, IST).`);

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "firebase": "^12.19.0",
+    "jsqr": "1.4.0",
     "mind-ar": "^1.2.5",
     "qrcode": "^1.5.4",
     "react": "^18.3.1",

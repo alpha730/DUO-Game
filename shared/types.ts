@@ -749,3 +749,19 @@ export interface StageReveal {
   explanation?: string;
 }
 export type AdminStageQuestionOutput = { question: StageQuestion } | { reveal: StageReveal };
+
+// ---------------------------------------------------------------- /redeem: prize desk
+
+/** deskPlayer (volunteer / admin): the player behind a scanned or typed prize code (= uid). */
+export interface DeskPlayerInput {
+  uid: string;
+}
+export interface DeskPlayerOutput {
+  uid: string;
+  name: string;
+  points: number;
+  spent: number;
+  /** points − spent */
+  balance: number;
+  disabled: boolean;
+}

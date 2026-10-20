@@ -173,6 +173,10 @@ export default function Me() {
           <Det10Icon name="key" fallback="🎁" /> Prize QR
         </h2>
         <canvas ref={qr} className="qr" data-uid={user?.uid} aria-label="QR code of your account" />
+        {/* No camera at the desk: the volunteer types this code instead. */}
+        <p className="qr-code-text" data-prize-code={user?.uid}>
+          Code: {user?.uid}
+        </p>
         <p className="small muted" style={{ margin: 0 }}>
           Show this at the prize desk. Prizes go only to this account, and your name must match your college ID card.
         </p>

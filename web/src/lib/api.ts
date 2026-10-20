@@ -11,12 +11,16 @@ import type {
   AdminUpsertQuestionsOutput,
   CompleteProfileInput,
   CompleteProfileOutput,
+  DeskPlayerInput,
+  DeskPlayerOutput,
   GetMyStateInput,
   GetMyStateOutput,
   JoinRaidInput,
   JoinRaidOutput,
   LockGameInput,
   LockGameOutput,
+  RedeemPrizeInput,
+  RedeemPrizeOutput,
   StartAttemptInput,
   StartAttemptOutput,
   SetFavoritesInput,
@@ -106,6 +110,9 @@ export const api = {
   adminDuplicates: call<Record<string, never>, AdminPlayersOutput>("adminDuplicates", 60_000),
   adminSetDisabled: call<{ uid: string; disabled: boolean }, { uid: string; disabled: boolean }>("adminSetDisabled"),
   adminTop20: call<Record<string, never>, AdminPlayersOutput>("adminTop20", 60_000),
+  // Prize desk (/redeem, volunteer or admin — the server checks).
+  deskPlayer: call<DeskPlayerInput, DeskPlayerOutput>("deskPlayer"),
+  redeemPrize: call<RedeemPrizeInput, RedeemPrizeOutput>("redeemPrize"),
   /** /stage sudden-death question: "next" (no answer) or "reveal" (its answer). */
   adminStageQuestion: call<AdminStageQuestionInput, AdminStageQuestionOutput>("adminStageQuestion"),
 };

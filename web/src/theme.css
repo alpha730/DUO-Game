@@ -4477,3 +4477,131 @@ body:has(.catch[data-phase="submitting"]) {
 .stage-foot .error {
   margin: 0;
 }
+
+/* ---------------------------------------------------------------- /redeem (prize desk, phone) */
+.desk-camera {
+  position: relative;
+  aspect-ratio: 1;
+  max-width: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--det-eel);
+}
+.desk-camera video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.desk-camera-frame {
+  position: absolute;
+  inset: 18%;
+  border: 4px solid var(--det-snow);
+  border-radius: var(--radius);
+  box-shadow: 0 0 0 999px color-mix(in srgb, black 25%, transparent);
+}
+.desk-camera-note {
+  position: absolute;
+  inset: auto 12px 12px;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+.desk-error {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--danger-border);
+  background: var(--danger-soft);
+  color: var(--danger-text);
+}
+.desk-error strong {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+.desk-name {
+  margin: 0 0 8px;
+}
+.desk-numbers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0;
+}
+.desk-numbers dt {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.desk-numbers dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+}
+.desk-numbers .desk-balance {
+  color: var(--primary-text);
+}
+.desk-paused {
+  margin: 10px 0 0;
+  color: var(--warn-text);
+  font-weight: 700;
+}
+.desk-prizes {
+  display: grid;
+  gap: 8px;
+}
+.desk-prize {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+  text-align: left;
+  padding: 12px 14px;
+  border: 2px solid var(--border);
+  border-bottom-width: var(--edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.desk-prize[aria-checked="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.desk-prize-name {
+  font-weight: 700;
+}
+.desk-prize-cost {
+  font-family: var(--font-display);
+}
+.desk-prize-stock {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.desk-prize[data-out] .desk-prize-stock {
+  color: var(--danger-text);
+}
+.desk-prize[data-short] .desk-prize-cost {
+  color: var(--danger-text);
+}
+.desk-done {
+  text-align: center;
+}
+.desk-done h2,
+.desk-done p {
+  margin: 0;
+}
+.desk-done-mark {
+  font-size: 3rem;
+  color: var(--primary);
+}
+.qr-code-text {
+  margin: 0;
+  font-family: ui-monospace, monospace;
+  font-size: 0.8rem;
+  word-break: break-all;
+  user-select: all;
+}

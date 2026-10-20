@@ -6,7 +6,8 @@ import { BASE, BROWSER, finish, launch, ok, shot } from "../lib.mjs";
 
 const { browser, page, errors } = await launch({ viewport: { width: 1200, height: 900 } });
 await page.goto(BASE + "/rules"); // any page: Vite serves the modules imported below
-await page.waitForLoadState("networkidle");
+// "load", not "networkidle": signed-out /rules reads public/event, and Firestore keeps its channel open.
+await page.waitForLoadState("load");
 
 const result = await page.evaluate(async () => {
   const THREE = await import("/node_modules/.vite/deps/three.js").catch(() => import("three"));

@@ -9,6 +9,7 @@ import {
   QUESTION_LEVELS,
   QUESTION_TYPES,
   type AdminPlayerRow,
+  type AdminPrizeRow,
   type AdminStatsOutput,
   type AdminUploadError,
   type ChallengeInput,
@@ -502,6 +503,88 @@ function LeaderboardRefresh() {
   );
 }
 
+type PrizeForm = { name: string; cost: string; stock: string };
+const prizeForm = (p?: AdminPrizeRow): PrizeForm => ({ name: p?.name ?? "", cost: p ? String(p.cost) : "", stock: p ? String(p.stock) : "" });
+/** An empty or non-numeric box is sent as null (the server refuses it) — never as 0. */
+const num = (v: string): number | null => {
+  const n = Number(v);
+  return v.trim() === "" || !Number.isFinite(n) ? null : n;
+};
+
+/** One prize: edit name / cost / stock in place (or a new one), stock + redeemed shown. */
+function PrizeRowForm({ prize, onSaved }: { prize?: AdminPrizeRow; onSaved: (rows: AdminPrizeRow[]) => void }) {
+  const [form, setForm] = useState<PrizeForm>(() => prizeForm(prize));
+  const { busy, status, run } = useAction();
+  const set = (k: keyof PrizeForm) => (e: ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  const save = (e: FormEvent) => {
+    e.preventDefault();
+    run(async () => {
+      const { prizes } = await api.adminPrizes({ action: "save", ...(prize ? { id: prize.id } : {}), name: form.name, cost: num(form.cost), stock: num(form.stock) });
+      onSaved(prizes);
+      if (!prize) setForm(prizeForm());
+      return prize ? "Saved." : "Prize added.";
+    }).catch(() => {});
+  };
+  const remove = () => {
+    if (!prize || !window.confirm(`Remove "${prize.name}"? Its ${prize.redeemed} redemption(s) stay in the history.`)) return;
+    run(async () => {
+      onSaved((await api.adminPrizes({ action: "remove", id: prize.id })).prizes);
+      return "Removed.";
+    }).catch(() => {});
+  };
+  const tag = prize?.id ?? "new";
+  return (
+    <form className="prize-row" onSubmit={save} data-prize-row={tag}>
+      <label className="field">
+        <span>Name</span>
+        <input name={`prize-${tag}-name`} value={form.name} onChange={set("name")} maxLength={80} />
+      </label>
+      <label className="field">
+        <span>Cost (points)</span>
+        <input name={`prize-${tag}-cost`} value={form.cost} onChange={set("cost")} inputMode="numeric" />
+      </label>
+      <label className="field">
+        <span>Stock</span>
+        <input name={`prize-${tag}-stock`} value={form.stock} onChange={set("stock")} inputMode="numeric" />
+      </label>
+      {prize && (
+        <p className="small muted prize-counts" data-stock={prize.stock} data-redeemed={prize.redeemed}>
+          {prize.stock.toLocaleString("en-IN")} in stock · {prize.redeemed.toLocaleString("en-IN")} redeemed
+        </p>
+      )}
+      <div className="row">
+        <button className="btn small" type="submit" disabled={busy}>
+          {prize ? "Save" : "Add prize"}
+        </button>
+        {prize && (
+          <button className="btn small danger" type="button" onClick={remove} disabled={busy}>
+            Remove
+          </button>
+        )}
+      </div>
+      <StatusLine status={status} />
+    </form>
+  );
+}
+
+/** Prizes for the desk (/redeem): add, edit, remove — validated by the adminPrizes function. */
+function Prizes() {
+  const [rows, setRows] = useState<AdminPrizeRow[] | null>(null);
+  const { status, run } = useAction();
+  useEffect(() => {
+    run(async () => (setRows((await api.adminPrizes({ action: "list" })).prizes), "")).catch(() => {});
+  }, [run]);
+  return (
+    <Section title="Prizes">
+      {rows?.length === 0 && <p className="small muted">No prizes yet.</p>}
+      {rows?.map((p) => <PrizeRowForm key={`${p.id}:${p.name}:${p.cost}:${p.stock}`} prize={p} onSaved={setRows} />)}
+      <h3 style={{ margin: 0 }}>Add a prize</h3>
+      <PrizeRowForm onSaved={setRows} />
+      {status?.kind === "error" && <StatusLine status={status} />}
+    </Section>
+  );
+}
+
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 const secs = (ms: number) => (ms ? `${(ms / 1000).toFixed(1)} s` : "—");
 
@@ -704,6 +787,7 @@ export default function Admin() {
       <QuestionUpload onDone={() => setStatsKey((k) => k + 1)} />
       {lingos.length > 0 && <CreateRaid lingos={lingos} />}
       <LeaderboardRefresh />
+      <Prizes />
       <Suspicious />
       <Duplicates />
       <Top20 />

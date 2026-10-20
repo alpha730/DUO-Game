@@ -29,3 +29,4 @@ export { adminSetDisabled } from "./fns/adminSetDisabled";
 export { redeemPrize } from "./fns/redeemPrize";
 export { adminStageQuestion } from "./fns/adminStageQuestion";
 export { deskPlayer } from "./fns/deskPlayer";
+export { adminPrizes } from "./fns/adminPrizes";

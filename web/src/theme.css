@@ -4605,3 +4605,19 @@ body:has(.catch[data-phase="submitting"]) {
   word-break: break-all;
   user-select: all;
 }
+
+/* /admin → Prizes: one small form per prize. */
+.prize-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+.prize-row > .row,
+.prize-row > .prize-counts,
+.prize-row > .done,
+.prize-row > .error {
+  grid-column: 1 / -1;
+  margin: 0;
+}

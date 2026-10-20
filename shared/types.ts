@@ -765,3 +765,23 @@ export interface DeskPlayerOutput {
   balance: number;
   disabled: boolean;
 }
+
+// ---------------------------------------------------------------- /admin: prizes
+
+export const PRIZE_NAME_MAX = 60;
+export const PRIZE_COST_MAX = 1_000_000;
+export const PRIZE_STOCK_MAX = 100_000;
+/** adminPrizes (admin only): list, add / edit (no id = new), remove. Every action returns the list. */
+export type AdminPrizesInput =
+  | { action: "list" }
+  /** cost / stock null = left empty (refused, like any bad value, by the server). */
+  | { action: "save"; id?: string; name: string; cost: number | null; stock: number | null }
+  | { action: "remove"; id: string };
+export interface AdminPrizeRow extends PrizeDoc {
+  id: string;
+  /** Redemptions so far. */
+  redeemed: number;
+}
+export interface AdminPrizesOutput {
+  prizes: AdminPrizeRow[];
+}

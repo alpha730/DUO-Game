@@ -3,6 +3,8 @@ import type {
   AdminCreateRaidInput,
   AdminCreateRaidOutput,
   AdminPlayersOutput,
+  AdminPrizesInput,
+  AdminPrizesOutput,
   AdminSetConfigInput,
   AdminStageQuestionInput,
   AdminStageQuestionOutput,
@@ -110,6 +112,7 @@ export const api = {
   adminDuplicates: call<Record<string, never>, AdminPlayersOutput>("adminDuplicates", 60_000),
   adminSetDisabled: call<{ uid: string; disabled: boolean }, { uid: string; disabled: boolean }>("adminSetDisabled"),
   adminTop20: call<Record<string, never>, AdminPlayersOutput>("adminTop20", 60_000),
+  adminPrizes: call<AdminPrizesInput, AdminPrizesOutput>("adminPrizes"),
   // Prize desk (/redeem, volunteer or admin — the server checks).
   deskPlayer: call<DeskPlayerInput, DeskPlayerOutput>("deskPlayer"),
   redeemPrize: call<RedeemPrizeInput, RedeemPrizeOutput>("redeemPrize"),

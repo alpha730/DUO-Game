@@ -4,6 +4,8 @@ import type {
   AdminCreateRaidOutput,
   AdminPlayersOutput,
   AdminSetConfigInput,
+  AdminStageQuestionInput,
+  AdminStageQuestionOutput,
   AdminStatsOutput,
   AdminUpsertQuestionsInput,
   AdminUpsertQuestionsOutput,
@@ -104,6 +106,8 @@ export const api = {
   adminDuplicates: call<Record<string, never>, AdminPlayersOutput>("adminDuplicates", 60_000),
   adminSetDisabled: call<{ uid: string; disabled: boolean }, { uid: string; disabled: boolean }>("adminSetDisabled"),
   adminTop20: call<Record<string, never>, AdminPlayersOutput>("adminTop20", 60_000),
+  /** /stage sudden-death question: "next" (no answer) or "reveal" (its answer). */
+  adminStageQuestion: call<AdminStageQuestionInput, AdminStageQuestionOutput>("adminStageQuestion"),
 };
 
 /** User-facing text for a callable error. Server HttpsErrors already carry friendly messages. */

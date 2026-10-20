@@ -719,3 +719,33 @@ export const ONE_DAY_RULES: Partial<GameRules> = {
   nonFavLevel3Catches: 100_000, // never
   hardFromStreakDay: 2,
 };
+
+// ---------------------------------------------------------------- /stage: sudden-death tiebreaker
+
+/**
+ * adminStageQuestion (admin only). "next": one random HARD meaning / fill-in-the-blank question from
+ * the pool, never one in `seen` (the stage's ids so far this session); no answer in it. "reveal": the
+ * answer of question `id`, only when the host taps "Reveal answer".
+ */
+export type AdminStageQuestionInput = { action: "next"; seen?: string[] } | { action: "reveal"; id: string };
+/** The stage may hold at most this many seen ids (a session never gets near it). */
+export const STAGE_SEEN_MAX = 1000;
+export interface StageQuestion {
+  id: string;
+  type: "meaning" | "question";
+  /** meaning */
+  word?: string;
+  /** question (fill in the blank) */
+  prompt?: string;
+  /** 4, in a random order */
+  options: string[];
+  /** Hard choice questions not shown yet after this one. */
+  left: number;
+}
+export interface StageReveal {
+  id: string;
+  /** The right option's text (as shown in `options`). */
+  answer: string;
+  explanation?: string;
+}
+export type AdminStageQuestionOutput = { question: StageQuestion } | { reveal: StageReveal };

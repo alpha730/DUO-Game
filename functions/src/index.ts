@@ -27,3 +27,4 @@ export { raidTicker } from "./fns/raidTicker";
 export { adminDuplicates } from "./fns/adminDuplicates";
 export { adminSetDisabled } from "./fns/adminSetDisabled";
 export { redeemPrize } from "./fns/redeemPrize";
+export { adminStageQuestion } from "./fns/adminStageQuestion";

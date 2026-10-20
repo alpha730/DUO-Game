@@ -4237,3 +4237,243 @@ body:has(.catch[data-phase="submitting"]) {
 .hud-round[data-active="true"] {
   border-color: var(--primary);
 }
+
+/* ---------------------------------------------------------------- /stage (projector, 16:9) */
+/* A 16:9 box, letterboxed in any window; everything scales with its width (cqw). Light theme only
+   (Stage.tsx sets data-theme="light"); the DET display type, large enough for the back of a hall. */
+.stage {
+  container-type: size;
+  width: min(100vw, calc(100vh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  margin: auto;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 1.6cqw;
+  padding: 2cqw 3cqw;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-family);
+  overflow: hidden;
+}
+.stage-head {
+  display: flex;
+  justify-content: center;
+}
+.stage-head .lockup {
+  --det-h: 2.6cqw; /* the JECRC logo is 1.55 × this: the whole lockup ≈ 4cqw high */
+}
+.stage-main {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 2.4cqw;
+  min-height: 0;
+}
+.stage-left {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 1.6cqw;
+  min-height: 0;
+}
+.stage-round,
+.stage-sd,
+.stage-board {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-bottom-width: var(--edge);
+  border-radius: var(--radius);
+  padding: 1.4cqw 2cqw;
+  min-height: 0;
+  overflow: hidden;
+}
+.stage-round-title {
+  font-family: var(--font-display);
+  font-size: 4cqw;
+  line-height: 1;
+  margin: 0;
+}
+.stage-countdown {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2cqw;
+  margin: 0.8cqw 0 0;
+}
+.stage-countdown-time {
+  font-family: var(--font-display);
+  font-size: 7cqw;
+  line-height: 1;
+  color: var(--primary-text);
+  font-variant-numeric: tabular-nums;
+}
+/* A question on screen: the round card shrinks to one line so the question gets the room. */
+.stage-left:has([data-sudden-death="asking"], [data-sudden-death="revealed"]) .stage-round {
+  display: flex;
+  align-items: baseline;
+  gap: 2cqw;
+}
+.stage-left:has([data-sudden-death="asking"], [data-sudden-death="revealed"]) .stage-round-title {
+  font-size: 2.6cqw;
+}
+.stage-left:has([data-sudden-death="asking"], [data-sudden-death="revealed"]) .stage-countdown {
+  margin: 0;
+}
+.stage-left:has([data-sudden-death="asking"], [data-sudden-death="revealed"]) .stage-countdown-time {
+  font-size: 3.4cqw;
+}
+.stage-countdown-label,
+.stage-muted {
+  color: var(--muted);
+  font-size: 1.4cqw;
+}
+.stage-board {
+  display: flex;
+  flex-direction: column;
+}
+.stage-board-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.stage-board-head h2,
+.stage-eyebrow {
+  font-family: var(--font-display);
+  font-size: 2.2cqw;
+  margin: 0 0 0.8cqw;
+}
+.stage-eyebrow {
+  color: var(--danger-text);
+  font-size: 1.6cqw;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.stage-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 0.35cqw;
+  flex: 1;
+  min-height: 0;
+}
+.stage-row {
+  display: flex;
+  align-items: center;
+  gap: 1cqw;
+  padding: 0 1cqw;
+  border-radius: var(--radius-sm);
+  font-size: 1.7cqw;
+}
+.stage-row:nth-child(odd) {
+  background: var(--primary-soft);
+}
+.stage-row[data-qualified="true"] {
+  box-shadow: inset 0.35cqw 0 0 var(--gold);
+}
+.stage-rank {
+  font-family: var(--font-display);
+  width: 2.6cqw;
+  text-align: right;
+  color: var(--muted);
+}
+.stage-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+.stage-fav,
+.stage-qualified {
+  font-family: var(--font-display);
+  font-size: 1.1cqw;
+  padding: 0.2cqw 0.7cqw;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.stage-fav {
+  background: var(--gold);
+  color: var(--on-gold);
+}
+.stage-qualified {
+  border: 2px solid var(--gold-dark);
+  color: var(--text);
+}
+.stage-points {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  min-width: 8cqw;
+  text-align: right;
+}
+.stage-sd {
+  display: flex;
+  flex-direction: column;
+  gap: 1cqw;
+}
+.stage-sd[data-sudden-death="idle"] {
+  justify-content: center;
+  align-items: center;
+}
+.stage-question {
+  font-family: var(--font-display);
+  font-size: 2.3cqw;
+  line-height: 1.2;
+  margin: 0;
+}
+.stage-options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6cqw;
+}
+.stage-option {
+  display: flex;
+  align-items: center;
+  gap: 0.8cqw;
+  font-size: 1.5cqw;
+  line-height: 1.2;
+  font-weight: 700;
+  padding: 0.6cqw 1cqw;
+  border: 2px solid var(--border);
+  border-bottom-width: var(--edge);
+  border-radius: var(--radius-sm);
+}
+.stage-option-key {
+  font-family: var(--font-display);
+  color: var(--muted);
+}
+.stage-option[data-correct="true"] {
+  background: var(--primary);
+  border-color: var(--primary-dark);
+  color: var(--on-primary);
+}
+.stage-option[data-correct="true"] .stage-option-key {
+  color: inherit;
+}
+.stage-option[data-correct="false"] {
+  opacity: 0.45;
+}
+.stage-explanation {
+  margin: 0;
+  font-size: 1.3cqw;
+  color: var(--muted);
+}
+.stage-sd-actions,
+.stage-foot {
+  display: flex;
+  align-items: center;
+  gap: 1cqw;
+  flex-wrap: wrap;
+}
+.stage .btn {
+  width: auto;
+  font-size: max(14px, 1.3cqw);
+}
+.stage-foot .done,
+.stage-foot .error {
+  margin: 0;
+}

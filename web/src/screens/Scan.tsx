@@ -30,7 +30,7 @@ const IN_APP = inAppBrowser();
 const STANDEE = BRAND.arMode === "standee";
 /** Standee texture for poster i: the 1024 px PNG made at build, else the pose itself. */
 const standeeUrl = (lingoId: string) => BRAND.lingoStandee[lingoId] ?? BRAND.lingoArt[lingoId] ?? null;
-/** /ar-test?level=1|2|3|MAX previews a level look on every standee (no sign-in needed). */
+/** /ar-test?level=1|2|3|MAX previews a level look on every standee (staff only). */
 const testLevel = (): Level | null => {
   const v = new URLSearchParams(window.location.search).get("level")?.toUpperCase();
   return v === "MAX" ? "MAX" : v === "1" || v === "2" || v === "3" ? (Number(v) as Level) : null;
@@ -40,8 +40,8 @@ const FAKE_SCANNER = usingEmulators && (window as { __FAKE_SCANNER?: boolean }).
 
 // Lazy-loaded route: MindAR + three.js live in this chunk only.
 /**
- * @param testMode `/ar-test`: no sign-in, no server calls, catching off — for camera/tracking tests
- *   on real phones before the game backend is live.
+ * @param testMode `/ar-test` (admin / volunteer): no server calls, catching off — for camera/tracking
+ *   and level-look tests on real phones.
  */
 export default function Scan({ testMode = false }: { testMode?: boolean }) {
   const container = useRef<HTMLDivElement>(null);
@@ -155,9 +155,9 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
           const l = byPoster.get(i);
           if (!l) {
             setBarePoster(i);
-            // DECISION: /ar-test is signed out, so the lingos collection can't be read; show the art /
-            // model by the file naming convention (poster i → lingo-<2016+i>) so tracking + art can be
-            // checked on real phones.
+            // DECISION: /ar-test doesn't load the lingos collection; show the art / model by the file
+            // naming convention (poster i → lingo-<2016+i>) so tracking + art can be checked on real
+            // phones (and with no game data at all).
             setModelReady(loaded.has(i));
             if (testMode && !loaded.has(i)) show(i, `lingo-${2016 + i}`, `/assets/models/lingo-${2016 + i}.glb`, s);
             return;

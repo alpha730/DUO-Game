@@ -2,7 +2,8 @@
 //     prize QR (uid) + the code under it; the desk scans it with the camera (a fake camera that films
 //     the real QR image: BarcodeDetector or jsQR), shows name / points / balance and the prizes
 //     (cost, stock); Confirm → redeemPrize, its refusals shown clearly (not enough points, out of
-//     stock, paused player, unknown code) and a success screen with the new balance.
+//     stock, paused player, unknown code) and a success screen with the new balance. Also: /ar-test is
+//     staff only (signed out → sign-in, a player → "Staff only", a volunteer → the test page).
 import { createRequire } from "node:module";
 import { adb, BASE, callFn, finish, launch, makeUser, ok, shot, signIn } from "../lib.mjs";
 
@@ -59,12 +60,24 @@ try {
   ok(await pl.page.getByText("Staff only").waitFor({ timeout: 15000 }).then(() => true, () => false), "a player can't open /redeem");
   const denied = await callFn("deskPlayer", { uid: paused.uid }, await player.idToken());
   ok(!denied.ok && denied.status === 403, `a player can't call deskPlayer (${denied.status})`);
+  // /ar-test (camera + level-look test page) is staff only too.
+  await pl.page.goto(BASE + "/ar-test");
+  ok(await pl.page.getByText("Staff only").waitFor({ timeout: 15000 }).then(() => true, () => false), "a player can't open /ar-test");
+  {
+    const anon = await launch();
+    runs.push(anon);
+    await anon.page.goto(BASE + "/ar-test");
+    await anon.page.waitForURL((u) => new URL(u).pathname === "/", { timeout: 15000 }).catch(() => {});
+    ok(new URL(anon.page.url()).pathname === "/" && (await anon.page.locator(".ar-test-banner").count()) === 0, "signed out: /ar-test goes to the sign-in page");
+  }
 
   // --- The desk: scan the QR with the camera.
   const desk = await launch({ init: [CAMERA] });
   runs.push(desk);
   const { page } = desk;
   await signIn(page, volunteer.email);
+  await page.goto(BASE + "/ar-test");
+  ok(await page.locator(".ar-test-banner").waitFor({ timeout: 25000 }).then(() => true, () => false), "a volunteer opens /ar-test (AR test mode)");
   await page.goto(BASE + "/redeem");
   const filmable = await page.evaluate(() => !!HTMLCanvasElement.prototype.captureStream);
   if (filmable) {

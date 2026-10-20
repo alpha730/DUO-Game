@@ -28,9 +28,9 @@ export default function App() {
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/" element={<PublicOnly><Login /></PublicOnly>} />
-          {/* DECISION: public camera/tracking test page for real-phone testing before the backend is
-              live (no sign-in, no server calls, catching off). Remove at the Day 9 freeze. */}
-          <Route path="/ar-test" element={<Scan testMode />} />
+          {/* Camera/tracking + level-look test page for staff on real phones (no server calls,
+              catching off). Admins and volunteers only — not public during the event. */}
+          <Route path="/ar-test" element={<RequireRole roles={["admin", "volunteer"]}><Scan testMode /></RequireRole>} />
           {/* Public: anyone can read the rules, signed in or not. */}
           <Route path="/rules" element={<Rules />} />
           <Route path="/setup" element={<SetupOnly><Setup /></SetupOnly>} />

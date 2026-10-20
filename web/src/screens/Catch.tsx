@@ -379,6 +379,7 @@ export default function Catch() {
           triesLeft={raidId ? null : (lingoTriesLeft ?? (me ? triesLeft(lingoId, me) : null))}
           onRetry={retry}
           prevLevel={level}
+          round={me?.round ?? null}
         />
       )}
     </main>

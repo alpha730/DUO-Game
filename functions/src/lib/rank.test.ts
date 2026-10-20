@@ -54,7 +54,7 @@ describe("rankStudents (SPEC §2 leaderboard order)", () => {
     const many = Array.from({ length: 150 }, (_, i) => u(`p${String(i).padStart(3, "0")}`, { points: 1000 - i }));
     const rows = rankStudents([...many, u("zero", { points: 0, wins: 0, losses: 3 })]);
     expect(rows).toHaveLength(100);
-    expect(rows[0]).toEqual({ uid: "p000", name: "P000", points: 1000, accuracy: 1, avgAnswerMs: 5000 });
+    expect(rows[0]).toEqual({ uid: "p000", name: "P000", points: 1000, accuracy: 1, avgAnswerMs: 5000, favMax: 0 });
     expect(rows.at(-1)!.uid).toBe("p099");
     expect(rows.some((r) => r.uid === "zero")).toBe(false);
   });

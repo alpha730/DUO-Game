@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { LINGO_COUNT, type CatchView } from "@shared/types";
+import { LINGO_COUNT, type CatchView, type RoundView } from "@shared/types";
 import Hud from "../components/Hud";
 import { Det10Icon } from "../components/BrandArt";
 
@@ -25,13 +25,18 @@ function DetailSheet({
   favorite,
   today,
   onClose,
+  round = null,
 }: {
   lingo: Lingo;
   c: CatchView | undefined;
   favorite: boolean;
   today: string | undefined;
   onClose: () => void;
+  /** One-day event: the streak goal is every round, not 10 days. */
+  round?: RoundView | null;
 }) {
+  const goal = round ? round.of : 10;
+  const unit = round ? "Round" : "Day";
   const caught = !!c && c.timesCaught > 0;
   const name = caught ? lingoName(lingo) : "???";
   const alive = !!c?.lastCaughtDate && !!today && (c.lastCaughtDate === today || c.lastCaughtDate === dayBefore(today));
@@ -85,23 +90,37 @@ function DetailSheet({
                 <span>first caught</span>
               </div>
               <div>
-                <strong>{c!.lastCaughtDate === today ? "Today" : c!.lastCaughtDate ? istDate(Date.parse(c!.lastCaughtDate)) : "—"}</strong>
+                <strong>
+                  {c!.lastCaughtDate === today
+                    ? round
+                      ? "This round"
+                      : "Today"
+                    : c!.lastCaughtDate
+                      ? /#R(\d+)$/.test(c!.lastCaughtDate)
+                        ? `Round ${/#R(\d+)$/.exec(c!.lastCaughtDate)![1]}`
+                        : istDate(Date.parse(c!.lastCaughtDate))
+                      : "—"}
+                </strong>
                 <span>last caught</span>
               </div>
             </div>
             {favorite ? (
               <div className="dex-streak">
                 <div className="row" style={{ justifyContent: "space-between" }}>
-                  <strong className="fav-streak">🔥 Day {Math.min(streak, 10)}/10</strong>
-                  <span className="small muted">{c!.level === "MAX" ? "MAX form unlocked" : "10 days in a row = MAX"}</span>
+                  <strong className="fav-streak">
+                    🔥 {unit} {Math.min(streak, goal)}/{goal}
+                  </strong>
+                  <span className="small muted">
+                    {c!.level === "MAX" ? "MAX form unlocked" : `${goal} ${unit.toLowerCase()}s in a row = MAX`}
+                  </span>
                 </div>
                 <div className="fav-bar" aria-hidden="true">
-                  <div style={{ width: `${(Math.min(streak, 10) / 10) * 100}%` }} />
+                  <div style={{ width: `${(Math.min(streak, goal) / goal) * 100}%` }} />
                 </div>
               </div>
             ) : (
               <p className="small muted" style={{ margin: 0 }}>
-                Make it a favourite to build a streak — 10 days in a row unlocks its MAX form.
+                Make it a favourite to build a streak — {goal} {unit.toLowerCase()}s in a row unlocks its MAX form.
               </p>
             )}
           </>
@@ -185,6 +204,7 @@ export default function Dex() {
           c={catches.get(openLingo.id)}
           favorite={favorites.includes(openLingo.id)}
           today={me?.today}
+          round={me?.round ?? null}
           onClose={() => setParams({}, { replace: true })}
         />
       )}

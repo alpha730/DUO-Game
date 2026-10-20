@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Level, SubmitAttemptOutput } from "@shared/types";
+import type { Level, SubmitAttemptOutput, RoundView } from "@shared/types";
 import { BRAND } from "../config/brand";
 import { haptic, play } from "../lib/feedback";
 import type { Lingo } from "../lib/lingos";
@@ -90,12 +90,15 @@ export default function WinCelebration({
   lingoName,
   lingo = null,
   prevLevel,
+  round = null,
 }: {
   data: SubmitAttemptOutput;
   lingoName: string;
   lingo?: Lingo | null;
   /** Level before this catch; null on the first-ever catch. */
   prevLevel: Level | null;
+  /** One-day event: MAX means every round in a row, not 10 days. */
+  round?: RoundView | null;
 }) {
   const shown = useCountUp(data.pointsAdded);
   const bonusTotal = data.bonuses.reduce((s, b) => s + b.points, 0);
@@ -107,7 +110,7 @@ export default function WinCelebration({
 
   // The biggest moment gets the full-screen card (MAX beats all-10 beats level up).
   const big: Big | null = max
-    ? { kind: "max", icon: "🌟", title: `${lingoName} MAX form unlocked! +${fmt(max.points)}`, sub: "10 days in a row — legendary dedication.", level: "MAX" }
+    ? { kind: "max", icon: "🌟", title: `${lingoName} MAX form unlocked! +${fmt(max.points)}`, sub: round ? `${round.of} rounds in a row — legendary dedication.` : "10 days in a row — legendary dedication.", level: "MAX" }
     : allTen
       ? { kind: "all-ten", icon: "🏆", title: `All 10 ${BRAND.creatureName}s collected! +${fmt(allTen.points)}`, sub: "Every poster, every year. The full Dex!", level: data.newLevel }
       : levelUp

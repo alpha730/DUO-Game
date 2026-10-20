@@ -25,6 +25,7 @@ export async function refreshStudentsBoard(now = Date.now()): Promise<number> {
         wins: u.wins ?? 0,
         losses: u.losses ?? 0,
         totalAnswerMs: u.totalAnswerMs ?? 0,
+        favMaxCount: u.favMaxCount ?? 0,
         pointsReachedAt: u.pointsReachedAt ? u.pointsReachedAt.toMillis() : null,
       };
     }),

@@ -3,7 +3,7 @@ import { COL, type AdminStatsOutput } from "../shared/types";
 import { serverNow } from "../lib/clock";
 import { questionPool } from "../lib/questionPool";
 import { countQuestions } from "../lib/questions";
-import { istDate } from "../lib/date";
+import { playPeriod } from "../lib/date";
 import { db, loadConfig } from "../lib/db";
 import { requireRole } from "../lib/guards";
 
@@ -18,7 +18,7 @@ export const adminStats = onCall<unknown, Promise<AdminStatsOutput>>(async (req)
   requireRole(req, ["admin"]);
   const config = await loadConfig();
   if (!config) throw new HttpsError("failed-precondition", "Game is not configured — run the seed first.");
-  const today = istDate(await serverNow());
+  const today = playPeriod(await serverNow(), config).key; // the IST date, or the round (one-day event)
   const attempts = db().collection(COL.attempts).where("date", "==", today);
   const [users, attemptsToday, winsToday, pool] = await Promise.all([
     db().collection(COL.users).count().get(),

@@ -30,6 +30,7 @@ export const setFavorites = onCall<unknown, Promise<SetFavoritesOutput>>(async (
       requested,
       caught,
       count: config.rules.favoritesCount,
+      keepStreaksOnFirstPick: (config.rounds?.length ?? 0) > 0,
     });
     if ("error" in plan) {
       throw new HttpsError(plan.error === "no-changes" ? "failed-precondition" : "invalid-argument", MESSAGES[plan.error], {

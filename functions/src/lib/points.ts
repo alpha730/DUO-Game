@@ -1,12 +1,13 @@
 import { LINGO_COUNT, type Bonus, type CatchDoc, type GameRules, type Level, type PointsReason, type UserDoc } from "../shared/types";
-import { isYesterday } from "./date";
+import { isPreviousPeriod, isRoundKey } from "./date";
 
 const RANK: Record<string, number> = { "1": 1, "2": 2, "3": 3, MAX: 4 };
 /** Levels never go down (SPEC §2). */
 export const maxLevel = (a: Level, b: Level): Level => (RANK[String(a)] >= RANK[String(b)] ? a : b);
 
 export interface CatchInput {
-  user: Pick<UserDoc, "favorites" | "lingosCaught" | "allTenBonus" | "dayStreak" | "lastPlayDate" | "points">;
+  user: Pick<UserDoc, "favorites" | "lingosCaught" | "allTenBonus" | "dayStreak" | "lastPlayDate" | "points"> &
+    Partial<Pick<UserDoc, "favMaxCount">>;
   /** Existing catch doc for this Lingo (undefined on the first-ever catch). */
   catchDoc: Pick<CatchDoc, "timesCaught" | "lastCaughtDate" | "level" | "favStreak" | "maxBonusGiven"> | undefined;
   lingoId: string;
@@ -27,8 +28,8 @@ export interface CatchOutcome {
   /** New catch-doc fields (firstCaughtAt is set by the caller on the first catch). */
   catchDoc: Pick<CatchDoc, "timesCaught" | "lastCaughtDate" | "level" | "favStreak" | "maxBonusGiven">;
   firstCatch: boolean;
-  /** New user fields (points via increment by pointsAdded). */
-  user: Pick<UserDoc, "lingosCaught" | "allTenBonus" | "dayStreak" | "lastPlayDate">;
+  /** New user fields (points via increment by pointsAdded). favMaxCount only when it went up. */
+  user: Pick<UserDoc, "lingosCaught" | "allTenBonus" | "dayStreak" | "lastPlayDate"> & Partial<Pick<UserDoc, "favMaxCount">>;
   newLevel: Level;
   levelUp: boolean;
   /** ≥ 2 Lingos caught and no favourites picked yet → open /favorites. */
@@ -67,13 +68,20 @@ export function scoreCatch({ user, catchDoc, lingoId, today, rules, speedBonus }
   const bonuses: Bonus[] = [];
   let maxBonusGiven = catchDoc?.maxBonusGiven ?? false;
 
+  // One-day event (round keys): the streak counts rounds in a row for EVERY Lingo, so a Duo caught
+  // in round 1 and picked as a favourite afterwards is already on streak 1 (3 rounds → MAX).
+  const rounds = isRoundKey(today);
+  const nextStreak = () => (isPreviousPeriod(catchDoc?.lastCaughtDate, today) ? (catchDoc?.favStreak ?? 0) + 1 : 1);
+  let favMaxAdded = false;
+
   if (firstCatch) {
     base = rules.firstCatchPoints;
     baseReason = "firstCatch";
     level = 1;
+    if (rounds) favStreak = 1;
   } else if (favorite) {
-    // +1 if caught on the IST day right after its last catch; a missed day starts again at day 1.
-    favStreak = isYesterday(catchDoc!.lastCaughtDate, today) ? catchDoc!.favStreak + 1 : 1;
+    // +1 if caught on the IST day (round) right after its last catch; a missed one starts again at 1.
+    favStreak = nextStreak();
     // SPEC §2: 20 × streak day, capped at 200 per catch from day 10 on.
     base = rules.favoriteCatchPointsPerDay * Math.min(favStreak, rules.favMaxStreak);
     baseReason = "favoriteCatch";
@@ -81,11 +89,13 @@ export function scoreCatch({ user, catchDoc, lingoId, today, rules, speedBonus }
     if (level === "MAX" && !maxBonusGiven) {
       bonuses.push({ kind: "max", points: rules.maxBonus });
       maxBonusGiven = true;
+      favMaxAdded = true;
     }
   } else {
     base = rules.repeatCatchPoints;
     baseReason = "repeatCatch";
     level = maxLevel(oldLevel, nonFavLevel(timesCaught, rules));
+    if (rounds) favStreak = nextStreak();
   }
 
   const lingosCaught = user.lingosCaught + (firstCatch ? 1 : 0);
@@ -97,7 +107,7 @@ export function scoreCatch({ user, catchDoc, lingoId, today, rules, speedBonus }
 
   // Overall day streak (display only): counts IST days with at least one win.
   const dayStreak =
-    user.lastPlayDate === today ? user.dayStreak : isYesterday(user.lastPlayDate, today) ? user.dayStreak + 1 : 1;
+    user.lastPlayDate === today ? user.dayStreak : isPreviousPeriod(user.lastPlayDate, today) ? user.dayStreak + 1 : 1;
 
   const pointsAdded = base + speedBonus + bonuses.reduce((s, b) => s + b.points, 0);
   return {
@@ -109,7 +119,13 @@ export function scoreCatch({ user, catchDoc, lingoId, today, rules, speedBonus }
     favorite,
     firstCatch,
     catchDoc: { timesCaught, lastCaughtDate: today, level, favStreak, maxBonusGiven },
-    user: { lingosCaught, allTenBonus, dayStreak, lastPlayDate: today },
+    user: {
+      lingosCaught,
+      allTenBonus,
+      dayStreak,
+      lastPlayDate: today,
+      ...(favMaxAdded ? { favMaxCount: (user.favMaxCount ?? 0) + 1 } : {}),
+    },
     newLevel: level,
     levelUp: !firstCatch && level !== oldLevel,
     needsFavorites: user.favorites.length === 0 && lingosCaught >= rules.favoritesCount,

@@ -14,6 +14,7 @@ import RaidBanner from "../components/RaidBanner";
 import { BRAND, lingoName } from "../config/brand";
 import { useAuth } from "../lib/auth";
 import { dayBefore, triesLeft, triesUsed } from "../lib/catchStatus";
+import { periodWords } from "../lib/period";
 import { loadLingos, type Lingo } from "../lib/lingos";
 import { serverOffsetMs, useMyState } from "../lib/myState";
 import { useOpenRaids } from "../lib/raids";
@@ -28,7 +29,10 @@ function liveStreak(c: CatchView | undefined, today: string): number {
 
 function FavoriteCard({ lingo, c, me }: { lingo: Lingo; c: CatchView | undefined; me: GetMyStateOutput | null }) {
   const today = me?.today ?? "";
-  const streak = Math.min(liveStreak(c, today), MAX_DAY);
+  // One-day event: the goal is every round (3), not 10 days.
+  const goal = me?.round ? me.round.of : MAX_DAY;
+  const w = periodWords(me?.round);
+  const streak = Math.min(liveStreak(c, today), goal);
   const caughtToday = !!today && c?.lastCaughtDate === today;
   const used = caughtToday ? 0 : triesUsed(lingo.id, me);
   const left = triesLeft(lingo.id, me);
@@ -43,13 +47,21 @@ function FavoriteCard({ lingo, c, me }: { lingo: Lingo; c: CatchView | undefined
           <strong>{lingoName(lingo)}</strong>
           {c && <LevelBadge level={c.level} />}
         </div>
-        <div className="fav-streak" aria-label={`Streak day ${streak} of ${MAX_DAY}`}>
-          🔥 Day {streak}/{MAX_DAY}
+        <div className="fav-streak" aria-label={`Streak ${w.unit} ${streak} of ${goal}`}>
+          🔥 {w.Unit} {streak}/{goal}
         </div>
         <div className="fav-bar" aria-hidden="true">
-          <div style={{ width: `${(streak / MAX_DAY) * 100}%` }} />
+          <div style={{ width: `${(streak / goal) * 100}%` }} />
         </div>
-        <span className="fav-today">{state === "caught" ? "Caught today ✓" : state === "tried" ? "Tried today ✗" : state === "retry" ? `Missed — ${left === 1 ? "1 more try" : `${left} more tries`} today` : "Not yet today"}</span>
+        <span className="fav-today">
+          {state === "caught"
+            ? `Caught ${w.now} ✓`
+            : state === "tried"
+              ? `Tried ${w.now} ✗`
+              : state === "retry"
+                ? `Missed — ${left === 1 ? "1 more try" : `${left} more tries`} ${w.now}`
+                : `Not yet ${w.now}`}
+        </span>
       </div>
     </div>
   );

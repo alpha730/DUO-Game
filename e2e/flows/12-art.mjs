@@ -51,7 +51,8 @@ for (const [width, scheme] of [[375, "light"], [375, "dark"], [320, "light"]]) {
   ok(cards.length === 10 && cards.every((c, i) => c.id === id(i) && c.src.includes(`/mascots/${POSES[i]}.svg`)), `${tag}: Dex — all 10 cards show their mapped Duo pose`);
   ok(cards.every((c, i) => c.silhouette === !(i in levels)), `${tag}: Dex — 6 uncaught are silhouettes of the same pose, 4 caught are not`);
   ok(cards.every((c) => !c.critter), `${tag}: Dex — no placeholder critter`);
-  ok(cards[0].level === "1" && cards[1].level === "2" && cards[2].level === "3" && cards[3].level === "MAX", `${tag}: Dex — level look Lv1/Lv2/Lv3/MAX (${cards.slice(0, 4).map((c) => c.level)})`);
+  // Three levels: Lv 1 → green ring look ("2"), Lv 2 → gold + sparkle ("3"), a legacy level 3 → as Lv 2, MAX.
+  ok(cards[0].level === "2" && cards[1].level === "3" && cards[2].level === "3" && cards[3].level === "MAX", `${tag}: Dex — level look Lv1/Lv2/(legacy 3)/MAX (${cards.slice(0, 4).map((c) => c.level)})`);
   const look = await page.evaluate(() => {
     const ring = (sel) => getComputedStyle(document.querySelector(sel), "::before");
     const lv1 = ring('.dex-card[data-lingo="lingo-2016"] .lingo-pose');
@@ -61,12 +62,12 @@ for (const [width, scheme] of [[375, "light"], [375, "dark"], [320, "light"]]) {
     const sil = document.querySelector('.dex-card[data-lingo="lingo-2020"] .lingo-pose img');
     const root = getComputedStyle(document.documentElement);
     return {
-      lv1: lv1.content,
+      lv1g: lv1.borderTopColor,
       lv2: lv2.borderTopColor,
       lv3: lv3.borderTopColor,
       green: root.getPropertyValue("--primary").trim(),
       gold: root.getPropertyValue("--gold").trim(),
-      sparkle: !!document.querySelector('.dex-card[data-lingo="lingo-2018"] .lingo-sparkle'),
+      sparkle: !!document.querySelector('.dex-card[data-lingo="lingo-2017"] .lingo-sparkle'),
       maxBadge: !!max.querySelector(".lingo-max[data-shape=scallop]"),
       maxGlow: getComputedStyle(max.querySelector("img")).filter,
       favGlow: max.style.getPropertyValue("--fav-glow"),
@@ -74,9 +75,9 @@ for (const [width, scheme] of [[375, "light"], [375, "dark"], [320, "light"]]) {
     };
   });
   const rgb = (hex) => `rgb(${parseInt(hex.slice(1, 3), 16)}, ${parseInt(hex.slice(3, 5), 16)}, ${parseInt(hex.slice(5, 7), 16)})`;
-  ok(look.lv1 === "none" || look.lv1 === "normal", `${tag}: Lv 1 plain (no ring)`);
-  ok(look.lv2 === rgb(look.green), `${tag}: Lv 2 thin green ring (${look.lv2})`);
-  ok(look.lv3 === rgb(look.gold) && look.sparkle, `${tag}: Lv 3 gold ring + sparkle`);
+  ok(look.lv1g === rgb(look.green), `${tag}: Lv 1 thin green ring (${look.lv1g})`);
+  ok(look.lv2 === rgb(look.gold) && look.sparkle, `${tag}: Lv 2 gold ring + sparkle (${look.lv2})`);
+  ok(look.lv3 === rgb(look.gold), `${tag}: a legacy level 3 looks like Lv 2`);
   ok(look.maxBadge && /drop-shadow/.test(look.maxGlow), `${tag}: MAX gold scallop badge + glow`);
   ok(Number(look.favGlow) > 0, `${tag}: favourite streak adds glow (--fav-glow ${look.favGlow})`);
   ok(/brightness\(0\)/.test(look.silFilter), `${tag}: silhouette = the art turned dark (${look.silFilter.slice(0, 40)})`);
@@ -116,7 +117,7 @@ for (const [width, scheme] of [[375, "light"], [375, "dark"], [320, "light"]]) {
   // --- Catch pre-flight + Read Aloud (Microphone Duo) + Result.
   await page.goto(BASE + "/catch/lingo-2018");
   await page.getByRole("button", { name: "Start" }).waitFor({ timeout: 25000 });
-  ok((await page.locator(".catch-spotlight .lingo-pose img").getAttribute("src"))?.includes("Duo_Skip"), `${tag}: Catch pre-flight — Winking Duo = Duo_Skip, Lv 3 look`);
+  ok((await page.locator(".catch-spotlight .lingo-pose img").getAttribute("src"))?.includes("Duo_Skip"), `${tag}: Catch pre-flight — Winking Duo = Duo_Skip, legacy level 3 look`);
   await page.waitForTimeout(900); // entrance animations
   await shot(page, `12-${width}-${scheme}-catch`);
   await startCatch(page, "lingo-2024");

@@ -9,8 +9,13 @@ export type CatchStatus =
   | { kind: "noAttempts"; favorite: boolean; favStreak: number }
   | { kind: "catch"; favorite: boolean; /** streak still alive (caught yesterday) */ favStreak: number };
 
-/** `YYYY-MM-DD` minus one day (pure date math on the server's `today`). */
+/**
+ * The period before the server's `today`: the previous ROUND in the one-day event ("2026-10-22#R2" →
+ * "…#R1"), else `YYYY-MM-DD` minus one day.
+ */
 export function dayBefore(date: string): string {
+  const r = /^(\d{4}-\d{2}-\d{2})#R(\d+)$/.exec(date);
+  if (r) return `${r[1]}#R${Number(r[2]) - 1}`;
   return new Date(Date.parse(`${date}T00:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
 }
 

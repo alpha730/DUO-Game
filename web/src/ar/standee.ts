@@ -162,7 +162,12 @@ export interface Standee {
   update(t: number, now: number, camera: Camera): void;
 }
 
-const rankOf = (l: Level | null): Rank => (l === "MAX" ? 4 : (l ?? 1));
+/**
+ * Three levels (Lv 1 → Lv 2 → MAX): Lv 1 wears the theme's 2nd look (pedestal), Lv 2 its 3rd
+ * (signature prop), MAX the finale. The theme's plainest look is no longer used; a legacy level 3
+ * shows as Lv 2.
+ */
+const rankOf = (l: Level | null): Rank => (l === "MAX" ? 4 : l === 2 || l === 3 ? 3 : 2);
 
 /** @param posterIndex picks the Lingo's theme (ar/themes.ts). */
 export function createStandee(texture: Texture, posterIndex: number): Standee {

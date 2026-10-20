@@ -4222,3 +4222,18 @@ body:has(.catch[data-phase="submitting"]) {
   align-self: center;
   margin-top: 46px;
 }
+
+/* One-day event: "Round 2 of 3 · until 14:00" under the HUD. */
+.hud-round {
+  margin: 6px 0 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  font-weight: 700;
+  font-size: 14px;
+  text-align: center;
+}
+.hud-round[data-active="true"] {
+  border-color: var(--primary);
+}

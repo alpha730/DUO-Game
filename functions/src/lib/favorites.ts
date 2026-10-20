@@ -20,6 +20,8 @@ export function planFavorites(input: {
   requested: unknown;
   caught: Set<string>;
   count: number;
+  /** One-day event: the first pick keeps the streaks (rounds already caught count towards MAX). */
+  keepStreaksOnFirstPick?: boolean;
 }): FavoritesPlan | { error: FavoritesError } {
   const { current, changesLeft, requested, caught, count } = input;
   if (
@@ -35,7 +37,7 @@ export function planFavorites(input: {
 
   if (current.length === 0) {
     // First pick: free. They were non-favourites, so their streaks are already 0 — reset anyway.
-    return { favorites: ids, favoriteChangesLeft: changesLeft, resetStreak: [...ids], changed: true };
+    return { favorites: ids, favoriteChangesLeft: changesLeft, resetStreak: input.keepStreaksOnFirstPick ? [] : [...ids], changed: true };
   }
   const same = ids.length === current.length && ids.every((id) => current.includes(id));
   if (same) return { favorites: current, favoriteChangesLeft: changesLeft, resetStreak: [], changed: false };

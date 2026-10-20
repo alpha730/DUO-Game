@@ -10,7 +10,7 @@ import {
   type QuestionUpload,
 } from "../shared/types";
 import { parseChallenge } from "./challenge";
-import { addDays } from "./date";
+import { isPreviousPeriod } from "./date";
 
 /** SPEC §9: a favourite's catch on its 6th streak day or later gets a hard question. */
 export const HARD_FROM_STREAK_DAY = 6;
@@ -29,13 +29,13 @@ export interface PoolQuestion {
  * its streak + 1; anything else → 1.
  */
 export function streakDayFor(favorite: boolean, c: Pick<CatchDoc, "lastCaughtDate" | "favStreak"> | undefined, today: IstDate): number {
-  if (!favorite || !c || c.lastCaughtDate !== addDays(today, -1)) return 1;
+  if (!favorite || !c || !isPreviousPeriod(c.lastCaughtDate, today)) return 1;
   return (c.favStreak ?? 0) + 1;
 }
 
-/** Favourite on streak day ≥ 6 → hard; everything else → medium. */
-export const levelFor = (favorite: boolean, streakDay: number): QuestionLevel =>
-  favorite && streakDay >= HARD_FROM_STREAK_DAY ? "hard" : "medium";
+/** Favourite on streak day ≥ `hardFrom` (rules.hardFromStreakDay: 6, one-day event 2) → hard; else medium. */
+export const levelFor = (favorite: boolean, streakDay: number, hardFrom: number = HARD_FROM_STREAK_DAY): QuestionLevel =>
+  favorite && streakDay >= hardFrom ? "hard" : "medium";
 
 /** The word a question is about (meaning/pronounce: the word; question: the blank's answer). */
 export const targetWord = (q: QuestionDoc): string => (q.type === "question" ? q.target : q.word).trim().toLowerCase();

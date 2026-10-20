@@ -1,10 +1,11 @@
-// Each Lingo's identity across its levels (Lv 1, Lv 2, Lv 3, MAX), by posterIndex 0–9.
+// Each Lingo's identity across its looks, by posterIndex 0–9. The game has THREE levels: Lv 1 uses
+// titles[1], Lv 2 titles[2], MAX titles[3] (titles[0] belonged to the old plain first level).
 // Used by the AR standee (ar/themes.ts) for its name tag; safe to use in any UI (no three.js here).
 // Titles are lowercase on purpose: they're set in Feather (DET rule: Feather headlines are lowercase).
 export interface LingoLevelIdentity {
   /** One-line idea of the look, for docs / the Dex. */
   vibe: string;
-  /** Title per level: Lv 1, Lv 2, Lv 3, MAX. */
+  /** Title per look: (unused), Lv 1, Lv 2, MAX. */
   titles: readonly [string, string, string, string];
 }
 
@@ -21,6 +22,5 @@ export const LINGO_LEVELS: readonly LingoLevelIdentity[] = [
   { vibe: "Champion Duo · the final: gold sparkles, a podium, caps in the air, gold confetti", titles: ["contender", "finalist", "champion", "grand champion"] },
 ];
 
-/** Level → 0–3 index into `titles` (null = not caught yet → Lv 1). */
-export const levelIndex = (level: 1 | 2 | 3 | "MAX" | null): 0 | 1 | 2 | 3 =>
-  level === "MAX" ? 3 : level === 3 ? 2 : level === 2 ? 1 : 0;
+/** Level → index into `titles` (null = not caught yet → Lv 1). Three levels: 1 → 1, 2 → 2, MAX → 3. */
+export const levelIndex = (level: 1 | 2 | 3 | "MAX" | null): 1 | 2 | 3 => (level === "MAX" ? 3 : level === 2 || level === 3 ? 2 : 1);

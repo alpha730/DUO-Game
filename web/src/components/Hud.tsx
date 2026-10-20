@@ -3,6 +3,7 @@ import type { GetMyStateOutput } from "@shared/types";
 import { useAuth } from "../lib/auth";
 import { fmt, initial, liveDayStreak, playerLevel } from "../lib/trainer";
 import { StreakFlame } from "./BrandArt";
+import { periodWords, roundLine } from "../lib/period";
 import { CoinIcon } from "./Icons";
 
 /**
@@ -14,9 +15,12 @@ export default function Hud({ state }: { state: GetMyStateOutput | null }) {
   const { profile } = useAuth();
   const points = profile?.points ?? state?.user?.points ?? 0;
   const { level } = playerLevel(points);
+  const w = periodWords(state?.round);
+  const round = roundLine(state?.round, state?.serverNow);
   const streak = liveDayStreak(profile?.dayStreak ?? state?.user?.dayStreak, profile?.lastPlayDate ?? state?.user?.lastPlayDate, state?.today);
 
   return (
+    <>
     <header className="hud">
       <Link to="/me" className="hud-avatar" aria-label={`${profile?.name ?? "Me"}, level ${level}`}>
         <span className="avatar" aria-hidden="true">
@@ -29,8 +33,8 @@ export default function Hud({ state }: { state: GetMyStateOutput | null }) {
       <span
         className="hud-chip hud-flame"
         data-lit={streak.lit}
-        title={streak.lit ? "Days in a row with a catch" : "Catch a Lingo today to keep your streak"}
-        aria-label={`${streak.days} day streak${streak.lit ? "" : ", not yet today"}`}
+        title={streak.lit ? `${w.Unit}s in a row with a catch` : `Catch a Lingo ${w.now} to keep your streak`}
+        aria-label={`${streak.days} ${w.unit} streak${streak.lit ? "" : `, not yet ${w.now}`}`}
       >
         <StreakFlame lit={streak.lit} />
         <span>{streak.days}</span>
@@ -43,7 +47,7 @@ export default function Hud({ state }: { state: GetMyStateOutput | null }) {
         <span
           className="hud-chip hud-left"
           data-left={state.attemptsLeft}
-          aria-label={`Lingos left today: ${state.attemptsLeft} of ${state.attemptsPerDay}`}
+          aria-label={`Lingos left ${w.now}: ${state.attemptsLeft} of ${state.attemptsPerDay}`}
         >
           <span className="hud-left-label">Lingos left </span>
           <strong>
@@ -52,5 +56,11 @@ export default function Hud({ state }: { state: GetMyStateOutput | null }) {
         </span>
       )}
     </header>
+    {round && (
+      <p className="hud-round" data-active={!!state?.round?.active}>
+        {round}
+      </p>
+    )}
+    </>
   );
 }

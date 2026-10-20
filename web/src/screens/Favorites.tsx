@@ -71,7 +71,9 @@ export default function Favorites() {
     <main className="screen stack">
       <h1 className="headline">{isChange ? "your favourites" : "pick 2 favourites"}</h1>
       <p className="muted">
-        Only favourite {BRAND.creatureName}s build a streak — catch one 10 days in a row to unlock its MAX form.
+        {me?.round
+          ? `Catch both favourites in all ${me.round.of} rounds to unlock their MAX form — and you need both at MAX to win. No changes later, so choose well.`
+          : `Only favourite ${BRAND.creatureName}s build a streak — catch one 10 days in a row to unlock its MAX form.`}
       </p>
       {isChange && (
         <p className="card small" data-warning>

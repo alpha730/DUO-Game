@@ -310,6 +310,7 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
                 raid={raids.find((r) => r.posterIndex === lingo.posterIndex && raidPhase(r, Date.now()) === "active") ?? null}
                 attemptsLeft={me?.attemptsLeft ?? null}
                 attemptsPerDay={me?.attemptsPerDay ?? null}
+                round={me?.round ?? null}
               />
             )}
           </>

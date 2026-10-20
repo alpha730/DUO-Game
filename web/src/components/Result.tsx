@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import type { ChallengeType, Level } from "@shared/types";
+import type { ChallengeType, Level, RoundView } from "@shared/types";
 import { BRAND } from "../config/brand";
 import { haptic, play } from "../lib/feedback";
 import type { Lingo } from "../lib/lingos";
+import { periodWords } from "../lib/period";
 import type { Outcome } from "../screens/Catch";
 import LingoArt from "./LingoArt";
 import LingoPips from "./LingoPips";
@@ -38,6 +39,7 @@ export default function Result({
   raid = false,
   triesLeft = null,
   onRetry,
+  round = null,
 }: {
   outcome: Outcome;
   lingoName: string;
@@ -55,7 +57,10 @@ export default function Result({
   triesLeft?: number | null;
   /** Start the second try at this Lingo. */
   onRetry?: () => void;
+  /** One-day event: the current round ("this round" instead of "today"). */
+  round?: RoundView | null;
 }) {
+  const w = periodWords(round);
   const left = attemptsLeft ?? 0;
   const won = outcome.kind === "won";
   // Duo's emotion (DET-DESIGN §4): win = Joyous, MAX = HeartEyes, all 10 = CoolGuy; a miss = Sad,
@@ -94,7 +99,7 @@ export default function Result({
       title = `${lingoName} caught!`;
       body = (
         <>
-          <WinCelebration data={outcome.data} lingoName={lingoName} lingo={lingo} prevLevel={prevLevel} />
+          <WinCelebration data={outcome.data} lingoName={lingoName} lingo={lingo} prevLevel={prevLevel} round={round} />
           {outcome.data.answer && <AnswerCard answer={outcome.data.answer} won />}
           {!raid && <PrepCard oncePerDay />}
           {outcome.data.needsFavorites && (
@@ -103,7 +108,7 @@ export default function Result({
             </Link>
           )}
           <p className="muted result-note">
-            {raid ? `${BRAND.raidName} won — great teamwork!` : "Nice one. Come back tomorrow to catch it again."}
+            {raid ? `${BRAND.raidName} won — great teamwork!` : round ? (round.n < round.of ? "Nice one. Catch it again next round to grow your streak." : "Nice one!") : "Nice one. Come back tomorrow to catch it again."}
           </p>
         </>
       );
@@ -181,7 +186,7 @@ export default function Result({
       {body}
       {attemptsLeft !== null && attemptsPerDay !== null && (
         <div className="result-left">
-          <LingoPips left={attemptsLeft} total={attemptsPerDay} className="attempts-left" />
+          <LingoPips left={attemptsLeft} total={attemptsPerDay} className="attempts-left" when={w.now} />
         </div>
       )}
       {canRetry ? (
@@ -191,7 +196,7 @@ export default function Result({
             <strong>
               {triesLeft === 1 ? "One more try" : `${triesLeft} more tries`} at {lingoName}
             </strong>
-            <span>You'll get a new question. It doesn't use another {BRAND.creatureName} from today's {attemptsPerDay ?? 4}.</span>
+            <span>You'll get a new question. It doesn't use another {BRAND.creatureName} from {round ? "this round's" : "today's"} {attemptsPerDay ?? 4}.</span>
           </p>
           <button className="btn big" onClick={onRetry} data-retry>
             Try again
@@ -208,14 +213,20 @@ export default function Result({
               {left > 0 ? (
                 <>
                   <strong>
-                    Try another {BRAND.creatureName} — {left} left today
+                    Try another {BRAND.creatureName} — {left} left {w.now}
                   </strong>
-                  <span>{lingoName} is closed for today.</span>
+                  <span>
+                    {lingoName} is closed for {w.now}.
+                  </span>
                 </>
               ) : (
                 <>
-                  <strong>No {BRAND.creatureName}s left today</strong>
-                  <span>{lingoName} is closed for today — come back tomorrow.</span>
+                  <strong>
+                    No {BRAND.creatureName}s left {w.now}
+                  </strong>
+                  <span>
+                    {lingoName} is closed for {w.now} — {w.comeBack}.
+                  </span>
                 </>
               )}
             </p>

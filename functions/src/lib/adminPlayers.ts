@@ -1,4 +1,5 @@
 import type { AdminPlayerRow, UserDoc } from "../shared/types";
+import { isQualified } from "./rank";
 
 /** A user doc as an admin list row (accuracy and average answer time computed). Pure. */
 export function playerRow(uid: string, u: UserDoc, rank?: number): AdminPlayerRow {
@@ -13,6 +14,8 @@ export function playerRow(uid: string, u: UserDoc, rank?: number): AdminPlayerRo
     wins,
     accuracy: played ? wins / played : 0,
     avgAnswerMs: wins ? Math.round((u.totalAnswerMs ?? 0) / wins) : 0,
+    favMax: u.favMaxCount ?? 0,
+    qualified: isQualified(u.favMaxCount),
     flags: u.flags ?? 0,
     suspect: u.suspect ?? false,
     voiceSuspect: u.voiceSuspect ?? false,

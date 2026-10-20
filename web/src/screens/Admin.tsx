@@ -537,6 +537,7 @@ function PlayersTable({ rows, showRank, showReason }: { rows: AdminPlayerRow[]; 
             <th>Name</th>
             <th>Email</th>
             <th>Points</th>
+            <th title="Favourites at MAX (2 = qualified to win)">Fav MAX</th>
             <th>Accuracy</th>
             <th>Avg time</th>
             <th>Flags</th>
@@ -552,6 +553,9 @@ function PlayersTable({ rows, showRank, showReason }: { rows: AdminPlayerRow[]; 
               <td>{r.name}</td>
               <td>{r.email}</td>
               <td>{r.points.toLocaleString("en-IN")}</td>
+              <td data-qualified={r.qualified ? "" : undefined}>
+                {r.favMax ?? 0}/2{r.qualified ? " ✓" : ""}
+              </td>
               <td>{pct(r.accuracy)}</td>
               <td>{secs(r.avgAnswerMs)}</td>
               <td>
@@ -623,10 +627,10 @@ function Duplicates() {
 /** CSV (Excel-friendly) of the top 20 for the final, flags column included. */
 function toCsv(rows: AdminPlayerRow[]): string {
   const q = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`;
-  const head = ["rank", "name", "email", "points", "accuracy_pct", "avg_answer_s", "wins", "flags", "suspect", "voice_flag", "location_jumps", "disabled"];
+  const head = ["rank", "name", "email", "points", "fav_max", "qualified", "accuracy_pct", "avg_answer_s", "wins", "flags", "suspect", "voice_flag", "location_jumps", "disabled"];
   const yes = (b: boolean) => (b ? "yes" : "no");
   const body = rows.map((r) =>
-    [r.rank ?? "", r.name, r.email, r.points, Math.round(r.accuracy * 100), (r.avgAnswerMs / 1000).toFixed(2), r.wins, r.flags, yes(r.suspect), yes(r.voiceSuspect), r.locationJumps, yes(r.disabled)]
+    [r.rank ?? "", r.name, r.email, r.points, r.favMax ?? 0, yes(!!r.qualified), Math.round(r.accuracy * 100), (r.avgAnswerMs / 1000).toFixed(2), r.wins, r.flags, yes(r.suspect), yes(r.voiceSuspect), r.locationJumps, yes(r.disabled)]
       .map(q)
       .join(","),
   );

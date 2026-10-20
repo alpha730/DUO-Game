@@ -83,7 +83,7 @@ try {
   await download.saveAs(csvPath);
   const csv = readFileSync(csvPath, "utf8").replace(/^﻿/, "");
   const [head, first] = csv.split(/\r\n/);
-  ok(head.startsWith("rank,name,email,points,accuracy_pct,avg_answer_s,wins,flags,suspect"), `CSV header: ${head}`);
+  ok(head.startsWith("rank,name,email,points,fav_max,qualified,accuracy_pct,avg_answer_s,wins,flags,suspect"), `CSV header: ${head}`);
   ok(first.includes('"8888888"') && first.includes('"4"'), `CSV row 1 has the flags: ${first}`);
   ok(csv.trim().split(/\r\n/).length - 1 <= 20, "≤ 20 rows");
   await shot(page, "08-admin", { fullPage: true });

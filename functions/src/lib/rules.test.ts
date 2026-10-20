@@ -27,6 +27,7 @@ describe("DEFAULT_RULES", () => {
       nonFavLevel3Catches: 6,
       allTenBonus: 1000,
       raidCatchPoints: 150,
+      hardFromStreakDay: 6,
     });
   });
 });

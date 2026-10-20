@@ -122,6 +122,8 @@ export interface UserDoc {
   totalAnswerMs: number;
   /** When the user reached their current points total (earlier ranks higher on ties). */
   pointsReachedAt: FireTimestamp | null;
+  /** Favourites taken to MAX (0–2). Ranks right after points; both = qualified to win (one-day event). */
+  favMaxCount?: number;
   profileDone: boolean;
   createdAt: FireTimestamp;
 }
@@ -175,6 +177,8 @@ export interface GameRules {
   nonFavLevel3Catches: number; // 6 total catches
   allTenBonus: number; // 1000, once
   raidCatchPoints: number; // 150, outside the daily 4
+  /** A favourite asks Hard questions from this streak day (round) on; everything else Medium. */
+  hardFromStreakDay: number; // 6 (one-day event: 2)
 }
 
 /** SPEC §2 */
@@ -201,6 +205,7 @@ export const DEFAULT_RULES: GameRules = {
   nonFavLevel3Catches: 6,
   allTenBonus: 1000,
   raidCatchPoints: 150,
+  hardFromStreakDay: 6,
 };
 
 /** One campus: players count as "on campus" within radiusM metres of its centre. */
@@ -221,6 +226,12 @@ export interface GameConfigDoc {
   /** On campus = inside any of these (1–MAX_CAMPUSES). */
   campuses: Campus[];
   rules: GameRules;
+  /**
+   * One-day event: 1–5 rounds inside startAt…lockAt. When set, every "per day" rule (tries, the 4
+   * Lingos, streaks, "caught today") is per ROUND instead, and a favourite's streak counts rounds in a
+   * row. Absent → the original multi-day game.
+   */
+  rounds?: GameRound[];
 }
 
 /** Seconds allowed for each challenge type. */
@@ -347,6 +358,8 @@ export interface StudentRow {
   accuracy: number;
   /** totalAnswerMs ÷ wins */
   avgAnswerMs: number;
+  /** Favourites at MAX (0–2); 2 = qualified to win. */
+  favMax?: number;
 }
 
 /** leaderboard/students — signed-in read */
@@ -446,6 +459,8 @@ export interface GetMyStateOutput {
   startAt: number | null;
   lockAt: number | null;
   locked: boolean;
+  /** One-day event: the current (or next) round; null for the multi-day game. */
+  round: RoundView | null;
 }
 
 export interface StartAttemptInput {
@@ -623,6 +638,9 @@ export interface AdminPlayerRow {
   /** ms per win (0 with no wins) */
   avgAnswerMs: number;
   flags: number;
+  /** Favourites at MAX (0–2); 2 = qualified to win. */
+  favMax?: number;
+  qualified?: boolean;
   suspect: boolean;
   voiceSuspect: boolean;
   locationJumps: number;
@@ -661,3 +679,43 @@ export type FinalControlInput =
 export interface OkOutput {
   ok: true;
 }
+
+// ---------------------------------------------------------------- one-day event: rounds (Oct 22)
+
+/** config/game.rounds[i] — a playing window. Between rounds normal tries are closed. */
+export interface GameRound {
+  startAt: FireTimestamp;
+  endAt: FireTimestamp;
+}
+
+/** The round a moment falls in (client view of config/game.rounds). */
+export interface RoundView {
+  /** 1-based round number: the current one, else the next, else the last. */
+  n: number;
+  of: number;
+  startAt: number;
+  endAt: number;
+  /** true while startAt ≤ now < endAt */
+  active: boolean;
+}
+
+/**
+ * The one-day event rules (Oct 22, 3 rounds), written over config/game.rules by
+ * scripts/oneDayEvent.ts. Three levels: Lv 1 → Lv 2 → MAX (level 3 is never given).
+ *   favourite: streak 1 → Lv 1, caught in 2 rounds in a row → Lv 2 (Hard questions), 3 rounds → MAX (+1000)
+ *   non-favourite: first catch → Lv 1, caught again in a later round → Lv 2, never MAX
+ */
+export const ONE_DAY_RULES: Partial<GameRules> = {
+  attemptsPerDay: 4, // per round
+  triesPerLingoPerDay: 2, // per round
+  favoritesCount: 2,
+  favoriteChanges: 0,
+  favoriteCatchPointsPerDay: 50, // × streak: round 2 = 100, round 3 = 150
+  favLevel2Streak: 2,
+  favLevel3Streak: 3, // MAX wins at 3, so level 3 never appears
+  favMaxStreak: 3,
+  maxBonus: 1000,
+  nonFavLevel2Catches: 2,
+  nonFavLevel3Catches: 100_000, // never
+  hardFromStreakDay: 2,
+};

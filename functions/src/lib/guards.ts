@@ -1,3 +1,4 @@
+import { playPeriod, type RoundsConfig } from "./date";
 import { HttpsError, type CallableRequest } from "firebase-functions/v2/https";
 import type { GameConfigDoc, Role, UserDoc } from "../shared/types";
 import { loadConfig, userRef } from "./db";
@@ -31,10 +32,25 @@ export function gameClosedReason(config: Pick<GameConfigDoc, "startAt" | "lockAt
   return null;
 }
 
-/** Game open (startAt ≤ now < lockAt, locked == false) → returns config. */
-export async function requireGameOpen(now = Date.now()): Promise<GameConfigDoc> {
+/** One-day event: "Round 2 starts at 12:30." while no round is running, else null. Pure. */
+export function betweenRoundsMessage(config: RoundsConfig, now: number): { message: string; startAt: number } | null {
+  const { round } = playPeriod(now, config);
+  if (!round || round.active || now >= round.endAt) return null;
+  const hhmm = new Date(round.startAt + 330 * 60_000).toISOString().slice(11, 16); // IST
+  return { message: `Round ${round.n} starts at ${hhmm}. Get ready!`, startAt: round.startAt };
+}
+
+/**
+ * Game open (startAt ≤ now < lockAt, locked == false) → returns config. `newTry`: also refuse while
+ * no round is running (one-day event) — answering a question that started in a round still works.
+ */
+export async function requireGameOpen(now = Date.now(), newTry = false): Promise<GameConfigDoc> {
   const config = await loadConfig();
   if (!config) throw new HttpsError("failed-precondition", "Game is not configured.", { code: "no-config" });
+  if (newTry && !config.locked && now < config.lockAt.toMillis()) {
+    const wait = betweenRoundsMessage(config, now);
+    if (wait) throw new HttpsError("failed-precondition", wait.message, { code: "between-rounds", startAt: wait.startAt });
+  }
   const reason = gameClosedReason(config, now);
   if (reason === "not-started") {
     throw new HttpsError("failed-precondition", "The hunt hasn't started yet.", {
@@ -69,6 +85,6 @@ export async function requirePlayer(req: Pick<CallableRequest, "auth">, now = Da
   const uid = requireAuth(req);
   requireVerified(req);
   await rateLimit(uid, kind, now);
-  const [user, config] = await Promise.all([requireProfile(uid), requireGameOpen(now)]);
+  const [user, config] = await Promise.all([requireProfile(uid), requireGameOpen(now, kind === "start")]);
   return { uid, user, config };
 }

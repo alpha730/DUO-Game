@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import type { Level } from "@shared/types";
+import type { Level, RoundView } from "@shared/types";
 import { BRAND, lingoName } from "../config/brand";
 import type { CatchStatus } from "../lib/catchStatus";
 import type { Lingo } from "../lib/lingos";
 import type { Raid } from "../lib/raids";
+import { periodWords } from "../lib/period";
 import LevelBadge from "./LevelBadge";
 import LingoArt from "./LingoArt";
 import { Det10Icon, DuoArt } from "./BrandArt";
@@ -21,6 +22,7 @@ export default function ScanOverlay({
   attemptsLeft,
   attemptsPerDay,
   raid = null,
+  round = null,
 }: {
   lingo: Lingo;
   /** This Lingo's level if the player has caught it before. */
@@ -33,7 +35,10 @@ export default function ScanOverlay({
   attemptsPerDay: number | null;
   /** Live Owl Raid on this poster, if any. */
   raid?: Raid | null;
+  /** One-day event: the current round ("this round" instead of "today"). */
+  round?: RoundView | null;
 }) {
+  const w = periodWords(round);
   const streak = status.favorite && status.favStreak > 0 ? status.favStreak : 0;
   const kind = server === "ok" ? status.kind : `server-${server}`;
 
@@ -61,7 +66,7 @@ export default function ScanOverlay({
           </p>
         </div>
         {server === "ok" && attemptsLeft !== null && attemptsPerDay !== null && (
-          <span className="scan-card-left" title="Lingos left today">
+          <span className="scan-card-left" title={`Lingos left ${w.now}`}>
             {attemptsLeft}/{attemptsPerDay}
           </span>
         )}
@@ -91,7 +96,7 @@ export default function ScanOverlay({
       {server === "ok" && status.kind === "catch" && (
         <>
           {status.favorite && (
-            <p className="streak">{streak > 0 ? `🔥 Day ${streak} — keep it going` : "🔥 Start your streak today"}</p>
+            <p className="streak">{streak > 0 ? `🔥 ${w.Unit} ${streak} — keep it going` : `🔥 Start your streak ${w.now}`}</p>
           )}
           <Link className="btn big catch-it" to={`/catch/${lingo.id}`}>
             Catch it!
@@ -102,7 +107,7 @@ export default function ScanOverlay({
       {server === "ok" && status.kind === "retry" && (
         <>
           <p className="streak" data-retry>
-            Missed it earlier — {status.triesLeft === 1 ? "1 more try" : `${status.triesLeft} more tries`} today
+            Missed it earlier — {status.triesLeft === 1 ? "1 more try" : `${status.triesLeft} more tries`} {w.now}
           </p>
           <Link className="btn big catch-it" to={`/catch/${lingo.id}`}>
             Try again!
@@ -112,22 +117,29 @@ export default function ScanOverlay({
 
       {server === "ok" && status.kind === "caughtToday" && (
         <p className="done" data-closed>
-          Caught today ✓ — come back tomorrow
-          {streak > 0 && <span className="streak"> · 🔥 Day {streak}</span>}
+          Caught {w.now} ✓ — {w.comeBack}
+          {streak > 0 && (
+            <span className="streak">
+              {" "}
+              · 🔥 {w.Unit} {streak}
+            </span>
+          )}
         </p>
       )}
 
       {server === "ok" && status.kind === "triedToday" && (
         <p className="done" data-closed>
-          Both tries used today ✗ — back tomorrow
+          Both tries used {w.now} ✗ — {w.comeBack}
         </p>
       )}
 
       {server === "ok" && status.kind === "noAttempts" && (
         <div className="done done-sleep" data-closed>
           <DuoArt mood={BRAND.duo.nightOwl ? "nightOwl" : "sleep"} className="sleep-art" />
-          <strong>No Lingos left today</strong>
-          <span className="small">You've tried {attemptsPerDay ?? 4} Lingos today — come back tomorrow</span>
+          <strong>No Lingos left {w.now}</strong>
+          <span className="small">
+            You've tried {attemptsPerDay ?? 4} Lingos {w.now} — {w.comeBack}
+          </span>
         </div>
       )}
     </section>

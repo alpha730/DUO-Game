@@ -2,7 +2,7 @@ import { onCall } from "firebase-functions/v2/https";
 import { COL, DEFAULT_RULES, type CatchDoc, type GetMyStateOutput, type UserDoc } from "../shared/types";
 import { serverNow } from "../lib/clock";
 import { forfeitOpenAttempt } from "../lib/attempts";
-import { istDate } from "../lib/date";
+import { playPeriod } from "../lib/date";
 import { loadConfig, userRef } from "../lib/db";
 import { requireAuth } from "../lib/guards";
 import { rateLimit } from "../lib/rateLimit";
@@ -13,8 +13,6 @@ export const getMyState = onCall<unknown, Promise<GetMyStateOutput>>(async (req)
   const uid = requireAuth(req);
   const now = await serverNow();
   await rateLimit(uid, "call", now);
-  const today = istDate(now);
-
   let [userSnap, catchesSnap, config] = await Promise.all([
     userRef(uid).get(),
     userRef(uid).collection(COL.catches).get(),
@@ -24,6 +22,9 @@ export const getMyState = onCall<unknown, Promise<GetMyStateOutput>>(async (req)
   // (losses changed).
   if (await forfeitOpenAttempt(uid, userSnap.data() as UserDoc | undefined, now)) userSnap = await userRef(uid).get();
   const rules = config?.rules ?? DEFAULT_RULES;
+  // One-day event: per-day state is per round (the current one, or the next while waiting).
+  const period = playPeriod(now, config);
+  const today = period.key;
   const user = userSnap.exists ? (userSnap.data() as UserDoc) : null;
 
   return {
@@ -37,5 +38,6 @@ export const getMyState = onCall<unknown, Promise<GetMyStateOutput>>(async (req)
     startAt: config ? config.startAt.toMillis() : null,
     lockAt: config ? config.lockAt.toMillis() : null,
     locked: config?.locked ?? false,
+    round: period.round,
   };
 });

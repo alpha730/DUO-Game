@@ -5,6 +5,7 @@ import { DuoArt } from "../components/BrandArt";
 import CoBrand from "../components/CoBrand";
 import { BRAND } from "../config/brand";
 import { useAuth } from "../lib/auth";
+import { istTime } from "../lib/period";
 
 type Row = [rule: string, value: React.ReactNode];
 
@@ -35,6 +36,8 @@ export default function Rules() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [rules, setRules] = useState<GameRules>(DEFAULT_RULES);
+  // One-day event: the rounds from config/game (IST times); null = the multi-day game.
+  const [rounds, setRounds] = useState<{ startAt: number; endAt: number }[] | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -44,6 +47,11 @@ export default function Rules() {
       .then((s) => {
         const c = s.data() as GameConfigDoc | undefined;
         if (live && c?.rules) setRules({ ...DEFAULT_RULES, ...c.rules });
+        if (live && c?.rounds?.length) {
+          setRounds(
+            c.rounds.map((x) => ({ startAt: x.startAt.toMillis(), endAt: x.endAt.toMillis() })).sort((a, b) => a.startAt - b.startAt),
+          );
+        }
       })
       .catch(() => {}); // offline: the defaults are the launch rules
     return () => {
@@ -73,6 +81,46 @@ export default function Rules() {
         </p>
       </div>
 
+      {rounds && (
+        <Table
+          id="rounds"
+          title="One day, three rounds"
+          rows={[
+            ...rounds.map((x, i): Row => [`Round ${i + 1}`, <strong>{istTime(x.startAt)} – {istTime(x.endAt)}</strong>]),
+            ["Between rounds", "Catching is closed — check the leaderboard and get ready"],
+            ["Each round", <><strong>{r.attemptsPerDay} different {L}s</strong>, {r.triesPerLingoPerDay} tries each — they reset when the next round starts</>],
+            ["After a catch", <>That {L} is done for the round — catch it again next round to grow its streak</>],
+          ]}
+        />
+      )}
+
+      {rounds && (
+        <Table
+          id="favourites"
+          title="Favourites and levels"
+          rows={[
+            ["Favourites", <>Pick <strong>{r.favoritesCount} favourite {L}s</strong> after your first 2 catches{r.favoriteChanges ? <> (you can change them {r.favoriteChanges}×)</> : <> — no changes, so choose well</>}</>],
+            ["Favourite streak", "Catch a favourite in every round. Miss a round and its streak breaks"],
+            ["Levels", <>Lv 1 on the first catch · Lv 2 when caught in {r.favLevel2Streak} rounds in a row · <strong>MAX</strong> in all {r.favMaxStreak} rounds (+{r.maxBonus.toLocaleString("en-IN")})</>],
+            ["Other " + L + "s", <>Lv 2 when caught again in a later round — only favourites reach MAX</>],
+            ["Harder questions", `A favourite caught in the round before gets hard questions`],
+          ]}
+        />
+      )}
+
+      {rounds && (
+        <Table
+          id="winning"
+          title="Winning and ties"
+          rows={[
+            ["To win", <>Take <strong>both favourites to MAX</strong> — only those players can win the top prizes</>],
+            ["Ranking", "Points, then favourites at MAX, then accuracy, then average answer time, then who reached the score first"],
+            ["A tie at the very top", "A sudden-death question on stage — the first correct answer wins"],
+          ]}
+        />
+      )}
+
+      {!rounds && (
       <Table
         id="daily"
         title="Every day"
@@ -85,6 +133,7 @@ export default function Rules() {
           ["Where", <>Only on the {BRAND.campusName} campuses — your location is checked when you tap Start</>],
         ]}
       />
+      )}
 
       <Table
         id="questions"
@@ -105,7 +154,9 @@ export default function Rules() {
         rows={[
           [`First catch of a ${L}`, <strong>+{r.firstCatchPoints}</strong>],
           [`Catch again (not a favourite)`, <strong>+{r.repeatCatchPoints}</strong>],
-          ["Catch a favourite", <><strong>+{r.favoriteCatchPointsPerDay} × streak day</strong> (day 1 = {r.favoriteCatchPointsPerDay} … day {r.favMaxStreak} = {r.favoriteCatchPointsPerDay * r.favMaxStreak}, then {r.favoriteCatchPointsPerDay * r.favMaxStreak} a day)</>],
+          ["Catch a favourite", rounds
+            ? <><strong>+{r.favoriteCatchPointsPerDay} × streak</strong> (round 2 in a row = {r.favoriteCatchPointsPerDay * 2}, round 3 = {r.favoriteCatchPointsPerDay * 3})</>
+            : <><strong>+{r.favoriteCatchPointsPerDay} × streak day</strong> (day 1 = {r.favoriteCatchPointsPerDay} … day {r.favMaxStreak} = {r.favoriteCatchPointsPerDay * r.favMaxStreak}, then {r.favoriteCatchPointsPerDay * r.favMaxStreak} a day)</>],
           ["Speed bonus", <><strong>+{r.speedBonusPerSecond}</strong> for every full second left on the timer (every correct answer)</>],
           [`All 10 ${L}s collected`, <strong>+{r.allTenBonus.toLocaleString("en-IN")} once</strong>],
           [`Favourite reaches MAX`, <strong>+{r.maxBonus.toLocaleString("en-IN")} once per {L}</strong>],
@@ -115,6 +166,7 @@ export default function Rules() {
         ]}
       />
 
+      {!rounds && (
       <Table
         id="favourites"
         title="Favourites, streaks and levels"
@@ -123,9 +175,10 @@ export default function Rules() {
           ["Favourite streak", "+1 for each day in a row you catch it. Miss a day and it restarts — levels never go down"],
           ["Favourite levels", <>Level 2 at a {r.favLevel2Streak}-day streak · Level 3 at {r.favLevel3Streak} days · <strong>MAX</strong> at {r.favMaxStreak} days</>],
           ["Other levels", <>Level 2 at {r.nonFavLevel2Catches} catches · Level 3 at {r.nonFavLevel3Catches} catches</>],
-          ["Harder questions", `A favourite on streak day 6 or later gets hard questions`],
+          ["Harder questions", `A favourite on streak day ${r.hardFromStreakDay} or later gets hard questions`],
         ]}
       />
+      )}
 
       <Table
         id="raids"
@@ -133,7 +186,7 @@ export default function Rules() {
         rows={[
           ["What", <>A surprise {L} at one poster for a short time — join at the poster</>],
           ["Unlock", "It opens when enough players have joined"],
-          ["Tries", <><strong>1 try</strong> per raid — it doesn't use your daily {L}s or tries</>],
+          ["Tries", <><strong>1 try</strong> per raid — it doesn't use your {rounds ? "round's" : "daily"} {L}s or tries</>],
         ]}
       />
 

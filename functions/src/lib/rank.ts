@@ -5,6 +5,8 @@ export const BOARD_SIZE = 100;
 export const CANDIDATES = 300;
 
 export type RankInput = Pick<UserDoc, "name" | "points" | "wins" | "losses" | "totalAnswerMs"> & {
+  /** Favourites at MAX (0–2). */
+  favMaxCount?: number;
   uid: string;
   /** millis; null if never scored */
   pointsReachedAt: number | null;
@@ -13,13 +15,21 @@ export type RankInput = Pick<UserDoc, "name" | "points" | "wins" | "losses" | "t
 const accuracy = (u: RankInput) => (u.wins + u.losses > 0 ? u.wins / (u.wins + u.losses) : 0);
 const avgAnswerMs = (u: RankInput) => (u.wins > 0 ? u.totalAnswerMs / u.wins : Number.POSITIVE_INFINITY);
 
+const favMax = (u: RankInput) => u.favMaxCount ?? 0;
+
+/** Both favourites at MAX: qualified to win (one-day event). */
+export const QUALIFY_FAV_MAX = 2;
+export const isQualified = (favMaxCount: number | undefined) => (favMaxCount ?? 0) >= QUALIFY_FAV_MAX;
+
 /**
- * Leaderboard order (SPEC §2): points ↓ → accuracy ↓ → average answer time ↑ → reached the
- * score first ↑. The same order picks the top 20 for the final. Pure.
+ * Leaderboard order (SPEC §2): points ↓ → favourites at MAX ↓ → accuracy ↓ → average answer time ↑
+ * → reached the score first ↑ → uid (never a tie). The same order picks the top 20 for the final,
+ * where qualified players (both favourites at MAX) come first. Pure.
  */
 export function compareStudents(a: RankInput, b: RankInput): number {
   return (
     b.points - a.points ||
+    favMax(b) - favMax(a) ||
     accuracy(b) - accuracy(a) ||
     avgAnswerMs(a) - avgAnswerMs(b) ||
     (a.pointsReachedAt ?? Number.POSITIVE_INFINITY) - (b.pointsReachedAt ?? Number.POSITIVE_INFINITY) ||
@@ -42,5 +52,6 @@ export function rankStudents(users: RankInput[], size = BOARD_SIZE): StudentRow[
       points: u.points,
       accuracy: Math.round(accuracy(u) * 1000) / 1000,
       avgAnswerMs: u.wins > 0 ? Math.round(u.totalAnswerMs / u.wins) : 0,
+      favMax: favMax(u),
     }));
 }

@@ -216,7 +216,8 @@ function podium(rank: Rank) {
 
 // ---------------------------------------------------------------- shared level recipe
 
-const LABEL = ["Lv 1", "Lv 2", "Lv 3", "MAX"] as const;
+/** Name-tag label per look (3 levels: look 2 = Lv 1, look 3 = Lv 2, look 4 = MAX; look 1 is unused). */
+const LABEL = ["Lv 1", "Lv 1", "Lv 2", "MAX"] as const;
 
 interface Recipe {
   color: string; // ring + name tag

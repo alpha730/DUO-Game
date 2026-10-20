@@ -18,7 +18,7 @@ import {
 import { serverNow } from "../lib/clock";
 import { forfeitTx, readOpenAttemptTx } from "../lib/attempts";
 import { publicChallenge, shuffledOrder } from "../lib/challenge";
-import { istDate } from "../lib/date";
+import { playPeriod } from "../lib/date";
 import { catchRef, db, userRef } from "../lib/db";
 import { lenientCampus } from "../lib/emulator";
 import { campusCheck, distanceM, isValidLatLng } from "../lib/geo";
@@ -52,7 +52,16 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
     fail("off-campus", "You need to be on campus to catch Lingos.");
   }
 
-  const today = istDate(now);
+  // Per-day keys hold the round key in the one-day event (lib/date.ts playPeriod).
+  const period = playPeriod(now, config);
+  const today = period.key;
+  const inRounds = period.round !== null;
+  const thisTime = inRounds ? "this round" : "today";
+  const comeBack = inRounds
+    ? period.round!.n < period.round!.of
+      ? " — come back next round"
+      : ""
+    : " — come back tomorrow";
   const { rules } = config;
   const lingoSnap = await db().collection(COL.lingos).doc(lingoId).get();
   if (!lingoSnap.exists) throw new HttpsError("not-found", "Unknown Lingo.");
@@ -103,13 +112,13 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
       // and this Lingo's catch doc — no query on attempts in the transaction.
       const name = (lingoSnap.data() as LingoDoc).name;
       if ((catchSnap!.data() as CatchDoc | undefined)?.lastCaughtDate === today) {
-        fail("already-caught", `You've already caught ${name} today — come back tomorrow`);
+        fail("already-caught", `You've already caught ${name} ${thisTime}${comeBack}`);
       }
       if (triesUsed >= rules.triesPerLingoPerDay) {
-        fail("already-tried", `You've used your ${rules.triesPerLingoPerDay} tries at ${name} today — come back tomorrow`);
+        fail("already-tried", `You've used your ${rules.triesPerLingoPerDay} tries at ${name} ${thisTime}${comeBack}`);
       }
       if (!tried.includes(lingoId) && (used >= rules.attemptsPerDay || tried.length >= rules.attemptsPerDay)) {
-        fail("no-attempts", `You've tried ${rules.attemptsPerDay} Lingos today — come back tomorrow`);
+        fail("no-attempts", `You've tried ${rules.attemptsPerDay} Lingos ${thisTime}${comeBack}`);
       }
     }
     // Which question (SPEC §9): favourite on streak day ≥ 6 → hard, else medium; weighted type; not
@@ -127,7 +136,7 @@ export const startAttempt = onCall<unknown, Promise<StartAttemptOutput>>(async (
       level = "medium";
     } else {
       const favorite = user.favorites.includes(lingoId);
-      level = levelFor(favorite, streakDayFor(favorite, catchSnap!.data() as CatchDoc | undefined, today));
+      level = levelFor(favorite, streakDayFor(favorite, catchSnap!.data() as CatchDoc | undefined, today), rules.hardFromStreakDay ?? 6);
       const q = pickQuestion(pool, {
         level,
         seen: new Set(user.seenQ ?? []),

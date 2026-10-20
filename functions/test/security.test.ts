@@ -261,7 +261,10 @@ describe("F. account abuse", () => {
 
   it("Possible duplicate accounts: same name, spelling variant, similar email, made minutes apart — flag only", async () => {
     const a = await admin();
-    const tag = Math.random().toString(36).slice(2, 7);
+    // Starts with "a": the name key sorts its words, so "a… ishaan mehrotra" keeps this run's
+    // variants next to each other — never interleaved with players left by earlier runs, which
+    // would push "Ishan" out of the sorted-neighbourhood window.
+    const tag = `a${Math.random().toString(36).slice(2, 7)}`;
     const make = async (name: string, email: string) => {
       const p = await newPlayer();
       await adb.doc(`users/${p.uid}`).update({ name: `${name} ${tag}`, email });

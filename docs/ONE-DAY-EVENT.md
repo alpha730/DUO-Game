@@ -43,7 +43,7 @@ npx tsx scripts/resetForEvent.ts --prod --project decade-hunt-66f6e --yes    # d
 | | |
 |---|---|
 | Rounds | 3 (default 10:00–11:30, 12:30–14:00, 15:00–16:00 IST). Between rounds new tries are closed ("Round 2 starts at 12:30"). An answer to a question started in a round still counts. |
-| Each round | 4 different Lingos, 2 tries each. A catch closes that Lingo for the round. Resets when the next round starts. |
+| Each round | 5 different Lingos, 2 tries each (2 favourites + 3 new, 3 new, 2 new = all 10 by round 3, with 1 spare). A catch closes that Lingo for the round. Resets when the next round starts. |
 | Levels | **Three**: Lv 1 → Lv 2 → MAX (level 3 is never given). |
 | Favourites | Pick **2** after the first 2 catches. **No changes.** Rounds caught before picking count. |
 | Favourite streak | Caught in round 1 → Lv 1 · rounds 1+2 → Lv 2 · rounds 1+2+3 → **MAX** (+1000 once). Miss a round → the streak breaks (no MAX that day). |

@@ -708,7 +708,7 @@ export interface RoundView {
  *   non-favourite: first catch → Lv 1, caught again in a later round → Lv 2, never MAX
  */
 export const ONE_DAY_RULES: Partial<GameRules> = {
-  attemptsPerDay: 4, // per round
+  attemptsPerDay: 5, // per round: 2 favourites every round + 3/3/2 new = all 10 by round 3 (with 1 spare)
   triesPerLingoPerDay: 2, // per round
   favoritesCount: 2,
   favoriteChanges: 0,

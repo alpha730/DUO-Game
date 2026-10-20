@@ -117,14 +117,14 @@ try {
   await setServerClock(at("10:25"));
   r = await roundLine();
   ok(r.text === "Round 2 starts at 10:30" && r.active === "false", `between rounds: HUD line "${r.text}"`);
-  ok((await page.locator(".hud-left strong").innerText()).trim() === "4/4", "between rounds: the next round's 4 Lingos are shown full");
+  ok((await page.locator(".hud-left strong").innerText()).trim() === "5/5", "between rounds: the next round's 5 Lingos are shown full");
   await shot(page, "15-between-rounds");
   const before = (await adb.doc(`users/${p.uid}`).get()).data();
   await page.goto(BASE + `/catch/${FAV[0].id}`);
   await page.getByRole("button", { name: "Start" }).waitFor({ timeout: 25000 });
   await page.waitForFunction(() => /Lingos left/.test(document.querySelector(".catch-head")?.textContent ?? ""), null, { timeout: 15000 }).catch(() => {});
   const head = (await page.locator(".catch-head").innerText()).replace(/\s+/g, " ");
-  ok(head.includes("Lingos left this round: 4/4"), `wording: Catch header "${head}"`);
+  ok(head.includes("Lingos left this round: 5/5"), `wording: Catch header "${head}"`);
   await page.getByRole("button", { name: "Start" }).click();
   const err = page.locator(".catch .error[role=alert]");
   await err.waitFor({ timeout: 15000 });

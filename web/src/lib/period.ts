@@ -32,6 +32,6 @@ export const istTime = (ms: number) => new Date(ms + 330 * 60_000).toISOString()
 export function roundLine(round: RoundView | null | undefined, now = Date.now()): string | null {
   if (!round) return null;
   if (round.active) return `Round ${round.n} of ${round.of} · until ${istTime(round.endAt)}`;
-  if (now < round.startAt) return `Round ${round.n} of ${round.of} starts at ${istTime(round.startAt)}`;
+  if (now < round.startAt) return `Round ${round.n} starts at ${istTime(round.startAt)}`;
   return "All rounds are over";
 }

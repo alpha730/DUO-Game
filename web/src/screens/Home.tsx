@@ -16,7 +16,7 @@ import { useAuth } from "../lib/auth";
 import { dayBefore, triesLeft, triesUsed } from "../lib/catchStatus";
 import { periodWords } from "../lib/period";
 import { loadLingos, type Lingo } from "../lib/lingos";
-import { serverOffsetMs, useMyState } from "../lib/myState";
+import { serverOffsetMs, useMyState, useRoundRefresh } from "../lib/myState";
 import { useOpenRaids } from "../lib/raids";
 
 const MAX_DAY = 10;
@@ -71,6 +71,7 @@ export default function Home() {
   const { profile } = useAuth();
   // Fresh on every visit (e.g. right after a catch); getMyState also auto-forfeits any open attempt.
   const { state: me, error, reload } = useMyState(0);
+  useRoundRefresh(me, reload);
   const w = periodWords(me?.round); // "today" / "this round" (one-day event)
   const [lingos, setLingos] = useState<Lingo[]>([]);
   const raids = useOpenRaids();

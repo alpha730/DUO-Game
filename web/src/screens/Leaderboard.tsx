@@ -6,7 +6,7 @@ import { api, apiErrorMessage } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { usingEmulators } from "../lib/firebase";
 import Hud from "../components/Hud";
-import { useMyState } from "../lib/myState";
+import { useMyState, useRoundRefresh } from "../lib/myState";
 import { initial } from "../lib/trainer";
 
 interface Board {
@@ -27,7 +27,8 @@ export default function Leaderboard() {
   const { user, profile } = useAuth();
   const [board, setBoard] = useState<Board | null | undefined>(undefined);
   const [msg, setMsg] = useState("");
-  const { state: me } = useMyState(60_000); // HUD numbers; a minute-old copy is fine here
+  const { state: me, reload } = useMyState(60_000); // HUD numbers; a minute-old copy is fine here
+  useRoundRefresh(me, reload);
 
   // Cost rule: listen only while this screen is open (one doc, refreshed every 10 min).
   useEffect(

@@ -2,7 +2,8 @@
 //     rounds (10:00–10:20, 10:30–10:50, 11:00–11:20 IST today) and the fake server clock walks
 //     through them. Checks: the round line under the HUD, "Round N starts at…" between rounds (HUD
 //     + a refused Start that uses no try), both favourites going Lv 1 → Lv 2 → MAX over the 3 rounds
-//     (+1000, favMaxCount 2 = qualified), "All rounds are over", and Rules showing the rounds.
+//     (+1000, favMaxCount 2 = qualified), "All rounds are over", Rules showing the rounds, and the
+//     round line switching by itself at a round's end and the next start (no reload).
 //     config/game and the clock are put back at the end, so the other flows are unaffected.
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -79,6 +80,8 @@ try {
   await page.goto(BASE + "/me");
   const meStreak = page.locator("[data-stat=streak] span").last();
   await meStreak.waitFor({ timeout: 20000 });
+  // The wording follows getMyState.round, which may land just after the first paint.
+  await page.waitForFunction(() => document.querySelector("[data-stat=streak] span:last-child")?.textContent?.trim() === "rounds in a row", null, { timeout: 15000 }).catch(() => {});
   ok((await meStreak.innerText()).trim() === "rounds in a row", `wording: Me streak stat "${(await meStreak.innerText()).trim()}"`);
   await page.goto(BASE + "/scan");
   const chip = page.locator(".scan-chip[data-left]");
@@ -89,7 +92,7 @@ try {
   // --- Between rounds (10:25): "Round 2 starts at 10:30" — HUD + a refused Start that uses no try.
   await setServerClock(at("10:25"));
   r = await roundLine();
-  ok(r.text === "Round 2 of 3 starts at 10:30" && r.active === "false", `between rounds: HUD line "${r.text}"`);
+  ok(r.text === "Round 2 starts at 10:30" && r.active === "false", `between rounds: HUD line "${r.text}"`);
   ok((await page.locator(".hud-left strong").innerText()).trim() === "4/4", "between rounds: the next round's 4 Lingos are shown full");
   await shot(page, "15-between-rounds");
   const before = (await adb.doc(`users/${p.uid}`).get()).data();
@@ -174,6 +177,26 @@ try {
   ok((await page.locator("[data-rules-section=favourites]").innerText()).includes("MAX"), "Rules: favourites and levels (Lv 1 → Lv 2 → MAX)");
   ok((await page.locator("[data-rules-section=daily]").count()) === 0, "Rules: no multi-day 'Every day' table");
   await shot(page, "15-rules", { fullPage: true });
+
+  // --- Live round line: no reload. Rounds 11:30–11:31 and 11:32–11:40 (a 1-minute gap); the clock at
+  //     11:30:55. Home switches to "Round 2 starts at 11:32" when round 1 ends, then (on Dex) to
+  //     "Round 2 of 2 · until 11:40" when round 2 starts — the screen re-fetches getMyState itself.
+  execFileSync("npx", ["tsx", "scripts/oneDayEvent.ts", "--date", DATE, "--rounds", "11:30-11:31,11:32-11:40"], {
+    cwd: ROOT,
+    shell: true,
+    env: { ...process.env, FIRESTORE_EMULATOR_HOST: "127.0.0.1:8085" },
+  });
+  await setServerClock(at("11:30") + 55_000);
+  r = await roundLine();
+  ok(r.text === "Round 1 of 2 · until 11:31", `live: round 1 "${r.text}"`);
+  const liveLine = (text, timeout) =>
+    page.waitForFunction((t) => document.querySelector(".hud-round")?.textContent?.trim() === t, text, { timeout }).then(() => true, () => false);
+  ok(await liveLine("Round 2 starts at 11:32", 20000), "live: Home switches to \"Round 2 starts at 11:32\" when round 1 ends (no reload)");
+  await page.goto(BASE + "/dex");
+  await page.locator(".hud-round").waitFor({ timeout: 20000 });
+  ok((await page.locator(".hud-round").innerText()).trim() === "Round 2 starts at 11:32", "live: Dex shows the gap too");
+  ok(await liveLine("Round 2 of 2 · until 11:40", 80000), "live: Dex switches to \"Round 2 of 2 · until 11:40\" when round 2 starts (no reload)");
+  ok((await page.locator(".hud-round").getAttribute("data-active")) === "true", "live: the line is active again");
 } finally {
   await resetServerClock();
   if (configBefore) await configRef.set(configBefore); // back to the multi-day game for the other flows

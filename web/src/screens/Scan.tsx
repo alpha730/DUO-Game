@@ -1,5 +1,5 @@
 import { BRAND, lingoName } from "../config/brand";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { LINGO_COUNT, type GetMyStateOutput, type Level } from "@shared/types";
 import { CameraError } from "../ar/cameraError";
@@ -10,6 +10,7 @@ import { CloseIcon, CoinIcon } from "../components/Icons";
 import ScanOverlay from "../components/ScanOverlay";
 import { periodWords } from "../lib/period";
 import { api } from "../lib/api";
+import { useRoundRefresh } from "../lib/myState";
 import { useAuth } from "../lib/auth";
 import { usingEmulators } from "../lib/firebase";
 import { inAppBrowser } from "../lib/browser";
@@ -56,6 +57,8 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
   const [me, setMe] = useState<GetMyStateOutput | null>(null);
   const [meState, setMeState] = useState<"loading" | "ok" | "error">("loading");
   const [meRun, setMeRun] = useState(0); // bump to retry getMyState
+  const bumpMe = useCallback(() => setMeRun((n) => n + 1), []);
+  useRoundRefresh(me, bumpMe); // a new round: the 4 Lingos come back
   const raids = useOpenRaids(!testMode); // polled (cost rules), for the "Join raid" button
   // Poster recognised but the `lingos` collection is empty (game data not seeded yet).
   const [bareposter, setBarePoster] = useState<number | null>(null);
@@ -64,7 +67,7 @@ export default function Scan({ testMode = false }: { testMode?: boolean }) {
   useEffect(() => {
     if (testMode) return;
     let cancelled = false;
-    setMeState("loading");
+    setMeState((s) => (s === "ok" ? s : "loading")); // a round-boundary refresh keeps the card
     api
       .getMyState({})
       .then((s) => {

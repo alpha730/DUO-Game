@@ -40,3 +40,27 @@ export function useMyState(maxAgeMs = 0) {
 
   return { state, error, reload };
 }
+
+// setTimeout's limit (~24.8 days); a later boundary is re-checked on the next fetch anyway.
+const MAX_DELAY_MS = 2 ** 31 - 1;
+/** Fetch a little after the boundary, so the server (the timer) is surely past it. */
+const BOUNDARY_SLACK_MS = 1500;
+
+/**
+ * One-day event: calls `reload` when the round in `state` ends, or when the next one starts (server
+ * time, via the serverNow offset), so "Round 1 of 3 · until 11:30" turns into "Round 2 starts at
+ * 12:30" and then "Round 2 of 3 · until 14:00" without a manual refresh. Each new answer re-arms it.
+ * Nothing to do for the multi-day game (round = null) or after the last round.
+ */
+export function useRoundRefresh(state: GetMyStateOutput | null, reload: () => void): void {
+  const round = state?.round;
+  const serverAt = state?.serverNow;
+  useEffect(() => {
+    if (!round) return;
+    const now = Date.now() + serverOffsetMs();
+    const next = round.active ? round.endAt : now < round.startAt ? round.startAt : null;
+    if (next === null) return;
+    const t = setTimeout(reload, Math.min(Math.max(next - now, 0) + BOUNDARY_SLACK_MS, MAX_DELAY_MS));
+    return () => clearTimeout(t);
+  }, [round, serverAt, reload]);
+}

@@ -12,7 +12,7 @@ import LingoArt from "../components/LingoArt";
 import { BRAND, lingoName } from "../config/brand";
 import { dayBefore } from "../lib/catchStatus";
 import { loadLingos, type Lingo } from "../lib/lingos";
-import { useMyState } from "../lib/myState";
+import { useMyState, useRoundRefresh } from "../lib/myState";
 import { fmt } from "../lib/trainer";
 
 const istDate = (ms: number) =>
@@ -137,7 +137,8 @@ function DetailSheet({
 
 /** Dex: all 10 Lingos in year order 2016 → 2025, caught in colour, uncaught as silhouettes. */
 export default function Dex() {
-  const { state: me } = useMyState(0);
+  const { state: me, reload } = useMyState(0);
+  useRoundRefresh(me, reload);
   const [lingos, setLingos] = useState<Lingo[]>([]);
   const [params, setParams] = useSearchParams();
   const open = params.get("lingo");

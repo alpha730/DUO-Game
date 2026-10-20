@@ -36,3 +36,7 @@ assets/brand/_to_delete/
 
 # Brand-derived app icons (web/scripts/app-icons.mjs)
 web/public/brand-icons/
+
+# Firebase service-account key for scripts (never commit)
+key.json
+*-firebase-adminsdk-*.json

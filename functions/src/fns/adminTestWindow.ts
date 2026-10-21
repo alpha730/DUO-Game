@@ -6,7 +6,7 @@ import { istDate } from "../lib/date";
 import { configRef, db } from "../lib/db";
 import { requireRole } from "../lib/guards";
 import { STAFF_INSTANCES } from "../lib/instances";
-import { closeWindow, openTestWindow, openWindow, restoreEvent, roundNumber, type Span, type WindowState } from "../lib/testWindow";
+import { closeWindow, demoView, openWindow, restoreEvent, type Span, type WindowState } from "../lib/testWindow";
 
 const toSpan = (r: GameRound): Span => ({ startAt: r.startAt.toMillis(), endAt: r.endAt.toMillis() });
 const toRound = (r: Span) => ({ startAt: Timestamp.fromMillis(r.startAt), endAt: Timestamp.fromMillis(r.endAt) });
@@ -23,19 +23,19 @@ function stateOf(c: GameConfigDoc): WindowState {
 }
 
 function view(s: WindowState, now: number): AdminTestWindowOutput {
-  const w = openTestWindow(s, now);
-  return { serverNow: now, testing: !!s.backup, open: w ? { n: roundNumber(s, w), ...w } : null, rounds: s.rounds.length };
+  return { serverNow: now, testing: !!s.backup, ...demoView(s, now), rounds: s.rounds.length };
 }
 
 /**
- * Admin "Test window" (/admin): a short test round on the real game before the event. "open" appends
- * a round [now, now + N min] (the real times saved once in config/game.eventBackup), "close" ends the
- * open test window now, "restore" puts the event times back and rewrites public/event. Refused on
- * the event day (lib/testWindow.ts). One transaction on config/game.
+ * Admin "Test window" (/admin): a 3-round demo of the event on the real game, before the event.
+ * "open" appends 3 rounds of 5 min from now (the real times saved once in config/game.eventBackup),
+ * "close" ends the running demo round now and drops the ones not started, "restore" puts the event
+ * times back and rewrites public/event. Refused on the event day (lib/testWindow.ts). One
+ * transaction on config/game.
  */
 export const adminTestWindow = onCall<unknown, Promise<AdminTestWindowOutput>>(STAFF_INSTANCES, async (req) => {
   requireRole(req, ["admin"]);
-  const d = (req.data ?? {}) as { action?: unknown; minutes?: unknown };
+  const d = (req.data ?? {}) as { action?: unknown };
   if (!["status", "open", "close", "restore"].includes(d.action as string)) {
     throw new HttpsError("invalid-argument", 'action must be "status", "open", "close" or "restore".');
   }
@@ -46,8 +46,7 @@ export const adminTestWindow = onCall<unknown, Promise<AdminTestWindowOutput>>(S
     const s = stateOf(config);
     if (d.action === "status") return view(s, now);
 
-    const minutes = d.minutes === undefined ? 5 : (d.minutes as number);
-    const out = d.action === "open" ? openWindow(s, now, minutes) : d.action === "close" ? closeWindow(s, now) : restoreEvent(s);
+    const out = d.action === "open" ? openWindow(s, now) : d.action === "close" ? closeWindow(s, now) : restoreEvent(s);
     if ("error" in out) throw new HttpsError("failed-precondition", out.error, { code: out.code });
     const n = out.state;
     tx.update(configRef(), {

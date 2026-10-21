@@ -135,51 +135,63 @@ const mmss = (ms: number) => {
 };
 
 /**
- * Test window (before the event): a 5-minute test round on the real game. The server saves the event
- * times on the first open and refuses on the event day (adminTestWindow, lib/testWindow.ts).
+ * Test window (before the event): a 3-round demo of the event on the real game. The server saves the
+ * event times on the first open and refuses on the event day (adminTestWindow, lib/testWindow.ts).
  */
 function TestWindow({ reload }: { reload: () => void }) {
   const [tw, setTw] = useState<{ out: AdminTestWindowOutput; offset: number } | null>(null);
   const { busy, status, run } = useAction();
   const now = useServerNow(tw?.offset ?? 0);
   const apply = useCallback((out: AdminTestWindowOutput) => setTw({ out, offset: out.serverNow - Date.now() }), []);
+  const refresh = useCallback(() => api.adminTestWindow({ action: "status" }).then(apply, () => {}), [apply]);
+  useEffect(() => void refresh(), [refresh]);
+  // The demo moves on by itself (round → gap → next round): ask again just after each boundary.
+  const boundary = tw ? (tw.out.open?.endAt ?? tw.out.next?.startAt ?? null) : null;
   useEffect(() => {
-    api.adminTestWindow({ action: "status" }).then(apply, () => {});
-  }, [apply]);
+    if (boundary === null || !tw) return;
+    const t = setTimeout(() => void refresh(), Math.max(0, boundary - (Date.now() + tw.offset)) + 1000);
+    return () => clearTimeout(t);
+  }, [boundary, tw, refresh]);
   const act = (action: "open" | "close" | "restore", done: string) =>
     run(async () => {
-      apply(await api.adminTestWindow(action === "open" ? { action, minutes: 5 } : { action }));
+      apply(await api.adminTestWindow({ action }));
       reload(); // the Lock / Config cards show the new times
       return done;
     }).catch(() => {});
   const restore = () => {
-    if (!window.confirm("Go back to the event times? Test windows end and the real rounds come back.")) return;
+    if (!window.confirm("Go back to the event times? The demo ends and the real rounds come back.")) return;
     act("restore", "Event times are back.");
   };
 
   const open = tw?.out.open && now < tw.out.open.endAt ? tw.out.open : null;
-  const state = !tw ? "loading" : open ? "open" : tw.out.testing ? "closed" : "event";
+  const next = !open && tw?.out.next ? tw.out.next : null;
+  const state = !tw ? "loading" : open ? "open" : next ? "next" : tw.out.testing ? "closed" : "event";
   return (
     <Section title="Test window">
       <p style={{ margin: 0 }} data-test-window={state} role="status">
         {state === "loading" && "…"}
         {open && (
           <>
-            🧪 Test window open · <strong data-countdown>{mmss(open.endAt - now)}</strong> left (round {open.n})
+            🧪 Demo round {open.k} of {open.of} · <strong data-countdown>{mmss(open.endAt - now)}</strong> left
           </>
         )}
-        {state === "closed" && "⏸ Closed — test windows in use; the event times are saved."}
-        {state === "event" && "📅 Event times active."}
+        {next && (
+          <>
+            Next demo round in <strong data-countdown>{mmss(next.startAt - now)}</strong>
+          </>
+        )}
+        {state === "closed" && "⏸ Closed"}
+        {state === "event" && "📅 Event times active"}
       </p>
       <p className="small muted" style={{ margin: 0 }}>
-        Opens a 5-minute round now with the real rules, so the team can play it through. Each window is the next
-        round, so favourites level up window to window. Not possible on the event day.
+        One press runs the event in miniature with the real rules: 3 rounds of 5 minutes, 1 minute apart. A favourite
+        caught in all 3 goes Lv 1 → Lv 2 → MAX. Not possible on the event day.
       </p>
       <div className="row" style={{ flexWrap: "wrap" }}>
-        <button className="btn small" onClick={() => act("open", "Test window open for 5 minutes.")} disabled={busy || !tw || !!open}>
-          Open for 5 minutes
+        <button className="btn small" onClick={() => act("open", "Demo started: 3 rounds.")} disabled={busy || !tw || !!open || !!next}>
+          Open demo (3 rounds)
         </button>
-        <button className="btn small secondary" onClick={() => act("close", "Test window closed.")} disabled={busy || !open}>
+        <button className="btn small secondary" onClick={() => act("close", "Demo closed.")} disabled={busy || (!open && !next)}>
           Close now
         </button>
         <button className="btn small danger" onClick={restore} disabled={busy || !tw?.out.testing}>

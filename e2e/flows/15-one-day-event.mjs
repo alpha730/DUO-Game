@@ -4,7 +4,8 @@
 //     + a refused Start that uses no try), both favourites going Lv 1 → Lv 2 → MAX over the 3 rounds
 //     (+1000, favMaxCount 2 = qualified), "All rounds are over", Rules showing the rounds, and the
 //     round line switching by itself at a round's end and the next start (no reload), --off, and the
-//     admin "Test window" (open / close / reopen → Lv 1 → Lv 2, the event-day refusal, restore).
+//     admin "Test window" demo (one press → 3 rounds → Lv 1 → Lv 2 → MAX, Close, the event-day
+//     refusal, restore).
 //     config/game and the clock are put back at the end, so the other flows are unaffected.
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -247,81 +248,127 @@ try {
     await anon.browser.close();
   }
 
-  // --- Admin "Test window" (before the event). The real rounds are TOMORROW (like prod the day
-  //     before); the clock is real time. Open → play → close → reopen: each window is the next round,
-  //     so a favourite goes Lv 1 → Lv 2. Then the event-day refusal and "Back to event times".
+  // --- Admin "Test window" → a 3-round demo (before the event). The real rounds are TOMORROW (like prod
+  //     the day before). One press = 3 rounds of 5 min, 1 minute apart; the fake clock walks through
+  //     them: a favourite caught in each goes Lv 1 → Lv 2 → MAX. Then Close (the rounds not started
+  //     go), the event-day refusal and "Back to event times".
   const TOMORROW = addDays(istDate(), 1);
-  execFileSync("npx", ["tsx", "scripts/oneDayEvent.ts", "--date", TOMORROW], { cwd: ROOT, shell: true, env: { ...process.env, FIRESTORE_EMULATOR_HOST: "127.0.0.1:8085" } });
-  await adb.doc("config/game").update({ locked: true }); // the event's times; play closed until a window opens
-  twAdmin = await makeUser({ name: "Window Admin", role: "admin" });
+  execFileSync("npx", ["tsx", "scripts/oneDayEvent.ts", "--date", TOMORROW, "--rounds", "11:30-12:30,13:00-14:00,14:30-15:30"], { cwd: ROOT, shell: true, env: { ...process.env, FIRESTORE_EMULATOR_HOST: "127.0.0.1:8085" } });
+  await adb.doc("config/game").update({ locked: true }); // the event's times; play closed until a demo opens
+  await resetServerClock();
+  twAdmin = await makeUser({ name: "Demo Admin", role: "admin" });
   const adm = await launch({ viewport: { width: 420, height: 900 } });
   adm.page.on("dialog", (d) => d.accept());
   await signIn(adm.page, twAdmin.email);
-  await adm.page.goto(BASE + "/admin");
   const card = adm.page.locator("[data-test-window]");
   const twState = (v) => adm.page.waitForFunction((x) => document.querySelector("[data-test-window]")?.getAttribute("data-test-window") === x, v, { timeout: 25000 }).then(() => true, () => false);
   const twButton = (name) => adm.page.getByRole("button", { name });
-  ok((await twState("event")) && (await card.innerText()).includes("Event times active"), `test window: "${(await card.innerText()).trim()}"`);
+  const adminAt = async (state) => {
+    await adm.page.goto(BASE + "/admin");
+    const shown = await twState(state);
+    return { shown, text: (await card.innerText()).trim() };
+  };
+  let a = await adminAt("event");
+  ok(a.shown && a.text === "📅 Event times active", `demo card: "${a.text}"`);
 
-  // Window 1.
-  await twButton("Open for 5 minutes").click();
-  ok(await twState("open"), "test window: opened");
-  const cardText = (await card.innerText()).trim();
-  ok(/Test window open · [45]:\d\d left \(round 1\)/.test(cardText), `test window: live countdown "${cardText}"`);
+  // One press → 3 rounds.
+  await twButton("Open demo (3 rounds)").click();
+  ok(await twState("open"), "demo: opened");
+  a = { text: (await card.innerText()).trim() };
+  ok(/^🧪 Demo round 1 of 3 · [45]:\d\d left$/.test(a.text), `demo: live countdown "${a.text}"`);
   const c1 = (await configRef.get()).data();
-  ok(c1.eventBackup?.rounds?.length === 3 && c1.rounds.length === 4 && c1.locked === false, "open: the real rounds saved in eventBackup, the window appended, the game unlocked");
-  await shot(adm.page, "15-test-window-open");
-  p2 = await makeUser({ name: "Window Player" });
+  const demo = c1.rounds.map((x) => ({ startAt: x.startAt.toMillis(), endAt: x.endAt.toMillis() })).filter((x) => !c1.eventBackup.rounds.some((y) => y.startAt.toMillis() === x.startAt)).sort((x, y) => x.startAt - y.startAt);
+  const T = demo[0]?.startAt;
+  ok(
+    c1.eventBackup?.rounds?.length === 3 && c1.rounds.length === 6 && c1.locked === false && demo.length === 3 &&
+      demo.every((x, i) => x.startAt === T + i * 6 * 60_000 && x.endAt === x.startAt + 5 * 60_000),
+    "one press: the real rounds saved in eventBackup, 3 rounds appended ([now,+5] [+6,+11] [+12,+17]), unlocked",
+  );
+  await shot(adm.page, "15-demo-open");
+
+  // Round 1: catch both, pick them as favourites → Lv 1.
+  p2 = await makeUser({ name: "Demo Player" });
   await signIn(page, p2.email);
+  await setServerClock(T + 30_000);
   r = await roundLine();
-  ok(/^Round 1 of 4 · until \d\d:\d\d$/.test(r.text) && r.active === "true", `window 1: HUD "${r.text}"`);
-  for (const f of FAV) ok((await win(f)) === "won", `window 1: caught ${f.name}`);
+  ok(/^Round 1 of 6 · until \d\d:\d\d$/.test(r.text) && r.active === "true", `demo round 1: HUD "${r.text}"`);
+  for (const f of FAV) ok((await win(f)) === "won", `demo round 1: caught ${f.name}`);
   await page.goto(BASE + "/favorites");
   for (const f of FAV) await page.getByRole("button", { name: new RegExp(f.name) }).click();
   await page.getByRole("button", { name: "Save favourites" }).click();
   await page.waitForURL("**/home", { timeout: 15000 });
-  let wc = (await adb.doc(`users/${p2.uid}/catches/${FAV[0].id}`).get()).data();
-  ok(wc.level === 1 && wc.favStreak === 1 && wc.lastCaughtDate.endsWith("#R1"), `window 1: ${FAV[0].name} Lv 1, streak 1 (${wc.lastCaughtDate})`);
+  const wcOf = async () => (await adb.doc(`users/${p2.uid}/catches/${FAV[0].id}`).get()).data();
+  let wc = await wcOf();
+  ok(wc.level === 1 && wc.favStreak === 1 && wc.lastCaughtDate.endsWith("#R1"), `demo round 1: ${FAV[0].name} Lv 1, streak 1`);
 
-  // Close: the game is closed until the next window (the next round is tomorrow's).
-  await twButton("Close now").click();
-  ok(await twState("closed"), "test window: closed");
-  ok((await card.innerText()).includes("Closed"), "close: the card says Closed");
+  // The 1-minute gap.
+  await setServerClock(T + 5 * 60_000 + 30_000);
+  a = await adminAt("next");
+  ok(/^Next demo round in 0:[0-3]\d$/.test(a.text), `demo gap: card "${a.text}"`);
   r = await roundLine();
-  ok(r.text === "Round 2 starts at 10:00" && r.active === "false", `closed: HUD "${r.text}" (tomorrow's round 1 comes next)`);
+  ok(/^Round 2 starts at \d\d:\d\d$/.test(r.text) && r.active === "false", `demo gap: HUD "${r.text}"`);
 
-  // Window 2: the next round → the favourite goes Lv 2.
-  await twButton("Open for 5 minutes").click();
-  ok(await twState("open"), "test window: reopened");
-  ok((await card.innerText()).includes("(round 2)"), "reopen: round 2");
-  r = await roundLine();
-  ok(/^Round 2 of 5 · until \d\d:\d\d$/.test(r.text), `window 2: HUD "${r.text}"`);
-  ok((await win(FAV[0])) === "won", `window 2: caught ${FAV[0].name}`);
-  wc = (await adb.doc(`users/${p2.uid}/catches/${FAV[0].id}`).get()).data();
-  ok(wc.level === 2 && wc.favStreak === 2 && wc.lastCaughtDate.endsWith("#R2"), `window 2: ${FAV[0].name} Lv 1 → Lv 2, streak 2`);
-  ok((await favBadge(FAV[0].id)) === "Lv 2", "window 2: Home favourite card shows Lv 2");
+  // Round 2 → Lv 2.
+  await setServerClock(T + 6 * 60_000 + 30_000);
+  a = await adminAt("open");
+  ok(/^🧪 Demo round 2 of 3 · [45]:\d\d left$/.test(a.text), `demo round 2: card "${a.text}"`);
+  ok((await win(FAV[0])) === "won", `demo round 2: caught ${FAV[0].name}`);
+  wc = await wcOf();
+  ok(wc.level === 2 && wc.favStreak === 2, `demo round 2: ${FAV[0].name} → Lv 2 (streak ${wc.favStreak})`);
+
+  // Round 3 → MAX.
+  await setServerClock(T + 12 * 60_000 + 30_000);
+  a = await adminAt("open");
+  ok(/^🧪 Demo round 3 of 3 · [45]:\d\d left$/.test(a.text), `demo round 3: card "${a.text}"`);
+  ok((await win(FAV[0])) === "won", `demo round 3: caught ${FAV[0].name}`);
+  wc = await wcOf();
+  ok(wc.level === "MAX" && wc.favStreak === 3 && wc.maxBonusGiven === true, `demo round 3: ${FAV[0].name} → MAX (streak ${wc.favStreak})`);
+  ok((await favBadge(FAV[0].id)) === "MAX", "demo round 3: Home favourite card shows MAX");
+  await shot(page, "15-demo-max");
+
+  // After the demo: Closed.
+  await setServerClock(T + 18 * 60_000);
+  a = await adminAt("closed");
+  ok(a.shown && a.text === "⏸ Closed", `after the demo: card "${a.text}"`);
+
+  // Close: a new demo, closed in its round 1 → that round ends now, rounds 2 and 3 are removed.
+  await twButton("Open demo (3 rounds)").click();
+  ok(await twState("open"), "second demo: opened");
+  ok((await configRef.get()).data().rounds.length === 9, "second demo: 3 more rounds (9)");
+  await setServerClock(T + 19 * 60_000);
+  await adminAt("open");
   await twButton("Close now").click();
-  ok(await twState("closed"), "window 2 closed");
+  ok(await twState("closed"), "close: the card says Closed");
+  const cc = (await configRef.get()).data();
+  const closedAt = cc.rounds.map((x) => x.endAt.toMillis()).sort((x, y) => x - y);
+  // (the click lands a few seconds after the clock was set: "now" = 19:00 + a little)
+  const endedNow = closedAt.some((t) => t >= T + 19 * 60_000 && t < T + 20 * 60_000);
+  ok(cc.rounds.length === 7 && endedNow, `close: round ended now, the 2 not started removed (${cc.rounds.length} rounds)`);
+  r = await roundLine();
+  ok(/^Round \d starts at 11:30$/.test(r.text), `closed: HUD "${r.text}" (tomorrow's round 1 comes next)`);
 
-  // Refused on the event day (clock: tomorrow 09:00 IST, an hour before round 1).
-  await setServerClock(Date.parse(`${TOMORROW}T09:00:00+05:30`));
-  await twButton("Open for 5 minutes").click();
+  // Refused on the event day: at 10:20 tomorrow the demo's 3 rounds would end at 10:37, past 10:30
+  // (1 h before round 1 at 11:30).
+  await setServerClock(Date.parse(`${TOMORROW}T10:20:00+05:30`));
+  await adminAt("closed");
+  await twButton("Open demo (3 rounds)").click();
   const refusal = adm.page.locator("section", { has: card }).locator(".error");
   await refusal.waitFor({ timeout: 15000 });
   const rtext = (await refusal.innerText()).trim();
-  ok(/No test windows on the event day: closed from 08:00 IST .* 16:00 IST/.test(rtext), `event day: refused — "${rtext}"`);
-  ok((await configRef.get()).data().rounds.length === 5, "event day: nothing written");
+  ok(/No demo on the event day: demos end at 10:30 IST \(1 h before round 1\).*after 15:30 IST/.test(rtext), `event day: refused — "${rtext}"`);
+  ok((await configRef.get()).data().rounds.length === 7, "event day: nothing written");
   await resetServerClock();
 
   // Back to event times (confirmed): the real rounds, no backup, public/event rewritten.
+  await adminAt("closed");
   await twButton("Back to event times").click();
   ok(await twState("event"), "restore: the card says Event times active");
   const cr = (await configRef.get()).data();
-  ok(cr.rounds.length === 3 && cr.eventBackup === undefined && cr.startAt.toMillis() === Date.parse(`${TOMORROW}T10:00:00+05:30`) && cr.lockAt.toMillis() === Date.parse(`${TOMORROW}T16:00:00+05:30`), "restore: rounds, startAt, lockAt back; eventBackup gone");
+  ok(cr.rounds.length === 3 && cr.eventBackup === undefined && cr.startAt.toMillis() === Date.parse(`${TOMORROW}T11:30:00+05:30`) && cr.lockAt.toMillis() === Date.parse(`${TOMORROW}T15:30:00+05:30`), "restore: rounds, startAt, lockAt back; eventBackup gone");
   const pubR = (await publicRef.get()).data();
   ok(pubR?.date === TOMORROW && pubR.rounds.length === 3, "restore: public/event rewritten with the real rounds");
   r = await roundLine();
-  ok(r.text === "Round 1 starts at 10:00", `restore: HUD "${r.text}"`);
+  ok(r.text === "Round 1 starts at 11:30", `restore: HUD "${r.text}"`);
   errors.push(...adm.errors);
   await adm.browser.close();
 } finally {

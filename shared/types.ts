@@ -806,21 +806,25 @@ export interface PublicEventDoc {
 
 // ---------------------------------------------------------------- /admin: test window
 
-/** adminTestWindow (admin only): open a short test round now, close it, or go back to the event times. */
-export type AdminTestWindowInput =
-  | { action: "status" }
-  | { action: "open"; minutes?: number }
-  | { action: "close" }
-  | { action: "restore" };
-export const TEST_WINDOW_MAX_MINUTES = 60;
+/**
+ * adminTestWindow (admin only): "open" = a 3-round demo of the event starting now, "close" = end it
+ * now (the rounds not started yet go), "restore" = back to the event times.
+ */
+export type AdminTestWindowInput = { action: "status" } | { action: "open" } | { action: "close" } | { action: "restore" };
+/** The demo: 3 rounds of 5 minutes with 1-minute gaps ([now, +5], [+6, +11], [+12, +17]). */
+export const DEMO_ROUNDS = 3;
+export const DEMO_ROUND_MINUTES = 5;
+export const DEMO_GAP_MINUTES = 1;
 /** "open" is refused from this long before the first real round until the last one ends. */
-export const TEST_WINDOW_GUARD_MS = 2 * 3600_000;
+export const TEST_WINDOW_GUARD_MS = 1 * 3600_000;
 export interface AdminTestWindowOutput {
   serverNow: number;
   /** eventBackup exists (test windows in use) — false = the event times are active. */
   testing: boolean;
-  /** The test window open now, if any (n = its round number). */
-  open: { n: number; startAt: number; endAt: number } | null;
+  /** The demo round running now: k of `of` in the demo (n = its round number in config/game). */
+  open: { n: number; k: number; of: number; startAt: number; endAt: number } | null;
+  /** Between demo rounds: the next one. */
+  next: { k: number; of: number; startAt: number } | null;
   /** Rounds in config/game now (test windows + the real ones). */
   rounds: number;
 }

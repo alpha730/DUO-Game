@@ -3,11 +3,12 @@
 //     through them. Checks: the round line under the HUD, "Round N starts at…" between rounds (HUD
 //     + a refused Start that uses no try), both favourites going Lv 1 → Lv 2 → MAX over the 3 rounds
 //     (+1000, favMaxCount 2 = qualified), "All rounds are over", Rules showing the rounds, and the
-//     round line switching by itself at a round's end and the next start (no reload).
+//     round line switching by itself at a round's end and the next start (no reload), --off, and the
+//     admin "Test window" (open / close / reopen → Lv 1 → Lv 2, the event-day refusal, restore).
 //     config/game and the clock are put back at the end, so the other flows are unaffected.
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { adb, answerChoice, BASE, finish, istDate, launch, makeUser, ok, pinQuestions, resetServerClock, setServerClock, shot, signIn, startCatch } from "../lib.mjs";
+import { addDays, adb, answerChoice, BASE, finish, istDate, launch, makeUser, ok, pinQuestions, resetServerClock, setServerClock, shot, signIn, startCatch } from "../lib.mjs";
 
 const ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const DATE = istDate();
@@ -23,6 +24,8 @@ const publicRef = adb.doc("public/event");
 const publicBefore = (await publicRef.get()).data();
 const { browser, page, errors } = await launch();
 let p = null; // the player — removed at the end (a qualified player would top other flows' Top 20)
+let p2 = null; // the test-window player
+let twAdmin = null;
 
 try {
   // --- Turn the event on with the real script (3 short rounds today).
@@ -243,15 +246,95 @@ try {
     errors.push(...anon.errors);
     await anon.browser.close();
   }
+
+  // --- Admin "Test window" (before the event). The real rounds are TOMORROW (like prod the day
+  //     before); the clock is real time. Open → play → close → reopen: each window is the next round,
+  //     so a favourite goes Lv 1 → Lv 2. Then the event-day refusal and "Back to event times".
+  const TOMORROW = addDays(istDate(), 1);
+  execFileSync("npx", ["tsx", "scripts/oneDayEvent.ts", "--date", TOMORROW], { cwd: ROOT, shell: true, env: { ...process.env, FIRESTORE_EMULATOR_HOST: "127.0.0.1:8085" } });
+  await adb.doc("config/game").update({ locked: true }); // the event's times; play closed until a window opens
+  twAdmin = await makeUser({ name: "Window Admin", role: "admin" });
+  const adm = await launch({ viewport: { width: 420, height: 900 } });
+  adm.page.on("dialog", (d) => d.accept());
+  await signIn(adm.page, twAdmin.email);
+  await adm.page.goto(BASE + "/admin");
+  const card = adm.page.locator("[data-test-window]");
+  const twState = (v) => adm.page.waitForFunction((x) => document.querySelector("[data-test-window]")?.getAttribute("data-test-window") === x, v, { timeout: 25000 }).then(() => true, () => false);
+  const twButton = (name) => adm.page.getByRole("button", { name });
+  ok((await twState("event")) && (await card.innerText()).includes("Event times active"), `test window: "${(await card.innerText()).trim()}"`);
+
+  // Window 1.
+  await twButton("Open for 5 minutes").click();
+  ok(await twState("open"), "test window: opened");
+  const cardText = (await card.innerText()).trim();
+  ok(/Test window open · [45]:\d\d left \(round 1\)/.test(cardText), `test window: live countdown "${cardText}"`);
+  const c1 = (await configRef.get()).data();
+  ok(c1.eventBackup?.rounds?.length === 3 && c1.rounds.length === 4 && c1.locked === false, "open: the real rounds saved in eventBackup, the window appended, the game unlocked");
+  await shot(adm.page, "15-test-window-open");
+  p2 = await makeUser({ name: "Window Player" });
+  await signIn(page, p2.email);
+  r = await roundLine();
+  ok(/^Round 1 of 4 · until \d\d:\d\d$/.test(r.text) && r.active === "true", `window 1: HUD "${r.text}"`);
+  for (const f of FAV) ok((await win(f)) === "won", `window 1: caught ${f.name}`);
+  await page.goto(BASE + "/favorites");
+  for (const f of FAV) await page.getByRole("button", { name: new RegExp(f.name) }).click();
+  await page.getByRole("button", { name: "Save favourites" }).click();
+  await page.waitForURL("**/home", { timeout: 15000 });
+  let wc = (await adb.doc(`users/${p2.uid}/catches/${FAV[0].id}`).get()).data();
+  ok(wc.level === 1 && wc.favStreak === 1 && wc.lastCaughtDate.endsWith("#R1"), `window 1: ${FAV[0].name} Lv 1, streak 1 (${wc.lastCaughtDate})`);
+
+  // Close: the game is closed until the next window (the next round is tomorrow's).
+  await twButton("Close now").click();
+  ok(await twState("closed"), "test window: closed");
+  ok((await card.innerText()).includes("Closed"), "close: the card says Closed");
+  r = await roundLine();
+  ok(r.text === "Round 2 starts at 10:00" && r.active === "false", `closed: HUD "${r.text}" (tomorrow's round 1 comes next)`);
+
+  // Window 2: the next round → the favourite goes Lv 2.
+  await twButton("Open for 5 minutes").click();
+  ok(await twState("open"), "test window: reopened");
+  ok((await card.innerText()).includes("(round 2)"), "reopen: round 2");
+  r = await roundLine();
+  ok(/^Round 2 of 5 · until \d\d:\d\d$/.test(r.text), `window 2: HUD "${r.text}"`);
+  ok((await win(FAV[0])) === "won", `window 2: caught ${FAV[0].name}`);
+  wc = (await adb.doc(`users/${p2.uid}/catches/${FAV[0].id}`).get()).data();
+  ok(wc.level === 2 && wc.favStreak === 2 && wc.lastCaughtDate.endsWith("#R2"), `window 2: ${FAV[0].name} Lv 1 → Lv 2, streak 2`);
+  ok((await favBadge(FAV[0].id)) === "Lv 2", "window 2: Home favourite card shows Lv 2");
+  await twButton("Close now").click();
+  ok(await twState("closed"), "window 2 closed");
+
+  // Refused on the event day (clock: tomorrow 09:00 IST, an hour before round 1).
+  await setServerClock(Date.parse(`${TOMORROW}T09:00:00+05:30`));
+  await twButton("Open for 5 minutes").click();
+  const refusal = adm.page.locator("section", { has: card }).locator(".error");
+  await refusal.waitFor({ timeout: 15000 });
+  const rtext = (await refusal.innerText()).trim();
+  ok(/No test windows on the event day: closed from 08:00 IST .* 16:00 IST/.test(rtext), `event day: refused — "${rtext}"`);
+  ok((await configRef.get()).data().rounds.length === 5, "event day: nothing written");
+  await resetServerClock();
+
+  // Back to event times (confirmed): the real rounds, no backup, public/event rewritten.
+  await twButton("Back to event times").click();
+  ok(await twState("event"), "restore: the card says Event times active");
+  const cr = (await configRef.get()).data();
+  ok(cr.rounds.length === 3 && cr.eventBackup === undefined && cr.startAt.toMillis() === Date.parse(`${TOMORROW}T10:00:00+05:30`) && cr.lockAt.toMillis() === Date.parse(`${TOMORROW}T16:00:00+05:30`), "restore: rounds, startAt, lockAt back; eventBackup gone");
+  const pubR = (await publicRef.get()).data();
+  ok(pubR?.date === TOMORROW && pubR.rounds.length === 3, "restore: public/event rewritten with the real rounds");
+  r = await roundLine();
+  ok(r.text === "Round 1 starts at 10:00", `restore: HUD "${r.text}"`);
+  errors.push(...adm.errors);
+  await adm.browser.close();
 } finally {
   await resetServerClock();
   if (configBefore) await configRef.set(configBefore); // back to the multi-day game for the other flows
   if (publicBefore) await publicRef.set(publicBefore);
   else await publicRef.delete();
-  if (p) {
-    const catches = await adb.collection(`users/${p.uid}/catches`).get();
-    await Promise.all([...catches.docs.map((d) => d.ref.delete()), adb.doc(`users/${p.uid}`).delete()]);
+  for (const u of [p, p2]) {
+    if (!u) continue;
+    const catches = await adb.collection(`users/${u.uid}/catches`).get();
+    await Promise.all([...catches.docs.map((d) => d.ref.delete()), adb.doc(`users/${u.uid}`).delete()]);
   }
+  if (twAdmin) await adb.doc(`users/${twAdmin.uid}`).delete();
 }
 ok(!(await configRef.get()).data().rounds, "config/game restored (no rounds)");
 ok(!(await publicRef.get()).exists || !!publicBefore, "public/event removed again (the multi-day game shows no rounds)");

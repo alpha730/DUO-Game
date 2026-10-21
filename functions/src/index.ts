@@ -30,3 +30,4 @@ export { redeemPrize } from "./fns/redeemPrize";
 export { adminStageQuestion } from "./fns/adminStageQuestion";
 export { deskPlayer } from "./fns/deskPlayer";
 export { adminPrizes } from "./fns/adminPrizes";
+export { adminTestWindow } from "./fns/adminTestWindow";

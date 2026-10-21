@@ -7,6 +7,8 @@ import type {
   AdminPrizesOutput,
   AdminSetConfigInput,
   AdminStageQuestionInput,
+  AdminTestWindowInput,
+  AdminTestWindowOutput,
   AdminStageQuestionOutput,
   AdminStatsOutput,
   AdminUpsertQuestionsInput,
@@ -113,6 +115,7 @@ export const api = {
   adminSetDisabled: call<{ uid: string; disabled: boolean }, { uid: string; disabled: boolean }>("adminSetDisabled"),
   adminTop20: call<Record<string, never>, AdminPlayersOutput>("adminTop20", 60_000),
   adminPrizes: call<AdminPrizesInput, AdminPrizesOutput>("adminPrizes"),
+  adminTestWindow: call<AdminTestWindowInput, AdminTestWindowOutput>("adminTestWindow"),
   // Prize desk (/redeem, volunteer or admin — the server checks).
   deskPlayer: call<DeskPlayerInput, DeskPlayerOutput>("deskPlayer"),
   redeemPrize: call<RedeemPrizeInput, RedeemPrizeOutput>("redeemPrize"),

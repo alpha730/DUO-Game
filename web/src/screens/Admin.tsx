@@ -10,6 +10,7 @@ import {
   QUESTION_TYPES,
   type AdminPlayerRow,
   type AdminPrizeRow,
+  type AdminTestWindowOutput,
   type AdminStatsOutput,
   type AdminUploadError,
   type ChallengeInput,
@@ -21,6 +22,7 @@ import {
 import { BRAND, lingoName } from "../config/brand";
 import { api, apiErrorMessage } from "../lib/api";
 import { loadLingos, type Lingo } from "../lib/lingos";
+import { useServerNow } from "../components/GameClock";
 
 // All admin times are typed and shown in IST (CLAUDE.md: Asia/Kolkata), whatever the laptop's zone.
 const IST_MS = 5.5 * 3600 * 1000;
@@ -122,6 +124,68 @@ function GameLock({ config, reload }: { config: GameConfigDoc; reload: () => voi
       <button className={config.locked ? "btn" : "btn danger"} onClick={toggle} disabled={busy}>
         {config.locked ? "Unlock game" : "Lock game now"}
       </button>
+      <StatusLine status={status} />
+    </Section>
+  );
+}
+
+const mmss = (ms: number) => {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+};
+
+/**
+ * Test window (before the event): a 5-minute test round on the real game. The server saves the event
+ * times on the first open and refuses on the event day (adminTestWindow, lib/testWindow.ts).
+ */
+function TestWindow({ reload }: { reload: () => void }) {
+  const [tw, setTw] = useState<{ out: AdminTestWindowOutput; offset: number } | null>(null);
+  const { busy, status, run } = useAction();
+  const now = useServerNow(tw?.offset ?? 0);
+  const apply = useCallback((out: AdminTestWindowOutput) => setTw({ out, offset: out.serverNow - Date.now() }), []);
+  useEffect(() => {
+    api.adminTestWindow({ action: "status" }).then(apply, () => {});
+  }, [apply]);
+  const act = (action: "open" | "close" | "restore", done: string) =>
+    run(async () => {
+      apply(await api.adminTestWindow(action === "open" ? { action, minutes: 5 } : { action }));
+      reload(); // the Lock / Config cards show the new times
+      return done;
+    }).catch(() => {});
+  const restore = () => {
+    if (!window.confirm("Go back to the event times? Test windows end and the real rounds come back.")) return;
+    act("restore", "Event times are back.");
+  };
+
+  const open = tw?.out.open && now < tw.out.open.endAt ? tw.out.open : null;
+  const state = !tw ? "loading" : open ? "open" : tw.out.testing ? "closed" : "event";
+  return (
+    <Section title="Test window">
+      <p style={{ margin: 0 }} data-test-window={state} role="status">
+        {state === "loading" && "…"}
+        {open && (
+          <>
+            🧪 Test window open · <strong data-countdown>{mmss(open.endAt - now)}</strong> left (round {open.n})
+          </>
+        )}
+        {state === "closed" && "⏸ Closed — test windows in use; the event times are saved."}
+        {state === "event" && "📅 Event times active."}
+      </p>
+      <p className="small muted" style={{ margin: 0 }}>
+        Opens a 5-minute round now with the real rules, so the team can play it through. Each window is the next
+        round, so favourites level up window to window. Not possible on the event day.
+      </p>
+      <div className="row" style={{ flexWrap: "wrap" }}>
+        <button className="btn small" onClick={() => act("open", "Test window open for 5 minutes.")} disabled={busy || !tw || !!open}>
+          Open for 5 minutes
+        </button>
+        <button className="btn small secondary" onClick={() => act("close", "Test window closed.")} disabled={busy || !open}>
+          Close now
+        </button>
+        <button className="btn small danger" onClick={restore} disabled={busy || !tw?.out.testing}>
+          Back to event times
+        </button>
+      </div>
       <StatusLine status={status} />
     </Section>
   );
@@ -783,6 +847,7 @@ export default function Admin() {
       {error && <p className="error">{error}</p>}
       <Stats key={statsKey} />
       {config && <GameLock config={config} reload={reload} />}
+      <TestWindow reload={reload} />
       {config && <ConfigForm config={config} reload={reload} />}
       <QuestionUpload onDone={() => setStatsKey((k) => k + 1)} />
       {lingos.length > 0 && <CreateRaid lingos={lingos} />}

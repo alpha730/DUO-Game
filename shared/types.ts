@@ -234,6 +234,11 @@ export interface GameConfigDoc {
    * row. Absent → the original multi-day game.
    */
   rounds?: GameRound[];
+  /**
+   * Admin "Test window" (adminTestWindow): the real event times, saved on the first test open and put
+   * back by "Back to event times". Present = test windows are in use.
+   */
+  eventBackup?: { rounds: GameRound[]; startAt: FireTimestamp; lockAt: FireTimestamp };
 }
 
 /** Seconds allowed for each challenge type. */
@@ -797,4 +802,25 @@ export interface PublicEventDoc {
   /** IST date of the event, YYYY-MM-DD */
   date: IstDate;
   rounds: GameRound[];
+}
+
+// ---------------------------------------------------------------- /admin: test window
+
+/** adminTestWindow (admin only): open a short test round now, close it, or go back to the event times. */
+export type AdminTestWindowInput =
+  | { action: "status" }
+  | { action: "open"; minutes?: number }
+  | { action: "close" }
+  | { action: "restore" };
+export const TEST_WINDOW_MAX_MINUTES = 60;
+/** "open" is refused from this long before the first real round until the last one ends. */
+export const TEST_WINDOW_GUARD_MS = 2 * 3600_000;
+export interface AdminTestWindowOutput {
+  serverNow: number;
+  /** eventBackup exists (test windows in use) — false = the event times are active. */
+  testing: boolean;
+  /** The test window open now, if any (n = its round number). */
+  open: { n: number; startAt: number; endAt: number } | null;
+  /** Rounds in config/game now (test windows + the real ones). */
+  rounds: number;
 }

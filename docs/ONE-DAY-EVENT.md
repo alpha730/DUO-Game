@@ -6,7 +6,7 @@ is now "per round", and a favourite's streak counts **rounds in a row**.
 Turn it on (or change the times) with:
 
 ```
-npx tsx scripts/oneDayEvent.ts --prod --project decade-hunt-66f6e --rounds 10:00-11:30,12:30-14:00,15:00-16:00
+npx tsx scripts/oneDayEvent.ts --prod --project decade-hunt-66f6e --rounds 11:30-12:30,13:00-14:00,14:30-15:30
 ```
 
 (IST times; `--date 2026-10-22` is the default; `--dry-run` shows what it would write.)
@@ -42,7 +42,7 @@ npx tsx scripts/resetForEvent.ts --prod --project decade-hunt-66f6e --yes    # d
 
 | | |
 |---|---|
-| Rounds | 3 (default 10:00–11:30, 12:30–14:00, 15:00–16:00 IST). Between rounds new tries are closed ("Round 2 starts at 12:30"). An answer to a question started in a round still counts. |
+| Rounds | 3 (default 11:30–12:30, 13:00–14:00, 14:30–15:30 IST). Between rounds new tries are closed ("Round 2 starts at 13:00"). An answer to a question started in a round still counts. |
 | Each round | 5 different Lingos, 2 tries each (2 favourites + 3 new, 3 new, 2 new = all 10 by round 3, with 1 spare). A catch closes that Lingo for the round. Resets when the next round starts. |
 | Levels | **Three**: Lv 1 → Lv 2 → MAX (level 3 is never given). |
 | Favourites | Pick **2** after the first 2 catches. **No changes.** Rounds caught before picking count. |

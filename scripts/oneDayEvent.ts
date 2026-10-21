@@ -5,7 +5,7 @@
 // anyone can read (the login screen + Rules show the times before sign-in). Nothing else is touched.
 //   Emulator (default):  npx tsx scripts/oneDayEvent.ts
 //   Production:          GOOGLE_APPLICATION_CREDENTIALS=key.json npx tsx scripts/oneDayEvent.ts --prod --project <id>
-//   Options:             --date 2026-10-22   --rounds 10:00-11:30,12:30-14:00,15:00-16:00   --dry-run
+//   Options:             --date 2026-10-22   --rounds 11:30-12:30,13:00-14:00,14:30-15:30   --dry-run
 //   Turn it off:         --off  removes `rounds` from config/game and deletes public/event (back to the
 //                        multi-day game; times, lock and rules are left as they are)
 // Times are IST. Re-run it to change the times.
@@ -22,7 +22,7 @@ const prod = args.includes("--prod");
 const dry = args.includes("--dry-run");
 const projectId = opt("project", "demo-decade-hunt");
 const date = opt("date", "2026-10-22");
-const spec = opt("rounds", "10:00-11:30,12:30-14:00,15:00-16:00");
+const spec = opt("rounds", "11:30-12:30,13:00-14:00,14:30-15:30");
 if (!prod) process.env.FIRESTORE_EMULATOR_HOST ??= "127.0.0.1:8085";
 if (prod && projectId.startsWith("demo-")) throw new Error("--prod needs --project <real project id>");
 if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("--date must be YYYY-MM-DD");

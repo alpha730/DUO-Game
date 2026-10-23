@@ -30,9 +30,16 @@ Claude outputs/
 # E2E output (screenshots, logs)
 e2e/out/
 
-# Licensed Duolingo brand fonts + raw downloads (do not publish)
-assets/brand/fonts/
-assets/brand/_to_delete/
+# Official Duolingo / DET + JECRC brand assets: supplied for this event only, never in the repo
+# (history was rewritten to remove them). Only assets/brand/README.md is tracked — it says what
+# goes where. Keep a copy outside the repo.
+assets/brand/*
+!assets/brand/README.md
+assets/posters/final/
+assets/test-posters/
+assets/targets.mind
+docs/DET-brand-board.png
+docs/DET-DESIGN.md
 
 # Brand-derived app icons (web/scripts/app-icons.mjs)
 web/public/brand-icons/

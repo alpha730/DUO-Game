@@ -1,8 +1,64 @@
 # Decade Hunt
 
-The campus AR game for the Duolingo English Test's 10-year celebration at JECRC, Jaipur.
+A campus augmented-reality game, built for the Duolingo English Test's 10-year celebration at JECRC
+University, Jaipur. Players find posters around campus and point their phone at one: a creature
+(a "Lingo") appears on the camera. They catch it by answering a quick English question, either
+reading a word aloud or picking a word's meaning, and climb a live leaderboard.
+
+> **Official Duolingo / DET brand assets are not included in this repository.** The app runs with
+> its own placeholder look; see [Run it with the placeholder brand](#run-it-with-the-placeholder-brand).
+
+## Features
+
+- **AR posters.** Image tracking ([MindAR](https://github.com/hiukim/mind-ar-js)) places a Lingo on
+  each of the 10 posters. It's a paper-standee in three.js, with a look for each level.
+- **English challenges.** Read aloud (browser speech recognition, `en-IN`), word meanings and
+  fill-in-the-blanks, from a pool of 456 questions in two levels. Questions are timed by the server.
+- **Progression.** Levels Lv 1 → Lv 2 → MAX, 2 favourites with streaks, a Dex of all 10 Lingos, and
+  points with speed bonuses.
+- **One-day event mode.** Three timed rounds instead of days, with a live round line. A 3-round
+  demo can be started from the admin page before the event.
+- **Owl Raids.** Timed group catches that unlock when enough players join.
+- **Staff tools.**
+  - `/admin`: config, question upload, prizes, suspicious players, a top-20 CSV export, and lock /
+    unlock.
+  - `/stage`: a projector screen with a countdown, the live top 10 and a sudden-death question.
+  - `/redeem`: a prize desk that scans the player's QR code.
+- **Anti-cheat.** The phone never writes to the database. All points are calculated on the server,
+  answers are never sent before the player answers, Firebase App Check is enforced, and there are
+  rate limits, speed / voice / location flags and possible-duplicate detection.
+
+## Tech stack
+
+| Part | Built with |
+|---|---|
+| Web app (`web/`) | React 18, Vite, TypeScript, react-router, Firebase JS SDK, three.js + MindAR |
+| Backend (`functions/`) | Firebase Cloud Functions v2 (Node 20, TypeScript), region `asia-south1` |
+| Data & auth | Cloud Firestore, Firebase Auth (Google + email/password), App Check (reCAPTCHA Enterprise) |
+| Hosting | Firebase Hosting |
+| Shared types | `shared/types.ts` (one source for data shapes and function I/O) |
+| Tests | Vitest (unit, emulator, Firestore rules), Playwright end-to-end (Chromium + WebKit) |
+
+## Run it with the placeholder brand
+
+Needs Node 20+ and the Firebase CLI (`npm i -g firebase-tools`). Everything runs on the local
+Firebase emulators, so no Firebase project or keys are needed.
+
+1. In `web/src/config/brand.ts` set `ACTIVE_BRAND = "placeholder"`. That's one line, and the app
+   then uses its own colours, fonts and creatures.
+2. Install: `npm install` in `web/`, `functions/` and `scripts/`.
+3. Start the emulators and seed them, then start the web app (see the commands just below).
+   `web/.env.development` already points the app at the emulators. Open http://localhost:5173 and
+   sign up with any email.
+
+Without the poster targets (`assets/targets.mind`) the Scan screen shows an error. The other
+screens and the end-to-end tests (which use a fake scanner) work. What the official files are and
+where they go: [assets/brand/README.md](assets/brand/README.md).
+
+## Project docs
+
 What to build: [docs/SPEC.md](docs/SPEC.md). Security and anti-cheat: [docs/SECURITY.md](docs/SECURITY.md).
-Working rules: [CLAUDE.md](CLAUDE.md).
+The one-day event: [docs/ONE-DAY-EVENT.md](docs/ONE-DAY-EVENT.md). Working rules: [CLAUDE.md](CLAUDE.md).
 
 ## Run it locally
 

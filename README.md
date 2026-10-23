@@ -44,8 +44,9 @@ reading a word aloud or picking a word's meaning, and climb a live leaderboard.
 Needs Node 20+ and the Firebase CLI (`npm i -g firebase-tools`). Everything runs on the local
 Firebase emulators, so no Firebase project or keys are needed.
 
-1. In `web/src/config/brand.ts` set `ACTIVE_BRAND = "placeholder"`. That's one line, and the app
-   then uses its own colours, fonts and creatures.
+1. In `web/src/config/brand.ts` change one line to
+   `export const ACTIVE_BRAND = "placeholder" as "official" | "placeholder";`. The app then uses its
+   own colours, fonts and creatures.
 2. Install: `npm install` in `web/`, `functions/` and `scripts/`.
 3. Start the emulators and seed them, then start the web app (see the commands just below).
    `web/.env.development` already points the app at the emulators. Open http://localhost:5173 and

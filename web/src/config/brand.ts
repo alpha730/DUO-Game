@@ -5,7 +5,9 @@
 // Official files come ONLY from the Duolingo team (assets/brand/ → copied to /brand/ at build). An
 // official item whose file isn't supplied yet falls back to the placeholder (see BRAND_PENDING).
 
-export const ACTIVE_BRAND: "official" | "placeholder" = "official";
+// `as` keeps the full type, so switching the value to "placeholder" still compiles (a plain annotation
+// lets TypeScript narrow the constant, and `ACTIVE_BRAND === "official"` below then fails to build).
+export const ACTIVE_BRAND = "official" as "official" | "placeholder";
 
 /** Files present in assets/brand/{fonts,logos,mascots,models} (filled in by vite.config.ts). */
 declare const __BRAND_FILES__: string[];

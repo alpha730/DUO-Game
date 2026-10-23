@@ -5,8 +5,26 @@ University, Jaipur. Players find posters around campus and point their phone at 
 (a "Lingo") appears on the camera. They catch it by answering a quick English question, either
 reading a word aloud or picking a word's meaning, and climb a live leaderboard.
 
-> **Official Duolingo / DET brand assets are not included in this repository.** The app runs with
-> its own placeholder look; see [Run it with the placeholder brand](#run-it-with-the-placeholder-brand).
+> **Official Duolingo / DET brand assets are not included in this repository.** The screenshots
+> below show the official look used at the event. A clone of this repo runs with its own placeholder
+> look; see [Run it with the placeholder brand](#run-it-with-the-placeholder-brand).
+
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/01-splash.jpg" width="200" alt="Splash screen: the DET 10 × JECRC lockup and Decade Hunt"><br><sub>Splash</sub></td>
+    <td align="center"><img src="docs/screenshots/03-login-rounds.jpg" width="200" alt="Login with the three round times shown before sign-in"><br><sub>Login with the day's rounds</sub></td>
+    <td align="center"><img src="docs/screenshots/04-rules.jpg" width="200" alt="Game rules: one day, three rounds"><br><sub>Game rules</sub></td>
+    <td align="center"><img src="docs/screenshots/02-about.jpg" width="200" alt="About Decade Hunt sheet"><br><sub>About</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/05-ar-scan.jpg" width="200" alt="AR scan: a Lingo standee on a poster with Catch it"><br><sub>AR scan on a poster</sub></td>
+    <td align="center"><img src="docs/screenshots/06-dex.jpg" width="200" alt="Dex: all 10 Lingos with levels and the live round line"><br><sub>Dex and the round line</sub></td>
+    <td align="center"><img src="docs/screenshots/07-share-card.jpg" width="200" alt="Share card: I caught 10/10 Lingos"><br><sub>Share card</sub></td>
+    <td></td>
+  </tr>
+</table>
 
 ## Features
 
